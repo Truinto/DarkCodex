@@ -10,8 +10,8 @@
     <GOGFolder>D:\Programme\GOG Galaxy\Games\</GOGFolder>
     <WrathManaged Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Wrath_Data\Managed</WrathManaged>
     <WrathManaged Condition="!Exists('$(GOGFolder)')">..\..\$non-backup\KM2 sources</WrathManaged>
-    <KMMods Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Mods</KMMods>
-    <KMMods Condition="!Exists('$(GOGFolder)')">..\..\$non-backup\KM2 sources</KMMods>
+    <ModFolder Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Mods</ModFolder>
+    <ModFolder Condition="!Exists('$(GOGFolder)')">..\..\$non-backup\KM2 sources</ModFolder>
   </PropertyGroup>
   
   <!-- Common references -->
@@ -26,7 +26,7 @@
     <Reference Include="System.Net.Http"/>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="UnityModManager" HintPath="$(WrathManaged)UnityModManager\UnityModManager.dll" />
+    <Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
     <Reference Include="0Harmony" HintPath="$(WrathManaged)\0Harmony.dll" />
     <Reference Include="Assembly-CSharp" HintPath="$(WrathManaged)\Assembly-CSharp.dll" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />

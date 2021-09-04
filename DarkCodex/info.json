@@ -1,0 +1,12 @@
+{
+  "Id": "DarkCodex",
+  "DisplayName": "DarkCodex",
+  "Author": "Fumihiko",
+  "Version": "1.0.1",
+  "ManagerVersion": "0.23.0",
+  "Requirements": [],
+  "AssemblyName": "DarkCodex.dll",
+  "HomePage": "https://github.com/Truinto/DarkCodex",
+  "Repository": "https://raw.githubusercontent.com/Truinto/DarkCodex/master/DarkCodex/Settings/Repository.json",
+  "EntryMethod": "DarkCodex.Main.Load"
+}
