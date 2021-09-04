@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemDefinitionGroup>
+    <Reference Private="false" />
+    <ProjectReference Private="false" />
+  </ItemDefinitionGroup>
+    
+  <!-- Source folders -->
+  <PropertyGroup>
+    <GOGFolder>D:\Programme\GOG Galaxy\Games\</GOGFolder>
+    <WrathManaged Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Wrath_Data\Managed</WrathManaged>
+    <WrathManaged Condition="!Exists('$(GOGFolder)')">..\..\$non-backup\KM2 sources</WrathManaged>
+    <KMMods Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Mods</KMMods>
+    <KMMods Condition="!Exists('$(GOGFolder)')">..\..\$non-backup\KM2 sources</KMMods>
+  </PropertyGroup>
+  
+  <!-- Common references -->
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions"/>
+    <Reference Include="Microsoft.CSharp"/>
+    <Reference Include="System.Data"/>
+    <Reference Include="System.Net.Http"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnityModManager" HintPath="$(WrathManaged)UnityModManager\UnityModManager.dll" />
+    <Reference Include="0Harmony" HintPath="$(WrathManaged)\0Harmony.dll" />
+    <Reference Include="Assembly-CSharp" HintPath="$(WrathManaged)\Assembly-CSharp.dll" />
+    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
+    <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
+    <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
+    <Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
+    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
+    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
+    <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <Product>DarkCodex</Product>
+    <Authors>Fumihiko</Authors>
+    <Copyright>Copyright ©Fumihiko 2021</Copyright>
+  </PropertyGroup>
+</Project>
+
