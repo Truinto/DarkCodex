@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityModManagerNet;
 using HarmonyLib;
 using Guid = DarkCodex.GuidManager;
+using DarkCodex.Components;
 
 namespace DarkCodex
 {
@@ -24,28 +25,7 @@ namespace DarkCodex
         /// <summary>Path of current mod.</summary>
         public static string ModPath;
 
-        #region logging
-
-        static UnityModManager.ModEntry.ModLogger logger;
-
-        /// <summary>Only prints message, if compiled on DEBUG.</summary>
-        [System.Diagnostics.Conditional("DEBUG")]
-        internal static void DebugLog(string msg)
-        {
-            logger?.Log(msg);
-        }
-
-        internal static void DebugLogAlways(string msg)
-        {
-            logger?.Log(msg);
-        }
-
-        internal static void DebugError(Exception ex)
-        {
-            logger?.LogException(ex);
-        }
-
-        #endregion
+        internal static UnityModManager.ModEntry.ModLogger logger;
 
         #region GUI
 
@@ -61,7 +41,8 @@ namespace DarkCodex
 
         private static bool bExpand = false;
         private static string[] loadSaveOptions = new string[] {
-            "xxx.*",
+            "Kineticist.*",
+            "Kineticist.createKineticistBackground",
         };
 
         /// <summary>Draws the GUI</summary>
@@ -131,7 +112,7 @@ namespace DarkCodex
                 }
                 catch (Exception)
                 {
-                    Main.DebugLogAlways($"Error while parsing number '{entry.Value}' for '{entry.Key}'");
+                    Helper.Print($"Error while parsing number '{entry.Value}' for '{entry.Key}'");
                 }
             }
 
@@ -210,7 +191,7 @@ namespace DarkCodex
             }
             catch (Exception ex)
             {
-                DebugError(ex);
+                Helper.PrintException(ex);
             }
 
 
@@ -224,28 +205,32 @@ namespace DarkCodex
         [HarmonyPatch(typeof(StartGameLoader), "LoadAllJson")]
         public static class StartGameLoader_LoadAllJson
         {
-            static bool Run = false;
-            static void Postfix()
+            private static bool Run = false;
+            public static void Postfix()
             {
                 if (Run) return; Run = true;
 
                 try
                 {
-                    Main.DebugLogAlways("Loading Dark Codex");
-
+                    Helper.Print("Loading Dark Codex");
                     //LoadSafe(CotW.modSlumber, Settings.StateManager.State.slumberHDrestriction);
+                    LoadSafe(Kineticist.createKineticistBackground);
+                    LoadSafe(Kineticist.createMobileGatheringFeat);
+                    LoadSafe(Hexcrafter.fixProgression);
 
-                    Main.DebugLogAlways("Finished loading Dark Codex");
+                    LoadSafe(Items.patchArrows);
+                    LoadSafe(RestoreEndOfCombat.Activate);
 
-                    //if (Settings.StateManager.State.debugEnsureGuids) Guid.i.Ensure(); does not work... too bad
+                    Helper.Print("Finished loading Dark Codex");
+
 #if DEBUG
-                    Main.DebugLog("Running in debug.");
+                    Helper.PrintDebug("Running in debug.");
                     Guid.i.WriteAll();
 #endif
                 }
                 catch (Exception ex)
                 {
-                    Main.DebugError(ex);
+                    Helper.PrintException(ex);
                 }
             }
         }
@@ -263,17 +248,17 @@ namespace DarkCodex
 
             if (CheckSetting(name))
             {
-                Main.DebugLogAlways($"Skipped loading {name}");
+                Helper.Print($"Skipped loading {name}");
                 return false;
             }
 
             try
             {
-                Main.DebugLogAlways($"Loading {name}");
+                Helper.Print($"Loading {name}");
                 action();
 #if DEBUG
                 watch.Stop();
-                Main.DebugLog("Loaded in milliseconds: " + watch.ElapsedMilliseconds);
+                Helper.PrintDebug("Loaded in milliseconds: " + watch.ElapsedMilliseconds);
 #endif
                 return true;
             }
@@ -282,7 +267,7 @@ namespace DarkCodex
 #if DEBUG
                 watch.Stop();
 #endif
-                Main.DebugError(e);
+                Helper.PrintException(e);
                 return false;
             }
         }
@@ -296,17 +281,17 @@ namespace DarkCodex
 
             if (CheckSetting(name))
             {
-                Main.DebugLogAlways($"Skipped loading {name}");
+                Helper.Print($"Skipped loading {name}");
                 return false;
             }
 
             try
             {
-                Main.DebugLogAlways($"Loading {name}:{flag}");
+                Helper.Print($"Loading {name}:{flag}");
                 action(flag);
 #if DEBUG
                 watch.Stop();
-                Main.DebugLog("Loaded in milliseconds: " + watch.ElapsedMilliseconds);
+                Helper.PrintDebug("Loaded in milliseconds: " + watch.ElapsedMilliseconds);
 #endif
                 return true;
             }
@@ -315,7 +300,7 @@ namespace DarkCodex
 #if DEBUG
                 watch.Stop();
 #endif
-                Main.DebugError(e);
+                Helper.PrintException(e);
                 return false;
             }
         }
@@ -353,7 +338,7 @@ namespace DarkCodex
                     return 0;
 
                 ExtraGroups++;
-                Main.DebugLog("GetNewGroup new: " + (Enum.GetValues(typeof(ActivatableAbilityGroup)).Cast<int>().Max() + ExtraGroups).ToString());
+                Helper.PrintDebug("GetNewGroup new: " + (Enum.GetValues(typeof(ActivatableAbilityGroup)).Cast<int>().Max() + ExtraGroups).ToString());
                 return (ActivatableAbilityGroup)(Enum.GetValues(typeof(ActivatableAbilityGroup)).Cast<int>().Max() + ExtraGroups);
             }
 

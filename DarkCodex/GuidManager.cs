@@ -44,7 +44,7 @@ namespace DarkCodex
                         guid_list[items[0]] = items[1];
                 }
             } catch (Exception e) {
-                Main.DebugLogAlways(e.ToString());
+                Helper.Print(e.ToString());
             }
         }
 
@@ -72,15 +72,15 @@ namespace DarkCodex
                 foreach (KeyValuePair<string, string> pair in guid_list)
                 {
                     SimpleBlueprint obj = null;
-                    try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(pair.Value); } catch (Exception e) { Main.DebugLogAlways("WriteAll guid_list: " + e.Message); }
+                    try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(pair.Value); } catch (Exception e) { Helper.Print("WriteAll guid_list: " + e.Message); }
                     if (obj != null)
                     {
                         writer.WriteLine(pair.Key + '\t' + pair.Value + '\t' + obj.GetType().FullName);
-                        if (pair.Key != obj.name) Main.DebugLogAlways(pair.Key + " != " + obj.name);
+                        if (pair.Key != obj.name) Helper.Print(pair.Key + " != " + obj.name);
                     }
                     else
                     {
-                        Main.DebugLogAlways(pair.Value + " does not exist");
+                        Helper.Print(pair.Value + " does not exist");
                         writer.WriteLine(pair.Key + '\t' + pair.Value + '\t' + "NULL");
                     }
                 }
@@ -91,14 +91,14 @@ namespace DarkCodex
                         continue;
 
                     BlueprintScriptableObject obj = null;
-                    try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(guid); } catch (Exception e) { Main.DebugLogAlways("WriteAll register: " + e.Message); }
+                    try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(guid); } catch (Exception e) { Helper.Print("WriteAll register: " + e.Message); }
                     if (obj != null)
                     {
                         writer.WriteLine(obj.name + '\t' + guid + '\t' + obj.GetType().FullName);
                     }
                     else
                     {
-                        Main.DebugLogAlways(guid + " does not exist");
+                        Helper.Print(guid + " does not exist");
                         writer.WriteLine("UNKNOWN" + '\t' + guid + '\t' + "NULL");
                     }
                 }
@@ -127,7 +127,7 @@ namespace DarkCodex
                 if (!allow_guid_generation)
                     throw new Exception("Tried to generate a new GUID while not allowed! " + key);
 
-                Main.DebugLogAlways("Warning: Generating new GUID for " + key);
+                Helper.Print("Warning: Generating new GUID for " + key);
                 result = Guid.NewGuid().ToString("N");
                 guid_list[key] = result;
                 Write(key, result);
