@@ -22,5 +22,11 @@ namespace DarkCodex
             ColdIronArrowsQuiverItem.AddComponents(new RestoreEndOfCombat());
             ColdIronArrowsQuiverItem_20Charges.ComponentsArray = ColdIronArrowsQuiverItem.ComponentsArray;
         }
+
+        public static void patchTerendelevScale()
+        {
+            var TerendelevScaleItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("816f244523b5455a85ae06db452d4330");
+            TerendelevScaleItem.RestoreChargesOnRest = true;
+        }
     }
 }

@@ -1,10 +1,12 @@
-﻿using Kingmaker.UnitLogic.Commands.Base;
+﻿using Kingmaker;
+using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TurnBased.Controllers;
 
 namespace DarkCodex.Components
 {
@@ -22,44 +24,61 @@ namespace DarkCodex.Components
 
         public override void RunAction()
         {
-            var cooldown = this.Context.MaybeCaster?.CombatState.Cooldown;
+            if (this.Context.MaybeCaster == null)
+                return;
 
-            if (Amount >= 0f)
+            TurnController currentTurn = null;
+
+            if (CombatController.IsInTurnBasedCombat()
+                && this.Context.MaybeCaster.IsCurrentUnit())
+                currentTurn = Game.Instance.TurnBasedCombatController.CurrentTurn;
+
+            Helper.PrintDebug($"pre  UndoAction GainTime={GainTime} TimeMoved={currentTurn?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime()}");
+
+            var cooldown = this.Context.MaybeCaster.CombatState.Cooldown;
+            if (GainTime >= 0f) // gain time
                 switch (Command)
                 {
                     case UnitCommand.CommandType.Standard:
-                        if (cooldown.StandardAction > 0)
-                            cooldown.StandardAction = 0f;
-                        else if (!Strict)
-                            cooldown.MoveAction = Math.Max(0, cooldown.MoveAction - Amount);
+                        cooldown.StandardAction = 0f;
                         break;
                     case UnitCommand.CommandType.Move:
-                        cooldown.MoveAction = Math.Max(0, cooldown.MoveAction - Amount);
+                        cooldown.MoveAction = Math.Max(0, cooldown.MoveAction - GainTime);
+                        if (ForceMove && currentTurn != null)
+                        {
+                            currentTurn.TimeMoved = cooldown.MoveAction;
+                            //currentTurn.TrySelectMovementLimit();
+                        }
                         break;
                     case UnitCommand.CommandType.Swift:
                         cooldown.SwiftAction = 0f;
                         break;
                 }
-            else
+            else            // lose time
                 switch (Command)
                 {
                     case UnitCommand.CommandType.Standard:
-                        if (cooldown.StandardAction <= 0)
-                            cooldown.StandardAction = 6f;
-                        else if (!Strict)
-                            cooldown.MoveAction = Math.Min(6, cooldown.MoveAction - Amount);
+                        cooldown.StandardAction = 6f;
                         break;
                     case UnitCommand.CommandType.Move:
-                        cooldown.MoveAction = Math.Max(cooldown.MoveAction, Math.Min(Strict ? 6 : 3, cooldown.MoveAction - Amount));
+                        if (ForceMove && currentTurn != null)
+                        {
+                            //currentTurn.TickMovement()
+                            currentTurn.TimeMoved -= GainTime;
+                            //currentTurn.TrySelectMovementLimit();
+                        }
+                        cooldown.MoveAction = Math.Min(6f, cooldown.MoveAction - GainTime);
                         break;
                     case UnitCommand.CommandType.Swift:
                         cooldown.SwiftAction = 6f;
                         break;
                 }
+
+            Helper.PrintDebug($"post UndoAction GainTime={GainTime} TimeMoved={currentTurn?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime()}");
         }
 
-        public bool Strict;
-        public float Amount = 1.5f;
+        public bool ForceMove = true; // counts as movement
+        public float GainTime = 1.5f; // gain half a move action
         public UnitCommand.CommandType Command;
     }
 }

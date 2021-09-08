@@ -6,10 +6,14 @@
 - fix hexcrafter lv3 hex arcana selection; lv11 spell recall
 - cold iron arrows refresh after combat
 - a kineticist background
-- healing burn heals non-lethal damage (instead of turning it into real damage)
 - kinetic blasts apply gather power, even if a weaker mode is picked
 - mobile gathering
 - made gather power ability visible
+- extra wild talent
+- option to allow achievements; this also clears the corresponding flag from future save files (otherwise uninstalling all mods would prevent achievements again)
+
+### Changed
+- testing out new parameters on mobile gathering
 
 ## [1.0.1]
 

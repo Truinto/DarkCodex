@@ -4,22 +4,29 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Facts;
+using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.Enums.Damage;
 using Kingmaker.Localization;
 using Kingmaker.ResourceLinks;
 using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
+using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
+using Kingmaker.UnitLogic.Mechanics.Properties;
+using Kingmaker.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -75,6 +82,7 @@ namespace DarkCodex
 
         public static T[] ObjToArray<T>(this T obj)
         {
+            if (obj == null) return null;
             return new T[] { obj };
         }
 
@@ -167,11 +175,11 @@ namespace DarkCodex
             var strings = LocalizationManager.CurrentPack.Strings;
             //string oldValue;
             //if (strings.TryGetValue(key, out oldValue) && value != oldValue)
-//            {
-//#if DEBUG
-//                Helper.Print($"Info: duplicate localized string `{key}`, different text.");
-//#endif
-//            }
+            //            {
+            //#if DEBUG
+            //                Helper.Print($"Info: duplicate localized string `{key}`, different text.");
+            //#endif
+            //            }
             strings[key] = value;
             localized = new LocalizedString();
             localized.Key = key;
@@ -218,6 +226,11 @@ namespace DarkCodex
 
         #region Context
 
+        public static ContextValue CreateContextValue(int value)
+        {
+            return new ContextValue() { ValueType = ContextValueType.Simple, Value = value };
+        }
+
         public static ContextValue CreateContextValue(AbilityRankType value = AbilityRankType.Default)
         {
             return new ContextValue() { ValueType = ContextValueType.Rank, ValueRank = value };
@@ -263,6 +276,149 @@ namespace DarkCodex
         public static void AddAsset(this SimpleBlueprint bp, string guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(BlueprintGuid.Parse(guid), bp);
         public static void AddAsset(this SimpleBlueprint bp, Guid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(new BlueprintGuid(guid), bp);
         public static void AddAsset(this SimpleBlueprint bp, BlueprintGuid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+
+        public static ContextRankConfig CreateContextRankConfig(ContextRankBaseValueType baseValueType = ContextRankBaseValueType.CasterLevel, ContextRankProgression progression = ContextRankProgression.AsIs, AbilityRankType type = AbilityRankType.Default, int? min = null, int? max = null, int startLevel = 0, int stepLevel = 0, bool exceptClasses = false, StatType stat = StatType.Unknown, BlueprintUnitProperty customProperty = null, BlueprintCharacterClass[] classes = null, BlueprintArchetype[] archetypes = null, BlueprintFeature feature = null, BlueprintFeature[] featureList = null/*, (int, int)[] customProgression = null*/)
+        {
+            var result = new ContextRankConfig();
+            result.m_Type = type;
+            result.m_BaseValueType = baseValueType;
+            result.m_Progression = progression;
+            result.m_UseMin = min.HasValue;
+            result.m_Min = min.GetValueOrDefault();
+            result.m_UseMax = max.HasValue;
+            result.m_Max = max.GetValueOrDefault();
+            result.m_StartLevel = startLevel;
+            result.m_StepLevel = stepLevel;
+            result.m_Feature = feature.ToRef();
+            result.m_CustomProperty = customProperty.ToRef();
+            result.m_Stat = stat;
+            result.m_Class = classes.ToRef() ?? Array.Empty<BlueprintCharacterClassReference>();
+            result.m_AdditionalArchetypes = archetypes.ToRef() ?? Array.Empty<BlueprintArchetypeReference>();
+            result.m_FeatureList = featureList.ToRef() ?? Array.Empty<BlueprintFeatureReference>();
+
+            return result;
+        }
+
+        public static ContextRankConfig CreateContextRankConfig(ContextRankBaseValueType baseValueType = ContextRankBaseValueType.CasterLevel, ContextRankProgression progression = ContextRankProgression.AsIs, AbilityRankType type = AbilityRankType.Default, int? min = null, int? max = null, int startLevel = 0, int stepLevel = 0, bool exceptClasses = false, StatType stat = StatType.Unknown, BlueprintUnitPropertyReference customProperty = null, BlueprintCharacterClassReference[] classes = null, BlueprintArchetypeReference[] archetypes = null, BlueprintFeatureReference feature = null, BlueprintFeatureReference[] featureList = null/*, (int, int)[] customProgression = null*/)
+        {
+            var result = new ContextRankConfig();
+            result.m_Type = type;
+            result.m_BaseValueType = baseValueType;
+            result.m_Progression = progression;
+            result.m_UseMin = min.HasValue;
+            result.m_Min = min ?? 0;
+            result.m_UseMax = max.HasValue;
+            result.m_Max = max ?? 20;
+            result.m_StartLevel = startLevel;
+            result.m_StepLevel = stepLevel;
+            result.m_Feature = feature;
+            result.m_CustomProperty = customProperty;
+            result.m_Stat = stat;
+            result.m_Class = classes ?? Array.Empty<BlueprintCharacterClassReference>();
+            result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>();
+            result.m_FeatureList = featureList ?? Array.Empty<BlueprintFeatureReference>();
+
+            return result;
+        }
+
+        public static ContextCalculateSharedValue CreateContextCalculateSharedValue(AbilitySharedValue ValueType = AbilitySharedValue.Damage, ContextDiceValue Value = null, double Modifier = 1.0)
+        {
+            if (Value == null)
+                Value = CreateContextDiceValue(DiceType.One, AbilityRankType.DamageDice, AbilityRankType.DamageBonus);
+
+            var result = new ContextCalculateSharedValue();
+            result.ValueType = ValueType;
+            result.Value = Value;
+            result.Modifier = Modifier;
+            return result;
+        }
+
+        public static ContextDiceValue CreateContextDiceValue(DiceType dice, ContextValue diceCount = null, ContextValue bonus = null)
+        {
+            return new ContextDiceValue()
+            {
+                DiceType = dice,
+                DiceCountValue = diceCount ?? CreateContextValue(),
+                BonusValue = bonus ?? 0
+            };
+        }
+        
+        public static ContextDiceValue CreateContextDiceValue(DiceType dice, AbilityRankType dicecount, AbilityRankType bonus)
+        {
+            return new ContextDiceValue()
+            {
+                DiceType = dice,
+                DiceCountValue = CreateContextValue(dicecount),
+                BonusValue = CreateContextValue(bonus)
+            };
+        }
+
+        public static ContextActionDealDamage CreateContextActionDealDamage(PhysicalDamageForm physical, ContextDiceValue damage, bool isAoE = false, bool halfIfSaved = false, bool IgnoreCritical = false, bool half = false)
+        {
+            // physical damage
+            var c = new ContextActionDealDamage();
+            c.DamageType = new DamageTypeDescription()
+            {
+                Type = DamageType.Physical,
+                Common = new DamageTypeDescription.CommomData(),
+                Physical = new DamageTypeDescription.PhysicalData() { Form = physical }
+            };
+            c.Duration = CreateContextDurationValue(0);
+            c.Value = damage;
+            c.IsAoE = isAoE;
+            c.HalfIfSaved = halfIfSaved;
+            c.IgnoreCritical = IgnoreCritical;
+            c.Half = half;
+            return c;
+        }
+
+        public static ContextActionDealDamage CreateContextActionDealDamage(DamageEnergyType energy, ContextDiceValue damage, bool isAoE = false, bool halfIfSaved = false, bool IgnoreCritical = false, bool half = false)
+        {
+            // energy damage
+            var c = new ContextActionDealDamage();
+            c.DamageType = new DamageTypeDescription()
+            {
+                Type = DamageType.Energy,
+                Energy = energy,
+                Common = new DamageTypeDescription.CommomData(),
+                Physical = new DamageTypeDescription.PhysicalData()
+            };
+            c.Duration = CreateContextDurationValue(0);
+            c.Value = damage;
+            c.IsAoE = isAoE;
+            c.HalfIfSaved = halfIfSaved;
+            c.IgnoreCritical = IgnoreCritical;
+            c.Half = half;
+            return c;
+        }
+
+        public static AbilityCasterHasFacts CreateAbilityCasterHasFacts(bool NeedsAll = false, params BlueprintUnitFactReference[] Facts)
+        {
+            var result = new AbilityCasterHasFacts();
+            result.m_Facts = Facts;
+            result.NeedsAll = NeedsAll;
+            return result;
+        }
+
+        public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(BlueprintProjectileReference projectile, AbilityProjectileType type = AbilityProjectileType.Simple, BlueprintItemWeaponReference weapon = null, Feet length = default(Feet), Feet width = default(Feet))
+        {
+            var result = new AbilityDeliverProjectile();
+            result.m_Projectiles = projectile.ObjToArray();
+            result.Type = type;
+            result.m_Length = length;
+            result.m_LineWidth = width;
+            result.m_Weapon = weapon;
+            result.Type = AbilityProjectileType.Line;
+            result.NeedAttackRoll = true;
+            return result;
+        }
+
+        public static AbilityShowIfCasterHasFact CreateAbilityShowIfCasterHasFact(BlueprintUnitFactReference UnitFact)
+        {
+            var result = new AbilityShowIfCasterHasFact();
+            result.m_UnitFact = UnitFact;
+            return result;
+        }
 
         public static AbilityRequirementActionAvailable CreateAbilityRequirementActionAvailable(bool Not, ActionType Action, float Amount = 3f)
         {
@@ -387,11 +543,11 @@ namespace DarkCodex
             return result;
         }
 
-        public static LevelEntry CreateLevelEntry(int level, params BlueprintFeatureBase[] features) // TODO: complete
+        public static LevelEntry CreateLevelEntry(int level, params BlueprintFeatureBase[] features)
         {
             var result = new LevelEntry();
             result.Level = level;
-            result.m_Features = features.Select(s => s.ToRef()).ToList();
+            result.m_Features = features.ToRef().ToList();
             return result;
         }
 
@@ -419,7 +575,7 @@ namespace DarkCodex
         public static AddFacts CreateAddFacts(params BlueprintUnitFact[] facts)
         {
             var result = new AddFacts();
-            result.m_Facts = facts.Select(s => s.ToRef()).ToArray();
+            result.m_Facts = facts.ToRef().ToArray();
             return result;
         }
 
@@ -429,6 +585,7 @@ namespace DarkCodex
                 guid = GuidManager.i.Get(name);
 
             var result = new BlueprintFeature();
+            result.IsClassFeature = true;
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
@@ -464,12 +621,39 @@ namespace DarkCodex
             return result;
         }
 
+        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, string guid, Sprite icon, FeatureGroup group, params BlueprintComponent[] components)
+        {
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = new BlueprintFeatureSelection();
+            result.IsClassFeature = true;
+            result.name = name;
+            result.m_DisplayName = displayName.CreateString();
+            result.m_Description = description.CreateString();
+            result.AssetGuid = BlueprintGuid.Parse(guid);
+            result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
+            result.m_Icon = icon;
+            result.ComponentsArray = components;
+
+            AddAsset(result, result.AssetGuid);
+            return result;
+        }
+
         #endregion
 
         #region ToReference
 
+        public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
+        {
+            T tref = Activator.CreateInstance<T>();
+            tref.ReadGuidFromJson(guid);
+            return tref;
+        }
+
         public static BlueprintFeatureReference ToRef(this BlueprintFeature feature)
         {
+            if (feature == null) return null;
             //feature.ToReference<BlueprintFeatureReference>();
             var result = new BlueprintFeatureReference();
             result.deserializedGuid = feature.AssetGuid;
@@ -477,6 +661,7 @@ namespace DarkCodex
         }
         public static BlueprintFeatureReference[] ToRef(this BlueprintFeature[] feature)
         {
+            if (feature == null) return null;
             var result = new BlueprintFeatureReference[feature.Length];
             for (int i = 0; i < result.Length; i++)
             {
@@ -488,31 +673,158 @@ namespace DarkCodex
 
         public static BlueprintCharacterClassReference ToRef(this BlueprintCharacterClass feature)
         {
+            if (feature == null) return null;
             var result = new BlueprintCharacterClassReference();
             result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintCharacterClassReference[] ToRef(this BlueprintCharacterClass[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintCharacterClassReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintCharacterClassReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
             return result;
         }
 
         public static BlueprintFeatureBaseReference ToRef(this BlueprintFeatureBase feature)
         {
+            if (feature == null) return null;
             var result = new BlueprintFeatureBaseReference();
             result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintFeatureBaseReference[] ToRef(this BlueprintFeatureBase[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintFeatureBaseReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintFeatureBaseReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
             return result;
         }
 
         public static BlueprintBuffReference ToRef(this BlueprintBuff feature)
         {
+            if (feature == null) return null;
             var result = new BlueprintBuffReference();
             result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintBuffReference[] ToRef(this BlueprintBuff[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintBuffReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintBuffReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
             return result;
         }
 
         public static BlueprintUnitFactReference ToRef(this BlueprintUnitFact feature)
         {
+            if (feature == null) return null;
             var result = new BlueprintUnitFactReference();
             result.deserializedGuid = feature.AssetGuid;
             return result;
         }
+        public static BlueprintUnitFactReference[] ToRef(this BlueprintUnitFact[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintUnitFactReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintUnitFactReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+        
+        public static BlueprintUnitPropertyReference ToRef(this BlueprintUnitProperty feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintUnitPropertyReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintUnitPropertyReference[] ToRef(this BlueprintUnitProperty[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintUnitPropertyReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintUnitPropertyReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+        
+        public static BlueprintArchetypeReference ToRef(this BlueprintArchetype feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintArchetypeReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintArchetypeReference[] ToRef(this BlueprintArchetype[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintArchetypeReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintArchetypeReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+        
+        public static BlueprintProjectileReference ToRef(this BlueprintProjectile feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintProjectileReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintProjectileReference[] ToRef(this BlueprintProjectile[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintProjectileReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintProjectileReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+        
+        public static BlueprintItemWeaponReference ToRef(this BlueprintItemWeapon feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintItemWeaponReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintItemWeaponReference[] ToRef(this BlueprintItemWeapon[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintItemWeaponReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintItemWeaponReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+
+
+        
 
         #endregion
 

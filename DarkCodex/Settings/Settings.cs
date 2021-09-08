@@ -10,7 +10,7 @@ namespace DarkCodex
         public int version = 1;
         
         [JsonProperty]
-        public bool debugEnsureGuids = true;
+        public bool allowAchievements = true;
 
         [JsonProperty]
         public List<string> doNotLoad = new List<string>();
