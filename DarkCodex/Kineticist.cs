@@ -51,9 +51,10 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
 
+        // call this last
         public static void createExtraWildTalentFeat(bool enabled = true)
         {
-            var kineticist_class = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("42a455d9ec1ad924d889272429eb8391");
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var wildtalent_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
 
@@ -85,7 +86,7 @@ namespace DarkCodex
             var buff2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("3a2bfdc8bf74c5c4aafb97591f6e4282");   //GatherPowerBuffII
             var buff3 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("82eb0c274eddd8849bb89a8e6dbc65f8");   //GatherPowerBuffIII
             var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
-            var kineticist_class = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("42a455d9ec1ad924d889272429eb8391");
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
 
             // rename buffs, so it's easier to tell them apart
             buff1.m_Icon = gather_original_ab.Icon;
@@ -178,34 +179,174 @@ namespace DarkCodex
 
         }
 
+        public static void createImpaleInfusion()
+        {
+            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+            var weapon = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8");
+            var icon = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("2aad85320d0751340a0786de073ee3d5").Icon; //TorrentInfusionFeature
+
+            var earth_base = Helper.ToRef<BlueprintAbilityReference>("e53f34fb268a7964caf1566afb82dadd");   //EarthBlastBase
+            var earth_blast = Helper.ToRef<BlueprintFeatureReference>("7f5f82c1108b961459c9884a0fa0f5c4");    //EarthBlastFeature
+
+            var metal_base = Helper.ToRef<BlueprintAbilityReference>("6276881783962284ea93298c1fe54c48");   //MetalBlastBase
+            var metal_blast = Helper.ToRef<BlueprintFeatureReference>("ad20bc4e586278c4996d4a81b2448998");    //MetalBlastFeature
+
+            var ice_base = Helper.ToRef<BlueprintAbilityReference>("403bcf42f08ca70498432cf62abee434");   //IceBlastBase
+            var ice_blast = Helper.ToRef<BlueprintFeatureReference>("a8cc34ca1a5e55a4e8aa5394efe2678e");    //IceBlastFeature
+
+
+            // impale feat
+            BlueprintFeature impale_feat = Helper.CreateBlueprintFeature(
+                "InfusionImpaleFeature",
+                "Impale",
+                "Element: earth\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: earth, metal, ice\n"
+                + "You extend a long, sharp spike of elemental matter along a line, impaling multiple foes. Make a single attack roll against each creature or object in a 30-foot line.",
+                null,
+                icon,
+                FeatureGroup.KineticBlastInfusion,
+                Helper.CreatePrerequisiteFeaturesFromList(true, earth_blast, metal_blast, ice_blast),
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 6)
+                );
+
+            // earth ability
+            var step1 = step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
+            var earth_impale_ab = Helper.CreateBlueprintAbility(
+                "ImpaleEarthBlastAbility",
+                impale_feat.m_DisplayName,
+                impale_feat.m_Description,
+                null,
+                icon,
+                AbilityType.SpellLike,
+                UnitCommand.CommandType.Standard,
+                AbilityRange.Close,
+                duration: "",
+                savingThrow: "",
+                step1,
+                step2_rank_dice(twice: false),
+                step3_rank_bonus(half_bonus: false),
+                step4_dc(),
+                step5_burn(step1, infusion: 2, blast: 0),
+                step6_feat(impale_feat),
+                step7_projectile(Resource.Projectile.Kinetic_EarthBlastLine00, true, AbilityProjectileType.Line, 30, 5),
+                step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
+                step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
+                );
+            var attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
+            attack.IfTrue = step1.Actions;
+            step1.Actions = Helper.CreateActionList(attack);
+
+            // metal ability
+            step1 = step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
+            var metal_impale_ab = Helper.CreateBlueprintAbility(
+                "ImpaleMetalBlastAbility",
+                impale_feat.m_DisplayName,
+                impale_feat.m_Description,
+                null,
+                icon,
+                AbilityType.SpellLike,
+                UnitCommand.CommandType.Standard,
+                AbilityRange.Close,
+                duration: "",
+                savingThrow: "",
+                step1,
+                step2_rank_dice(twice: true),
+                step3_rank_bonus(half_bonus: false),
+                step4_dc(),
+                step5_burn(step1, infusion: 2, blast: 2),
+                step6_feat(impale_feat),
+                step7_projectile(Resource.Projectile.Kinetic_MetalBlastLine00, true, AbilityProjectileType.Line, 30, 5),
+                step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
+                step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
+                );
+            attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
+            attack.IfTrue = step1.Actions;
+            step1.Actions = Helper.CreateActionList(attack);
+
+            // ice ability
+            step1 = step1_run_damage(p: PhysicalDamageForm.Piercing, e: DamageEnergyType.Cold, isAOE: true, half: false);
+            var ice_impale_ab = Helper.CreateBlueprintAbility(
+                "ImpaleIceBlastAbility",
+                impale_feat.m_DisplayName,
+                impale_feat.m_Description,
+                null,
+                icon,
+                AbilityType.SpellLike,
+                UnitCommand.CommandType.Standard,
+                AbilityRange.Close,
+                duration: "",
+                savingThrow: "",
+                step1,
+                step2_rank_dice(twice: true),
+                step3_rank_bonus(half_bonus: false),
+                step4_dc(),
+                step5_burn(step1, infusion: 2, blast: 2),
+                step6_feat(impale_feat),
+                step7_projectile(Resource.Projectile.Kinetic_IceBlastLine00, true, AbilityProjectileType.Line, 30, 5),
+                step8_spell_description(SpellDescriptor.Cold),
+                step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
+                step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
+                );
+            attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
+            attack.IfTrue = step1.Actions;
+            step1.Actions = Helper.CreateActionList(attack);
+
+            // add to feats and append variants
+            Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, impale_feat.ToRef());
+            Helper.AddToAbilityVariants(earth_base, earth_impale_ab);
+            Helper.AddToAbilityVariants(metal_base, metal_impale_ab);
+            Helper.AddToAbilityVariants(ice_base, ice_impale_ab);
+        }
+
         #region Helper
 
+        /// <summary>
+        /// 1) make BlueprintAbility
+        /// 2) set m_Parent to XBlastBase
+        /// 3) set SpellResistance
+        /// 4) make components with helpers (step1 to 9)
+        /// Logic for dealing damage. Will make a composite blast, if both p and e are set. How much damage is dealt is defined in step 2.
+        /// </summary>
         public static AbilityEffectRunAction step1_run_damage(PhysicalDamageForm p = 0, DamageEnergyType e = (DamageEnergyType)255, SavingThrowType save = SavingThrowType.Unknown, bool isAOE = false, bool half = false)
         {
             ContextDiceValue dice = Helper.CreateContextDiceValue(DiceType.D6, AbilityRankType.DamageDice, AbilityRankType.DamageBonus);
 
             List<ContextAction> list = new List<ContextAction>(2);
 
+            bool isComposite = e != 0 && e != (DamageEnergyType)255;
+
             if (p != 0)
-                list.Add(Helper.CreateContextActionDealDamage(p, dice, isAOE, isAOE, false, half));
+                list.Add(Helper.CreateContextActionDealDamage(p, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, writeShare: isComposite));
             if (e != (DamageEnergyType)255)
-                list.Add(Helper.CreateContextActionDealDamage(e, dice, isAOE, isAOE, false, half));
+                list.Add(Helper.CreateContextActionDealDamage(e, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, readShare: isComposite));
 
             var runaction = Helper.CreateAbilityEffectRunAction(save, list.ToArray());
 
             return runaction;
         }
 
-        public static ContextRankConfig step2_rank_dice()
+        /// <summary>
+        /// Defines damage dice. Set twice for composite blasts. You shouldn't need half at all.
+        /// </summary>
+        public static ContextRankConfig step2_rank_dice(bool twice = false, bool half = false)
         {
+            var progression = ContextRankProgression.AsIs;
+            if (half) progression = ContextRankProgression.Div2;
+            if (twice) progression = ContextRankProgression.MultiplyByModifier;
+
             var rankdice = Helper.CreateContextRankConfig(
                 type: AbilityRankType.DamageDice,
+                progression: progression,
+                stepLevel: twice ? 2 : 0,
                 baseValueType: ContextRankBaseValueType.FeatureRank,
                 feature: "93efbde2764b5504e98e6824cab3d27c".ToRef<BlueprintFeatureReference>()); //KineticBlastFeature
             return rankdice;
         }
 
-        public static ContextRankConfig step3_rank_bonus(bool half_bonus)
+        /// <summary>
+        /// Defines bonus damage. Set half_bonus for energy blasts.
+        /// </summary>
+        public static ContextRankConfig step3_rank_bonus(bool half_bonus = false)
         {
             var rankdice = Helper.CreateContextRankConfig(
                 progression: half_bonus ? ContextRankProgression.Div2 : ContextRankProgression.AsIs,
@@ -216,12 +357,10 @@ namespace DarkCodex
             return rankdice;
         }
 
-        public static ContextCalculateSharedValue step4_shared_value() // I think that's not used at all
-        {
-            return Helper.CreateContextCalculateSharedValue();
-        }
-
-        public static ContextCalculateAbilityParamsBasedOnClass step5dc()
+        /// <summary>
+        /// Simply makes the DC dex based.
+        /// </summary>
+        public static ContextCalculateAbilityParamsBasedOnClass step4_dc()
         {
             var dc = new ContextCalculateAbilityParamsBasedOnClass();
             dc.StatType = StatType.Dexterity;
@@ -229,20 +368,15 @@ namespace DarkCodex
             return dc;
         }
 
-        public static SpellDescriptorComponent step6_spell_description(SpellDescriptor descriptor)
-        {
-            return new SpellDescriptorComponent
-            {
-                Descriptor = descriptor
-            };
-        }
-
-        public static AbilityKineticist step7_burn(AbilityEffectRunAction run, int infusion = 0, int blast = 0, int talent = 0)
+        /// <summary>
+        /// Creates damage tooltip from the run-action. Defines burn cost. Blast cost is 0, except for composite blasts which is 2. Talent is not used.
+        /// </summary>
+        public static AbilityKineticist step5_burn(AbilityEffectRunAction run, int infusion = 0, int blast = 0, int talent = 0)
         {
             var list = new List<AbilityKineticist.DamageInfo>();
             for (int i = 0; i < run.Actions.Actions.Length; i++)
             {
-                var action = run.Actions.Actions[i] as ContextActionDealDamage;
+                var action = run.Actions.Actions[i] as ContextActionDealDamage; // TODO: don't get run, but action[]
                 if (action == null) continue;
 
                 list.Add(new AbilityKineticist.DamageInfo() { Value = action.Value, Type = action.DamageType, Half = action.Half });
@@ -256,14 +390,22 @@ namespace DarkCodex
             return comp;
         }
 
-        public static AbilityShowIfCasterHasFact step8_feat(BlueprintUnitFact fact)
+        /// <summary>
+        /// Required feat for this ability to show up.
+        /// </summary>
+        public static AbilityShowIfCasterHasFact step6_feat(BlueprintFeature fact)
         {
-            return Helper.CreateAbilityShowIfCasterHasFact(fact.ToRef());
+            return Helper.CreateAbilityShowIfCasterHasFact(fact.ToRef2());
         }
 
-        public static AbilityDeliverProjectile step9_projectile(string projectile_guid, bool isPhysical, AbilityProjectileType type, float length, float width)
+        /// <summary>
+        /// Defines projectile.
+        /// </summary>
+        public static AbilityDeliverProjectile step7_projectile(string projectile_guid, bool isPhysical, AbilityProjectileType type, float length, float width)
         {
             string weapon = isPhysical ? "65951e1195848844b8ab8f46d942f6e8" : "4d3265a5b9302ee4cab9c07adddb253f"; //KineticBlastPhysicalWeapon //KineticBlastEnergyWeapon
+            //KineticBlastPhysicalBlade b05a206f6c1133a469b2f7e30dc970ef
+            //KineticBlastEnergyBlade a15b2fb1d5dc4f247882a7148d50afb0
 
             var projectile = Helper.CreateAbilityDeliverProjectile(
                 projectile_guid.ToRef<BlueprintProjectileReference>(),
@@ -274,31 +416,36 @@ namespace DarkCodex
             return projectile;
         }
 
-        public static AbilitySpawnFx step_sfx(AbilitySpawnFxTime time, string sfx_guid) //OnPrecastStart //OnStart
+        /// <summary>
+        /// Element descriptor for energy blasts.
+        /// </summary>
+        public static SpellDescriptorComponent step8_spell_description(SpellDescriptor descriptor)
+        {
+            return new SpellDescriptorComponent
+            {
+                Descriptor = descriptor
+            };
+        }
+
+        // <summary>
+        // This is identical for all blasts or is missing completely. It seems to me as if it not used and a leftover.
+        // </summary>
+        //public static ContextCalculateSharedValue step9_shared_value()
+        //{
+        //    return Helper.CreateContextCalculateSharedValue();
+        //}
+
+        /// <summary>
+        /// Defines sfx for casting.
+        /// Use either use either OnPrecastStart or OnStart for time.
+        /// </summary>
+        public static AbilitySpawnFx step_sfx(AbilitySpawnFxTime time, string sfx_guid)
         {
             var sfx = new AbilitySpawnFx();
             sfx.Time = time;
             sfx.PrefabLink = new PrefabLink() { AssetId = sfx_guid };
             return sfx;
         }
-
-        //AbilityEffectRunAction - deals the actual damage; defines energy type (physical often half)
-        //ContextRankConfig - defines damage dice
-        //ContextRankConfig - defines bonus damage (half for energy)
-        //ContextCalculateSharedValue - ? (same for all?)
-        //ContextCalculateAbilityParamsBasedOnClass - defines primary stat (same for all)
-        //SpellDescriptorComponent - marks spell type
-        //AbilityKineticist - defines burn
-        //AbilityKineticist.CachedDamageInfo - shows damage preview (incl. energy type)
-        //AbilityShowIfCasterHasFact - feat requirement
-        //AbilityDeliverProjectile - which projectile to use
-        //AbilitySpawnFx - sfx x2
-
-        // 1) make BlueprintAbility
-        // 2) set m_Parent to XBlastBase
-        // 3) set SpellResistance
-        // 4) is step1_run_damage halved?
-        // 5) is step3_rank_bonus constitution bonus halved?
 
         #endregion
     }

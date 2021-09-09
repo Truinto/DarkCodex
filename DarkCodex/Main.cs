@@ -217,6 +217,7 @@ namespace DarkCodex
 
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
+                    LoadSafe(Kineticist.createImpaleInfusion);
                     LoadSafe(Kineticist.createExtraWildTalentFeat, true); //Settings.StateManager.State.
                     LoadSafe(Hexcrafter.fixProgression);
 
