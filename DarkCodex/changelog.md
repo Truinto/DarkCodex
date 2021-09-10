@@ -12,6 +12,7 @@
 - extra wild talent
 - option to allow achievements; this also clears the corresponding flag from future save files (otherwise uninstalling all mods would prevent achievements again)
 - impale infusion
+- ice tomb
 
 ### Changed
 - testing out new parameters on mobile gathering

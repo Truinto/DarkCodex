@@ -5,6 +5,7 @@ using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
@@ -21,10 +22,12 @@ using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UI.Log;
 using Kingmaker.UI.Log.CombatLog_ThreadSystem;
+using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
+using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
@@ -198,6 +201,9 @@ namespace DarkCodex
         private static Dictionary<string, string> _mappedStrings;
         public static LocalizedString CreateString(this string value, string key = null)
         {
+            if (value == null || value == "")
+                return new LocalizedString { Key = "" };
+
             if (key == null)
             {
                 var sha = _SHA.ComputeHash(Encoding.UTF8.GetBytes(value));
@@ -296,11 +302,11 @@ namespace DarkCodex
 
         #endregion
 
-        #region Context
+        #region Context Values
 
         public static ContextValue CreateContextValue(int value)
         {
-            return new ContextValue() { ValueType = ContextValueType.Simple, Value = value };
+            return (ContextValue)value;
         }
 
         public static ContextValue CreateContextValue(AbilityRankType value = AbilityRankType.Default)
@@ -311,6 +317,28 @@ namespace DarkCodex
         public static ContextValue CreateContextValue(AbilitySharedValue value)
         {
             return new ContextValue() { ValueType = ContextValueType.Shared, ValueShared = value };
+        }
+
+        public static ContextDurationValue CreateContextDurationValue(ContextValue diceCount = null, DiceType dice = DiceType.Zero, ContextValue bonus = null, DurationRate rate = DurationRate.Rounds)
+        {
+            return new ContextDurationValue()
+            {
+                DiceCountValue = diceCount ?? 0,
+                DiceType = dice,
+                BonusValue = bonus ?? 0,
+                Rate = rate
+            };
+        }
+
+        public static ContextDurationValue CreateContextDurationValue(AbilityRankType diceRank, DiceType dice = DiceType.One, int bonus = 0, DurationRate rate = DurationRate.Rounds)
+        {
+            return new ContextDurationValue()
+            {
+                DiceCountValue = CreateContextValue(diceRank),
+                DiceType = dice,
+                BonusValue = bonus,
+                Rate = rate
+            };
         }
 
         #endregion
@@ -338,6 +366,26 @@ namespace DarkCodex
             return true;
         }
 
+        public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = false, bool? stayOnDeath = false)
+        {
+            if (hidden != null)
+            {
+                if (hidden.Value)
+                    buff.m_Flags |= BlueprintBuff.Flags.HiddenInUi;
+                else
+                    buff.m_Flags &= BlueprintBuff.Flags.HiddenInUi;
+            }
+
+            if (stayOnDeath != null)
+            {
+                if (stayOnDeath.Value)
+                    buff.m_Flags |= BlueprintBuff.Flags.StayOnDeath;
+                else
+                    buff.m_Flags &= BlueprintBuff.Flags.StayOnDeath;
+            }
+            return buff;
+        }
+
         public static ContextCondition[] CreateConditionHasNoBuff(params BlueprintBuff[] buffs)
         {
             if (buffs == null || buffs[0] == null) throw new ArgumentNullException();
@@ -362,6 +410,27 @@ namespace DarkCodex
         public static void AddAsset(this SimpleBlueprint bp, Guid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(new BlueprintGuid(guid), bp);
         public static void AddAsset(this SimpleBlueprint bp, BlueprintGuid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
 
+        public static AddCondition CreateAddCondition(UnitCondition condition)
+        {
+            return new AddCondition
+            {
+                Condition = condition
+            };
+        }
+
+        public static SpellDescriptorComponent CreateSpellDescriptorComponent(SpellDescriptor descriptor)
+        {
+            return new SpellDescriptorComponent { Descriptor = descriptor };
+        }
+
+        public static AbilityTargetHasFact CreateAbilityTargetHasFact(bool inverted, params BlueprintUnitFactReference[] facts)
+        {
+            var result = new AbilityTargetHasFact();
+            result.Inverted = inverted;
+            result.m_CheckedFacts = facts;
+            return result;
+        }
+
         public static ContextRankConfig CreateContextRankConfig(ContextRankBaseValueType baseValueType = ContextRankBaseValueType.CasterLevel, ContextRankProgression progression = ContextRankProgression.AsIs, AbilityRankType type = AbilityRankType.Default, int? min = null, int? max = null, int startLevel = 0, int stepLevel = 0, bool exceptClasses = false, StatType stat = StatType.Unknown, BlueprintUnitPropertyReference customProperty = null, BlueprintCharacterClassReference[] classes = null, BlueprintArchetypeReference[] archetypes = null, BlueprintFeatureReference feature = null, BlueprintFeatureReference[] featureList = null/*, (int, int)[] customProgression = null*/)
         {
             var result = new ContextRankConfig();
@@ -378,6 +447,7 @@ namespace DarkCodex
             result.m_CustomProperty = customProperty;
             result.m_Stat = stat;
             result.m_Class = classes ?? Array.Empty<BlueprintCharacterClassReference>();
+            result.Archetype = ToRef<BlueprintArchetypeReference>(null);
             result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>();
             result.m_FeatureList = featureList ?? Array.Empty<BlueprintFeatureReference>();
 
@@ -426,7 +496,7 @@ namespace DarkCodex
                 Common = new DamageTypeDescription.CommomData(),
                 Physical = new DamageTypeDescription.PhysicalData() { Form = physical }
             };
-            c.Duration = CreateContextDurationValue(0);
+            c.Duration = CreateContextDurationValue();
             c.Value = damage;
             c.IsAoE = isAoE;
             c.HalfIfSaved = halfIfSaved;
@@ -451,7 +521,7 @@ namespace DarkCodex
                 Common = new DamageTypeDescription.CommomData(),
                 Physical = new DamageTypeDescription.PhysicalData()
             };
-            c.Duration = CreateContextDurationValue(0);
+            c.Duration = CreateContextDurationValue();
             c.Value = damage;
             c.IsAoE = isAoE;
             c.HalfIfSaved = halfIfSaved;
@@ -550,6 +620,14 @@ namespace DarkCodex
             return c;
         }
 
+        public static ContextActionConditionalSaved CreateContextActionConditionalSaved(GameAction succeed = null, GameAction failed = null)
+        {
+            var result = new ContextActionConditionalSaved();
+            result.Succeed = CreateActionList(succeed);
+            result.Failed = CreateActionList(failed);
+            return result;
+        }
+
         public static AbilityRequirementHasBuffs CreateAbilityRequirementHasBuffs(bool Not, params BlueprintBuff[] Buffs)
         {
             var result = new AbilityRequirementHasBuffs();
@@ -567,23 +645,12 @@ namespace DarkCodex
             return result;
         }
 
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool dispellable = false, bool permanent = false)
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool dispellable = false, bool permanent = false)
         {
-            return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: new ContextValue() { Value = duration }, rate: rate), fromSpell: false, dispellable: dispellable, permanent: permanent);
+            return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: false, dispellable: dispellable, permanent: permanent);
         }
 
-        public static ContextDurationValue CreateContextDurationValue(ContextValue bonus = null, DurationRate rate = DurationRate.Rounds, DiceType diceType = DiceType.Zero, ContextValue diceCount = null)
-        {
-            return new ContextDurationValue()
-            {
-                BonusValue = bonus ?? CreateContextValue(),
-                Rate = rate,
-                DiceCountValue = diceCount ?? 0,
-                DiceType = diceType
-            };
-        }
-
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
             var result = new ContextActionApplyBuff();
             result.m_Buff = buff.ToRef();
@@ -662,10 +729,10 @@ namespace DarkCodex
             return result;
         }
 
-        public static AddFacts CreateAddFacts(params BlueprintUnitFact[] facts)
+        public static AddFacts CreateAddFacts(params BlueprintUnitFactReference[] facts)
         {
             var result = new AddFacts();
-            result.m_Facts = facts.ToRef().ToArray();
+            result.m_Facts = facts;
             return result;
         }
 
@@ -688,7 +755,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, string guid, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, string duration, string savingThrow, params BlueprintComponent[] components)
+        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, string guid, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, LocalizedString duration = null, LocalizedString savingThrow = null, params BlueprintComponent[] components)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -704,8 +771,8 @@ namespace DarkCodex
             result.Type = type;
             result.ActionType = actionType;
             result.Range = range;
-            result.LocalizedDuration = CreateString(duration);
-            result.LocalizedSavingThrow = CreateString(savingThrow);
+            result.LocalizedDuration = duration ?? Resource.Strings.Empty;
+            result.LocalizedSavingThrow = savingThrow ?? Resource.Strings.Empty;
 
             AddAsset(result, result.AssetGuid);
             return result;
@@ -741,6 +808,13 @@ namespace DarkCodex
             return tref;
         }
 
+        public static BlueprintUnitFactReference ToRef2(this BlueprintAbility feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintUnitFactReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
         public static BlueprintUnitFactReference ToRef2(this BlueprintFeature feature)
         {
             if (feature == null) return null;
@@ -748,6 +822,14 @@ namespace DarkCodex
             result.deserializedGuid = feature.AssetGuid;
             return result;
         }
+        public static BlueprintUnitFactReference ToRef2(this BlueprintBuff feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintUnitFactReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+
 
         public static BlueprintFeatureReference ToRef(this BlueprintFeature feature)
         {

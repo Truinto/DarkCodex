@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kingmaker.Localization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,44 @@ namespace DarkCodex
 {
     public class Resource
     {
+        public class Strings
+        {
+            public static LocalizedString Empty = new LocalizedString { Key = "" };
+
+
+            public static LocalizedString RoundPerLevel = new LocalizedString { Key = "6250ccf0-1ed0-460f-8ce7-094c2da7e198" };
+            public static LocalizedString RoundPerLevelRepeatSave = new LocalizedString { Key = "d7cb2411-bd6e-4b59-a72d-43ea018de978" };
+            public static LocalizedString RoundPerLevelPlus1 = new LocalizedString { Key = "fb690795-9d4e-423b-a81f-44f6e43a17b5" };
+            public static LocalizedString MinutesPerLevel = new LocalizedString { Key = "00b2e4c2-aafe-487b-b890-d57473373da7" };
+            public static LocalizedString TenMinutesPerLevel = new LocalizedString { Key = "9178f928-579f-43d0-bd80-e67e478c7bfc" };
+            public static LocalizedString HoursPerLevel = new LocalizedString { Key = "cca23e25-a5b6-4138-b2bf-0b6387738a22" };
+
+            public static LocalizedString OneRound = new LocalizedString { Key = "62761fbe-42ce-4474-ae10-14f9024f4c57" };
+            public static LocalizedString ThreeRounds = new LocalizedString { Key = "c106ea15-f587-44ce-9472-fa7cd4c11dab" };
+            public static LocalizedString OneMinute = new LocalizedString { Key = "70e2c2f0-b2c6-423a-b6ec-c05084530366" };
+            public static LocalizedString TenMinutes = new LocalizedString { Key = "96bcc776-c41d-4467-99f7-d5848641ca11" };
+            public static LocalizedString OneHour = new LocalizedString { Key = "9e29a1ac-9b6c-42e1-aa32-08b51962127f" };
+            public static LocalizedString OneDay = new LocalizedString { Key = "b2581d37-9b43-4473-a755-f675929feaa2" };
+            public static LocalizedString Permanent = new LocalizedString { Key = "0b5bb39b-9e2e-4841-9f1c-5c20c306553b" };
+            public static LocalizedString Instantaneous = new LocalizedString { Key = "3d7fbfb9-10e8-4509-bab6-a8e4d3dbc3c8" };
+
+
+            public static LocalizedString FortitudeHalf = new LocalizedString { Key = "fc1ffd3d-d343-4dfe-8441-118b33c8026a" };
+            public static LocalizedString FortitudePartial = new LocalizedString { Key = "af1a01bb-3924-4663-94e8-79e080287aaa" };
+            public static LocalizedString FortitudeNegates = new LocalizedString { Key = "c8ec9dfb-37ba-485d-8c08-c45a6bfc88f3" };
+            public static LocalizedString FortitudeNegatesRound = new LocalizedString { Key = "23355cb5-0024-4da1-a542-0ef4a672ed8e" };
+
+            public static LocalizedString WillHalf = new LocalizedString { Key = "d47299a3-2f17-4e60-8199-65545e148a89" };
+            public static LocalizedString WillPartial = new LocalizedString { Key = "03e30000-0921-4296-a8b4-9566a9777a5d" };
+            public static LocalizedString WillNegates = new LocalizedString { Key = "7ac9f1bb-ab14-4d64-8543-4c97a64a71bd" };
+            public static LocalizedString WillPartialRound = new LocalizedString { Key = "1035efbd-2846-480a-ae8a-4593fe3c63d8" };
+            public static LocalizedString WillNegatesRound = new LocalizedString { Key = "50f1639f-a789-4939-bab6-557375828c4d" };
+
+            public static LocalizedString ReflexHalf = new LocalizedString { Key = "dccd7029-0a51-4e5b-9cb2-7a2969b61516" };
+            public static LocalizedString ReflexPartial = new LocalizedString { Key = "d58f2d26-2317-4023-921a-76d0c1590bcf" };
+            public static LocalizedString ReflexNegates = new LocalizedString { Key = "c649bb57-1a11-4d76-ae8c-8caa59feb39b" };
+        }
+
         public class Projectile
         {
             public static string AcidArrow00 = "89cd363b66b1df440b5281f7d3ef188d";

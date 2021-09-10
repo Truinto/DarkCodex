@@ -50,6 +50,7 @@
     <Compile Include="Settings\ConfigManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Witch.cs" />
     <None Include="Settings\Repository.json" />
     <None Include="changelog.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
