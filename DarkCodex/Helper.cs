@@ -1,4 +1,5 @@
-﻿using DarkCodex.Components;
+﻿using Config;
+using DarkCodex.Components;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -13,6 +14,7 @@ using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.Enums.Damage;
 using Kingmaker.Localization;
+using Kingmaker.Localization.Shared;
 using Kingmaker.ResourceLinks;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
@@ -35,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -189,36 +192,41 @@ namespace DarkCodex
 
         #region Strings
 
-        public static LocalizedString CreateString(this string value, string key = null) // TODO: get rid of key and make database
+        private static SHA1 _SHA = SHA1Managed.Create();
+        private static StringBuilder _sb = new StringBuilder();
+        private static Locale _lastLocale = Locale.enGB;
+        public static LocalizedString CreateString(this string value, string key = null)
         {
             if (key == null)
-                key = new Guid().ToString();
+            {
+                var sha = _SHA.ComputeHash(Encoding.UTF8.GetBytes(value));
+                for (int i = 0; i < sha.Length; i++)
+                    _sb.Append(sha[i].ToString("x2"));
+                key = _sb.ToString();
+                _sb.Clear();
+            }
 
-            // See if we used the text previously.
-            // (It's common for many features to use the same localized text.
-            // In that case, we reuse the old entry instead of making a new one.)
-            LocalizedString localized;
-            //if (_textToLocalizedString.TryGetValue(value, out localized))
-            //{
-            //    return localized;
-            //}
-            var strings = LocalizationManager.CurrentPack.Strings;
-            //string oldValue;
-            //if (strings.TryGetValue(key, out oldValue) && value != oldValue)
-            //            {
-            //#if DEBUG
-            //                Helper.Print($"Info: duplicate localized string `{key}`, different text.");
-            //#endif
-            //            }
-            strings[key] = value;
-            localized = new LocalizedString();
-            localized.Key = key;
-            //_textToLocalizedString[value] = localized;
-            return localized;
+            var pack = LocalizationManager.CurrentPack.Strings;
+            if (LocalizationManager.CurrentPack.Locale != _lastLocale)
+            {
+                _lastLocale = LocalizationManager.CurrentPack.Locale;
+                try
+                {
+                    var dict = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
+                    foreach (var entry in dict)
+                        pack[entry.Key] = entry.Value;
+                }
+                catch (Exception e)
+                {
+                    Print($"Could not read lanaguage file for {LocalizationManager.CurrentPack.Locale}: {e.Message}");
+                }
+            }
+
+            if (!pack.ContainsKey(key))
+                pack.Add(key, value);
+
+            return new LocalizedString { Key = key };
         }
-
-        // All localized strings created in this mod, mapped to their localized key. Populated by CreateString.
-        public static Dictionary<string, LocalizedString> _textToLocalizedString = new Dictionary<string, LocalizedString>();
 
         #endregion
 
@@ -368,7 +376,7 @@ namespace DarkCodex
                 BonusValue = bonus ?? 0
             };
         }
-        
+
         public static ContextDiceValue CreateContextDiceValue(DiceType dice, AbilityRankType dicecount, AbilityRankType bonus)
         {
             return new ContextDiceValue()
@@ -607,7 +615,7 @@ namespace DarkCodex
             result.Amount = 1;
             return result;
         }
-        
+
         public static PrerequisiteFeature CreatePrerequisiteFeature(this BlueprintFeatureReference feat, bool any = false)
         {
             var result = new PrerequisiteFeature();
@@ -731,7 +739,7 @@ namespace DarkCodex
             }
             return result;
         }
-      
+
         public static BlueprintAbilityReference ToRef(this BlueprintAbility feature)
         {
             if (feature == null) return null;
@@ -826,7 +834,7 @@ namespace DarkCodex
             }
             return result;
         }
-        
+
         public static BlueprintUnitPropertyReference ToRef(this BlueprintUnitProperty feature)
         {
             if (feature == null) return null;
@@ -845,7 +853,7 @@ namespace DarkCodex
             }
             return result;
         }
-        
+
         public static BlueprintArchetypeReference ToRef(this BlueprintArchetype feature)
         {
             if (feature == null) return null;
@@ -864,7 +872,7 @@ namespace DarkCodex
             }
             return result;
         }
-        
+
         public static BlueprintProjectileReference ToRef(this BlueprintProjectile feature)
         {
             if (feature == null) return null;
@@ -883,7 +891,7 @@ namespace DarkCodex
             }
             return result;
         }
-        
+
         public static BlueprintItemWeaponReference ToRef(this BlueprintItemWeapon feature)
         {
             if (feature == null) return null;
@@ -904,7 +912,7 @@ namespace DarkCodex
         }
 
 
-        
+
 
         #endregion
 
