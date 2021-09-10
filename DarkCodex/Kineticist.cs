@@ -450,30 +450,6 @@ namespace DarkCodex
         #endregion
     }
 
-    public static class Extension_Kin
-    {
-        //public static DamageEnergyType ToEnergy(this EnergyType type)
-        //{
-
-        //}
-    }
-
-    [Flags]
-    public enum EnergyType
-    {
-        None = 0,
-        Bludgeoning = 1,
-        Piercing = 2,
-        Slashing = 4,
-        Fire = 8,
-        Cold = 16,
-        Electric = 32,
-
-        Physical = 0x20000000,
-        Energy = 0x40000000,
-    }
-
-
     #region Patches
 
     /// <summary>

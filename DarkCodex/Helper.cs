@@ -195,6 +195,7 @@ namespace DarkCodex
         private static SHA1 _SHA = SHA1Managed.Create();
         private static StringBuilder _sb = new StringBuilder();
         private static Locale _lastLocale = Locale.enGB;
+        private static Dictionary<string, string> _mappedStrings;
         public static LocalizedString CreateString(this string value, string key = null)
         {
             if (key == null)
@@ -212,9 +213,10 @@ namespace DarkCodex
                 _lastLocale = LocalizationManager.CurrentPack.Locale;
                 try
                 {
-                    var dict = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
-                    foreach (var entry in dict)
+                    _mappedStrings = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
+                    foreach (var entry in _mappedStrings)
                         pack[entry.Key] = entry.Value;
+                    _mappedStrings = null;
                 }
                 catch (Exception e)
                 {
@@ -223,9 +225,36 @@ namespace DarkCodex
             }
 
             if (!pack.ContainsKey(key))
+            {
                 pack.Add(key, value);
+                _saveString(key, value);
+            }
 
             return new LocalizedString { Key = key };
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        private static void _saveString(string key, string value)
+        {
+            if (_mappedStrings == null)
+                _mappedStrings = new Dictionary<string, string>();
+            _mappedStrings[key] = value;
+        }
+
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void ExportStrings()
+        {
+            if (_mappedStrings == null)
+                return;
+
+            try
+            {
+                new JsonManager().Serialize(_mappedStrings, Path.Combine(Main.ModPath, "enGB.json"));
+            }
+            catch (Exception e)
+            {
+                Print($"Failed export lanaguage file: {e.Message}");
+            }
         }
 
         #endregion
