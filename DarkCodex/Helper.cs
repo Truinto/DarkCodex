@@ -45,6 +45,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
+using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 
 namespace DarkCodex
 {
@@ -400,6 +401,25 @@ namespace DarkCodex
             }
 
             return result;
+        }
+
+        public static BlueprintAbility TargetPoint(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = false)
+        {
+            ability.CanTargetEnemies = true;
+            ability.CanTargetPoint = true;
+            ability.CanTargetFriends = true;
+            ability.CanTargetSelf = self;
+            ability.Animation = animation;
+            return ability;
+        }
+        public static BlueprintAbility TargetEnemy(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional)
+        {
+            ability.CanTargetEnemies = true;
+            ability.CanTargetPoint = false;
+            ability.CanTargetFriends = false;
+            ability.CanTargetSelf = false;
+            ability.Animation = animation;
+            return ability;
         }
 
         #endregion

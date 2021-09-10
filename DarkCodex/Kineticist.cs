@@ -32,6 +32,7 @@ using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.ResourceLinks;
 using Kingmaker.Blueprints.Facts;
+using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 
 namespace DarkCodex
 {
@@ -42,7 +43,7 @@ namespace DarkCodex
             var feature = Helper.CreateBlueprintFeature(
                 "BackgroundElementalist",
                 "Elemental Plane Outsider",
-                "Elemental Plane Outsider count as 1 level higher for determining Kineticist levels.",
+                "Elemental Plane Outsider count as 1 Kineticist level higher for determining prerequisites for wild talents.",
                 null,
                 null,
                 0,
@@ -90,11 +91,11 @@ namespace DarkCodex
 
             // rename buffs, so it's easier to tell them apart
             buff1.m_Icon = gather_original_ab.Icon;
-            buff1.m_DisplayName = Helper.CreateString("Gather Power Lv1");
+            buff1.m_DisplayName = Helper.CreateString(buff1.m_DisplayName + " Lv1");
             buff2.m_Icon = gather_original_ab.Icon;
-            buff2.m_DisplayName = Helper.CreateString("Gather Power Lv2");
+            buff2.m_DisplayName = Helper.CreateString(buff2.m_DisplayName + " Lv2");
             buff3.m_Icon = gather_original_ab.Icon;
-            buff3.m_DisplayName = Helper.CreateString("Gather Power Lv3");
+            buff3.m_DisplayName = Helper.CreateString(buff3.m_DisplayName + " Lv3");
 
             // new buff that halves movement speed, disallows normal gathering
             var mobile_debuff = Helper.CreateBlueprintBuff(
@@ -130,8 +131,8 @@ namespace DarkCodex
                 AbilityType.Special,
                 UnitCommand.CommandType.Move,
                 AbilityRange.Personal,
-                "",
-                "",
+                null,
+                null,
                 can_gather,
                 Helper.CreateAbilityEffectRunAction(0, regain_halfmove, apply_debuff, three2three, two2three, one2two, zero2one));
             mobile_gathering_short_ab.CanTargetSelf = true;
@@ -152,8 +153,8 @@ namespace DarkCodex
                 AbilityType.Special,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Personal,
-                "",
-                "",
+                null,
+                null,
                 can_gather,
                 hasMoveAction,
                 Helper.CreateAbilityEffectRunAction(0, lose_halfmove, apply_debuff, three2three, two2three, one2three, zero2two));
@@ -169,7 +170,7 @@ namespace DarkCodex
                 mobile_debuff.Icon,
                 FeatureGroup.Feat,
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 7, true),
-                Helper.CreateAddFacts(mobile_gathering_short_ab, mobile_gathering_long_ab));
+                Helper.CreateAddFacts(mobile_gathering_short_ab.ToRef2(), mobile_gathering_long_ab.ToRef2()));
             mobile_gathering_feat.Ranks = 1;
             Helper.AddFeats(mobile_gathering_feat);
 
@@ -220,8 +221,8 @@ namespace DarkCodex
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close,
-                duration: "",
-                savingThrow: "",
+                duration: null,
+                savingThrow: null,
                 step1,
                 step2_rank_dice(twice: false),
                 step3_rank_bonus(half_bonus: false),
@@ -231,7 +232,7 @@ namespace DarkCodex
                 step7_projectile(Resource.Projectile.Kinetic_EarthBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
-                );
+                ).TargetPoint(CastAnimationStyle.Kineticist);
             var attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
             attack.IfTrue = step1.Actions;
             step1.Actions = Helper.CreateActionList(attack);
@@ -247,8 +248,8 @@ namespace DarkCodex
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close,
-                duration: "",
-                savingThrow: "",
+                duration: null,
+                savingThrow: null,
                 step1,
                 step2_rank_dice(twice: true),
                 step3_rank_bonus(half_bonus: false),
@@ -258,7 +259,7 @@ namespace DarkCodex
                 step7_projectile(Resource.Projectile.Kinetic_MetalBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
-                );
+                ).TargetPoint(CastAnimationStyle.Kineticist);
             attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
             attack.IfTrue = step1.Actions;
             step1.Actions = Helper.CreateActionList(attack);
@@ -274,8 +275,8 @@ namespace DarkCodex
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close,
-                duration: "",
-                savingThrow: "",
+                duration: null,
+                savingThrow: null,
                 step1,
                 step2_rank_dice(twice: true),
                 step3_rank_bonus(half_bonus: false),
@@ -286,7 +287,7 @@ namespace DarkCodex
                 step8_spell_description(SpellDescriptor.Cold),
                 step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
-                );
+                ).TargetPoint(CastAnimationStyle.Kineticist);
             attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
             attack.IfTrue = step1.Actions;
             step1.Actions = Helper.CreateActionList(attack);
@@ -497,6 +498,31 @@ namespace DarkCodex
             cost.IncreaseGatherPower(value); // apply value
 
             return false;
+        }
+    }
+
+    //[HarmonyPatch(typeof(AddKineticistPart), MethodType.Constructor)]
+    public class Patch_BlastCollection
+    {
+        public static List<BlueprintAbilityReference> blasts = new List<BlueprintAbilityReference>();
+
+        public static void Postfix(AddKineticistPart __instance)
+        {
+            if (__instance == null)
+            {
+                Helper.PrintDebug("AddKineticistPart instance is null");
+                return;
+            }
+
+            if (__instance.m_Blasts == null)
+            {
+                Helper.PrintDebug("AddKineticistPart m_Blasts is null");
+                return;
+            }
+
+            Helper.PrintDebug("AddKineticistPart m_Blasts before length is " + __instance.m_Blasts.Length);
+            __instance.m_Blasts = __instance.m_Blasts.ToList().Union(blasts).ToArray();
+            Helper.PrintDebug("AddKineticistPart m_Blasts after length is " + __instance.m_Blasts.Length);
         }
     }
 
