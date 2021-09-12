@@ -55,7 +55,7 @@ namespace DarkCodex
         }
 
         // call this last
-        public static void createExtraWildTalentFeat(bool enabled = true)
+        public static void createExtraWildTalentFeat()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
@@ -76,8 +76,7 @@ namespace DarkCodex
             extra_wild_talent_selection.m_AllFeatures = Helper.Append(infusion_selection.m_AllFeatures,     //InfusionSelection
                                                                     wildtalent_selection.m_AllFeatures);  //+WildTalentSelection
 
-            if (enabled)
-                Helper.AddFeats(extra_wild_talent_selection);
+            Helper.AddFeats(extra_wild_talent_selection);
         }
 
         // known issue:

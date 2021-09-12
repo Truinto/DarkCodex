@@ -47,6 +47,11 @@ namespace DarkCodex
         private static string[] loadSaveOptions = new string[] {
             "Kineticist.*",
             "Kineticist.createKineticistBackground",
+            "Items.*",
+            "General.*",
+            "Rogue.*",
+            "Witch.*",
+            "Hexcrafter.*",
         };
 
         /// <summary>Draws the GUI</summary>
@@ -224,13 +229,15 @@ namespace DarkCodex
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
-                    LoadSafe(Kineticist.createExtraWildTalentFeat, true); // keep last
+                    LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
                     LoadSafe(Witch.createIceTomb);
                     LoadSafe(Hexcrafter.fixProgression);
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
 
                     LoadSafe(Items.patchArrows);
                     LoadSafe(Items.patchTerendelevScale);
+
+                    LoadSafe(General.patchAngelsLight);
 
                     Patch_CombatState.End += RestoreEndOfCombat.HandlePartyCombatEnd;
 

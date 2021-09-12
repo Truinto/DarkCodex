@@ -39,6 +39,7 @@
     <Compile Include="Components\ContextConditionAttackRoll.cs" />
     <Compile Include="Components\RestoreEndOfCombat.cs" />
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
+    <Compile Include="General.cs" />
     <Compile Include="GuidManager.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Hexcrafter.cs" />
