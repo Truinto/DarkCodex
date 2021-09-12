@@ -20,6 +20,11 @@ namespace DarkCodex
 {
     public class Witch
     {
+        public static void createExtraHex()
+        {
+
+        }
+
         public static void createHexStrike()
         {
 
@@ -46,7 +51,8 @@ namespace DarkCodex
 
             var icetomb_cooldown = Helper.CreateBlueprintBuff("WitchHexIceTombCooldownBuff", "", "").Flags(hidden: true);
 
-            var icetomb_debuff = Helper.CreateBlueprintBuff("WitchHexIceTombBuff", "Frozen", "A storm of ice and freezing wind enveloped the creature.", null, null, null,
+            var icetomb_debuff = Helper.CreateBlueprintBuff("WitchHexIceTombBuff", "Frozen", "A storm of ice and freezing wind enveloped the creature.", null, null, null
+                ).SetComponents(
                 Helper.CreateAddCondition(UnitCondition.Paralyzed),
                 Helper.CreateAddCondition(UnitCondition.Unconscious)
                 );
@@ -71,7 +77,8 @@ namespace DarkCodex
                 CommandType.Standard,
                 AbilityRange.Medium,
                 Resource.Strings.MinutesPerLevel,
-                Resource.Strings.FortitudePartial,
+                Resource.Strings.FortitudePartial
+                ).SetComponents(
                 runaction,
                 Helper.CreateAbilityTargetHasFact(true, icetomb_cooldown.ToRef2()),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Hex | SpellDescriptor.Cold)
@@ -83,7 +90,8 @@ namespace DarkCodex
                 icetomb_ab.m_Description,
                 null,
                 IcyPrison.Icon,
-                FeatureGroup.WitchHex,
+                FeatureGroup.WitchHex
+                ).SetComponents(
                 Helper.CreateAddFacts(icetomb_ab.ToRef2()),
                 Helper.CreatePrerequisiteFeature(WitchMajorHex)
                 );

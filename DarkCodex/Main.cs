@@ -14,6 +14,9 @@ using DarkCodex.Components;
 using Kingmaker.Modding;
 using Kingmaker.Achievements;
 using Kingmaker;
+using Config;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace DarkCodex
 {
@@ -81,6 +84,9 @@ namespace DarkCodex
                             Settings.StateManager.State.doNotLoad.Remove(str);
                     }
                 }
+
+                if (GUILayout.Button("Export Player Data", GUILayout.ExpandWidth(false)))
+                    ExportPlayerData();
             }
 
             GUILayout.Label("");
@@ -221,6 +227,7 @@ namespace DarkCodex
                     LoadSafe(Kineticist.createExtraWildTalentFeat, true); // keep last
                     LoadSafe(Witch.createIceTomb);
                     LoadSafe(Hexcrafter.fixProgression);
+                    LoadSafe(Rogue.createExtraRogueTalent); // keep last
 
                     LoadSafe(Items.patchArrows);
                     LoadSafe(Items.patchTerendelevScale);
@@ -327,6 +334,31 @@ namespace DarkCodex
             }
 
             return false;
+        }
+
+        private static void ExportPlayerData()
+        {
+            try
+            {
+                JsonSerializer serializer = JsonSerializer.CreateDefault(new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    TypeNameHandling = TypeNameHandling.All,
+                });
+
+                using (StreamWriter sw = new StreamWriter(Path.Combine(ModPath, "player.json")))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    serializer.Serialize(writer, Game.Instance.Player.Party);
+                }
+
+                Helper.Print("Exported player data.");
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
         }
 
         // TODO: make patch helper?

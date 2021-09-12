@@ -268,19 +268,22 @@ namespace DarkCodex
 
         #region Components
 
-        public static void AddComponents(this BlueprintScriptableObject obj, params BlueprintComponent[] components)
+        public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
+            foreach (var comp in components)
+                comp.name = $"${comp.GetType().Name}${obj.AssetGuid}";
+
             obj.ComponentsArray = Append(obj.ComponentsArray, components);
+            return obj;
         }
 
-        public static void SetComponents(this BlueprintScriptableObject obj, params BlueprintComponent[] components)
+        public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
+            foreach (var comp in components)
+                comp.name = $"${comp.GetType().Name}${obj.AssetGuid}";
+
             obj.ComponentsArray = components;
-        }
-
-        public static void SetComponents(this BlueprintScriptableObject obj, IEnumerable<BlueprintComponent> components)
-        {
-            obj.ComponentsArray = components.ToArray();
+            return obj;
         }
 
         public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
@@ -468,7 +471,7 @@ namespace DarkCodex
             result.m_Stat = stat;
             result.m_Class = classes ?? Array.Empty<BlueprintCharacterClassReference>();
             result.Archetype = ToRef<BlueprintArchetypeReference>(null);
-            result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>();
+            result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>(); // TODO: check if this is ok, or if it should split 1 to Archetype instead
             result.m_FeatureList = featureList ?? Array.Empty<BlueprintFeatureReference>();
 
             return result;
@@ -683,7 +686,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, string guid = null, Sprite icon = null, PrefabLink fxOnStart = null, params BlueprintComponent[] components)
+        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, string guid = null, Sprite icon = null, PrefabLink fxOnStart = null)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -694,7 +697,6 @@ namespace DarkCodex
             result.m_Description = description.CreateString();
             result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
-            result.ComponentsArray = components;
             result.FxOnStart = fxOnStart ?? new PrefabLink();
             result.FxOnRemove = new PrefabLink();
             result.IsClassFeature = true;
@@ -711,13 +713,11 @@ namespace DarkCodex
             return result;
         }
 
-        public static ClassLevelsForPrerequisites CreateClassLevelsForPrerequisites(string target_class, int bonus = 0, string source_class = null, double multiplier = 1d)
+        public static ClassLevelsForPrerequisites CreateClassLevelsForPrerequisites(BlueprintCharacterClassReference target_class, int bonus = 0, BlueprintCharacterClassReference source_class = null, double multiplier = 0d)
         {
             var result = new ClassLevelsForPrerequisites();
-            result.m_FakeClass = new BlueprintCharacterClassReference();
-            result.m_FakeClass.ReadGuidFromJson(target_class);
-            result.m_ActualClass = new BlueprintCharacterClassReference();
-            result.m_ActualClass.ReadGuidFromJson(source_class);
+            result.m_FakeClass = target_class;
+            result.m_ActualClass = source_class ?? target_class;
             result.Summand = bonus;
             result.Modifier = multiplier;
             return result;
@@ -756,7 +756,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintFeature CreateBlueprintFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, params BlueprintComponent[] components)
+        public static BlueprintFeature CreateBlueprintFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -769,13 +769,12 @@ namespace DarkCodex
             result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
-            result.ComponentsArray = components;
 
             AddAsset(result, result.AssetGuid);
             return result;
         }
 
-        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, string guid, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, LocalizedString duration = null, LocalizedString savingThrow = null, params BlueprintComponent[] components)
+        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, string guid, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, LocalizedString duration = null, LocalizedString savingThrow = null)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -786,7 +785,6 @@ namespace DarkCodex
             result.m_Description = description.CreateString();
             result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
-            result.ComponentsArray = components;
             result.ResourceAssetIds = Array.Empty<string>();
             result.Type = type;
             result.ActionType = actionType;
@@ -798,7 +796,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, string guid, Sprite icon, FeatureGroup group, params BlueprintComponent[] components)
+        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -811,7 +809,6 @@ namespace DarkCodex
             result.AssetGuid = BlueprintGuid.Parse(guid);
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.m_Icon = icon;
-            result.ComponentsArray = components;
 
             AddAsset(result, result.AssetGuid);
             return result;

@@ -14,7 +14,6 @@ using DarkCodex.Components;
 using Kingmaker.Utility;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.Visual.Animation.Kingmaker.Actions;
-using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 using Kingmaker.ElementsSystem;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
@@ -40,14 +39,17 @@ namespace DarkCodex
     {
         public static void createKineticistBackground()
         {
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+            //var dragon_class = Helper.ToRef<BlueprintCharacterClassReference>("01a754e7c1b7c5946ba895a5ff0faffc");
+
             var feature = Helper.CreateBlueprintFeature(
                 "BackgroundElementalist",
                 "Elemental Plane Outsider",
                 "Elemental Plane Outsider count as 1 Kineticist level higher for determining prerequisites for wild talents.",
                 null,
                 null,
-                0,
-                Helper.CreateClassLevelsForPrerequisites("42a455d9ec1ad924d889272429eb8391", 1)); //kineticist class
+                0
+                ).SetComponents(Helper.CreateClassLevelsForPrerequisites(kineticist_class, 1));
 
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
@@ -65,9 +67,10 @@ namespace DarkCodex
                 "You gain a wild talent for which you meet the prerequisites. You can select an infusion or a non-infusion wild talent, but not a blast or defense wild talent.\nSpecial: You can take this feat multiple times. Each time, you must choose a different wild talent.",
                 null,
                 ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("42f96fc8d6c80784194262e51b0a1d25").Icon, //ExtraArcanePool.Icon
-                FeatureGroup.Feat,
+                FeatureGroup.Feat
+                ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 1, true)
-            );
+                );
             extra_wild_talent_selection.Ranks = 10;
 
             extra_wild_talent_selection.m_AllFeatures = Helper.Append(infusion_selection.m_AllFeatures,     //InfusionSelection
@@ -104,7 +107,8 @@ namespace DarkCodex
                 "Your movement speed is halved after gathering power.",
                 null,
                 Helper.CreateSprite("GatherMobileHigh.png"),
-                null,
+                null
+                ).SetComponents(
                 new TurnBasedBuffMovementSpeed(multiplier: 0.5f));
 
             var apply_debuff = Helper.CreateContextActionApplyBuff(mobile_debuff, 1);
@@ -132,7 +136,8 @@ namespace DarkCodex
                 UnitCommand.CommandType.Move,
                 AbilityRange.Personal,
                 null,
-                null,
+                null
+                ).SetComponents(
                 can_gather,
                 Helper.CreateAbilityEffectRunAction(0, regain_halfmove, apply_debuff, three2three, two2three, one2two, zero2one));
             mobile_gathering_short_ab.CanTargetSelf = true;
@@ -154,7 +159,8 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Personal,
                 null,
-                null,
+                null
+                ).SetComponents(
                 can_gather,
                 hasMoveAction,
                 Helper.CreateAbilityEffectRunAction(0, lose_halfmove, apply_debuff, three2three, two2three, one2three, zero2two));
@@ -168,7 +174,8 @@ namespace DarkCodex
                 "While gathering power, you can move up to half your normal speed. This movement provokes attacks of opportunity as normal.",
                 null,
                 mobile_debuff.Icon,
-                FeatureGroup.Feat,
+                FeatureGroup.Feat
+                ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 7, true),
                 Helper.CreateAddFacts(mobile_gathering_short_ab.ToRef2(), mobile_gathering_long_ab.ToRef2()));
             mobile_gathering_feat.Ranks = 1;
@@ -205,7 +212,8 @@ namespace DarkCodex
                 + "You extend a long, sharp spike of elemental matter along a line, impaling multiple foes. Make a single attack roll against each creature or object in a 30-foot line.",
                 null,
                 icon,
-                FeatureGroup.KineticBlastInfusion,
+                FeatureGroup.KineticBlastInfusion
+                ).SetComponents(
                 Helper.CreatePrerequisiteFeaturesFromList(true, earth_blast, metal_blast, ice_blast),
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 6)
                 );
@@ -222,7 +230,8 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close,
                 duration: null,
-                savingThrow: null,
+                savingThrow: null
+                ).SetComponents(
                 step1,
                 step2_rank_dice(twice: false),
                 step3_rank_bonus(half_bonus: false),
@@ -249,7 +258,8 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close,
                 duration: null,
-                savingThrow: null,
+                savingThrow: null
+                ).SetComponents(
                 step1,
                 step2_rank_dice(twice: true),
                 step3_rank_bonus(half_bonus: false),
@@ -276,7 +286,8 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close,
                 duration: null,
-                savingThrow: null,
+                savingThrow: null
+                ).SetComponents(
                 step1,
                 step2_rank_dice(twice: true),
                 step3_rank_bonus(half_bonus: false),

@@ -47,6 +47,7 @@
     <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.cs" />
+    <Compile Include="Rogue.cs" />
     <Compile Include="Settings\ConfigManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Settings\Settings.cs" />
