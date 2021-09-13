@@ -181,9 +181,15 @@ namespace DarkCodex
             Helper.AddFeats(mobile_gathering_feat);
 
             // make original gather ability visible for manual gathering and allow to extend buff3
-            gather_original_ab.Hidden = false;
             Helper.AppendAndReplace(ref gather_original_ab.GetComponent<AbilityEffectRunAction>().Actions.Actions, three2three);
 
+        }
+
+        public static void patchGatherPower()
+        {
+            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
+            gather_original_ab.Hidden = false;
+            gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
         }
 
         public static void createImpaleInfusion()

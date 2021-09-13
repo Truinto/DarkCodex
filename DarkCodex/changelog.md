@@ -14,6 +14,7 @@
 - impale infusion
 - ice tomb
 - extra rogue talent
+- buffed angel's light
 
 ### Changed
 - testing out new parameters on mobile gathering

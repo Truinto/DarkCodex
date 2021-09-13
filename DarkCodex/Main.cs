@@ -17,6 +17,7 @@ using Kingmaker;
 using Config;
 using System.IO;
 using Newtonsoft.Json;
+using Kingmaker.PubSubSystem;
 
 namespace DarkCodex
 {
@@ -226,6 +227,7 @@ namespace DarkCodex
                 {
                     Helper.Print("Loading Dark Codex");
 
+                    LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
@@ -239,11 +241,14 @@ namespace DarkCodex
 
                     LoadSafe(General.patchAngelsLight);
 
-                    Patch_CombatState.End += RestoreEndOfCombat.HandlePartyCombatEnd;
+                    EventBus.Subscribe(new RestoreEndOfCombat());
+                    //Patch_CombatState.End += RestoreEndOfCombat.HandlePartyCombatEnd;
 
-                    harmony.Patch(
-                        original: AccessTools.PropertyGetter(typeof(OwlcatModificationsManager), "IsAnyModActive"),
-                        prefix: new HarmonyMethod(typeof(Patch_AllowAchievements), nameof(Patch_AllowAchievements.Prefix)));
+                    Helper.Patch(typeof(Patch_AllowAchievements), "Prefix", null);
+                    //harmony.Patch(
+                    //    original: AccessTools.PropertyGetter(typeof(OwlcatModificationsManager), "IsAnyModActive"),
+                    //    prefix: new HarmonyMethod(typeof(Patch_AllowAchievements), nameof(Patch_AllowAchievements.Prefix)));
+
 
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG

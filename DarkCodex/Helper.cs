@@ -1,5 +1,6 @@
 ﻿using Config;
 using DarkCodex.Components;
+using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -40,6 +41,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,6 +84,78 @@ namespace DarkCodex
                 }
             }
             throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Patching
+
+        /// <summary>Needs ManualPatch attribute.</summary>
+        public static void Patch(Type patch, string Prefix, string Postfix)
+        {
+            var manual = patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) as ManualPatchAttribute;
+            if (manual == null)
+                return;
+
+            var attr = new HarmonyPatch(manual.declaringType, manual.methodName, manual.methodType);
+            Main.harmony.Patch(
+                        original: GetOriginalMethod(attr.info),
+                        prefix: Prefix == null ? null : new HarmonyMethod(patch, Prefix),
+                        postfix: Postfix == null ? null : new HarmonyMethod(patch, Postfix));
+        }
+
+        /// <summary>Needs HarmonyPatch attribute.</summary>
+        public static void Patch(Type patch)
+        {
+            Main.harmony.CreateClassProcessor(patch).Patch();
+        }
+
+        public static void Unpatch(Type patch, HarmonyPatchType patchType)
+        {
+            var attr = patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) as HarmonyPatch;
+            if (attr == null)
+                return;
+
+            MethodBase orignal = attr.info.GetOriginalMethod();
+            Main.harmony.Unpatch(orignal, patchType, Main.harmony.Id);
+        }
+
+        public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
+        {
+            try
+            {
+                switch (attr.methodType)
+                {
+                    case MethodType.Normal:
+                        if (attr.methodName is null)
+                            return null;
+                        return AccessTools.DeclaredMethod(attr.declaringType, attr.methodName, attr.argumentTypes);
+
+                    case MethodType.Getter:
+                        if (attr.methodName is null)
+                            return null;
+                        return AccessTools.DeclaredProperty(attr.declaringType, attr.methodName).GetGetMethod(true);
+
+                    case MethodType.Setter:
+                        if (attr.methodName is null)
+                            return null;
+                        return AccessTools.DeclaredProperty(attr.declaringType, attr.methodName).GetSetMethod(true);
+
+                    case MethodType.Constructor:
+                        return AccessTools.DeclaredConstructor(attr.declaringType, attr.argumentTypes);
+
+                    case MethodType.StaticConstructor:
+                        return AccessTools.GetDeclaredConstructors(attr.declaringType)
+                            .Where(c => c.IsStatic)
+                            .FirstOrDefault();
+                }
+            }
+            catch (AmbiguousMatchException ex)
+            {
+                throw new Exception("GetOriginalMethod " + ex.ToString());
+            }
+
+            return null;
         }
 
         #endregion

@@ -43,6 +43,7 @@
     <Compile Include="GuidManager.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Hexcrafter.cs" />
+    <Compile Include="Attributes\ManualPatchAttribute.cs" />
     <Compile Include="Items.cs" />
     <Compile Include="Kineticist.cs" />
     <Compile Include="Patches.cs" />
@@ -60,6 +61,9 @@
     <None Include="info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

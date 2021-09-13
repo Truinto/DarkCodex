@@ -6,6 +6,7 @@ using Kingmaker.UnitLogic.ActivatableAbilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,11 +32,14 @@ namespace DarkCodex
     }
 
     /// <summary>
-    /// [HarmonyPatch(typeof(OwlcatModificationsManager), nameof(OwlcatModificationsManager.IsAnyModActive), MethodType.Getter)]
     /// Is manually patched. It crashes otherwise. Clears the 'has used mods before' flag and also pretends that no mods are active.
     /// </summary>
-    public static class Patch_AllowAchievements
+    [ManualPatch(typeof(OwlcatModificationsManager), nameof(OwlcatModificationsManager.IsAnyModActive), MethodType.Getter)]
+    public class Patch_AllowAchievements
     {
+        public static MethodBase Original => AccessTools.PropertyGetter(typeof(OwlcatModificationsManager), nameof(OwlcatModificationsManager.IsAnyModActive));
+        public static HarmonyMethod PatchPrefix => new HarmonyMethod(typeof(Patch_AllowAchievements), nameof(Patch_AllowAchievements.Prefix));
+
         public static bool Prefix(ref bool __result)
         {
             if (!Settings.StateManager.State.allowAchievements)
