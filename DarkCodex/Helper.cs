@@ -360,6 +360,20 @@ namespace DarkCodex
             return obj;
         }
 
+        public static void ReplaceComponent<T, TRep, TOrig>(this T obj, TRep replacement, TOrig tori) where T : BlueprintScriptableObject where TRep : BlueprintComponent
+        {
+            replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}";
+
+            for (int i = 0; i < obj.ComponentsArray.Length; i++)
+            {
+                if (obj.ComponentsArray[i] is TOrig)
+                {
+                    obj.ComponentsArray[i] = replacement;
+                    break;
+                }
+            }
+        }
+
         public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
         {
             var levelentry = obj.AddFeatures.FirstOrDefault(f => f.Level == level);
@@ -429,6 +443,19 @@ namespace DarkCodex
             if (_basicfeats == null)
                 _basicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45");
             Helper.AppendAndReplace(ref _basicfeats.m_AllFeatures, feats.ToRef());
+        }
+
+        public static BlueprintFeatureSelection _mythicfeats;
+        public static BlueprintFeatureSelection _mythicextrafeats;
+        public static void AddMythicFeat(BlueprintFeatureReference feat)
+        {
+            if (_mythicfeats == null)
+                _mythicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
+            if (_mythicextrafeats == null)
+                _mythicextrafeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
+
+            Helper.AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat);
+            _mythicextrafeats.m_AllFeatures = _mythicfeats.m_AllFeatures;
         }
 
         public static bool AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)

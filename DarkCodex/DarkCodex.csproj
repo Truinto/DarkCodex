@@ -35,6 +35,7 @@
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
+    <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
     <Compile Include="Components\ContextActionUndoAction.cs" />
     <Compile Include="Components\ContextConditionAttackRoll.cs" />
     <Compile Include="Components\RestoreEndOfCombat.cs" />
@@ -46,6 +47,7 @@
     <Compile Include="Attributes\ManualPatchAttribute.cs" />
     <Compile Include="Items.cs" />
     <Compile Include="Kineticist.cs" />
+    <Compile Include="Mythic.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.cs" />

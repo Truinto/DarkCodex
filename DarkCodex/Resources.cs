@@ -1,4 +1,7 @@
-﻿using Kingmaker.Localization;
+﻿using Kingmaker.Blueprints;
+using Kingmaker.Localization;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.ActivatableAbilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +12,36 @@ namespace DarkCodex
 {
     public class Resource
     {
+        public class Cache
+        {
+            public static List<BlueprintAbility> Ability;
+            public static List<BlueprintActivatableAbility> Activatable;
+
+            public static void Ensure()
+            {
+                if (Ability != null)
+                    return;
+
+                Ability = new List<BlueprintAbility>();
+                Activatable = new List<BlueprintActivatableAbility>();
+
+                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                {
+                    if (bp.Blueprint is BlueprintAbility)
+                        Ability.Add((BlueprintAbility)bp.Blueprint);
+                    else if (bp.Blueprint is BlueprintActivatableAbility)
+                        Activatable.Add((BlueprintActivatableAbility)bp.Blueprint);
+                }
+            }
+
+            public static void Dispose()
+            {
+                Ability = null;
+                Activatable = null;
+            }
+
+        }
+
         public class Strings
         {
             public static LocalizedString Empty = new LocalizedString { Key = "" };

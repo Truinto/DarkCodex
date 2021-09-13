@@ -228,6 +228,7 @@ namespace DarkCodex
                     Helper.Print("Loading Dark Codex");
 
                     LoadSafe(Kineticist.patchGatherPower);
+                    LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
@@ -235,6 +236,8 @@ namespace DarkCodex
                     LoadSafe(Witch.createIceTomb);
                     LoadSafe(Hexcrafter.fixProgression);
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
+                    LoadSafe(Mythic.createLimitlessBardicPerformance);
+                    LoadSafe(Mythic.createLimitlessWitchHexes);
 
                     LoadSafe(Items.patchArrows);
                     LoadSafe(Items.patchTerendelevScale);
@@ -372,8 +375,6 @@ namespace DarkCodex
                 Helper.PrintException(e);
             }
         }
-
-        // TODO: make patch helper?
 
         #endregion
 
