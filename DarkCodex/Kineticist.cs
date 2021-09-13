@@ -192,6 +192,14 @@ namespace DarkCodex
             gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
         }
 
+        /// <summary>The same creature can be racked over and over.</summary>
+        public static void patchDarkElementalist()
+        {
+            var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c");    //DarkElementalistSoulPowerAbility
+            var targets = soulability.GetComponent<AbilityTargetsAround>();
+            targets.m_Condition.Conditions = Array.Empty<Condition>();
+        }
+
         public static void createImpaleInfusion()
         {
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
