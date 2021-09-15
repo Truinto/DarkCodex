@@ -14,7 +14,7 @@ Installation
 -----------
 * You will need [Unity Mod Manager](https://www.nexusmods.com/site/mods/21).
 * Follow the installation procedure (tl;dr; select game, select folder, press install).
-* Download a release or rebuild your own.
+* Download a release or rebuild your own [https://github.com/Truinto/DarkCodex/releases](https://github.com/Truinto/DarkCodex/releases).
 * Switch to the mod tab and drop the zip file into the manager.
 
 Contact
