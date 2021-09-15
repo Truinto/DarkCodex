@@ -1,8 +1,15 @@
 ﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Achievements;
+using Kingmaker.Controllers.Combat;
+using Kingmaker.EntitySystem;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Modding;
+using Kingmaker.UI.UnitSettings;
+using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Commands;
+using Kingmaker.UnitLogic.Commands.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,5 +100,148 @@ namespace DarkCodex
         {
             __result += ExtraGroups;
         }
+    }
+
+    public class Patches_Activatable
+    {
+        // uses up move action when triggered; deactivates activatable if no action left
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.OnNewRound))]
+        public static class ActivatableAbility_OnNewRoundPatch
+        {
+            public static void OldPostfix(ActivatableAbility __instance)
+            {
+                var unit = __instance.Owner.Unit;
+
+                if (!unit.IsInCombat) // cooldowns are not refreshed out of combat, therefore must not increase cooldown out of combat
+                    return;
+
+                ActivatableAbilityUnitCommand ucommand = __instance.GetComponent<ActivatableAbilityUnitCommand>();
+                if (ucommand == null || ucommand.Type != UnitCommand.CommandType.Move) // we only care to modify move actions
+                    return;
+
+                if (__instance.m_ShouldBeDeactivatedInNextRound || !__instance.IsOn || !__instance.IsAvailable) // if the ability is about to cancel, we don't consume cooldowns
+                    return;
+
+                if (!AlreadySpendMove(unit.CombatState))
+                {
+                    Helper.PrintDebug("ActivatableAbility set Move Cooldown! old=" + unit.CombatState.Cooldown.MoveAction);
+                    unit.CombatState.Cooldown.MoveAction += 3f;
+                }
+                else
+                {
+                    Helper.PrintDebug("ActivatableAbility turn off because no move action left");
+                    __instance.IsOn = false;
+                }
+
+                bool AlreadySpendMove(UnitCombatState state)
+                {
+                    if (state.HasCooldownForCommand(UnitCommand.CommandType.Standard))
+                        return state.Cooldown.MoveAction > 0f;
+                    else
+                        return state.Cooldown.MoveAction > 3f;
+                }
+            }
+        
+            public static void Postfix(ActivatableAbility __instance)
+            {
+                var cd = __instance.Owner.Unit.CombatState.Cooldown;
+                if (cd.StandardAction > 0f && cd.MoveAction > 3f || cd.MoveAction > 6f)
+                    __instance.IsOn = false;
+            }
+        }
+
+        // fixes move actions disabling the activatable (since we have 2 of them)
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.HandleUnitRunCommand))]
+        public static class ActivatableAbility_HandleUnitRunCommand
+        {
+            public static bool Prefix(UnitCommand command, ActivatableAbility __instance)
+            {
+                if (command.Type == UnitCommand.CommandType.Move) // skip this logic, if the trigger came from a move action
+                    return false;
+
+                return true;
+            }
+        }
+
+        // fixes activatable not being allowed to be active when they have the same action (like 2 move actions)
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.OnDidTurnOn))]
+        public static class ActivatableAbility_OnTurnOn
+        {
+            public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+            {
+                List<CodeInstruction> list = instr.ToList();
+                MethodInfo original = AccessTools.Method(typeof(EntityFact), nameof(EntityFact.GetComponent), null, typeof(ActivatableAbilityUnitCommand).ObjToArray());
+                MethodInfo replacement = AccessTools.Method(typeof(ActivatableAbility_OnTurnOn), nameof(NullReplacement));
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var mi = list[i].operand as MethodInfo;
+                    if (mi != null && mi == original)
+                    {
+                        Helper.PrintDebug("ActivatableAbility_OnTurnOnPatch at " + i);
+                        list[i].operand = replacement;
+                    }
+                }
+
+                return list;
+            }
+
+            public static object NullReplacement(object something)
+            {
+                return null;
+            }
+        }
+
+        // removes validation
+        [HarmonyPatch(typeof(ActivatableAbilityUnitCommand), nameof(ActivatableAbilityUnitCommand.ApplyValidation))]
+        public static class ActivatableAbilityUnitCommand_ApplyValidation
+        {
+            public static bool Prefix()
+            {
+                return false;
+            }
+        }
+
+        // fixes activatable not starting the second time, while being outside of combat
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.TryStart))]
+        public static class ActivatableAbility_TryStart
+        {
+            public static void Prefix(ActivatableAbility __instance)
+            {
+                if (!__instance.Owner.Unit.IsInCombat)
+                {
+                    __instance.Owner.Unit.CombatState.Cooldown.SwiftAction = 0f;
+                    __instance.Owner.Unit.CombatState.Cooldown.MoveAction = 0f;
+                }
+
+            }
+        }
+
+        // fixes activatable can be activated manually
+        [HarmonyPatch(typeof(MechanicActionBarSlotActivableAbility), nameof(MechanicActionBarSlotActivableAbility.OnClick))]
+        public static class ActionBar
+        {
+            public static readonly int NoManualOn = 788704819;
+            public static readonly int NoManualOff = 788704820;
+            public static readonly int NoManualAny = 788704821;
+
+            public static bool Prefix(MechanicActionBarSlotActivableAbility __instance)
+            {
+                if (!__instance.ActivatableAbility.IsOn && __instance.ActivatableAbility.Blueprint.WeightInGroup == NoManualOn)
+                {
+                    return false;
+                }
+                if (__instance.ActivatableAbility.IsOn && __instance.ActivatableAbility.Blueprint.WeightInGroup == NoManualOff)
+                {
+                    return false;
+                }
+                if (__instance.ActivatableAbility.Blueprint.WeightInGroup == NoManualAny)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
     }
 }

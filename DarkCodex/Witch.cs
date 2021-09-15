@@ -42,14 +42,17 @@ namespace DarkCodex
 
         }
 
+        // known issues: activatable doesn't cost any time
         public static void createCackleActivatable()
         {
-            var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("36f2467103d4635459d412fb418276f4");
+            var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("36f2467103d4635459d412fb418276f4");
             var cackle = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("4bd01292a9bc4304f861a6a07f03b855");
-            var chant_feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("3f776576b5f27604a9dad54d361153af");
+            var chant_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("3f776576b5f27604a9dad54d361153af");
             var chant = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6cd07c80aabf2b248a11921090de9c17");
             var sfx = new PrefabLink() { AssetId = "79665f3d500fdf44083feccf4cbfc00a" };
-            
+
+            var consume_move = new ActivatableAbilityUnitCommand { Type = CommandType.Move };
+
             var cackle_addarea = Helper.CreateBlueprintAbilityAreaEffect(
                 "CacklePassiveArea",
                 shape: AreaEffectShape.Cylinder,
@@ -68,7 +71,7 @@ namespace DarkCodex
                 commandType: CommandType.Move,
                 deactivateWhenStunned: true,
                 deactivateWhenDead: true
-                );
+                ).SetComponents(consume_move);
             cackle_buff.SetComponents(cackle_addarea);
 
             var chant_addarea = Helper.CreateBlueprintAbilityAreaEffect(
@@ -89,7 +92,7 @@ namespace DarkCodex
                 commandType: CommandType.Move,
                 deactivateWhenStunned: true,
                 deactivateWhenDead: true
-                );
+                ).SetComponents(consume_move);
             chant_buff.SetComponents(chant_addarea);
 
             Helper.AppendAndReplace(ref cackle_feat.GetComponent<AddFacts>().m_Facts, cackle_passiv.ToRef());

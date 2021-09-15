@@ -96,6 +96,7 @@ namespace DarkCodex
         /// <summary>Needs ManualPatch attribute.</summary>
         public static void Patch(Type patch, string Prefix, string Postfix)
         {
+            Print("ManualPatch " + patch);
             var manual = patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) as ManualPatchAttribute;
             if (manual == null)
                 throw new ArgumentException("Type must have ManualPatchAttribute");
@@ -110,11 +111,13 @@ namespace DarkCodex
         /// <summary>Needs HarmonyPatch attribute.</summary>
         public static void Patch(Type patch)
         {
+            Print("RePatch " + patch);
             Main.harmony.CreateClassProcessor(patch).Patch();
         }
 
         public static void Unpatch(Type patch, HarmonyPatchType patchType)
         {
+            Print("Unpatch " + patch);
             var attr = patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) as HarmonyPatch;
             if (attr == null)
                 return;
