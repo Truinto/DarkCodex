@@ -35,6 +35,7 @@
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
+    <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
     <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
     <Compile Include="Components\ContextActionUndoAction.cs" />
     <Compile Include="Components\ContextConditionAttackRoll.cs" />

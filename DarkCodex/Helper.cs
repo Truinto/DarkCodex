@@ -27,9 +27,12 @@ using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
+using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
@@ -491,7 +494,7 @@ namespace DarkCodex
             return buff;
         }
 
-        public static ContextCondition[] CreateConditionHasNoBuff(params BlueprintBuff[] buffs)
+        public static ContextCondition[] MakeConditionHasNoBuff(params BlueprintBuff[] buffs)
         {
             if (buffs == null || buffs[0] == null) throw new ArgumentNullException();
             var result = new ContextCondition[buffs.Length];
@@ -504,6 +507,13 @@ namespace DarkCodex
                 result[i] = buff;
             }
 
+            return result;
+        }
+
+        public static AddAreaEffect MakeAddAreaEffect(this BlueprintAbilityAreaEffect area)
+        {
+            var result = new AddAreaEffect();
+            result.m_AreaEffect = area.ToRef();
             return result;
         }
 
@@ -787,25 +797,6 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, string guid = null, Sprite icon = null, PrefabLink fxOnStart = null)
-        {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-
-            var result = new BlueprintBuff();
-            result.name = name;
-            result.m_DisplayName = displayName.CreateString();
-            result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
-            result.m_Icon = icon;
-            result.FxOnStart = fxOnStart ?? new PrefabLink();
-            result.FxOnRemove = new PrefabLink();
-            result.IsClassFeature = true;
-
-            AddAsset(result, result.AssetGuid);
-            return result;
-        }
-
         public static LevelEntry CreateLevelEntry(int level, params BlueprintFeatureBase[] features)
         {
             var result = new LevelEntry();
@@ -854,6 +845,25 @@ namespace DarkCodex
         {
             var result = new AddFacts();
             result.m_Facts = facts;
+            return result;
+        }
+
+        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, string guid = null, Sprite icon = null, PrefabLink fxOnStart = null)
+        {
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = new BlueprintBuff();
+            result.name = name;
+            result.m_DisplayName = displayName.CreateString();
+            result.m_Description = description.CreateString();
+            result.AssetGuid = BlueprintGuid.Parse(guid);
+            result.m_Icon = icon;
+            result.FxOnStart = fxOnStart ?? new PrefabLink();
+            result.FxOnRemove = new PrefabLink();
+            result.IsClassFeature = true;
+
+            AddAsset(result, result.AssetGuid);
             return result;
         }
 
@@ -910,6 +920,104 @@ namespace DarkCodex
             result.AssetGuid = BlueprintGuid.Parse(guid);
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.m_Icon = icon;
+
+            AddAsset(result, result.AssetGuid);
+            return result;
+        }
+
+        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(String name, String displayName, String description, out BlueprintBuff buff, string guid = null, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
+        {
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = new BlueprintActivatableAbility();
+            result.name = name;
+            result.m_DisplayName = displayName.CreateString();
+            result.m_Description = description.CreateString();
+            result.AssetGuid = BlueprintGuid.Parse(guid);
+            result.m_Icon = icon;
+            result.ResourceAssetIds = Array.Empty<string>();
+
+            //result.m_Buff = buff;
+            result.m_ActivateWithUnitCommand = commandType;
+            result.ActivationType = activationType;
+            result.DeactivateImmediately = deactivateImmediately;
+            result.IsOnByDefault = onByDefault;
+            result.OnlyInCombat = onlyInCombat;
+
+            result.DeactivateIfCombatEnded = deactivateEndOfCombat;
+            result.DeactivateAfterFirstRound = deactivateAfterRound;
+            result.DeactivateIfOwnerDisabled = deactivateWhenStunned;
+            result.DeactivateIfOwnerUnconscious = deactivateWhenDead;
+            result.DoNotTurnOffOnRest = deactivateOnRest;
+
+            result.Group = group;
+            result.WeightInGroup = groupWeight; // how many resources one activation costs
+            result.m_ActivateOnUnitAction = useWithSpell ? AbilityActivateOnUnitActionType.CastSpell : 0; // when spell casts costs resources
+
+            //result.IsTargeted = ;
+            //result.m_SelectTargetAbility = ;
+
+            AddAsset(result, result.AssetGuid);
+
+            // make activatable buff
+            buff = new BlueprintBuff();
+            buff.name = name + "_Buff";
+            buff.m_DisplayName = result.m_DisplayName;
+            buff.m_Description = result.m_Description;
+            buff.AssetGuid = BlueprintGuid.Parse(GuidManager.i.Get(buff.name));
+            buff.m_Icon = icon;
+            buff.FxOnStart = new PrefabLink();
+            buff.FxOnRemove = new PrefabLink();
+            buff.IsClassFeature = true;
+            AddAsset(buff, buff.AssetGuid);
+
+            result.m_Buff = buff.ToRef();
+            return result;
+        }
+
+        public static BlueprintAbilityAreaEffect CreateBlueprintAbilityAreaEffect(string name, string guid = null, bool applyEnemy = false, bool applyAlly = false, AreaEffectShape shape = AreaEffectShape.Cylinder, Feet size = default(Feet), PrefabLink sfx = null, BlueprintBuffReference buffWhileInside = null, ActionList unitEnter = null, ActionList unitExit = null, ActionList unitMove = null, ActionList unitRound = null)
+        {
+            if (!applyAlly && !applyEnemy)
+                throw new ArgumentException("area must effect either allies or enemies");
+
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = new BlueprintAbilityAreaEffect();
+            result.name = name;
+            result.AssetGuid = BlueprintGuid.Parse(guid);
+            result.Shape = shape;
+            result.Size = size;
+            result.Fx = sfx ?? new PrefabLink();
+
+            if (applyEnemy && applyAlly)
+                result.m_TargetType = BlueprintAbilityAreaEffect.TargetType.Any;
+            else if (applyEnemy)
+                result.m_TargetType = BlueprintAbilityAreaEffect.TargetType.Enemy;
+            else if (applyAlly)
+                result.m_TargetType = BlueprintAbilityAreaEffect.TargetType.Ally;
+
+            if (buffWhileInside != null)
+            {
+                AbilityAreaEffectBuff areabuff = new AbilityAreaEffectBuff(); // applies buff while inside
+                areabuff.Condition = new ConditionsChecker();
+                areabuff.CheckConditionEveryRound = false;
+                areabuff.m_Buff = buffWhileInside;
+
+                result.SetComponents(areabuff);
+            }
+
+            if (unitEnter != null || unitExit != null || unitMove != null || unitRound != null)
+            {
+                AbilityAreaEffectRunAction runaction = new AbilityAreaEffectRunAction(); // runs actions that persist even when leaving
+                runaction.UnitEnter = unitEnter ?? new ActionList();
+                runaction.UnitExit = unitExit ?? new ActionList();
+                runaction.UnitMove = unitMove ?? new ActionList();
+                runaction.Round = unitRound ?? new ActionList();
+
+                result.AddComponents(runaction);
+            }
 
             AddAsset(result, result.AssetGuid);
             return result;
@@ -1140,8 +1248,24 @@ namespace DarkCodex
             return result;
         }
 
-
-
+        public static BlueprintAbilityAreaEffectReference ToRef(this BlueprintAbilityAreaEffect feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintAbilityAreaEffectReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintAbilityAreaEffectReference[] ToRef(this BlueprintAbilityAreaEffect[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintAbilityAreaEffectReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintAbilityAreaEffectReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
 
         #endregion
 

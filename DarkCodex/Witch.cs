@@ -5,10 +5,16 @@ using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.Enums.Damage;
+using Kingmaker.ResourceLinks;
 using Kingmaker.RuleSystem;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +44,60 @@ namespace DarkCodex
         public static void createAmplifyHex()
         {
 
+        }
+
+        public static void createCackleActivatable()
+        {
+            var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("36f2467103d4635459d412fb418276f4");
+            var cackle = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("4bd01292a9bc4304f861a6a07f03b855");
+            var chant_feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("3f776576b5f27604a9dad54d361153af");
+            var chant = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6cd07c80aabf2b248a11921090de9c17");
+            var sfx = new PrefabLink() { AssetId = "79665f3d500fdf44083feccf4cbfc00a" };
+            
+            var cackle_addarea = Helper.CreateBlueprintAbilityAreaEffect(
+                "CacklePassiveArea",
+                shape: AreaEffectShape.Cylinder,
+                applyAlly: true,
+                applyEnemy: true,
+                size: 30.Feet(),
+                sfx: sfx,
+                unitRound: cackle.GetComponent<AbilityEffectRunAction>().Actions
+                ).MakeAddAreaEffect();
+            var cackle_passiv = Helper.CreateBlueprintActivatableAbility(
+                "WitchHexCacklePassive",
+                "Cackle (passive)",
+                cackle.m_Description, 
+                out BlueprintBuff cackle_buff,
+                icon: cackle.Icon,
+                commandType: CommandType.Move,
+                deactivateWhenStunned: true,
+                deactivateWhenDead: true
+                );
+            cackle_buff.SetComponents(cackle_addarea);
+
+            var chant_addarea = Helper.CreateBlueprintAbilityAreaEffect(
+                "ChantPassiveArea",
+                shape: AreaEffectShape.Cylinder,
+                applyAlly: true,
+                applyEnemy: true,
+                size: 30.Feet(),
+                sfx: sfx,
+                unitRound: chant.GetComponent<AbilityEffectRunAction>().Actions
+                ).MakeAddAreaEffect();
+            var chant_passiv = Helper.CreateBlueprintActivatableAbility(
+                "ShamanHexChantPassive",
+                "Chant (passive)",
+                chant.m_Description,
+                out BlueprintBuff chant_buff,
+                icon: chant.Icon,
+                commandType: CommandType.Move,
+                deactivateWhenStunned: true,
+                deactivateWhenDead: true
+                );
+            chant_buff.SetComponents(chant_addarea);
+
+            Helper.AppendAndReplace(ref cackle_feat.GetComponent<AddFacts>().m_Facts, cackle_passiv.ToRef());
+            Helper.AppendAndReplace(ref chant_feat.GetComponent<AddFacts>().m_Facts, chant_passiv.ToRef());
         }
 
         public static void createIceTomb()

@@ -233,8 +233,9 @@ namespace DarkCodex
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
                     LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
-                    LoadSafe(Witch.createIceTomb);
                     LoadSafe(Hexcrafter.fixProgression);
+                    LoadSafe(Witch.createIceTomb);
+                    LoadSafe(Witch.createCackleActivatable); // keep last
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
                     LoadSafe(Mythic.createLimitlessBardicPerformance);
                     LoadSafe(Mythic.createLimitlessWitchHexes);

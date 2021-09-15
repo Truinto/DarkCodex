@@ -15,6 +15,7 @@
 - ice tomb
 - extra rogue talent
 - buffed angel's light
+- cackle/shant passive activatable
 
 ### Changed
 - testing out new parameters on mobile gathering
