@@ -23,22 +23,22 @@ Contact
 
 Content
 -----------
-General.patchAngelsLight
-General.createAbilityFocus
-Items.patchArrows
-Items.patchTerendelevScale
-Rogue.createExtraRogueTalent
-Mythic.createLimitlessBardicPerformance
-Mythic.createLimitlessWitchHexes
-Witch.createCackleActivatable
-Witch.createIceTomb
-Hexcrafter.fixProgression
-Kineticist.createExtraWildTalentFeat
-Kineticist.patchGatherPower
-Kineticist.patchDarkElementalist
-Kineticist.createKineticistBackground
-Kineticist.createMobileGatheringFeat
-Kineticist.createImpaleInfusion
+General.patchAngelsLight - increase temporary HP from 1 to character level
+General.createAbilityFocus - basic feat: ability focus to increase DC of one ability by +2 (untested)
+Items.patchArrows - recollect cold iron arrows after combat (untested)
+Items.patchTerendelevScale - Terendelev's Scale can be used once daily (untested, but should work)
+Rogue.createExtraRogueTalent - basic feat: extra rogue talent (untested)
+Mythic.createLimitlessBardicPerformance - mythic feat: bardic performances cost no resources (untested)
+Mythic.createLimitlessWitchHexes - mythic feat: hexes ignore the cooldown (untested)
+Witch.createCackleActivatable - cackle/chant give an activatable ability that uses move action passively (tested in turn based)
+Witch.createIceTomb - hex: ice tomb (untested, probably doesn't work?)
+Hexcrafter.fixProgression - hexcrafter can select hex with any arcana and get spell recall at level 11 (tested)
+Kineticist.createExtraWildTalentFeat - kineticist extra wild talent (tested)
+Kineticist.patchGatherPower - kineticist gather power can be used manually (tested)
+Kineticist.patchDarkElementalist - kineticist soul power can be used repeatably on the same creatures (untested)
+Kineticist.createKineticistBackground - regional background: that grants +1 kineticist level for the purpose of feat prerequisits (tested)
+Kineticist.createMobileGatheringFeat - basic feat: mobile gathering (tested)
+Kineticist.createImpaleInfusion - infusion: impale (tested earth)
 
 FAQ
 -----------
