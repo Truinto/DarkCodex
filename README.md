@@ -23,7 +23,22 @@ Contact
 
 Content
 -----------
-Fill out later
+General.patchAngelsLight
+General.createAbilityFocus
+Items.patchArrows
+Items.patchTerendelevScale
+Rogue.createExtraRogueTalent
+Mythic.createLimitlessBardicPerformance
+Mythic.createLimitlessWitchHexes
+Witch.createCackleActivatable
+Witch.createIceTomb
+Hexcrafter.fixProgression
+Kineticist.createExtraWildTalentFeat
+Kineticist.patchGatherPower
+Kineticist.patchDarkElementalist
+Kineticist.createKineticistBackground
+Kineticist.createMobileGatheringFeat
+Kineticist.createImpaleInfusion
 
 FAQ
 -----------
