@@ -227,32 +227,34 @@ namespace DarkCodex
                 {
                     Helper.Print("Loading Dark Codex");
 
+                    LoadSafe(General.patchAngelsLight);
+
+                    LoadSafe(Items.patchArrows);
+                    LoadSafe(Items.patchTerendelevScale);
+
+                    LoadSafe(Mythic.createLimitlessBardicPerformance);
+                    LoadSafe(Mythic.createLimitlessWitchHexes);
+
                     LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
-                    LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
-                    LoadSafe(Hexcrafter.fixProgression);
+
                     LoadSafe(Witch.createIceTomb);
+
+                    LoadSafe(Hexcrafter.fixProgression);
+
+                    LoadSafe(General.createAbilityFocus); // keep last
+                    LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
                     LoadSafe(Witch.createCackleActivatable); // keep last
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
-                    LoadSafe(Mythic.createLimitlessBardicPerformance);
-                    LoadSafe(Mythic.createLimitlessWitchHexes);
-
-                    LoadSafe(Items.patchArrows);
-                    LoadSafe(Items.patchTerendelevScale);
-
-                    LoadSafe(General.patchAngelsLight);
 
                     EventBus.Subscribe(new RestoreEndOfCombat());
                     //Patch_CombatState.End += RestoreEndOfCombat.HandlePartyCombatEnd;
 
-                    Helper.Patch(typeof(Patch_AllowAchievements), "Prefix", null);
-                    //harmony.Patch(
-                    //    original: AccessTools.PropertyGetter(typeof(OwlcatModificationsManager), "IsAnyModActive"),
-                    //    prefix: new HarmonyMethod(typeof(Patch_AllowAchievements), nameof(Patch_AllowAchievements.Prefix)));
 
+                    Helper.Patch(typeof(Patch_AllowAchievements), "Prefix", null);
 
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG

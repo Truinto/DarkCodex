@@ -54,7 +54,6 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
 
-        // call this last
         public static void createExtraWildTalentFeat()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
@@ -79,9 +78,6 @@ namespace DarkCodex
             Helper.AddFeats(extra_wild_talent_selection);
         }
 
-        // known issue:
-        // - gathering long consumes the remaining move range (cannot fix)
-        // - gathering long works while weapon is equiped
         public static void createMobileGatheringFeat()
         {
             // --- base game stuff ---
@@ -123,7 +119,7 @@ namespace DarkCodex
             var three2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff3), Helper.CreateContextActionApplyBuff(buff3, 2));
             var two2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff2).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff2), Helper.CreateContextActionApplyBuff(buff3, 2) });
             var one2two = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff2, 2) });
-            var zero2one = Helper.CreateConditional(Helper.CreateConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff1, 2) });
+            var zero2one = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff1, 2) });
             var regain_halfmove = new ContextActionUndoAction(command: UnitCommand.CommandType.Move);
             var mobile_gathering_short_ab = Helper.CreateBlueprintAbility(
                 "MobileGatheringShort",
@@ -145,7 +141,7 @@ namespace DarkCodex
 
             // same as above but standard action and 2 levels of gatherpower
             var one2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff3, 2) });
-            var zero2two = Helper.CreateConditional(Helper.CreateConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff2, 2) });
+            var zero2two = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff2, 2) });
             var hasMoveAction = Helper.CreateAbilityRequirementActionAvailable(false, ActionType.Move, 6f);
             var lose_halfmove = new ContextActionUndoAction(command: UnitCommand.CommandType.Move, amount: -1.5f);
             var mobile_gathering_long_ab = Helper.CreateBlueprintAbility(
@@ -162,7 +158,8 @@ namespace DarkCodex
                 ).SetComponents(
                 can_gather,
                 hasMoveAction,
-                Helper.CreateAbilityEffectRunAction(0, lose_halfmove, apply_debuff, three2three, two2three, one2three, zero2two));
+                Helper.CreateAbilityEffectRunAction(0, lose_halfmove, apply_debuff, three2three, two2three, one2three, zero2two),
+                new RestrictionCanGatherPowerAbility());
             mobile_gathering_long_ab.CanTargetSelf = true;
             mobile_gathering_long_ab.Animation = CastAnimationStyle.Self;
             mobile_gathering_long_ab.HasFastAnimation = true;
@@ -176,7 +173,8 @@ namespace DarkCodex
                 FeatureGroup.Feat
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 7, true),
-                Helper.CreateAddFacts(mobile_gathering_short_ab.ToRef2(), mobile_gathering_long_ab.ToRef2()));
+                Helper.CreateAddFacts(mobile_gathering_short_ab.ToRef2(), mobile_gathering_long_ab.ToRef2()),
+                new RestrictionCanGatherPowerAbility());
             mobile_gathering_feat.Ranks = 1;
             Helper.AddFeats(mobile_gathering_feat);
 
@@ -190,6 +188,7 @@ namespace DarkCodex
             var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
             gather_original_ab.Hidden = false;
             gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
+            gather_original_ab.AddComponents(new RestrictionCanGatherPowerAbility());
         }
 
         /// <summary>The same creature can be racked over and over.</summary>
@@ -478,21 +477,7 @@ namespace DarkCodex
     #region Patches
 
     /// <summary>
-    /// Normal: Healing burn turns its non-lethal damage into actual damage.
-    /// Patched: Healing burn heals non-lethal damage completely.
-    /// Correction: This might work differently than I thought. The HP bar is not consistant with the actual max HP. Needs investigation.
-    /// </summary>
-    //[HarmonyPatch(typeof(UnitPartKineticist), nameof(UnitPartKineticist.HealBurn))]
-    public class Patch_HealBurnDamage
-    {
-        public static void Postfix(int value, UnitPartKineticist __instance)
-        {
-            __instance.Owner.Damage -= value * __instance.Owner.Progression.CharacterLevel;
-        }
-    }
-
-    /// <summary>
-    /// Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, than levels are lost.
+    /// Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost.
     /// Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.
     /// </summary>
     [HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryApplyGatherPower))]
@@ -552,18 +537,4 @@ namespace DarkCodex
 
     #endregion
 
-    //[HarmonyPatch(typeof(UnitCommands), nameof(UnitCommands.Run), typeof(UnitCommand))]
-    public class Patch_Debug1
-    {
-        public static void Prefix(UnitCommands __instance)
-        {
-            var cd = __instance.m_Owner?.CombatState?.Cooldown;
-            Helper.Print($"pre move={cd?.MoveAction} std={cd?.StandardAction}");
-        }
-        public static void Postfix(UnitCommands __instance)
-        {
-            var cd = __instance.m_Owner?.CombatState?.Cooldown;
-            Helper.Print($"post move={cd?.MoveAction} std={cd?.StandardAction}");
-        }
-    }
 }

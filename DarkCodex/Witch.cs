@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
+using DarkCodex.Components;
 
 namespace DarkCodex
 {
@@ -37,11 +38,6 @@ namespace DarkCodex
         }
 
         public static void createSplitHex()
-        {
-
-        }
-
-        public static void createAmplifyHex()
         {
 
         }

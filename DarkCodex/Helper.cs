@@ -98,7 +98,7 @@ namespace DarkCodex
         {
             var manual = patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) as ManualPatchAttribute;
             if (manual == null)
-                return;
+                throw new ArgumentException("Type must have ManualPatchAttribute");
 
             var attr = new HarmonyPatch(manual.declaringType, manual.methodName, manual.methodType);
             Main.harmony.Patch(
@@ -924,6 +924,26 @@ namespace DarkCodex
             AddAsset(result, result.AssetGuid);
             return result;
         }
+        
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, AnyBlueprintReference[] blueprints = null)
+        {
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = new BlueprintParametrizedFeature();
+            result.IsClassFeature = true;
+            result.name = name;
+            result.m_DisplayName = displayName.CreateString();
+            result.m_Description = description.CreateString();
+            result.AssetGuid = BlueprintGuid.Parse(guid);
+            result.m_Icon = icon;
+            result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
+            result.ParameterType = FeatureParameterType.FeatureSelection;
+            result.BlueprintParameterVariants = blueprints;
+
+            AddAsset(result, result.AssetGuid);
+            return result;
+        }
 
         public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(String name, String displayName, String description, out BlueprintBuff buff, string guid = null, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
         {
@@ -1034,6 +1054,7 @@ namespace DarkCodex
             return tref;
         }
 
+
         public static BlueprintUnitFactReference ToRef2(this BlueprintAbility feature)
         {
             if (feature == null) return null;
@@ -1056,6 +1077,45 @@ namespace DarkCodex
             return result;
         }
 
+
+        public static AnyBlueprintReference ToRef3(this BlueprintAbility feature)
+        {
+            if (feature == null) return null;
+            var result = new AnyBlueprintReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static AnyBlueprintReference[] ToRef3(this BlueprintAbility[] feature)
+        {
+            if (feature == null) return null;
+            var result = new AnyBlueprintReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new AnyBlueprintReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+
+
+        public static AnyBlueprintReference ToRef(this BlueprintScriptableObject feature)
+        {
+            if (feature == null) return null;
+            var result = new AnyBlueprintReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static AnyBlueprintReference[] ToRef(this BlueprintScriptableObject[] feature)
+        {
+            if (feature == null) return null;
+            var result = new AnyBlueprintReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new AnyBlueprintReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
 
         public static BlueprintFeatureReference ToRef(this BlueprintFeature feature)
         {

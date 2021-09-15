@@ -37,9 +37,6 @@ namespace DarkCodex
     [ManualPatch(typeof(OwlcatModificationsManager), nameof(OwlcatModificationsManager.IsAnyModActive), MethodType.Getter)]
     public class Patch_AllowAchievements
     {
-        public static MethodBase Original => AccessTools.PropertyGetter(typeof(OwlcatModificationsManager), nameof(OwlcatModificationsManager.IsAnyModActive));
-        public static HarmonyMethod PatchPrefix => new HarmonyMethod(typeof(Patch_AllowAchievements), nameof(Patch_AllowAchievements.Prefix));
-
         public static bool Prefix(ref bool __result)
         {
             if (!Settings.StateManager.State.allowAchievements)
