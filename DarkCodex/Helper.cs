@@ -11,6 +11,7 @@ using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.Designers.Mechanics.Prerequisites;
 using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
@@ -453,15 +454,42 @@ namespace DarkCodex
 
         public static BlueprintFeatureSelection _mythicfeats;
         public static BlueprintFeatureSelection _mythicextrafeats;
-        public static void AddMythicFeat(BlueprintFeatureReference feat)
+        public static void AddMythicFeat(BlueprintFeature feat)
         {
             if (_mythicfeats == null)
                 _mythicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
             if (_mythicextrafeats == null)
                 _mythicextrafeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
 
-            Helper.AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat);
+            Helper.AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat.ToRef());
             _mythicextrafeats.m_AllFeatures = _mythicfeats.m_AllFeatures;
+        }
+
+        public static BlueprintFeatureSelection _roguefeats;
+        public static BlueprintFeatureSelection _slayerfeats1;
+        public static BlueprintFeatureSelection _slayerfeats2;
+        public static BlueprintFeatureSelection _slayerfeats3;
+        public static BlueprintFeatureSelection _vivsectionistfeats3;
+        public static void AddRogueFeat(BlueprintFeature feat)
+        {
+            if (_roguefeats == null)
+                _roguefeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
+            if (_slayerfeats1 == null)
+                _slayerfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("04430ad24988baa4daa0bcd4f1c7d118");
+            if (_slayerfeats2 == null)
+                _slayerfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("43d1b15873e926848be2abf0ea3ad9a8");
+            if (_slayerfeats3 == null)
+                _slayerfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("913b9cf25c9536949b43a2651b7ffb66");
+            if (_vivsectionistfeats3 == null)
+                _vivsectionistfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
+
+            var reference = feat.ToRef();
+
+            Helper.AppendAndReplace(ref _roguefeats.m_AllFeatures, reference);
+            Helper.AppendAndReplace(ref _slayerfeats1.m_AllFeatures, reference);
+            Helper.AppendAndReplace(ref _slayerfeats2.m_AllFeatures, reference);
+            Helper.AppendAndReplace(ref _slayerfeats3.m_AllFeatures, reference);
+            Helper.AppendAndReplace(ref _vivsectionistfeats3.m_AllFeatures, reference);
         }
 
         public static bool AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
@@ -546,6 +574,27 @@ namespace DarkCodex
         public static void AddAsset(this SimpleBlueprint bp, string guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(BlueprintGuid.Parse(guid), bp);
         public static void AddAsset(this SimpleBlueprint bp, Guid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(new BlueprintGuid(guid), bp);
         public static void AddAsset(this SimpleBlueprint bp, BlueprintGuid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+
+        public static AddInitiatorAttackRollTrigger CreateAddInitiatorAttackRollTrigger(ActionList Action, bool OnOwner = false, bool SneakAttack = false, bool OnlyHit = true, bool CriticalHit = false, bool CheckWeapon = false, WeaponCategory WeaponCategory = 0)
+        {
+            var result = new AddInitiatorAttackRollTrigger();
+            result.Action = Action;
+            result.OnOwner = OnOwner;
+            result.SneakAttack = SneakAttack;
+            result.OnlyHit = OnlyHit;
+            result.CriticalHit = CriticalHit;
+            result.CheckWeapon = CheckWeapon;
+            result.WeaponCategory = WeaponCategory;
+            return result;
+        }
+
+        public static PrerequisiteFullStatValue CreatePrerequisiteFullStatValue(StatType stat, int value = 0)
+        {
+            var result = new PrerequisiteFullStatValue();
+            result.Stat = stat;
+            result.Value = value;
+            return result;
+        }
 
         public static AddCondition CreateAddCondition(UnitCondition condition)
         {
@@ -927,7 +976,7 @@ namespace DarkCodex
             AddAsset(result, result.AssetGuid);
             return result;
         }
-        
+
         public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, AnyBlueprintReference[] blueprints = null)
         {
             if (guid == null)

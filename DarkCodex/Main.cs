@@ -46,13 +46,29 @@ namespace DarkCodex
 
         private static bool bExpand = false;
         private static string[] loadSaveOptions = new string[] {
-            "Kineticist.*",
-            "Kineticist.createKineticistBackground",
-            "Items.*",
             "General.*",
+            "Hexcrafter.*",
+            "Items.*",
+            "Kineticist.*",
             "Rogue.*",
             "Witch.*",
-            "Hexcrafter.*",
+            "General.createAbilityFocus",
+            "General.patchAngelsLight",
+            "Hexcrafter.fixProgression",
+            "Items.patchArrows",
+            "Items.patchTerendelevScale",
+            "Kineticist.createExtraWildTalentFeat",
+            "Kineticist.createImpaleInfusion",
+            "Kineticist.createKineticistBackground",
+            "Kineticist.createMobileGatheringFeat",
+            "Kineticist.patchDarkElementalist",
+            "Kineticist.patchGatherPower",
+            "Mythic.createLimitlessBardicPerformance",
+            "Mythic.createLimitlessWitchHexes",
+            "Rogue.createBleedingAttack",
+            "Rogue.createExtraRogueTalent",
+            "Witch.createCackleActivatable",
+            "Witch.createIceTomb",
         };
 
         /// <summary>Draws the GUI</summary>
@@ -244,6 +260,8 @@ namespace DarkCodex
                     LoadSafe(Witch.createIceTomb);
 
                     LoadSafe(Hexcrafter.fixProgression);
+
+                    LoadSafe(Rogue.createBleedingAttack);
 
                     LoadSafe(General.createAbilityFocus); // keep last
                     LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last

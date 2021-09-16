@@ -37,6 +37,7 @@
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\Bleed.cs" />
+    <Compile Include="Components\DiceValue.cs" />
     <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
     <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
     <Compile Include="Components\ContextActionUndoAction.cs" />

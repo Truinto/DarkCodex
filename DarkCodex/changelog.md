@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.3]
+- added bleeding attack
+- added flensing strike
+- added missing gui elements
+
 ## [1.0.2]
 
 ### Added

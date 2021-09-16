@@ -50,7 +50,7 @@ namespace DarkCodex
                 logic.m_FreeBlueprint = limitless.ToRef2();
             }
 
-            Helper.AddMythicFeat(limitless.ToRef());
+            Helper.AddMythicFeat(limitless);
         }
 
         public static void createLimitlessWitchHexes()
@@ -87,7 +87,7 @@ namespace DarkCodex
             ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
             ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("cedc4959ab311d548881844eecddf57a").GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2()); // WitchHexLifeGiverAbility
 
-            Helper.AddMythicFeat(limitless.ToRef());
+            Helper.AddMythicFeat(limitless);
         }
     }
 }
