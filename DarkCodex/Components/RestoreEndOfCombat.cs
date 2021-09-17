@@ -16,35 +16,17 @@ namespace DarkCodex.Components
     [TypeId("f6b36505daa4414f93d2e3c94b1254ac")]
     public class RestoreEndOfCombat : BlueprintComponent, IPartyCombatHandler, IGlobalSubscriber, ISubscriber
     {
-        public static void HandlePartyCombatEnd()
-        {
-            foreach (var unit in Game.Instance.Player.AllCharacters)
-            {
-                foreach (var item in unit.Inventory)
-                {
-                    if (item.Blueprint.GetComponent<RestoreEndOfCombat>() != null)
-                    {
-                        Helper.PrintDebug($"RestoreEndOfCombat {item.Name}");
-                        item.RestoreCharges();
-                    }
-                }
-            }
-        }
-
         public void HandlePartyCombatStateChanged(bool inCombat)
         {
             if (inCombat)
                 return;
 
-            foreach (var unit in Game.Instance.Player.AllCharacters)
+            foreach (var item in Game.Instance.Player.Inventory)
             {
-                foreach (var item in unit.Inventory)
+                if (item.Blueprint.GetComponent<RestoreEndOfCombat>() != null)
                 {
-                    if (item.Blueprint.GetComponent<RestoreEndOfCombat>() != null)
-                    {
-                        Helper.PrintDebug($"RestoreEndOfCombat {item.Name}");
-                        item.RestoreCharges();
-                    }
+                    Helper.PrintDebug($"RestoreEndOfCombat {item.Name}");
+                    item.RestoreCharges();
                 }
             }
         }

@@ -95,24 +95,29 @@ namespace DarkCodex
         #region Patching
 
         /// <summary>Needs ManualPatch attribute.</summary>
-        public static void Patch(Type patch, string Prefix, string Postfix)
+        public static void Patch(Type patch, bool _)
         {
-            Print("ManualPatch " + patch);
+            Print("ManualPatch " + patch.Name);
             var manual = patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) as ManualPatchAttribute;
             if (manual == null)
                 throw new ArgumentException("Type must have ManualPatchAttribute");
 
+            var prefix = patch.GetMethod("Prefix");
+            var postfix = patch.GetMethod("Postfix");
+
             var attr = new HarmonyPatch(manual.declaringType, manual.methodName, manual.methodType);
             Main.harmony.Patch(
                         original: GetOriginalMethod(attr.info),
-                        prefix: Prefix == null ? null : new HarmonyMethod(patch, Prefix),
-                        postfix: Postfix == null ? null : new HarmonyMethod(patch, Postfix));
+                        prefix: prefix != null ? new HarmonyMethod(prefix) : null,
+                        postfix: postfix != null ? new HarmonyMethod(postfix) : null);
+
+            patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
         }
 
         /// <summary>Needs HarmonyPatch attribute.</summary>
         public static void Patch(Type patch)
         {
-            Print("RePatch " + patch);
+            Print("Patching " + patch.Name);
             Main.harmony.CreateClassProcessor(patch).Patch();
         }
 
@@ -125,6 +130,18 @@ namespace DarkCodex
 
             MethodBase orignal = attr.info.GetOriginalMethod();
             Main.harmony.Unpatch(orignal, patchType, Main.harmony.Id);
+        }
+
+        /// <summary>Only works with HarmonyPatch.</summary>
+        public static bool IsPatched(Type patch)
+        {
+            var attr = patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) as HarmonyPatch;
+            if (attr == null)
+                throw new ArgumentException("Type must have HarmonyPatch attribute");
+
+            MethodBase orignal = attr.info.GetOriginalMethod();
+            var info = Harmony.GetPatchInfo(orignal);
+            return info != null && (info.Prefixes?.Any() == true || info.Postfixes?.Any() == true || info.Transpilers?.Any() == true);
         }
 
         public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
@@ -276,6 +293,11 @@ namespace DarkCodex
         #endregion
 
         #region Strings
+
+        public static LocalizedString GetString(string guid)
+        {
+            return new LocalizedString { Key = "" };
+        }
 
         private static SHA1 _SHA = SHA1Managed.Create();
         private static StringBuilder _sb = new StringBuilder();
@@ -444,6 +466,12 @@ namespace DarkCodex
 
         #region Create Advanced
 
+        private static MethodInfo _memberwiseClone = AccessTools.Method(typeof(object), "MemberwiseClone");
+        public static T Clone<T>(this T obj)
+        {
+            return (T)_memberwiseClone.Invoke(obj, null);
+        }
+
         public static BlueprintFeatureSelection _basicfeats;
         public static void AddFeats(params BlueprintFeature[] feats)
         {
@@ -452,24 +480,33 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref _basicfeats.m_AllFeatures, feats.ToRef());
         }
 
-        public static BlueprintFeatureSelection _mythicfeats;
-        public static BlueprintFeatureSelection _mythicextrafeats;
+        private static BlueprintFeatureSelection _mythicfeats;
+        private static BlueprintFeatureSelection _mythictalents;
+        private static BlueprintFeatureSelection _mythicextratalents;
+        public static void AddMythicTalent(BlueprintFeature feat)
+        {
+            if (_mythictalents == null)
+                _mythictalents = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
+            if (_mythicextratalents == null)
+                _mythicextratalents = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
+
+            Helper.AppendAndReplace(ref _mythictalents.m_AllFeatures, feat.ToRef());
+            _mythicextratalents.m_AllFeatures = _mythictalents.m_AllFeatures;
+        }
+
         public static void AddMythicFeat(BlueprintFeature feat)
         {
             if (_mythicfeats == null)
-                _mythicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
-            if (_mythicextrafeats == null)
-                _mythicextrafeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
+                _mythicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81");
 
             Helper.AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat.ToRef());
-            _mythicextrafeats.m_AllFeatures = _mythicfeats.m_AllFeatures;
         }
 
-        public static BlueprintFeatureSelection _roguefeats;
-        public static BlueprintFeatureSelection _slayerfeats1;
-        public static BlueprintFeatureSelection _slayerfeats2;
-        public static BlueprintFeatureSelection _slayerfeats3;
-        public static BlueprintFeatureSelection _vivsectionistfeats3;
+        private static BlueprintFeatureSelection _roguefeats;
+        private static BlueprintFeatureSelection _slayerfeats1;
+        private static BlueprintFeatureSelection _slayerfeats2;
+        private static BlueprintFeatureSelection _slayerfeats3;
+        private static BlueprintFeatureSelection _vivsectionistfeats3;
         public static void AddRogueFeat(BlueprintFeature feat)
         {
             if (_roguefeats == null)
@@ -571,9 +608,24 @@ namespace DarkCodex
 
         #region Create
 
-        public static void AddAsset(this SimpleBlueprint bp, string guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(BlueprintGuid.Parse(guid), bp);
-        public static void AddAsset(this SimpleBlueprint bp, Guid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(new BlueprintGuid(guid), bp);
-        public static void AddAsset(this SimpleBlueprint bp, BlueprintGuid guid) => ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        public static void AddAsset(this SimpleBlueprint bp, string guid) => AddAsset(bp, BlueprintGuid.Parse(guid));
+        public static void AddAsset(this SimpleBlueprint bp, Guid guid) => AddAsset(bp, new BlueprintGuid(guid));
+        public static void AddAsset(this SimpleBlueprint bp, BlueprintGuid guid)
+        {
+            if (guid == BlueprintGuid.Empty)
+                throw new ArgumentException("GUID must not be empty!");
+            bp.AssetGuid = guid;
+            ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(BlueprintUnitFactReference ceckedFact, BlueprintUnitFactReference feature, bool Not = false)
+        {
+            var result = new AddFeatureIfHasFact();
+            result.m_CheckedFact = ceckedFact;
+            result.m_Feature = feature;
+            result.Not = Not;
+            return result;
+        }
 
         public static AddInitiatorAttackRollTrigger CreateAddInitiatorAttackRollTrigger(ActionList Action, bool OnOwner = false, bool SneakAttack = false, bool OnlyHit = true, bool CriticalHit = false, bool CheckWeapon = false, WeaponCategory WeaponCategory = 0)
         {
@@ -909,13 +961,12 @@ namespace DarkCodex
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
             result.FxOnStart = fxOnStart ?? new PrefabLink();
             result.FxOnRemove = new PrefabLink();
             result.IsClassFeature = true;
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
             return result;
         }
 
@@ -929,11 +980,10 @@ namespace DarkCodex
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
             return result;
         }
 
@@ -946,7 +996,6 @@ namespace DarkCodex
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
             result.ResourceAssetIds = Array.Empty<string>();
             result.Type = type;
@@ -955,7 +1004,7 @@ namespace DarkCodex
             result.LocalizedDuration = duration ?? Resource.Strings.Empty;
             result.LocalizedSavingThrow = savingThrow ?? Resource.Strings.Empty;
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
             return result;
         }
 
@@ -969,11 +1018,10 @@ namespace DarkCodex
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.m_Icon = icon;
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
             return result;
         }
 
@@ -987,13 +1035,12 @@ namespace DarkCodex
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.ParameterType = FeatureParameterType.FeatureSelection;
             result.BlueprintParameterVariants = blueprints;
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
             return result;
         }
 
@@ -1006,7 +1053,6 @@ namespace DarkCodex
             result.name = name;
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.m_Icon = icon;
             result.ResourceAssetIds = Array.Empty<string>();
 
@@ -1030,7 +1076,7 @@ namespace DarkCodex
             //result.IsTargeted = ;
             //result.m_SelectTargetAbility = ;
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
 
             // make activatable buff
             buff = new BlueprintBuff();
@@ -1058,7 +1104,6 @@ namespace DarkCodex
 
             var result = new BlueprintAbilityAreaEffect();
             result.name = name;
-            result.AssetGuid = BlueprintGuid.Parse(guid);
             result.Shape = shape;
             result.Size = size;
             result.Fx = sfx ?? new PrefabLink();
@@ -1091,7 +1136,7 @@ namespace DarkCodex
                 result.AddComponents(runaction);
             }
 
-            AddAsset(result, result.AssetGuid);
+            AddAsset(result, guid);
             return result;
         }
 
@@ -1359,6 +1404,26 @@ namespace DarkCodex
             }
             return result;
         }
+        
+        public static BlueprintWeaponTypeReference ToRef(this BlueprintWeaponType feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintWeaponTypeReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintWeaponTypeReference[] ToRef(this BlueprintWeaponType[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintWeaponTypeReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintWeaponTypeReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
+
 
         public static BlueprintAbilityAreaEffectReference ToRef(this BlueprintAbilityAreaEffect feature)
         {

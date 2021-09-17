@@ -26,7 +26,10 @@ namespace DarkCodex
                 if (ability.Type == AbilityType.Spell)
                     return false;
 
-                if (ability.m_Parent != null && !ability.m_Parent.IsEmpty())
+                if (ability.m_Parent != null || !ability.m_Parent.IsEmpty())
+                    return false;
+
+                if (ability.m_DisplayName.IsEmpty())
                     return false;
 
                 var run = ability.GetComponent<AbilityEffectRunAction>();

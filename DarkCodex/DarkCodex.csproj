@@ -30,12 +30,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\AbilityFocusParametrized.cs" />
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
+    <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
+    <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\DiceValue.cs" />
     <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
@@ -44,6 +47,7 @@
     <Compile Include="Components\ContextConditionAttackRoll.cs" />
     <Compile Include="Components\RestoreEndOfCombat.cs" />
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
+    <Compile Include="DEBUG.cs" />
     <Compile Include="General.cs" />
     <Compile Include="GuidManager.cs" />
     <Compile Include="Helper.cs" />
@@ -61,14 +65,9 @@
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Witch.cs" />
     <None Include="Settings\Repository.json" />
-    <None Include="changelog.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="info.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="..\README.md" />
+    <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

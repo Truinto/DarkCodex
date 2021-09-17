@@ -50,7 +50,7 @@ namespace DarkCodex
                 logic.m_FreeBlueprint = limitless.ToRef2();
             }
 
-            Helper.AddMythicFeat(limitless);
+            Helper.AddMythicTalent(limitless);
         }
 
         public static void createLimitlessWitchHexes()
@@ -87,7 +87,48 @@ namespace DarkCodex
             ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
             ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("cedc4959ab311d548881844eecddf57a").GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2()); // WitchHexLifeGiverAbility
 
-            Helper.AddMythicFeat(limitless);
+            Helper.AddMythicTalent(limitless);
+        }
+    
+        public static void createLimitlessSmite()
+        {
+            var smite_evil = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("7bb9eb2042e67bf489ccd1374423cdec");
+            var smite_chaos = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("a4df3ed7ef5aa9148a69e8364ad359c5");
+            var abundant_smite = Helper.ToRef<BlueprintFeatureReference>("7e5b63faeca24474db0bfd019167dda4");
+            var abundant_smitechaos = Helper.ToRef<BlueprintFeatureReference>("4cdc155e26204491ba4d193646cb4443");
+
+            var limitless = Helper.CreateBlueprintFeature(
+                "LimitlessSmite",
+                "Limitless Smite",
+                "Benefit: You no longer have a limited amount of Smite per day.",
+                icon: smite_evil.Icon,
+                group: FeatureGroup.MythicAbility
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature(abundant_smite, true),
+                Helper.CreatePrerequisiteFeature(abundant_smitechaos, true)
+                );
+
+            smite_evil.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
+            smite_chaos.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
+
+            Helper.AddMythicTalent(limitless);
+        }
+
+        public static void createKineticMastery()
+        {
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+
+            var kinetic_mastery = Helper.CreateBlueprintFeature(
+                "KineticMastery",
+                "Kinetic Mastery",
+                "You mastered the elements. Benefit: You add your mythic rank to physical kinetic blasts and half your mythic rank to energy kinetic blasts.",
+                group: FeatureGroup.MythicFeat
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 1),
+                new KineticMastery()
+                );
+
+            Helper.AddMythicFeat(kinetic_mastery);
         }
     }
 }

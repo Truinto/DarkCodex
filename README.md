@@ -1,7 +1,7 @@
 # DarkCodex
 Mod for Pathfinder: Wrath of the Righteous
 
-:construction: <span style="color:red">**This mod is under development! Some features are untested and work not properly, cause crashes, or corrupt your save.**</span> :construction:
+:construction: <span style="color:red">**This mod is under development! Some features are untested and work not properly, cause crashes, or corrupt your save.**</span> :construction: \
 I made this public so people can help me with testing. Don't expect a full-fledged mod.
 
 Disclaimers
@@ -26,19 +26,22 @@ Content
 -----------
 | Option | Description | Status |
 | ------ | ----------- | ------ |
-|General.createAbilityFocus|basic feat: Ability Focus to increase DC of one ability by +2|:construction:|
+|General.createAbilityFocus|basic feat: Ability Focus to increase DC of one ability by +2|:x:|
 |General.patchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:heavy_check_mark:|
 |Hexcrafter.fixProgression|Hexcrafter can select Hex with any Arcana and get Spell Recall at level 11|:heavy_check_mark:|
-|Items.patchArrows|recollect Cold Iron Arrows after combat|:construction:|
+|Items.patchArrows|recollect Cold Iron Arrows after combat|:heavy_check_mark:|
 |Items.patchTerendelevScale|Terendelev´s Scale can be used once daily|:construction:|
 |Kineticist.createExtraWildTalentFeat|Kineticist Extra Wild Talent|:heavy_check_mark:|
 |Kineticist.createImpaleInfusion|Infusion: Impale|:heavy_check_mark: only earth|
 |Kineticist.createKineticistBackground|Regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:heavy_check_mark:|
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:heavy_check_mark:|
-|Kineticist.patchDarkElementalist|Kineticist soul power can be used repeatably on the same creatures|:construction:|
+|Kineticist.patchDarkElementalist|Dark Elementalist QoL, faster animation and use anywhere, but only out of combat|:construction:|
 |Kineticist.patchGatherPower|Kineticist Gather Power can be used manually|:heavy_check_mark:|
-|Mythic.createLimitlessBardicPerformance|mythic feat: Bardic Performances cost no resources|:construction:|
-|Mythic.createLimitlessWitchHexes|mythic feat: Hexes ignore their cooldown|:construction:|
+|Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
+|Mythic.createLimitlessBardicPerformance|mythic talent: Bardic Performances cost no resources|:construction:|
+|Mythic.createLimitlessWitchHexes|mythic talent: Hexes ignore their cooldown|:construction:|
+|Mythic.createLimitlessSmite|mythic talent: infinite Smites, requires Abundant Smite|:heavy_check_mark:|
+|Mythic.createKineticMastery|mythic feat: physical Kinetic Blasts gain bonus equal to mythic level, or half with energy Blasts|:heavy_check_mark:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:x:|
 |Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:construction:|
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|

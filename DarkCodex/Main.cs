@@ -18,6 +18,7 @@ using Config;
 using System.IO;
 using Newtonsoft.Json;
 using Kingmaker.PubSubSystem;
+using System.Reflection;
 
 namespace DarkCodex
 {
@@ -44,7 +45,6 @@ namespace DarkCodex
             return true;
         }
 
-        private static bool bExpand = false;
         private static string[] loadSaveOptions = new string[] {
             "General.*",
             "Hexcrafter.*",
@@ -63,22 +63,29 @@ namespace DarkCodex
             "Kineticist.createMobileGatheringFeat",
             "Kineticist.patchDarkElementalist",
             "Kineticist.patchGatherPower",
+            "Kineticist.fixWallInfusion",
             "Mythic.createLimitlessBardicPerformance",
             "Mythic.createLimitlessWitchHexes",
+            "Mythic.createLimitlessSmite",
+            "Mythic.createKineticMastery",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
             "Witch.createCackleActivatable",
             "Witch.createIceTomb",
         };
+        private static float _debug1 = 30f;
 
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            GUILayout.Label("Disclaimer: Remember that playing with mods makes them mandatory for your save game! If you want to uninstall anyway, then you need to remove all references to said mod. In my case respec all your characters, that should do the trick.");
+            GUILayout.Label("Disclaimer: Remember that playing with mods often makes them mandatory for your save game!");
             GUILayout.Label("Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above."
                 + "\n[*] Option is enabled/disabled immediately, without restart.");
 
-            Checkbox(ref Settings.StateManager.State.allowAchievements, "[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files");
+            if (Patch_AllowAchievements.Patched)
+                Checkbox(ref Settings.StateManager.State.allowAchievements, "[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files");
+            else
+                GUILayout.Label("Allow achievements - managed by other mod");
 
             GUILayout.Label("");
 
@@ -86,37 +93,31 @@ namespace DarkCodex
 
             GUILayout.Label("");
 
-            if (!bExpand)
-            {
-                Checkbox(ref bExpand, "Expand 'Advanced feature select'");
-            }
-            else
-            {
-                Checkbox(ref bExpand, "Collapse 'Advanced feature select'");
-                GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
+            GUILayout.Label("Advanced: Patch Control");
+            GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
                     + "\nWarning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.");
-                foreach (string str in loadSaveOptions)
+            foreach (string str in loadSaveOptions)
+            {
+                bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
+                if (GUILayout.Button($"{(enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>")} {str}", GUILayout.ExpandWidth(false)))
                 {
-                    bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
-                    if (GUILayout.Button($"{(enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>")} {str}", GUILayout.ExpandWidth(false)))
-                    {
-                        if (enabled)
-                            Settings.StateManager.State.doNotLoad.Add(str);
-                        else
-                            Settings.StateManager.State.doNotLoad.Remove(str);
-                    }
+                    if (enabled)
+                        Settings.StateManager.State.doNotLoad.Add(str);
+                    else
+                        Settings.StateManager.State.doNotLoad.Remove(str);
                 }
-
-                if (GUILayout.Button("Export Player Data", GUILayout.ExpandWidth(false)))
-                    ExportPlayerData();
             }
+
+            if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
+                ExportPlayerData();
+
+            NumberFieldFast(ref _debug1, "Target Frame Rate");
+            Application.targetFrameRate = (int)_debug1;
 
             GUILayout.Label("");
 
             if (GUILayout.Button("Save settings!"))
-            {
                 OnSaveGUI(modEntry);
-            }
 
         }
 
@@ -214,7 +215,8 @@ namespace DarkCodex
             try
             {
                 harmony = new Harmony(modEntry.Info.Id);
-                harmony.PatchAll(typeof(Main).Assembly);
+                Helper.Patch(typeof(StartGameLoader_LoadAllJson));
+                //harmony.PatchAll(typeof(Main).Assembly);
                 //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
                 //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
             }
@@ -243,6 +245,20 @@ namespace DarkCodex
                 {
                     Helper.Print("Loading Dark Codex");
 
+                    //PatchSafe(typeof(DEBUG.Rage));
+                    //PatchSafe(typeof(DEBUG.ItemEntity_IsUsableFromInventory_Patch));
+                    //PatchSafe(typeof(DEBUG.PatchLootEverythingOnLeave));
+                    PatchUnique(typeof(Patch_AllowAchievements));
+                    PatchSafe(typeof(Patch_TrueGatherPowerLevel));
+                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
+                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack2));
+                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnNewRoundPatch));
+                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_HandleUnitRunCommand));
+                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnTurnOn));
+                    PatchSafe(typeof(Patches_Activatable.ActivatableAbilityUnitCommand_ApplyValidation));
+                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_TryStart));
+                    PatchSafe(typeof(Patches_Activatable.ActionBar));
+
                     LoadSafe(General.patchAngelsLight);
 
                     LoadSafe(Items.patchArrows);
@@ -250,7 +266,10 @@ namespace DarkCodex
 
                     LoadSafe(Mythic.createLimitlessBardicPerformance);
                     LoadSafe(Mythic.createLimitlessWitchHexes);
+                    LoadSafe(Mythic.createLimitlessSmite);
+                    LoadSafe(Mythic.createKineticMastery);
 
+                    LoadSafe(Kineticist.fixWallInfusion);
                     LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.createKineticistBackground);
@@ -269,10 +288,8 @@ namespace DarkCodex
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
 
                     EventBus.Subscribe(new RestoreEndOfCombat());
-                    //Patch_CombatState.End += RestoreEndOfCombat.HandlePartyCombatEnd;
 
-
-                    Helper.Patch(typeof(Patch_AllowAchievements), "Prefix", null);
+                    //Kineticist.createKineticWhip(); // TODO: debug
 
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG
@@ -355,6 +372,39 @@ namespace DarkCodex
 #endif
                 Helper.PrintException(e);
                 return false;
+            }
+        }
+
+        public static void PatchUnique(Type patch)
+        {
+            if (Helper.IsPatched(patch))
+            {
+                Helper.Print("Skipped patching because not unique " + patch.Name);
+                return;
+            }
+
+            PatchSafe(patch);
+            patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
+        }
+
+        public static void PatchSafe(Type patch)
+        {
+            if (CheckSetting(patch.Name))
+            {
+                Helper.Print("Skipped patching " + patch.Name);
+                return;
+            }
+
+            try
+            {
+                if (patch.GetCustomAttributes(false).Any(a => a is ManualPatchAttribute))
+                    Helper.Patch(patch, default);
+                else
+                    Helper.Patch(patch);
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
             }
         }
 

@@ -1,9 +1,15 @@
 # Changelog
 
+## [1.0.4]
+
 ## [1.0.3]
 - added bleeding attack
 - added flensing strike
 - added missing gui elements
+- added mythic limitless smite
+- added mythic kinetic mastery
+- fixed wall infusion
+- bugfixes
 
 ## [1.0.2]
 

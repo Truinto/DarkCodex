@@ -32,6 +32,17 @@ using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.ResourceLinks;
 using Kingmaker.Blueprints.Facts;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
+using Kingmaker.Blueprints.Items.Weapons;
+using Newtonsoft.Json;
+using System.IO;
+using Kingmaker;
+using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
+using System.Reflection;
+using Kingmaker.UnitLogic;
+using Kingmaker.EntitySystem.Entities;
+using Kingmaker.Items.Slots;
+using Kingmaker.UnitLogic.Buffs;
 
 namespace DarkCodex
 {
@@ -76,6 +87,114 @@ namespace DarkCodex
                                                                     wildtalent_selection.m_AllFeatures);  //+WildTalentSelection
 
             Helper.AddFeats(extra_wild_talent_selection);
+        }
+
+        public static List<string> _blade_weapons = new List<string>() {
+            "43ff67143efb86d4f894b10577329050",
+            "6f121ff0644a2804d8239d4dfe0ace11",
+            "92f9a719ffd652947ab37363266cc0a6",
+            "5b0f10876af4fe54e989cc4d93bd0545",
+            "7b413fc4f99050349ab5488f83fe25df",
+            "df849df04cd828b4489f7827dbbf1dcd",
+            "a72c3375b022c124986365d23596bd21",
+            "31862bcb47f539649ae59d7e18f8ed11",
+            "3ca6bbdb3c1dea541891f0568f52db05",
+            "a1eee0a2735401546ba2b442e1a9d25d",
+            "f58bc29b252308242a81b3f84a1d176a",
+            "e72caa96c32ca3f4d8b736b97b067f58",
+            "64885226d77f2bd408dde84fb8ccacc2",
+            "878f68ff160c8fa42b05ade8b2d12ea5",
+            "4934f54691fa90941b04341d457f4f96",
+            "2e72609caf23e4843b246bec80550f06",
+            "a8cd6e691ad7ee44dbdd4a255bf304d8",
+            "6a1bc011f6bbc7745876ce2692ecdfb5",
+        };
+        public static void createKineticWhip()
+        {
+            var enablebuff = Helper.ToRef<BlueprintBuffReference>("426a9c079ee7ac34aa8e0054f2218074");
+            var blade = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponType>("a15b2fb1d5dc4f247882a7148d50afb0");
+            var blade_infusion = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("9ff81732daddb174aa8138ad1297c787");
+
+            // make new weapon type so we can distinguish blade and whip (for AoO) and increase range 
+            var weapon_energy = blade.Clone();
+
+            try
+            {
+                JsonSerializer serializer = JsonSerializer.CreateDefault(new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    TypeNameHandling = TypeNameHandling.All,
+                });
+
+                using (StreamWriter sw = new StreamWriter(Path.Combine(Main.ModPath, "clone.json")))
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    serializer.Serialize(writer, weapon_energy);
+                }
+
+                Helper.Print("Exported clone data.");
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+
+            return;
+
+            weapon_energy.m_AttackRange = 10.Feet();
+            var weapon_physical = weapon_energy.Clone();
+            weapon_physical.m_AttackType = AttackType.Melee;
+
+            var whip = Helper.CreateBlueprintFeature(
+                "KineticWhipInfusion",
+                "Kinetic Whip",
+                "Element: universal\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou form a long tendril of energy or elemental matter. This functions as kinetic blade but counts as a reach weapon appropriate for your size. Unlike most reach weapons, the kinetic whip can also attack nearby creatures. The kinetic whip disappears at the beginning of your next turn, but in the intervening time, it threatens all squares within its reach, allowing you to make attacks of opportunity that deal the whip’s usual damage.",
+                group: FeatureGroup.KineticBlastInfusion
+                );
+
+            // clone all weapon blasts
+            foreach (var guid in _blade_weapons)
+            {
+                var weapon_base = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>(guid); // AirKineticBladeWeapon
+                if (weapon_base == null) continue;
+
+                var weapon_clone = weapon_base.Clone();
+                weapon_clone.name += "Whip";
+                weapon_clone.m_Type = weapon_clone.Type.AttackType == AttackType.Melee ? weapon_physical.ToRef() : weapon_energy.ToRef();
+                weapon_clone.AddAsset(GuidManager.i.Get(weapon_clone.name));
+
+                var buff1 = Helper.CreateBlueprintBuff(
+                    weapon_clone.name + "Buff",
+                    "Kinetic Whip",
+                    ""
+                    ).SetComponents(
+                    new AddKineticistBlade() { m_Blade = weapon_clone.ToRef() }
+                    ); //AddKineticistBlade, see KineticBladeAirBlastBuff
+
+                var ability1 = Helper.CreateBlueprintAbility(
+                    weapon_clone.name + "Ability",
+                    "Kinetic Whip",
+                    "",
+                    null,
+                    icon: null,
+                    AbilityType.Special,
+                    UnitCommand.CommandType.Free,
+                    AbilityRange.Personal
+                    ).SetComponents(
+                    Helper.CreateAbilityEffectRunAction(0,
+                        Helper.CreateContextActionApplyBuff(buff1, 1),
+                        Helper.CreateContextActionApplyBuff(enablebuff, 1)
+                        ),
+                    new AbilityKineticBlade(),
+                    new AbilityKineticist() { BlastBurnCost = 0, InfusionBurnCost = 2 } // todo fix composite
+                    ).ToRef2();
+
+                whip.AddComponents(
+                    Helper.CreateAddFeatureIfHasFact(ability1, ability1)
+                    );
+            }
+
         }
 
         public static void createMobileGatheringFeat()
@@ -181,22 +300,6 @@ namespace DarkCodex
             // make original gather ability visible for manual gathering and allow to extend buff3
             Helper.AppendAndReplace(ref gather_original_ab.GetComponent<AbilityEffectRunAction>().Actions.Actions, three2three);
 
-        }
-
-        public static void patchGatherPower()
-        {
-            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
-            gather_original_ab.Hidden = false;
-            gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
-            gather_original_ab.AddComponents(new RestrictionCanGatherPowerAbility());
-        }
-
-        /// <summary>The same creature can be racked over and over.</summary>
-        public static void patchDarkElementalist()
-        {
-            var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c");    //DarkElementalistSoulPowerAbility
-            var targets = soulability.GetComponent<AbilityTargetsAround>();
-            targets.m_Condition.Conditions = Array.Empty<Condition>();
         }
 
         public static void createImpaleInfusion()
@@ -321,6 +424,45 @@ namespace DarkCodex
             Helper.AddToAbilityVariants(metal_base, metal_impale_ab);
             Helper.AddToAbilityVariants(ice_base, ice_impale_ab);
         }
+
+        public static void patchGatherPower()
+        {
+            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
+            gather_original_ab.Hidden = false;
+            gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
+            gather_original_ab.AddComponents(new RestrictionCanGatherPowerAbility());
+        }
+
+        /// <summary>QoL Soul Power.</summary>
+        public static void patchDarkElementalist()
+        {
+            var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c");    //DarkElementalistSoulPowerAbility
+            soulability.ActionType = UnitCommand.CommandType.Free;
+            soulability.m_IsFullRoundAction = false;
+            soulability.HasFastAnimation = true;
+            var targets = soulability.GetComponent<AbilityTargetsAround>();
+            targets.m_Condition.Conditions = Array.Empty<Condition>();
+            soulability.AddComponents(new AbilityRequirementOnlyCombat { Not = true });
+        }
+
+        public static void fixWallInfusion()
+        {
+            int counter = 0;
+            foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+            {
+                if (bp.Blueprint is BlueprintAbilityAreaEffect)
+                {
+                    var run = (bp.Blueprint as BlueprintAbilityAreaEffect).GetComponent<AbilityAreaEffectRunAction>();
+                    if (run == null || !bp.Blueprint.name.StartsWith("Wall"))
+                        continue;
+
+                    run.Round = run.UnitEnter;
+                    counter++;
+                }
+            }
+            Helper.Print("Patched Wall Infusions: " + counter);
+        }
+
 
         #region Helper
 
@@ -510,30 +652,61 @@ namespace DarkCodex
         }
     }
 
-    //[HarmonyPatch(typeof(AddKineticistPart), MethodType.Constructor)]
-    public class Patch_BlastCollection
+    [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
+    public class Patch_KineticistAllowOpportunityAttack
     {
-        public static List<BlueprintAbilityReference> blasts = new List<BlueprintAbilityReference>();
-
-        public static void Postfix(AddKineticistPart __instance)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
-            if (__instance == null)
+            List<CodeInstruction> list = instr.ToList();
+            MethodInfo original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
+            MethodInfo replacement = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
+
+            for (int i = 0; i < list.Count; i++)
             {
-                Helper.PrintDebug("AddKineticistPart instance is null");
-                return;
+                var mi = list[i].operand as MethodInfo;
+                if (mi != null && mi == original)
+                {
+                    Helper.PrintDebug("KineticistAoO at " + i);
+                    list[i].operand = replacement;
+                }
             }
 
-            if (__instance.m_Blasts == null)
-            {
-                Helper.PrintDebug("AddKineticistPart m_Blasts is null");
-                return;
-            }
+            return list;
+        }
 
-            Helper.PrintDebug("AddKineticistPart m_Blasts before length is " + __instance.m_Blasts.Length);
-            __instance.m_Blasts = __instance.m_Blasts.ToList().Union(blasts).ToArray();
-            Helper.PrintDebug("AddKineticistPart m_Blasts after length is " + __instance.m_Blasts.Length);
+        public static void NullReplacement(UnitState state, UnitCondition condition, Buff sourceBuff)
+        {
         }
     }
+
+    [HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
+    public class Patch_KineticistAllowOpportunityAttack2
+    {
+        private static BlueprintGuid KineticBlastPhysicalBlade = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef");
+        private static BlueprintGuid KineticBlastEnergyBlade = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0");
+
+        public static bool Prefix(UnitEntityData unit, WeaponSlot hand, ref bool __result)
+        {
+            if (!hand.HasWeapon)
+                __result = false;
+
+            else if (!hand.Weapon.Blueprint.IsMelee && !unit.State.Features.SnapShot)
+                __result = false;
+
+            else if (hand.Weapon.Blueprint.IsUnarmed && !unit.Descriptor.State.Features.ImprovedUnarmedStrike)
+                __result = false;
+
+            else if (hand.Weapon.Blueprint.Type?.AssetGuid == KineticBlastPhysicalBlade
+                  || hand.Weapon.Blueprint.Type?.AssetGuid == KineticBlastEnergyBlade)
+                __result = false;
+
+            else
+                __result = true;
+
+            return false;
+        }
+    }
+
 
     #endregion
 
