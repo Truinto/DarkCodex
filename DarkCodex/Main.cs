@@ -111,6 +111,8 @@ namespace DarkCodex
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
 
+            Checkbox(ref Settings.StateManager.State.debug_block_unrecruit, "DEBUG: Block Unrecruit");
+
             NumberFieldFast(ref _debug1, "Target Frame Rate");
             Application.targetFrameRate = (int)_debug1;
 
@@ -248,6 +250,8 @@ namespace DarkCodex
                     //PatchSafe(typeof(DEBUG.Rage));
                     //PatchSafe(typeof(DEBUG.ItemEntity_IsUsableFromInventory_Patch));
                     //PatchSafe(typeof(DEBUG.PatchLootEverythingOnLeave));
+                    PatchSafe(typeof(DEBUG.Quest1));
+                    PatchSafe(typeof(DEBUG.Quest2));
                     PatchUnique(typeof(Patch_AllowAchievements));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));

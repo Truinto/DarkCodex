@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
 using Kingmaker;
+using Kingmaker.AreaLogic.Etudes;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
@@ -29,6 +31,30 @@ namespace DarkCodex
 {
     public class DEBUG
     {
+        [HarmonyPatch(typeof(Unrecruit), nameof(Unrecruit.RunAction))]
+        public class Quest1
+        {
+            public static bool Prefix()
+            {
+                return !Settings.StateManager.State.debug_block_unrecruit;
+            }
+        }
+
+        [HarmonyPatch(typeof(EtudesSystem), nameof(EtudesSystem.StartEtude))]
+        public class Quest2
+        {
+            public static bool Prefix(BlueprintEtude bp)
+            {
+                foreach (var str in Settings.StateManager.State.debug_block_quest)
+                {
+                    if (Guid.TryParse(str, out Guid guid))
+                        if (bp.AssetGuid == new BlueprintGuid(guid))
+                            return false;
+                }
+                return true;
+            }
+        }
+
         public class Date //#278
         {
             public static void SetDate()
