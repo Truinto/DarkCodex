@@ -64,16 +64,22 @@ namespace DarkCodex
             "Kineticist.patchDarkElementalist",
             "Kineticist.patchGatherPower",
             "Kineticist.fixWallInfusion",
+            "Kineticist.createSelectiveMetakinesis",
             "Mythic.createLimitlessBardicPerformance",
             "Mythic.createLimitlessWitchHexes",
             "Mythic.createLimitlessSmite",
+            "Mythic.createLimitlessBombs",
+            "Mythic.createLimitlessArcanePool",
+            "Mythic.createLimitlessArcaneReservoir",
+            "Mythic.createLimitlessKi",
+            "Mythic.createLimitlessDomain",
             "Mythic.createKineticMastery",
+            "Mythic.patchKineticOvercharge",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
             "Witch.createCackleActivatable",
             "Witch.createIceTomb",
         };
-        private static float _debug1 = 30f;
 
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
@@ -111,10 +117,7 @@ namespace DarkCodex
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
 
-            Checkbox(ref Settings.StateManager.State.debug_block_unrecruit, "DEBUG: Block Unrecruit");
-
-            NumberFieldFast(ref _debug1, "Target Frame Rate");
-            Application.targetFrameRate = (int)_debug1;
+            //NumberFieldFast(ref _debug1, "Target Frame Rate");
 
             GUILayout.Label("");
 
@@ -250,8 +253,6 @@ namespace DarkCodex
                     //PatchSafe(typeof(DEBUG.Rage));
                     //PatchSafe(typeof(DEBUG.ItemEntity_IsUsableFromInventory_Patch));
                     //PatchSafe(typeof(DEBUG.PatchLootEverythingOnLeave));
-                    PatchSafe(typeof(DEBUG.Quest1));
-                    PatchSafe(typeof(DEBUG.Quest2));
                     PatchUnique(typeof(Patch_AllowAchievements));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
@@ -271,7 +272,13 @@ namespace DarkCodex
                     LoadSafe(Mythic.createLimitlessBardicPerformance);
                     LoadSafe(Mythic.createLimitlessWitchHexes);
                     LoadSafe(Mythic.createLimitlessSmite);
+                    LoadSafe(Mythic.createLimitlessBombs);
+                    LoadSafe(Mythic.createLimitlessArcanePool);
+                    LoadSafe(Mythic.createLimitlessArcaneReservoir);
+                    LoadSafe(Mythic.createLimitlessKi);
+                    LoadSafe(Mythic.createLimitlessDomain);
                     LoadSafe(Mythic.createKineticMastery);
+                    LoadSafe(Mythic.patchKineticOvercharge);
 
                     LoadSafe(Kineticist.fixWallInfusion);
                     LoadSafe(Kineticist.patchGatherPower);
@@ -279,6 +286,7 @@ namespace DarkCodex
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
+                    LoadSafe(Kineticist.createSelectiveMetakinesis);
 
                     LoadSafe(Witch.createIceTomb);
 

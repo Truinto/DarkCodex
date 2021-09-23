@@ -38,6 +38,7 @@
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
+    <Compile Include="Components\KineticistReduceBurnPooled.cs" />
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\DiceValue.cs" />
@@ -68,6 +69,8 @@
     <None Include="..\README.md" />
     <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
     <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

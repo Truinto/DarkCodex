@@ -403,6 +403,14 @@ namespace DarkCodex
             }
         }
 
+        public static T RemoveComponents<T, TRemove>(this T obj, TRemove _) where T : BlueprintScriptableObject where TRemove : BlueprintComponent
+        {
+            var list = obj.ComponentsArray.ToList();
+            list.RemoveAll(r => r is TRemove);
+            obj.ComponentsArray = list.ToArray();
+            return obj;
+        }
+
         public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
         {
             var levelentry = obj.AddFeatures.FirstOrDefault(f => f.Level == level);
@@ -419,6 +427,29 @@ namespace DarkCodex
                 levelentry.m_Features.Add(feature.ToRef());
             else
                 AppendAndReplace(ref obj.RemoveFeatures, CreateLevelEntry(level, feature));
+        }
+
+        public static void AddFeature(this BlueprintProgression obj, int level, BlueprintFeatureBase feature, string pairWithGuid = null)
+        {
+            var levelentry = obj.LevelEntries.FirstOrDefault(f => f.Level == level);
+            if (levelentry != null)
+                levelentry.m_Features.Add(feature.ToRef());
+            else
+                AppendAndReplace(ref obj.LevelEntries, CreateLevelEntry(level, feature));
+
+            if (pairWithGuid != null)
+            {
+                var pairGuid = BlueprintGuid.Parse(pairWithGuid);
+                foreach (var ui in obj.UIGroups)
+                {
+                    if (ui.m_Features.Any(a => a.deserializedGuid == pairGuid))
+                    {
+                        ui.m_Features.Add(feature.ToRef());
+                        break;
+                    }
+                }
+            }
+
         }
 
         #endregion

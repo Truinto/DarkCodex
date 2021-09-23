@@ -43,11 +43,25 @@ using Kingmaker.UnitLogic;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items.Slots;
 using Kingmaker.UnitLogic.Buffs;
+using Kingmaker.UnitLogic.ActivatableAbilities;
+using UnityEngine;
 
 namespace DarkCodex
 {
     public class Kineticist
     {
+        private static List<BlueprintAbilityReference> _allAbilities;
+        public static List<BlueprintAbilityReference> Blasts
+        {
+            get
+            {
+                if (_allAbilities != null)
+                    return _allAbilities;
+                _allAbilities = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f690edc756b748e43bba232e0eabd004").GetComponent<AddKineticistBurnModifier>().m_AppliableTo.ToList();
+                return _allAbilities;
+            }
+        }
+
         public static void createKineticistBackground()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
@@ -194,7 +208,7 @@ namespace DarkCodex
                     Helper.CreateAddFeatureIfHasFact(ability1, ability1)
                     );
             }
-
+            // see MetakinesisQuickenBuff; must add new ability to metakinesis lists
         }
 
         public static void createMobileGatheringFeat()
@@ -463,6 +477,45 @@ namespace DarkCodex
             Helper.Print("Patched Wall Infusions: " + counter);
         }
 
+        public static void createSelectiveMetakinesis()
+        {
+            var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
+            //var empower2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"); //MetakinesisEmpowerCheaperBuff
+            var kineticist = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("b79e92dd495edd64e90fb483c504b8df"); //KineticistProgression
+
+             Sprite icon = null; // TODO icon!
+            string displayname = "Metakinesis — Selective";
+            string description = "At 7th level, by accepting 1 point of burn, a kineticist can adjust her kinetic blast as if using Selective Spell.";
+
+            BlueprintActivatableAbility ab1 = Helper.CreateBlueprintActivatableAbility(
+                "MetakinesisSelectiveAbility",
+                displayname,
+                description,
+                out BlueprintBuff buff1,
+                icon: icon
+                );
+            buff1.ComponentsArray = empower1.ComponentsArray;
+
+            var feature1 = Helper.CreateBlueprintFeature(
+                "MetakinesisSelectiveFeature",
+                displayname,
+                description,
+                icon: icon
+                ).SetComponents(
+                Helper.CreateAddFacts(ab1.ToRef())
+                );
+
+            kineticist.AddFeature(7, feature1, "70322f5a2a294e54a9552f77ee85b0a7");
+
+            //foreach (var ab in Blasts)
+            //{
+            //    ab.Get().AvailableMetamagic |= Metamagic.Selective;
+            //    var variants = ab.Get().GetComponent<AbilityVariants>();
+            //    if (variants != null)
+            //        foreach (var variant in variants.m_Variants)
+            //            variant.Get().AvailableMetamagic |= Metamagic.Selective;
+            //}
+        }
 
         #region Helper
 

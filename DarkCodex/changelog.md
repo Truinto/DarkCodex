@@ -1,6 +1,14 @@
 # Changelog
 
 ## [1.0.4]
+- added patchKineticOvercharge
+- removed debug functions
+- added Mythic.createLimitlessBombs
+- added Mythic.createLimitlessArcanePool
+- added Mythic.createLimitlessArcaneReservoir
+- added Mythic.createLimitlessKi
+- added Mythic.createLimitlessDomain
+- added Kineticist.createSelectiveMetakinesis
 
 ## [1.0.3]
 - added bleeding attack
