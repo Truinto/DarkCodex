@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.5]
+- expanded createLimitlessBombs to include IncenseFog
+- added Mythic.createLimitlessShaman
+- added Mythic.createLimitlessWarpriest
+- fixed Selective Metakinesis
+- added Witch.createExtraHex
+- added General.patchBasicFreebieFeats
+- added Kineticist.patchDemonCharge
+
 ## [1.0.4]
 - added patchKineticOvercharge
 - removed debug functions

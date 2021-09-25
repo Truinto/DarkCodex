@@ -28,6 +28,7 @@ Content
 | ------ | ----------- | ------ |
 |General.createAbilityFocus|basic feat: Ability Focus to increase DC of one ability by +2|:x:|
 |General.patchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:heavy_check_mark:|
+|General.patchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/ |:construction:|
 |Hexcrafter.fixProgression|Hexcrafter can select Hex with any Arcana and get Spell Recall at level 11|:heavy_check_mark:|
 |Items.patchArrows|recollect Cold Iron Arrows after combat|:heavy_check_mark:|
 |Items.patchTerendelevScale|Terendelev´s Scale can be used once daily|:construction:|
@@ -37,22 +38,26 @@ Content
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:heavy_check_mark:|
 |Kineticist.patchDarkElementalist|Dark Elementalist QoL, faster animation and use anywhere, but only out of combat|:construction:|
 |Kineticist.patchGatherPower|Kineticist Gather Power can be used manually|:heavy_check_mark:|
+|Kineticist.patchDemonCharge|Demon Charge also gathers power|:heavy_check_mark:|
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
-|Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:construction:|
+|Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
 |Mythic.createLimitlessBardicPerformance|mythic talent: Bardic Performances cost no resources|:construction:|
 |Mythic.createLimitlessWitchHexes|mythic talent: Hexes ignore their cooldown|:construction:|
 |Mythic.createLimitlessSmite|mythic talent: infinite Smites, requires Abundant Smite|:heavy_check_mark:|
-|Mythic.createLimitlessBombs|mythic talent: infinite alchemist bombs|:construction:|
+|Mythic.createLimitlessBombs|mythic talent: infinite alchemist bombs and incenses|:construction:|
 |Mythic.createLimitlessArcanePool|mythic talent: infinite arcane pool, expect spell recall|:construction:|
 |Mythic.createLimitlessArcaneReservoir|mythic talent: infinite arcane reservoir|:construction:|
 |Mythic.createLimitlessKi|mythic talent: reduce ki costs by 1|:heavy_check_mark:|
 |Mythic.createLimitlessDomain|mythic talent: use domain powers at will|:heavy_check_mark:|
+|Mythic.createLimitlessShaman|mythic talent: infinite spirit weapon uses (shaman, spirit hunter)|:construction:|
+|Mythic.createLimitlessWarpriest|mythic talent: infinite scared weapon uses|:construction:|
 |Mythic.createKineticMastery|mythic feat: physical Kinetic Blasts gain bonus equal to mythic level, or half with energy Blasts|:heavy_check_mark:|
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:construction:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:construction:|
 |Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:construction:|
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|
-|Witch.createIceTomb|Hex: Ice Tomb|:construction: probably doesn't work?|
+|Witch.createIceTomb|Hex: Ice Tomb|:x:|
+|Witch.createExtraHex|basic feat: Extra Hex|:construction:|
 
 :heavy_check_mark: works \
 :construction: not tested \

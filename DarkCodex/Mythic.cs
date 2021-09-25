@@ -101,18 +101,22 @@ namespace DarkCodex
         public static void createLimitlessBombs()
         {
             var bomb_resource = BlueprintGuid.Parse("1633025edc9d53f4691481b48248edd7");
+            var incense_resource = BlueprintGuid.Parse("d03d97aac38e798479b81dfa9eda55c6");
             var bomb_prereq = Helper.ToRef<BlueprintFeatureReference>("54c57ce67fa1d9044b1b3edc459e05e2"); //AlchemistBombsFeature
+            var incense_prereq = Helper.ToRef<BlueprintFeatureReference>("7614401346b64a8409f7b8c367db488f"); //IncenseFogFeature
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessBombs",
-                "Limitless Alchemist Bombs",
-                "You learn how to create a philosopher’s stone that turns everything into explosives.\nBenefit: You no longer have a limited amount of Bombs per day.",
+                "Limitless Alchemist's Creations",
+                "You learn how to create a philosopher’s stone that turns everything into chemicals.\nBenefit: You no longer have a limited amount of Bombs or Incenses per day.",
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature(bomb_prereq)
+                Helper.CreatePrerequisiteFeature(bomb_prereq, true),
+                Helper.CreatePrerequisiteFeature(incense_prereq, true)
                 ); // todo: icon?
 
             setResourceDecreasing(bomb_resource, limitless.ToRef2());
+            setResourceDecreasing(incense_resource, limitless.ToRef2());
 
             Helper.AddMythicTalent(limitless);
         }
@@ -219,6 +223,44 @@ namespace DarkCodex
                 logic.m_FreeBlueprint = limitless.ToRef2();
                 Helper.PrintDebug(" -free activatable " + ability.name);
             }
+
+            Helper.AddMythicTalent(limitless);
+        }
+
+        public static void createLimitlessShaman()
+        {
+            var shaman_resource = BlueprintGuid.Parse("ecf700928d1e3a647a92c095f5de1999"); //ShamanWeaponPoolResourse
+            var shaman_prereq = Helper.ToRef<BlueprintFeatureReference>("ef7e19661304e124f95c49637f931429"); //ShamanWeaponPoolFeature
+
+            var limitless = Helper.CreateBlueprintFeature(
+                "LimitlessShamanWeapon",
+                "Limitless Spirit Weapon",
+                "Your soul fused with a spirit.\nBenefit: You no longer have a limited amount of Spirit Weapon uses per day.",
+                group: FeatureGroup.MythicAbility
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature(shaman_prereq)
+                ); // todo: icon?
+
+            setResourceDecreasing(shaman_resource, limitless.ToRef2());
+
+            Helper.AddMythicTalent(limitless);
+        }
+
+        public static void createLimitlessWarpriest()
+        {
+            var warpriest_resource = BlueprintGuid.Parse("cc700ef06c6fec449ab085cbcd74709c"); //SacredWeaponEnchantResource
+            var warpriest_prereq = Helper.ToRef<BlueprintFeatureReference>(""); //
+
+            var limitless = Helper.CreateBlueprintFeature(
+                "LimitlessWarpriest",
+                "Limitless Sacred Weapon",
+                "You are chosen by your deity.\nBenefit: You no longer have a limited amount of Sacred Weapon rounds per day.",
+                group: FeatureGroup.MythicAbility
+                ).SetComponents(
+                //Helper.CreatePrerequisiteFeature(warpriest_prereq)
+                ); // todo: icon?
+
+            setResourceDecreasing(warpriest_resource, limitless.ToRef2());
 
             Helper.AddMythicTalent(limitless);
         }

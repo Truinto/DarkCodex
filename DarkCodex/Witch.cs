@@ -29,7 +29,36 @@ namespace DarkCodex
     {
         public static void createExtraHex()
         {
+            var witch_class = Helper.ToRef<BlueprintCharacterClassReference>("1b9873f1e7bfe5449bc84d03e9c8e3cc"); //WitchClass
+            var hexcrafter_class = Helper.ToRef<BlueprintArchetypeReference>("79ccf7a306a5d5547bebd97299f6fc89"); //HexcrafterArchetype
+            var witch_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
+            var shaman_class = Helper.ToRef<BlueprintCharacterClassReference>("145f1d3d360a7ad48bd95d392c81b38e"); //ShamanClass
+            var shaman_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
 
+            var witch_extra = Helper.CreateBlueprintFeatureSelection(
+                "WitchHexExtra",
+                "Extra Hex",
+                "You gain one additional hex. You must meet the prerequisites for this hex. You can take this feat multiple times. Each time you do, you gain another hex.",
+                group: FeatureGroup.WitchHex
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(witch_class, 1, true),
+                Helper.CreatePrerequisiteArchetypeLevel(hexcrafter_class, 1, true)
+                );
+            witch_extra.Ranks = 10;
+            witch_extra.m_AllFeatures = witch_selection.m_AllFeatures;
+
+            var shaman_extra = Helper.CreateBlueprintFeatureSelection(
+                "ShamanhHexExtra",
+                "Extra Hex",
+                "You gain one additional hex. You must meet the prerequisites for this hex. You can take this feat multiple times. Each time you do, you gain another hex.",
+                group: FeatureGroup.ShamanHex
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(shaman_class, 1)
+                );
+            shaman_extra.Ranks = 10;
+            shaman_extra.m_AllFeatures = shaman_selection.m_AllFeatures;
+
+            Helper.AddFeats(witch_extra, shaman_extra);
         }
 
         public static void createHexStrike()

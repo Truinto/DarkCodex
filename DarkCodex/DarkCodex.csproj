@@ -38,6 +38,7 @@
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
+    <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
     <Compile Include="Components\KineticistReduceBurnPooled.cs" />
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />

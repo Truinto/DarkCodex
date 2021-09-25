@@ -45,6 +45,7 @@ using Kingmaker.Items.Slots;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using UnityEngine;
+using Kingmaker.UnitLogic.Mechanics.Conditions;
 
 namespace DarkCodex
 {
@@ -205,7 +206,7 @@ namespace DarkCodex
                     ).ToRef2();
 
                 whip.AddComponents(
-                    Helper.CreateAddFeatureIfHasFact(ability1, ability1)
+                    Helper.CreateAddFacts(ability1)
                     );
             }
             // see MetakinesisQuickenBuff; must add new ability to metakinesis lists
@@ -441,10 +442,18 @@ namespace DarkCodex
 
         public static void patchGatherPower()
         {
-            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
+            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
             gather_original_ab.Hidden = false;
             gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
             gather_original_ab.AddComponents(new RestrictionCanGatherPowerAbility());
+        }
+
+        public static void patchDemonCharge()
+        {
+            var charge = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
+            var gather = Helper.ToRef<BlueprintAbilityReference>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
+
+            Helper.AppendAndReplace(ref charge.GetComponent<AbilityExecuteActionOnCast>().Actions.Actions, new ContextActionCastSpellOnCaster() { m_Spell = gather });
         }
 
         /// <summary>QoL Soul Power.</summary>
@@ -479,13 +488,20 @@ namespace DarkCodex
 
         public static void createSelectiveMetakinesis()
         {
-            var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
+            //var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
             //var empower2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"); //MetakinesisEmpowerCheaperBuff
             var kineticist = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("b79e92dd495edd64e90fb483c504b8df"); //KineticistProgression
 
-             Sprite icon = null; // TODO icon!
+            Sprite icon = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("85f3340093d144dd944fff9a9adfd2f2").Icon;
             string displayname = "Metakinesis — Selective";
             string description = "At 7th level, by accepting 1 point of burn, a kineticist can adjust her kinetic blast as if using Selective Spell.";
+
+            var applicable = Blasts.GetVariants(
+                g => g.CanTargetPoint
+                  || g.GetComponent<AbilityTargetsAround>()
+                  || g.GetComponent<AbilityDeliverChain>());
+
+            Helper.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
 
             BlueprintActivatableAbility ab1 = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisSelectiveAbility",
@@ -494,7 +510,10 @@ namespace DarkCodex
                 out BlueprintBuff buff1,
                 icon: icon
                 );
-            buff1.ComponentsArray = empower1.ComponentsArray;
+            buff1.SetComponents(
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Metakinesis, Value = 1, m_AppliableTo = applicable.ToArray() },
+                new AutoMetamagic() { m_AllowedAbilities = AutoMetamagic.AllowedType.KineticistBlast, Metamagic = Metamagic.Selective, Abilities = applicable }
+                );
 
             var feature1 = Helper.CreateBlueprintFeature(
                 "MetakinesisSelectiveFeature",

@@ -411,6 +411,24 @@ namespace DarkCodex
             return obj;
         }
 
+        public static List<BlueprintAbilityReference> GetVariants(this List<BlueprintAbilityReference> source, Func<BlueprintAbility, bool> predicate = null)
+        {
+            var result = new List<BlueprintAbilityReference>();
+
+            for (int i = 0; i < source.Count; i++)
+            {
+                var variants = source[i].Get().GetComponent<AbilityVariants>()?.m_Variants ?? Array.Empty<BlueprintAbilityReference>();
+
+                foreach (var variant in variants)
+                {
+                    if (predicate == null || predicate(variant.Get()))
+                        result.Add(variant);
+                }
+            }
+
+            return result;
+        }
+
         public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
         {
             var levelentry = obj.AddFeatures.FirstOrDefault(f => f.Level == level);
@@ -616,6 +634,16 @@ namespace DarkCodex
             return result;
         }
 
+        /// <summary>Adds a fact, but only fact not already granted through other means.</summary>
+        public static AddFeatureIfHasFact MakeAddFactSafe(BlueprintUnitFactReference feature)
+        {
+            var result = new AddFeatureIfHasFact();
+            result.m_CheckedFact = feature;
+            result.m_Feature = feature;
+            result.Not = true;
+            return result;
+        }
+
         public static BlueprintAbility TargetPoint(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = false)
         {
             ability.CanTargetEnemies = true;
@@ -648,16 +676,7 @@ namespace DarkCodex
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
         }
-
-        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(BlueprintUnitFactReference ceckedFact, BlueprintUnitFactReference feature, bool Not = false)
-        {
-            var result = new AddFeatureIfHasFact();
-            result.m_CheckedFact = ceckedFact;
-            result.m_Feature = feature;
-            result.Not = Not;
-            return result;
-        }
-
+                
         public static AddInitiatorAttackRollTrigger CreateAddInitiatorAttackRollTrigger(ActionList Action, bool OnOwner = false, bool SneakAttack = false, bool OnlyHit = true, bool CriticalHit = false, bool CheckWeapon = false, WeaponCategory WeaponCategory = 0)
         {
             var result = new AddInitiatorAttackRollTrigger();
@@ -972,6 +991,16 @@ namespace DarkCodex
             var result = new PrerequisiteClassLevel();
             result.m_CharacterClass = @class;
             result.Level = level;
+            result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
+            return result;
+        }
+
+        public static PrerequisiteArchetypeLevel CreatePrerequisiteArchetypeLevel(BlueprintArchetypeReference m_Archetype, int level = 1, bool any = false, BlueprintCharacterClassReference m_CharacterClass = null)
+        {
+            var result = new PrerequisiteArchetypeLevel();
+            result.m_Archetype = m_Archetype;
+            result.m_CharacterClass = m_CharacterClass ?? m_Archetype.Get().GetParentClass().ToRef();
+            result.Level = 1;
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
             return result;
         }

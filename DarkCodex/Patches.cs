@@ -2,6 +2,7 @@
 using Kingmaker;
 using Kingmaker.Achievements;
 using Kingmaker.Controllers.Combat;
+using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Modding;
@@ -204,5 +205,15 @@ namespace DarkCodex
             }
         }
 
+    }
+
+    [HarmonyPatch(typeof(Element), nameof(Element.AssetGuidShort), MethodType.Getter)]
+    public class Patch_DebugReport
+    {
+        public static void Prefix(Element __instance)
+        {
+            if (__instance.name == null)
+                __instance.name = "";
+        }
     }
 }

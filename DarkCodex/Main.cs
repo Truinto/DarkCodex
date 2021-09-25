@@ -54,6 +54,7 @@ namespace DarkCodex
             "Witch.*",
             "General.createAbilityFocus",
             "General.patchAngelsLight",
+            "General.patchBasicFreebieFeats",
             "Hexcrafter.fixProgression",
             "Items.patchArrows",
             "Items.patchTerendelevScale",
@@ -63,6 +64,7 @@ namespace DarkCodex
             "Kineticist.createMobileGatheringFeat",
             "Kineticist.patchDarkElementalist",
             "Kineticist.patchGatherPower",
+            "Kineticist.patchDemonCharge",
             "Kineticist.fixWallInfusion",
             "Kineticist.createSelectiveMetakinesis",
             "Mythic.createLimitlessBardicPerformance",
@@ -73,6 +75,8 @@ namespace DarkCodex
             "Mythic.createLimitlessArcaneReservoir",
             "Mythic.createLimitlessKi",
             "Mythic.createLimitlessDomain",
+            "Mythic.createLimitlessShaman",
+            "Mythic.createLimitlessWarpriest",
             "Mythic.createKineticMastery",
             "Mythic.patchKineticOvercharge",
             "Rogue.createBleedingAttack",
@@ -254,6 +258,7 @@ namespace DarkCodex
                     //PatchSafe(typeof(DEBUG.ItemEntity_IsUsableFromInventory_Patch));
                     //PatchSafe(typeof(DEBUG.PatchLootEverythingOnLeave));
                     PatchUnique(typeof(Patch_AllowAchievements));
+                    PatchUnique(typeof(Patch_DebugReport));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack2));
@@ -265,6 +270,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patches_Activatable.ActionBar));
 
                     LoadSafe(General.patchAngelsLight);
+                    LoadSafe(General.patchBasicFreebieFeats);
 
                     LoadSafe(Items.patchArrows);
                     LoadSafe(Items.patchTerendelevScale);
@@ -277,16 +283,19 @@ namespace DarkCodex
                     LoadSafe(Mythic.createLimitlessArcaneReservoir);
                     LoadSafe(Mythic.createLimitlessKi);
                     LoadSafe(Mythic.createLimitlessDomain);
+                    LoadSafe(Mythic.createLimitlessShaman);
+                    LoadSafe(Mythic.createLimitlessWarpriest);
                     LoadSafe(Mythic.createKineticMastery);
                     LoadSafe(Mythic.patchKineticOvercharge);
 
                     LoadSafe(Kineticist.fixWallInfusion);
-                    LoadSafe(Kineticist.patchGatherPower);
-                    LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
-                    LoadSafe(Kineticist.createSelectiveMetakinesis);
+                    LoadSafe(Kineticist.patchGatherPower);
+                    LoadSafe(Kineticist.patchDarkElementalist);
+                    LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat
+                    LoadSafe(Kineticist.createSelectiveMetakinesis); // keep last
 
                     LoadSafe(Witch.createIceTomb);
 
@@ -296,6 +305,7 @@ namespace DarkCodex
 
                     LoadSafe(General.createAbilityFocus); // keep last
                     LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
+                    LoadSafe(Witch.createExtraHex); // keep last
                     LoadSafe(Witch.createCackleActivatable); // keep last
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
 
