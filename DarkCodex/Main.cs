@@ -25,6 +25,7 @@ namespace DarkCodex
     public class Main
     {
         public static Harmony harmony;
+        public static bool IsInGame { get { return Game.Instance.Player?.Party.Any() ?? false; } }
 
         /// <summary>True if mod is enabled. Doesn't do anything right now.</summary>
         public static bool Enabled { get; set; } = true;
@@ -50,6 +51,7 @@ namespace DarkCodex
             "Hexcrafter.*",
             "Items.*",
             "Kineticist.*",
+            "Mythic.*",
             "Rogue.*",
             "Witch.*",
             "General.createAbilityFocus",
@@ -58,10 +60,14 @@ namespace DarkCodex
             "Hexcrafter.fixProgression",
             "Items.patchArrows",
             "Items.patchTerendelevScale",
+            "Items.createKineticArtifact",
             "Kineticist.createExtraWildTalentFeat",
             "Kineticist.createImpaleInfusion",
+            "Kineticist.createWhipInfusion",
+            "Kineticist.createBladeRushInfusion",
             "Kineticist.createKineticistBackground",
             "Kineticist.createMobileGatheringFeat",
+            "Kineticist.createAutoMetakinesis",
             "Kineticist.patchDarkElementalist",
             "Kineticist.patchGatherPower",
             "Kineticist.patchDemonCharge",
@@ -78,7 +84,10 @@ namespace DarkCodex
             "Mythic.createLimitlessShaman",
             "Mythic.createLimitlessWarpriest",
             "Mythic.createKineticMastery",
+            "Mythic.createMagicItemAdept",
+            "Mythic.createExtraMythicFeats",
             "Mythic.patchKineticOvercharge",
+            "Mythic.patchLimitlessDemonRage",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
             "Witch.createCackleActivatable",
@@ -97,15 +106,15 @@ namespace DarkCodex
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
 
-            GUILayout.Label("");
-
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
+            //NumberFieldFast(ref _debug1, "Target Frame Rate");
 
             GUILayout.Label("");
 
             GUILayout.Label("Advanced: Patch Control");
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
-                    + "\nWarning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.");
+                    + "\nWarning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled."
+                    + "\nSee Github for descriptions of these options.");
             foreach (string str in loadSaveOptions)
             {
                 bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
@@ -120,8 +129,12 @@ namespace DarkCodex
 
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
-
-            //NumberFieldFast(ref _debug1, "Target Frame Rate");
+            if (GUILayout.Button("Debug: Date minus 1", GUILayout.ExpandWidth(false)))
+                DEBUG.Date.SetDate();
+            if (GUILayout.Button("Debug: Open Shared Stash", GUILayout.ExpandWidth(false)))
+                DEBUG.Loot.Open();
+            //if (GUILayout.Button("Debug: Export Icons", GUILayout.ExpandWidth(false)))
+            //    DEBUG.ExportAllIconTextures();
 
             GUILayout.Label("");
 
@@ -254,14 +267,20 @@ namespace DarkCodex
                 {
                     Helper.Print("Loading Dark Codex");
 
-                    //PatchSafe(typeof(DEBUG.Rage));
-                    //PatchSafe(typeof(DEBUG.ItemEntity_IsUsableFromInventory_Patch));
-                    //PatchSafe(typeof(DEBUG.PatchLootEverythingOnLeave));
+                    // Debug
+                    LoadSafe(DEBUG.Enchantments.NameAll);
+                    PatchSafe(typeof(DEBUG.Settlement1));
+                    PatchSafe(typeof(DEBUG.Settlement2));
+                    PatchSafe(typeof(DEBUG.ArmyLeader1));
+                    //PatchSafe(typeof(General.DEBUGTEST));
+
+                    // Harmony Patches
                     PatchUnique(typeof(Patch_AllowAchievements));
                     PatchUnique(typeof(Patch_DebugReport));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack2));
+                    PatchSafe(typeof(Patch_MagicItemAdept));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnNewRoundPatch));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_HandleUnitRunCommand));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnTurnOn));
@@ -269,12 +288,16 @@ namespace DarkCodex
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_TryStart));
                     PatchSafe(typeof(Patches_Activatable.ActionBar));
 
+                    // General
                     LoadSafe(General.patchAngelsLight);
                     LoadSafe(General.patchBasicFreebieFeats);
 
+                    // Items
                     LoadSafe(Items.patchArrows);
                     LoadSafe(Items.patchTerendelevScale);
+                    LoadSafe(Items.createKineticArtifact);
 
+                    // Mythic
                     LoadSafe(Mythic.createLimitlessBardicPerformance);
                     LoadSafe(Mythic.createLimitlessWitchHexes);
                     LoadSafe(Mythic.createLimitlessSmite);
@@ -286,32 +309,44 @@ namespace DarkCodex
                     LoadSafe(Mythic.createLimitlessShaman);
                     LoadSafe(Mythic.createLimitlessWarpriest);
                     LoadSafe(Mythic.createKineticMastery);
+                    LoadSafe(Mythic.createMagicItemAdept);
                     LoadSafe(Mythic.patchKineticOvercharge);
+                    LoadSafe(Mythic.patchLimitlessDemonRage);
 
+                    // Kineticist
                     LoadSafe(Kineticist.fixWallInfusion);
                     LoadSafe(Kineticist.createKineticistBackground);
                     LoadSafe(Kineticist.createMobileGatheringFeat);
                     LoadSafe(Kineticist.createImpaleInfusion);
+                    LoadSafe(Kineticist.createWhipInfusion);
+                    LoadSafe(Kineticist.createBladeRushInfusion);
+                    LoadSafe(Kineticist.createAutoMetakinesis);
                     LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat
-                    LoadSafe(Kineticist.createSelectiveMetakinesis); // keep last
-
+                    LoadSafe(Kineticist.createSelectiveMetakinesis); // keep late
+                    
+                    // Witch
                     LoadSafe(Witch.createIceTomb);
 
+                    // Hexcrafter
                     LoadSafe(Hexcrafter.fixProgression);
 
+                    // Rogue
+                    LoadSafe(PropertyGetterSneakAttack.createPropertyGetterSneakAttack);
+                    LoadSafe(ContextActionIncreaseBleed.createBleedBuff);
                     LoadSafe(Rogue.createBleedingAttack);
 
+                    // Extra Features - keep last
                     LoadSafe(General.createAbilityFocus); // keep last
                     LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
                     LoadSafe(Witch.createExtraHex); // keep last
                     LoadSafe(Witch.createCackleActivatable); // keep last
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
+                    LoadSafe(Mythic.createExtraMythicFeats); // keep last
 
+                    // Event subscriptions
                     EventBus.Subscribe(new RestoreEndOfCombat());
-
-                    //Kineticist.createKineticWhip(); // TODO: debug
 
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG

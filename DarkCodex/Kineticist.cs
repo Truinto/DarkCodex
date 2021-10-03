@@ -46,6 +46,12 @@ using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using UnityEngine;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
+using Kingmaker.Localization;
+using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
+using Kingmaker.Blueprints.Root;
+using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
+using Kingmaker.RuleSystem.Rules;
 
 namespace DarkCodex
 {
@@ -104,112 +110,116 @@ namespace DarkCodex
             Helper.AddFeats(extra_wild_talent_selection);
         }
 
-        public static List<string> _blade_weapons = new List<string>() {
-            "43ff67143efb86d4f894b10577329050",
-            "6f121ff0644a2804d8239d4dfe0ace11",
-            "92f9a719ffd652947ab37363266cc0a6",
-            "5b0f10876af4fe54e989cc4d93bd0545",
-            "7b413fc4f99050349ab5488f83fe25df",
-            "df849df04cd828b4489f7827dbbf1dcd",
-            "a72c3375b022c124986365d23596bd21",
-            "31862bcb47f539649ae59d7e18f8ed11",
-            "3ca6bbdb3c1dea541891f0568f52db05",
-            "a1eee0a2735401546ba2b442e1a9d25d",
-            "f58bc29b252308242a81b3f84a1d176a",
-            "e72caa96c32ca3f4d8b736b97b067f58",
-            "64885226d77f2bd408dde84fb8ccacc2",
-            "878f68ff160c8fa42b05ade8b2d12ea5",
-            "4934f54691fa90941b04341d457f4f96",
-            "2e72609caf23e4843b246bec80550f06",
-            "a8cd6e691ad7ee44dbdd4a255bf304d8",
-            "6a1bc011f6bbc7745876ce2692ecdfb5",
-        };
-        public static void createKineticWhip()
+        public static void createWhipInfusion()
         {
-            var enablebuff = Helper.ToRef<BlueprintBuffReference>("426a9c079ee7ac34aa8e0054f2218074");
-            var blade = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponType>("a15b2fb1d5dc4f247882a7148d50afb0");
-            var blade_infusion = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("9ff81732daddb174aa8138ad1297c787");
+            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
+            var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
-            // make new weapon type so we can distinguish blade and whip (for AoO) and increase range 
-            var weapon_energy = blade.Clone();
+            var applicable = Blasts.Where(g => g.Get().name.StartsWith("KineticBlade")).ToArray();
+            Helper.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
+            var icon = Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3");
 
-            try
-            {
-                JsonSerializer serializer = JsonSerializer.CreateDefault(new JsonSerializerSettings
-                {
-                    Formatting = Formatting.Indented,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    TypeNameHandling = TypeNameHandling.All,
-                });
+            var ability = Helper.CreateBlueprintActivatableAbility(
+                "KineticWhipActivatable",
+                "Kinetic Whip",
+                "Element: universal\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou form a long tendril of energy or elemental matter. While active, your kinetic blade increases its reach by 5 feet and you can make attacks of opportunity with your kinetic blade.",
+                out BlueprintBuff buff,
+                icon: icon
+                ).SetComponents(
+                new RestrictionCanGatherPower()
+                );
 
-                using (StreamWriter sw = new StreamWriter(Path.Combine(Main.ModPath, "clone.json")))
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    serializer.Serialize(writer, weapon_energy);
-                }
-
-                Helper.Print("Exported clone data.");
-            }
-            catch (Exception e)
-            {
-                Helper.PrintException(e);
-            }
-
-            return;
-
-            weapon_energy.m_AttackRange = 10.Feet();
-            var weapon_physical = weapon_energy.Clone();
-            weapon_physical.m_AttackType = AttackType.Melee;
+            buff.Flags(hidden: true);
+            buff.SetComponents(
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 1, m_AppliableTo = applicable },
+                Helper.CreateAddStatBonus(5, StatType.Reach)
+                );
 
             var whip = Helper.CreateBlueprintFeature(
                 "KineticWhipInfusion",
-                "Kinetic Whip",
-                "Element: universal\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou form a long tendril of energy or elemental matter. This functions as kinetic blade but counts as a reach weapon appropriate for your size. Unlike most reach weapons, the kinetic whip can also attack nearby creatures. The kinetic whip disappears at the beginning of your next turn, but in the intervening time, it threatens all squares within its reach, allowing you to make attacks of opportunity that deal the whip’s usual damage.",
+                ability.m_DisplayName,
+                ability.m_Description,
+                icon: icon,
                 group: FeatureGroup.KineticBlastInfusion
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 6),
+                Helper.CreatePrerequisiteFeature(blade),
+                Helper.CreateAddFacts(ability.ToRef())
                 );
 
-            // clone all weapon blasts
-            foreach (var guid in _blade_weapons)
-            {
-                var weapon_base = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>(guid); // AirKineticBladeWeapon
-                if (weapon_base == null) continue;
+            // kinetic knight also gets bonuses with whips
+            var maneuver = Helper.CreateBlueprintFeature(
+                "KineticKnightManeuverBonus",
+                "",
+                ""
+                ).SetComponents(
+                new ManeuverBonus() { Type = CombatManeuver.Trip, Bonus = 4 },
+                new ManeuverBonus() { Type = CombatManeuver.Disarm, Bonus = 4 }
+                );
+            maneuver.HideInUI = true;
 
-                var weapon_clone = weapon_base.Clone();
-                weapon_clone.name += "Whip";
-                weapon_clone.m_Type = weapon_clone.Type.AttackType == AttackType.Melee ? weapon_physical.ToRef() : weapon_energy.ToRef();
-                weapon_clone.AddAsset(GuidManager.i.Get(weapon_clone.name));
+            Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, whip.ToRef());
+            knight.AddFeature(5, whip);
+            knight.AddFeature(5, maneuver);
+            Patch_KineticistAllowOpportunityAttack2.whip_buff = buff;
 
-                var buff1 = Helper.CreateBlueprintBuff(
-                    weapon_clone.name + "Buff",
-                    "Kinetic Whip",
-                    ""
-                    ).SetComponents(
-                    new AddKineticistBlade() { m_Blade = weapon_clone.ToRef() }
-                    ); //AddKineticistBlade, see KineticBladeAirBlastBuff
+        }
 
-                var ability1 = Helper.CreateBlueprintAbility(
-                    weapon_clone.name + "Ability",
-                    "Kinetic Whip",
-                    "",
-                    null,
-                    icon: null,
-                    AbilityType.Special,
-                    UnitCommand.CommandType.Free,
-                    AbilityRange.Personal
-                    ).SetComponents(
-                    Helper.CreateAbilityEffectRunAction(0,
-                        Helper.CreateContextActionApplyBuff(buff1, 1),
-                        Helper.CreateContextActionApplyBuff(enablebuff, 1)
-                        ),
-                    new AbilityKineticBlade(),
-                    new AbilityKineticist() { BlastBurnCost = 0, InfusionBurnCost = 2 } // todo fix composite
-                    ).ToRef2();
+        public static void createBladeRushInfusion()
+        {
+            var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
+            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
+            var dimensiondoor = Helper.ToRef<BlueprintAbilityReference>("a9b8be9b87865744382f7c64e599aeb2"); //DimensionDoorCasterOnly
 
-                whip.AddComponents(
-                    Helper.CreateAddFacts(ability1)
-                    );
-            }
-            // see MetakinesisQuickenBuff; must add new ability to metakinesis lists
+            string name = "Blade Rush";
+            string description = "Element: universal\nType: form infusion\nLevel: 2\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou use your element’s power to instantly move 30 feet, manifest a kinetic blade, and attack once. You gain a +2 bonus on the attack roll and take a –2 penalty to your AC until the start of your next turn. The movement doesn’t provoke attacks of opportunity, though activating blade rush does.";
+            Sprite icon = Helper.StealIcon("4c349361d720e844e846ad8c19959b1e");
+
+            var ability = Helper.CreateBlueprintAbility(
+                "KineticBladeRushAbility",
+                name,
+                description,
+                null,
+                icon,
+                AbilityType.SpellLike,
+                UnitCommand.CommandType.Standard,
+                AbilityRange.Close
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(0,
+                    Helper.CreateContextActionCastSpell(dimensiondoor),
+                    Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true),
+                    Helper.CreateContextActionMeleeAttack(true)),
+                step5_burn(null, 1),
+                new RestrictionCanGatherPowerAbility()
+                ).TargetPoint();
+
+            var rush = Helper.CreateBlueprintFeature(
+                "KineticBladeRush",
+                name,
+                description,
+                null,
+                icon,
+                FeatureGroup.KineticBlastInfusion
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 4),
+                Helper.CreatePrerequisiteFeature(blade),
+                Helper.CreateAddFacts(ability.ToRef2())
+                );
+
+            var quickblade = Helper.CreateBlueprintFeature(
+                "KineticKnightQuickenBladeRush",
+                "Blade Rush — Quicken",
+                "At 13th level as a swift action, a Kinetic Knight can accept 2 points of burn to unleash a kinetic blast with the blade rush infusion."
+                ).SetComponents(
+                new AutoMetamagic() { Metamagic = Metamagic.Quicken, m_AllowedAbilities = AutoMetamagic.AllowedType.KineticistBlast, Abilities = new List<BlueprintAbilityReference>() { ability.ToRef() } }
+                );
+
+            Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, rush.ToRef());
+            knight.AddFeature(13, quickblade);
         }
 
         public static void createMobileGatheringFeat()
@@ -366,7 +376,7 @@ namespace DarkCodex
                 step2_rank_dice(twice: false),
                 step3_rank_bonus(half_bonus: false),
                 step4_dc(),
-                step5_burn(step1, infusion: 2, blast: 0),
+                step5_burn(step1.Actions.Actions, infusion: 2, blast: 0),
                 step6_feat(impale_feat),
                 step7_projectile(Resource.Projectile.Kinetic_EarthBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
@@ -394,7 +404,7 @@ namespace DarkCodex
                 step2_rank_dice(twice: true),
                 step3_rank_bonus(half_bonus: false),
                 step4_dc(),
-                step5_burn(step1, infusion: 2, blast: 2),
+                step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
                 step6_feat(impale_feat),
                 step7_projectile(Resource.Projectile.Kinetic_MetalBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
@@ -422,7 +432,7 @@ namespace DarkCodex
                 step2_rank_dice(twice: true),
                 step3_rank_bonus(half_bonus: false),
                 step4_dc(),
-                step5_burn(step1, infusion: 2, blast: 2),
+                step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
                 step6_feat(impale_feat),
                 step7_projectile(Resource.Projectile.Kinetic_IceBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 step8_spell_description(SpellDescriptor.Cold),
@@ -476,11 +486,19 @@ namespace DarkCodex
                 if (bp.Blueprint is BlueprintAbilityAreaEffect)
                 {
                     var run = (bp.Blueprint as BlueprintAbilityAreaEffect).GetComponent<AbilityAreaEffectRunAction>();
-                    if (run == null || !bp.Blueprint.name.StartsWith("Wall"))
+                    if (run == null)
                         continue;
 
-                    run.Round = run.UnitEnter;
-                    counter++;
+                    if (bp.Blueprint.name.StartsWith("Wall"))
+                    {
+                        run.Round = run.UnitEnter;
+                        //run.UnitEnter = Helper.CreateActionList();
+                        counter++;
+                    }
+                    //else if (bp.Blueprint.name.StartsWith("DeadlyEarth"))
+                    //{
+                    //    run.UnitEnter = Helper.CreateActionList();
+                    //}
                 }
             }
             Helper.Print("Patched Wall Infusions: " + counter);
@@ -491,6 +509,7 @@ namespace DarkCodex
             //var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
             //var empower2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"); //MetakinesisEmpowerCheaperBuff
             var kineticist = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("b79e92dd495edd64e90fb483c504b8df"); //KineticistProgression
+            var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
             Sprite icon = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("85f3340093d144dd944fff9a9adfd2f2").Icon;
             string displayname = "Metakinesis — Selective";
@@ -498,7 +517,7 @@ namespace DarkCodex
 
             var applicable = Blasts.GetVariants(
                 g => g.CanTargetPoint
-                  || g.GetComponent<AbilityTargetsAround>()
+                  || g.GetComponent<AbilityTargetsAround>() && g.CanTargetFriends
                   || g.GetComponent<AbilityDeliverChain>());
 
             Helper.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
@@ -525,15 +544,26 @@ namespace DarkCodex
                 );
 
             kineticist.AddFeature(7, feature1, "70322f5a2a294e54a9552f77ee85b0a7");
+            knight.RemoveFeature(7, feature1);
+        }
 
-            //foreach (var ab in Blasts)
-            //{
-            //    ab.Get().AvailableMetamagic |= Metamagic.Selective;
-            //    var variants = ab.Get().GetComponent<AbilityVariants>();
-            //    if (variants != null)
-            //        foreach (var variant in variants.m_Variants)
-            //            variant.Get().AvailableMetamagic |= Metamagic.Selective;
-            //}
+        public static void createAutoMetakinesis()
+        {
+            var empower = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("70322f5a2a294e54a9552f77ee85b0a7"); //MetakinesisEmpowerFeature
+
+            var auto = Helper.CreateBlueprintActivatableAbility(
+                "MetakinesisAutoAbility",
+                "Metakinesis — Empower/Maximize (Automatic)",
+                "Apply Empower and Maxmize automatically depending on leftover gather power burn.",
+                out BlueprintBuff autobuff,
+                icon: Helper.StealIcon("45d94c6db453cfc4a9b99b72d6afe6f6"),
+                onByDefault: true
+                );
+
+            autobuff.SetComponents(new AutoMetakinesis());
+            autobuff.Flags(hidden: true);
+
+            Helper.AppendAndReplace(ref empower.GetComponent<AddFacts>().m_Facts, auto.ToRef());
         }
 
         #region Helper
@@ -573,10 +603,10 @@ namespace DarkCodex
             if (twice) progression = ContextRankProgression.MultiplyByModifier;
 
             var rankdice = Helper.CreateContextRankConfig(
+                baseValueType: ContextRankBaseValueType.FeatureRank,
                 type: AbilityRankType.DamageDice,
                 progression: progression,
                 stepLevel: twice ? 2 : 0,
-                baseValueType: ContextRankBaseValueType.FeatureRank,
                 feature: "93efbde2764b5504e98e6824cab3d27c".ToRef<BlueprintFeatureReference>()); //KineticBlastFeature
             return rankdice;
         }
@@ -587,9 +617,9 @@ namespace DarkCodex
         public static ContextRankConfig step3_rank_bonus(bool half_bonus = false)
         {
             var rankdice = Helper.CreateContextRankConfig(
+                baseValueType: ContextRankBaseValueType.CustomProperty,
                 progression: half_bonus ? ContextRankProgression.Div2 : ContextRankProgression.AsIs,
                 type: AbilityRankType.DamageBonus,
-                baseValueType: ContextRankBaseValueType.CustomProperty,
                 stat: StatType.Constitution,
                 customProperty: "f897845bbbc008d4f9c1c4a03e22357a".ToRef<BlueprintUnitPropertyReference>()); //KineticistMainStatProperty
             return rankdice;
@@ -609,22 +639,23 @@ namespace DarkCodex
         /// <summary>
         /// Creates damage tooltip from the run-action. Defines burn cost. Blast cost is 0, except for composite blasts which is 2. Talent is not used.
         /// </summary>
-        public static AbilityKineticist step5_burn(AbilityEffectRunAction run, int infusion = 0, int blast = 0, int talent = 0)
+        public static AbilityKineticist step5_burn(GameAction[] actions, int infusion = 0, int blast = 0, int talent = 0)
         {
-            var list = new List<AbilityKineticist.DamageInfo>();
-            for (int i = 0; i < run.Actions.Actions.Length; i++)
-            {
-                var action = run.Actions.Actions[i] as ContextActionDealDamage; // TODO: don't get run, but action[]
-                if (action == null) continue;
-
-                list.Add(new AbilityKineticist.DamageInfo() { Value = action.Value, Type = action.DamageType, Half = action.Half });
-            }
-
             var comp = new AbilityKineticist();
             comp.InfusionBurnCost = infusion;
             comp.BlastBurnCost = blast;
             comp.WildTalentBurnCost = talent;
-            comp.CachedDamageInfo = list;
+
+            if (actions == null)
+                return comp;
+
+            for (int i = 0; i < actions.Length; i++)
+            {
+                var action = actions[i] as ContextActionDealDamage;
+                if (action == null) continue;
+
+                comp.CachedDamageInfo.Add(new AbilityKineticist.DamageInfo() { Value = action.Value, Type = action.DamageType, Half = action.Half });
+            }
             return comp;
         }
 
@@ -754,8 +785,9 @@ namespace DarkCodex
     [HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
     public class Patch_KineticistAllowOpportunityAttack2
     {
-        private static BlueprintGuid KineticBlastPhysicalBlade = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef");
-        private static BlueprintGuid KineticBlastEnergyBlade = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0");
+        private static BlueprintGuid blade_p = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
+        private static BlueprintGuid blade_e = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0"); //KineticBlastEnergyBlade
+        public static BlueprintBuff whip_buff;
 
         public static bool Prefix(UnitEntityData unit, WeaponSlot hand, ref bool __result)
         {
@@ -768,8 +800,8 @@ namespace DarkCodex
             else if (hand.Weapon.Blueprint.IsUnarmed && !unit.Descriptor.State.Features.ImprovedUnarmedStrike)
                 __result = false;
 
-            else if (hand.Weapon.Blueprint.Type?.AssetGuid == KineticBlastPhysicalBlade
-                  || hand.Weapon.Blueprint.Type?.AssetGuid == KineticBlastEnergyBlade)
+            else if ((hand.Weapon.Blueprint.Type.AssetGuid == blade_p || hand.Weapon.Blueprint.Type.AssetGuid == blade_e)
+                     && unit.Buffs.GetBuff(whip_buff) == null)
                 __result = false;
 
             else
@@ -779,6 +811,18 @@ namespace DarkCodex
         }
     }
 
+    //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]
+    //public class Patch_KineticistWhipReach
+    //{
+    //    public static void Postfix(UnitPartKineticist kineticist, UnitCommand cmd, bool __result)
+    //    {
+    //        if (!__result)
+    //            return;
+    //        if (kineticist.Owner.Buffs.GetBuff(Patch_KineticistAllowOpportunityAttack2.whip_buff) == null) 
+    //            return;
+    //        cmd.ApproachRadius += 5f * 0.3048f;
+    //    }
+    //}
 
     #endregion
 

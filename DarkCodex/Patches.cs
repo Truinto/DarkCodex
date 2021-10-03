@@ -213,7 +213,7 @@ namespace DarkCodex
         public static void Prefix(Element __instance)
         {
             if (__instance.name == null)
-                __instance.name = "";
+                __instance.name = "$$empty";
         }
     }
 }

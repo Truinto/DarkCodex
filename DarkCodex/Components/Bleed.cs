@@ -27,7 +27,7 @@ namespace DarkCodex.Components
 {
 
     [AllowedOn(typeof(BlueprintUnitFact), false)]
-    public class BleedBuff : UnitBuffComponentDelegate<BuffDamageStackingDiceData>, ITickEachRound, ISubscriber, ITargetRulebookSubscriber, ITargetRulebookHandler<RuleHealDamage>, IRulebookHandler<RuleHealDamage>
+    public class BleedBuff : UnitBuffComponentDelegate, ITickEachRound, ISubscriber, ITargetRulebookSubscriber, ITargetRulebookHandler<RuleHealDamage>, IRulebookHandler<RuleHealDamage>
     {
         public override void OnActivate()
         {
@@ -39,14 +39,17 @@ namespace DarkCodex.Components
 
         public void OnNewRound()
         {
-            if (!this.Owner.IsInCombat)
-                this.Owner.Buffs.RemoveFact(this.Buff);
-
-            if (this.Data.Value == null)
+            if (this.Value == null)
                 return;
 
-            var damage = this.Data.Value.GetDirect();
-            base.Context.TriggerRule(new RuleDealDamage(this.Owner, this.Owner, damage));
+            var damage = this.Value.GetDirect();
+            var ruleDamage = new RuleDealDamage(this.Owner, this.Owner, damage);
+            base.Context.TriggerRule(ruleDamage);
+
+            Helper.PrintDebug($"BleedBuff.OnNewRound {Value.Dice}d{(int)Value.DiceType}+{Value.Bonus} result={ruleDamage.Result}");
+
+            if (!this.Owner.IsInCombat)
+                this.Owner.Buffs.RemoveFact(this.Buff);
         }
 
         public void OnEventAboutToTrigger(RuleHealDamage evt)
@@ -55,41 +58,10 @@ namespace DarkCodex.Components
 
         public void OnEventDidTrigger(RuleHealDamage evt)
         {
-            if (evt.Value > 0)
+            if (evt.Value > 0 && evt.HealFormula != DiceFormula.Zero)
                 this.Owner.Buffs.RemoveFact(this.Buff);
         }
 
-        public void ApplyBleed(ContextDiceValue value, bool stacking, bool flensing)
-        {
-            if (this.Data.Value == null)
-                this.Data.Value = DiceValue.Get(value, this.Context);
-            else if (stacking)
-                this.Data.Value.Increase(value, this.Context);
-
-            var damage = this.Data.Value.GetDirect();
-            base.Context.TriggerRule(new RuleDealDamage(this.Owner, this.Owner, damage));
-
-            if (flensing)
-            {
-                var ac = this.Owner.Stats.GetStat(StatType.AC);
-                int natural = ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmor);
-                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorEnhancement);
-                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorForm);
-                natural = Math.Max(0, natural);
-                int malus = Math.Min(natural, value.DiceCountValue.Calculate(this.Context));
-
-                if (malus > 0)
-                {
-                    var modifier = this.Owner.Stats.GetStat(StatType.AC).AddModifier(-malus, ModifierDescriptor.NaturalArmor);
-                    modifier.StackMode = ModifiableValue.StackMode.ForceStack;
-                    this.Buff.StoreModifier(modifier);
-                }
-            }
-        }
-    }
-
-    public class BuffDamageStackingDiceData
-    {
         [JsonProperty]
         public DiceValue Value;
     }
@@ -115,8 +87,57 @@ namespace DarkCodex.Components
             if (bleed == null)
                 return;
 
-            bleed.ApplyBleed(this.Value, this.IsStacking, this.IsFlensing);
-            buff.Owner.Buffs.UpdateNextEvent();
+            ApplyBleed(buff, bleed);
+            //buff.Owner.Buffs.UpdateNextEvent();
+        }
+
+        public void ApplyBleed(Buff buff, BleedBuff bleed)
+        {
+            var caster = this.Context.MaybeCaster;
+            var target = this.Target.Unit;
+
+            this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue; // todo: fix rank not getting set?
+            int rank = this.Context[AbilityRankType.Default];
+            int sneak = caster.Stats.SneakAttack.ModifiedValue;
+
+            if (bleed.Value == null)
+                bleed.Value = DiceValue.Get(this.Value, this.Context);
+            else if (this.IsStacking)
+                bleed.Value.Increase(this.Value, this.Context);
+
+            var damage = bleed.Value.GetDirect();
+            var ruleDamage = new RuleDealDamage(caster, target, damage);
+            this.Context.TriggerRule(ruleDamage);
+
+            Helper.PrintDebug($"ContextActionIncreaseBleed.ApplyBleed {Value.DiceCountValue}d{(int)Value.DiceType}+{Value.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result}");
+
+            if (this.IsFlensing)
+            {
+                var ac = target.Stats.GetStat(StatType.AC);
+                int natural = ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmor);
+                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorEnhancement);
+                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorForm);
+                natural = Math.Max(0, natural);
+                int value = this.Value.Calculate(this.Context);
+                int malus = Math.Min(natural, value);
+
+                Helper.PrintDebug($" -flensing natural={natural} value={value} malus={malus}");
+
+                if (malus > 0)
+                {
+                    var modifier = buff.m_StoredMods?.FirstOrDefault();
+                    if (modifier == null)
+                    {
+                        modifier = ac.AddModifier(-malus, ModifierDescriptor.NaturalArmor);
+                        modifier.StackMode = ModifiableValue.StackMode.ForceStack;
+                        buff.StoreModifier(modifier);
+                    }
+                    else
+                    {
+                        modifier.ModValue -= malus;
+                    }
+                }
+            }
         }
 
         public ContextActionIncreaseBleed()
@@ -126,20 +147,21 @@ namespace DarkCodex.Components
         public ContextActionIncreaseBleed(bool flensing)
         {
             this.IsFlensing = flensing;
-            Value = new ContextDiceValue() { 
-                DiceCountValue = Helper.CreateContextValue(AbilityRankType.Default),
-                DiceType = DiceType.D6,
-                BonusValue = 0 };
+            this.Value = new ContextDiceValue() { 
+                DiceCountValue = 0,
+                DiceType = DiceType.Zero,
+                BonusValue = Helper.CreateContextValue(AbilityRankType.Default)
+            };
         }
 
-        public static BlueprintBuff createBleedBuff()
+        internal static void createBleedBuff()
         {
-            return Helper.CreateBlueprintBuff(
+            BleedBlueprint = Helper.CreateBlueprintBuff(
                 "BleedVariableBuff",
                 "Bleed",
                 "This creature takes hit point damage each turn. Bleeding can be stopped through the application of any spell that cures hit point damage.",
                 "e12fafba433448f8b71208b0162061fb",
-                ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("75039846c3d85d940aa96c249b97e562").Icon
+                Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
                 ).SetComponents(
                 new BleedBuff()
                 );
@@ -148,6 +170,6 @@ namespace DarkCodex.Components
         public ContextDiceValue Value;
         public bool IsFlensing; // reduce natural armor by dice count
         public bool IsStacking; // false = apply higher value; true = add value
-        public static readonly BlueprintBuff BleedBlueprint = createBleedBuff();
+        public static BlueprintBuff BleedBlueprint;
     }
 }

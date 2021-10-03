@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using DarkCodex.Components;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Mechanics.Properties;
 
 namespace DarkCodex
 {
     public class Rogue
     {
-        public static void createBleedingAttack()
+        public static void createBleedingAttack() // TODO: play test
         {
             var RogueTalentSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
             var SneakAttack = Helper.ToRef<BlueprintFeatureReference>("9b9eac6709e1c084cb18c3a366e0ec87");
@@ -35,11 +36,13 @@ namespace DarkCodex
                 ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("75039846c3d85d940aa96c249b97e562").Icon
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(SneakAttack),
-                Helper.CreateAddInitiatorAttackRollTrigger(Helper.CreateActionList(Helper.CreateConditional(
-                    condition: new ContextConditionHasFact { m_Fact = flensing.ToRef2() },
-                    ifTrue: new ContextActionIncreaseBleed(true),
-                    ifFalse: new ContextActionIncreaseBleed(false)))),
-                Helper.CreateContextRankConfig(ContextRankBaseValueType.StatBonus, stat: StatType.SneakAttack) 
+                Helper.CreateAddInitiatorAttackRollTrigger(
+                    Helper.CreateActionList(Helper.CreateConditional(
+                        condition: new ContextConditionCasterHasFact { m_Fact = flensing.ToRef2() },
+                        ifTrue: new ContextActionIncreaseBleed(true),
+                        ifFalse: new ContextActionIncreaseBleed(false))),
+                    SneakAttack: true),
+                Helper.CreateContextRankConfig(ContextRankBaseValueType.CustomProperty, stat: StatType.SneakAttack, customProperty: PropertyGetterSneakAttack.Property)
                 );
             bleeding.Groups = new FeatureGroup[] { FeatureGroup.RogueTalent, FeatureGroup.SlayerTalent, FeatureGroup.VivisectionistDiscovery };
 

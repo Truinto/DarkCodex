@@ -1,7 +1,11 @@
 ﻿using DarkCodex.Components;
+using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Enums;
+using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
@@ -18,6 +22,8 @@ namespace DarkCodex
 {
     public class Mythic
     {
+        public static BlueprintFeature _itemAdept;
+
         public static void createLimitlessBardicPerformance()
         {
             var bardic_resource = BlueprintGuid.Parse("e190ba276831b5c4fa28737e5e49e6a6");
@@ -46,7 +52,9 @@ namespace DarkCodex
                 "Limitless Witch Hexes",
                 "Your curse knows no bounds.\nBenefit: You can use your hexes with no time restriction.",
                 group: FeatureGroup.MythicAbility
-                ); // todo: icon? class requirement
+                ); // todo: icon?
+
+            Helper.PrintJoinDebug(" -remove cooldown ", null);
 
             // cooldown based
             foreach (var ability in Resource.Cache.Ability)
@@ -58,14 +66,16 @@ namespace DarkCodex
                 if (check == null)
                     continue;
 
-                Helper.PrintDebug(" -remove cooldown " + ability.name);
+                Helper.PrintJoinDebug(ability.name);
                 var checknew = new AbilityTargetHasFactExcept();
                 checknew.m_CheckedFacts = check.m_CheckedFacts;
                 checknew.Inverted = check.Inverted;
                 checknew.PassIfFact = limitless.ToRef2();
 
-                ability.ReplaceComponent(check, new AbilityTargetHasFactExcept());
+                ability.ReplaceComponent(default(AbilityTargetHasFactExcept), check);
             }
+
+            Helper.PrintJoinDebug(flush: true);
 
             // resource based
             ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
@@ -109,11 +119,12 @@ namespace DarkCodex
                 "LimitlessBombs",
                 "Limitless Alchemist's Creations",
                 "You learn how to create a philosopher’s stone that turns everything into chemicals.\nBenefit: You no longer have a limited amount of Bombs or Incenses per day.",
-                group: FeatureGroup.MythicAbility
+                group: FeatureGroup.MythicAbility,
+                icon: Helper.StealIcon("5fa0111ac60ed194db82d3110a9d0352")
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(bomb_prereq, true),
                 Helper.CreatePrerequisiteFeature(incense_prereq, true)
-                ); // todo: icon?
+                );
 
             setResourceDecreasing(bomb_resource, limitless.ToRef2());
             setResourceDecreasing(incense_resource, limitless.ToRef2());
@@ -154,11 +165,12 @@ namespace DarkCodex
                 "LimitlessArcaneReservoir",
                 "Limitless Arcane Reservoir",
                 "Benefit: You can use your arcane exploits without using your arcane reservoir. This does not apply to Magical Supremacy.",
-                group: FeatureGroup.MythicAbility
+                group: FeatureGroup.MythicAbility,
+                icon: Helper.StealIcon("42f96fc8d6c80784194262e51b0a1d25")
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(arcane_prereq, true),
                 Helper.CreatePrerequisiteFeature(enforcerer_prereq, true)
-                ); // todo: icon?
+                );
 
             setResourceDecreasing(arcane_resource, limitless.ToRef2(), true);
 
@@ -196,6 +208,8 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility
                 );
 
+            Helper.PrintJoinDebug(" -free ability ", null);
+
             foreach (var ability in Resource.Cache.Ability)
             {
                 var logic = ability.GetComponent<AbilityResourceLogic>();
@@ -207,8 +221,10 @@ namespace DarkCodex
                     continue;
 
                 logic.ResourceCostDecreasingFacts.Add(limitless.ToRef2());
-                Helper.PrintDebug(" -free ability " + ability.name);
+                Helper.PrintJoinDebug(ability.name);
             }
+
+            Helper.PrintJoinDebug(" -free activatable ", null, true);
 
             foreach (var ability in Resource.Cache.Activatable)
             {
@@ -221,7 +237,7 @@ namespace DarkCodex
                 if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
                     Helper.Print($"ERROR: {ability.name} has already a FreeBlueprint");
                 logic.m_FreeBlueprint = limitless.ToRef2();
-                Helper.PrintDebug(" -free activatable " + ability.name);
+                Helper.PrintJoinDebug(ability.name);
             }
 
             Helper.AddMythicTalent(limitless);
@@ -236,10 +252,11 @@ namespace DarkCodex
                 "LimitlessShamanWeapon",
                 "Limitless Spirit Weapon",
                 "Your soul fused with a spirit.\nBenefit: You no longer have a limited amount of Spirit Weapon uses per day.",
-                group: FeatureGroup.MythicAbility
+                group: FeatureGroup.MythicAbility,
+                icon: Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3")
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(shaman_prereq)
-                ); // todo: icon?
+                );
 
             setResourceDecreasing(shaman_resource, limitless.ToRef2());
 
@@ -255,10 +272,11 @@ namespace DarkCodex
                 "LimitlessWarpriest",
                 "Limitless Sacred Weapon",
                 "You are chosen by your deity.\nBenefit: You no longer have a limited amount of Sacred Weapon rounds per day.",
-                group: FeatureGroup.MythicAbility
+                group: FeatureGroup.MythicAbility,
+                icon: Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3")
                 ).SetComponents(
                 //Helper.CreatePrerequisiteFeature(warpriest_prereq)
-                ); // todo: icon?
+                );
 
             setResourceDecreasing(warpriest_resource, limitless.ToRef2());
 
@@ -282,6 +300,39 @@ namespace DarkCodex
             Helper.AddMythicFeat(kinetic_mastery);
         }
 
+        public static void createMagicItemAdept()
+        {
+            _itemAdept = Helper.CreateBlueprintFeature(
+                "MagicItemAdept",
+                "Magic Item Adept",
+                "You learned how to pour your own magic into magic items. Benefit: When you are using magic trinkets you use your character level inplace of the items caster level. This does not work with potions, scrolls, or wands.",
+                group: FeatureGroup.MythicFeat
+                );
+
+            Helper.AddMythicFeat(_itemAdept);
+        }
+
+        public static void createExtraMythicFeats()
+        {
+            var base_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81"); //MythicFeatSelection
+            var base_selection2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d"); //MythicAbilitySelection
+            var extra_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8"); //ExtraMythicAbilityMythicFeat
+            
+            extra_selection1.Ranks = 10;
+
+            var extra_selection2 = Helper.CreateBlueprintFeatureSelection(
+                "ExtraMythicFeatMythicAbility",
+                "Extra Mythic Feat",
+                "",
+                icon: extra_selection1.m_Icon,
+                group: FeatureGroup.MythicAbility
+                );
+            extra_selection2.Ranks = 10;
+            extra_selection2.m_AllFeatures = base_selection1.m_AllFeatures;
+
+            Helper.AppendAndReplace(ref base_selection2.m_AllFeatures, extra_selection2.ToRef());
+        }
+
         public static void patchKineticOvercharge()
         {
             var overcharge = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("4236ca275c6fa9b4a9945b2645262616");
@@ -294,11 +345,21 @@ namespace DarkCodex
                 );
         }
 
+        public static void patchLimitlessDemonRage()
+        {
+            var rage = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
+            var limitless = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
+
+            rage.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
+        }
+
         #region Helper
 
         public static void setResourceDecreasing(BlueprintGuid resource, BlueprintUnitFactReference limitless, bool repeat = false)
         {
             Resource.Cache.Ensure();
+
+            Helper.PrintJoinDebug(" -free abilities: ", null);
 
             foreach (var ability in Resource.Cache.Ability)
             {
@@ -311,8 +372,10 @@ namespace DarkCodex
                 int total = !repeat ? 1 : logic.Amount + logic.ResourceCostIncreasingFacts.Count;
                 for (int i = 0; i < total; i++)
                     logic.ResourceCostDecreasingFacts.Add(limitless);
-                Helper.PrintDebug(" -free ability " + ability.name);
+                Helper.PrintJoinDebug(ability.name);
             }
+
+            Helper.PrintJoinDebug(" -free activatable: ", null, true);
 
             foreach (var ability in Resource.Cache.Activatable)
             {
@@ -320,14 +383,35 @@ namespace DarkCodex
                 if (logic == null || logic.m_RequiredResource?.deserializedGuid != resource)
                     continue;
 
-                Helper.PrintDebug(" -free activatable " + ability.name);
+                Helper.PrintJoinDebug(ability.name);
                 if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
                     Helper.Print($"ERROR: {ability.name} has already a FreeBlueprint");
                 logic.m_FreeBlueprint = limitless;
             }
+
+            Helper.PrintJoinDebug(flush: true);
         }
-        
+
         #endregion
 
     }
+
+    #region Patches
+
+    [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetParamsFromItem))]
+    public class Patch_MagicItemAdept
+    {
+        public static void Postfix(AbilityData __instance, AbilityParams __result)
+        {
+            if (__instance.Caster == null || Mythic._itemAdept == null)
+                return;
+
+            if (!__instance.Caster.Unit.Descriptor.HasFact(Mythic._itemAdept))
+                return;
+
+            __result.CasterLevel = __instance.Caster.Progression.CharacterLevel;
+        }
+    }
+
+    #endregion
 }

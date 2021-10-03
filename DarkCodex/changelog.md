@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.6]
+- added Mythic.createMagicItemAdept
+- added Items.createKineticArtifact
+- added Kineticist.createAutoMetakinesis
+- set freeby feats as default off
+- added Mythic.createExtraMythicFeats
+- added Mythic.patchLimitlessDemonRage
+- added Kineticist.createWhipInfusion
+- added Kineticist.createBladeRushInfusion
+- expanded Kinetic Knight to get whip, blade rush, quicken blade rush, and maneuver bonuses
+
 ## [1.0.5]
 - expanded createLimitlessBombs to include IncenseFog
 - added Mythic.createLimitlessShaman

@@ -1,8 +1,10 @@
 ﻿using JetBrains.Annotations;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.Enums;
 using Kingmaker.Items;
 using Kingmaker.RuleSystem.Rules;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
 using System;
 using System.Collections.Generic;
@@ -28,13 +30,26 @@ namespace DarkCodex.Components
         public override bool CheckCondition()
         {
             var weapon = Weapon.Get().CreateEntity<ItemEntityWeapon>();
-            var attack = new RuleAttackRoll(this.Context.MaybeCaster, this.Target.Unit, weapon, 0);
+
+            if (this.AbilityContext.AttackRoll == null)
+            {
+
+            }
+
+            var attack = new RuleAttackRoll2(this.Context.MaybeCaster, this.Target.Unit, weapon, 0);
             attack.DoNotProvokeAttacksOfOpportunity = IgnoreAoO;
             attack.SuspendCombatLog = false;
             this.Context.TriggerRule(attack);
 
+            //this.Context[AbilitySharedValue.Heal] = 1;
+            //int d20 = attack.D20;
+            //int d20crit = attack.CriticalConfirmationD20;
+
             return attack.IsHit;
         }
+
+        public static RuleRollD20 LastAttack;
+        public static RuleRollD20 LastCrit;
 
         [NotNull]
         public BlueprintItemWeaponReference Weapon;

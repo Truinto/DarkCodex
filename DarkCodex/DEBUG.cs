@@ -1,7 +1,12 @@
 ﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.AreaLogic.Etudes;
+using Kingmaker.Armies;
+using Kingmaker.Armies.TacticalCombat;
+using Kingmaker.Armies.TacticalCombat.Controllers;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Facts;
+using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
@@ -11,7 +16,10 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
 using Kingmaker.Items.Slots;
 using Kingmaker.Kingdom;
+using Kingmaker.Kingdom.Settlements;
+using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
+using Kingmaker.UI.Loot;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Class.Kineticist;
@@ -27,103 +35,193 @@ using System.Text;
 using System.Threading.Tasks;
 using TurnBased.Controllers;
 using UnityEngine;
+using UnityModManagerNet;
 
 namespace DarkCodex
 {
     public class DEBUG
     {
+        [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
+        public static class Patch_RuleRollD20 // todo remove code
+        {
+            // patch RuleAttackRoll.OnTrigger
+            // transpile replace RulebookEvent.Dice.D20 with custom method
+
+            public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+            {
+                List<CodeInstruction> list = instr.ToList();
+                MethodInfo original = AccessTools.PropertyGetter(typeof(RulebookEvent.Dice), nameof(RulebookEvent.Dice.D20));
+                MethodInfo replacement = AccessTools.Method(typeof(Patch_RuleRollD20), nameof(D20));
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var mi = list[i].operand as MethodInfo;
+                    if (mi != null && mi == original)
+                    {
+                        Helper.PrintDebug("Patch_RuleRollD20 at " + i);
+                        list[i].operand = replacement;
+                    }
+                }
+
+                return list;
+            }
+
+            public static RuleRollD20 D20()
+            {
+                RuleRollD20 ruleRollD = new RuleRollD20(Rulebook.CurrentContext.CurrentEvent?.Initiator);
+                ruleRollD.PreRollDice();
+                Rulebook.Trigger(ruleRollD);
+                return ruleRollD;
+            }
+
+            public static List<int> FakeRolls = new List<int>();
+        }
+
+        public static void ExportAllIconTextures()
+        {
+            foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+            {
+                if (bp.Blueprint is BlueprintUnitFact fact && fact.m_Icon != null)
+                {
+                    try
+                    {
+                        Helper.SaveSprite(fact.m_Icon);
+                        Helper.PrintDebug($"Export sprite {fact.m_Icon.name} from {fact.name} ");
+                    }
+                    catch (Exception)
+                    {
+                        Helper.PrintDebug($"Didn't like sprite {fact.m_Icon.name} from {fact.name} ");
+                    }
+                }
+            }
+        }
+
         public class Date //#278
         {
             public static void SetDate()
             {
-                KingdomState.Instance.CurrentDay -= 1;
-                Helper.Print(Game.Instance.BlueprintRoot.Calendar.GetDateText(KingdomState.Instance.Date - Game.Instance.BlueprintRoot.Calendar.GetStartDate(), GameDateFormat.Full, true));
+                //KingdomState.Instance.CurrentDay -= 1;
+                //Helper.Print(Game.Instance.BlueprintRoot.Calendar.GetDateText(KingdomState.Instance.Date - Game.Instance.BlueprintRoot.Calendar.GetStartDate(), GameDateFormat.Full, true));
+                Game.Instance.AdvanceGameTime(new TimeSpan(days: -1, 0, 0, 0, 0));
+                Game.Instance.MatchTimeOfDay(null);
+                Game.Instance.KingdomController.Tick();
             }
         }
 
-        [HarmonyPatch(typeof(CombatController), nameof(CombatController.HandlePartyCombatStateChanged))]
-        public class Rage //#262
+        public class Loot //#365
         {
-            private static BlueprintGuid rage = BlueprintGuid.Parse("df6a2cce8e3a9bd4592fb1968b83f730");
-            private static bool setting = true;
-            // Auto Enable Rage On Combat Start
-
-            public static void Postfix(bool inCombat)
+            public static void Open()
             {
-                if (!setting) return;
-                if (!inCombat) return;
+                Helper.PrintDebug("opening shared stash with items " + Game.Instance.Player.SharedStash.Count());
 
-                foreach (var unit in Game.Instance.Player.Party)
+                UnityModManager.UI.Instance.ToggleWindow();
+
+                Kingmaker.UI.Loot.LootWindowController window = Game.Instance.UI.LootWindowController;
+                //window.HandleLootInterraction(Game.Instance.Player.MainCharacter.Value, Game.Instance.Player.SharedStash, "Remote Stash");
+                window.WindowMode = LootWindowMode.PlayerChest;
+                window.m_Collector.SetData(Game.Instance.Player.SharedStash, "Remote Stash");
+                window.Show(true);
+
+            }
+        }
+
+        // #364 -> toggle UI open/close, if open show all judgments and put in list in order they are enabled, print numbers to show order
+
+        public class Enchantments
+        {
+            public static void X()
+            {
+                //UIUtilityItem.FillEnchantmentDescription
+            }
+
+            public static void NameAll()
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
                 {
-                    foreach (var activatable in unit.ActivatableAbilities)
+                    var enchantment = bp.Blueprint as BlueprintItemEnchantment;
+                    if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "")
+                        continue;
+
+                    string name = enchantment.name;
+                    if (name == null) continue;
+                    name = name.Replace("Enchantment", "");
+                    name = name.Replace("Enchant", "");
+                    if (name.Length < 1) continue;
+                    sb.Clear();
+                    sb.Append(name[0]);
+                    for (int i = 1; i < name.Length; i++)
                     {
-                        if (activatable.Blueprint.AssetGuid == rage)
-                        {
-                            activatable.TryStart();
-                            break;
-                        }
+                        if (name[i] <= 90)
+                            sb.Append(' ');
+                        if (name[i] <= 57)
+                            sb.Append('+');
+                        sb.Append(name[i]);
                     }
+
+                    enchantment.m_EnchantName = sb.ToString().CreateString();
                 }
             }
         }
 
-        [HarmonyPatch(typeof(ItemEntity), nameof(ItemEntity.IsUsableFromInventory), MethodType.Getter)]
-        public class ItemEntity_IsUsableFromInventory_Patch
+        [HarmonyPatch(typeof(TacticalCombatTurnController), nameof(TacticalCombatTurnController.ReadyToStartNextTurn), MethodType.Getter)]
+        public class ArmyLeader1
         {
-            // Allow Item Use From Inventory During Combat
-            public static bool Prefix(ItemEntity __instance, ref bool __result)
+            public static void Leader()
             {
-                //if (false) return true;
+                var attacker = Game.Instance.TacticalCombat.Data.Attacker.LeaderData;
+                var defender = Game.Instance.TacticalCombat.Data.Defender.LeaderData;
 
-                BlueprintItemEquipment item = __instance.Blueprint as BlueprintItemEquipment;
-                __result = item?.Ability != null;
-                return false;
+                bool isAttacking = attacker.Faction == ArmyFaction.Crusaders;
+
+                //Game.Instance.TacticalCombat.Data.Turn.
+            }
+
+            public static void Prefix(TacticalCombatTurnController __instance)
+            {
+
+                var turn = Game.Instance.TacticalCombat.Data.Turn;
+                var unit = turn.Unit;
+
+                if (unit == null || TacticalCombatHelper.IsDemon(unit))
+                    return;
+
+                unit.GetTacticalData().LeaderActionUsed = false;
+
+                if (!__instance.TurnEnded)
+                    return;
+
+                return;
+
+                __instance.m_PrevTurnEndTime = null;
+                turn.UsedActionsCount = 0;
+                turn.UpdateStandardAction(false);
             }
         }
 
-        [HarmonyPatch(typeof(MassLootHelper), nameof(MassLootHelper.GetMassLootFromCurrentArea))]
-        public class PatchLootEverythingOnLeave
+        [HarmonyPatch(typeof(SettlementState), nameof(SettlementState.GetSellPrice))]
+        public class Settlement1
         {
-            public static bool Prefix(ref IEnumerable<LootWrapper> __result)
+            public static float sell_multiplier = 1f;
+
+            public static void Postfix(ref KingdomResourcesAmount __result)
             {
-                //return true;
+                __result *= sell_multiplier;
+            }
+        }
 
-                var all_units = Game.Instance.State.Units.All.Where(w => w.IsInGame);
-                var result_units = all_units.Where(unit => unit.HasLoot).Select(unit => new LootWrapper { Unit = unit }); //unit.IsRevealed && unit.IsDeadAndHasLoot
+        [HarmonyPatch(typeof(SettlementState), nameof(SettlementState.GetActualCost), new Type[] { typeof(BlueprintSettlementBuilding) })]
+        public class Settlement2
+        {
+            public static float buy_multiplier = 1f;
+            public static float sell_multiplier = 1f;
 
-                var all_entities = Game.Instance.State.Entities.All.Where(w => w.IsInGame);
-                var all_chests = all_entities.Select(s => s.Get<InteractionLootPart>()).Where(i => i?.Loot != Game.Instance.Player.SharedStash).NotNull();
-
-                List<InteractionLootPart> tmp = TempList.Get<InteractionLootPart>();
-
-                foreach (InteractionLootPart i in all_chests)
-                {
-                    //if (i.Owner.IsRevealed
-                    //    && i.Loot.HasLoot
-                    //    && (i.LootViewed
-                    //        || (i.View is DroppedLoot && !i.Owner.Get<DroppedLoot.EntityPartBreathOfMoney>())
-                    //        || i.View.GetComponent<SkinnedMeshRenderer>()))
-                    if (i.Loot.HasLoot)
-                    {
-                        tmp.Add(i);
-                    }
-                }
-
-                var result_chests = tmp.Distinct(new MassLootHelper.LootDuplicateCheck()).Select(i => new LootWrapper { InteractionLoot = i });
-
-                __result = result_units.Concat(result_chests);
-
-#if false   // TODO - check if this solves the invisible items in the loot all UI
-                foreach (var loot in __result)
-                {
-                    if (loot.Unit != null)
-                        loot.Unit.LootViewed = true;
-                    if (loot.InteractionLoot != null)
-                        loot.InteractionLoot.IsViewed = true;
-                }
-#endif
-
-                return false;
+            public static void Postfix(BlueprintSettlementBuilding bp, SettlementState __instance, ref KingdomResourcesAmount __result)
+            {
+                if (__instance.m_SellDiscountedBuilding == bp)
+                    __result *= sell_multiplier; // re-buying a sold building should cost the same
+                else
+                    __result *= buy_multiplier;
             }
         }
     }

@@ -46,13 +46,13 @@ namespace DarkCodex.Components
 
 			if (!SkipCheck && !caster.Descriptor.HasFact(this.Spell))
             {
-				Helper.PrintDebug("ContextActionCastSpellOnCaster skipped");
+				//Helper.PrintDebug("ContextActionCastSpellOnCaster skipped");
                 return;
             }
 
             AbilityData abilityData = new AbilityData(this.Spell, caster.Descriptor);
 			Rulebook.Trigger(new RuleCastSpell(abilityData, caster));
-			Helper.PrintDebug("ContextActionCastSpellOnCaster casted spell");
+			//Helper.PrintDebug("ContextActionCastSpellOnCaster casted spell");
 		}
 
 		public bool SkipCheck;

@@ -1,12 +1,18 @@
 ﻿using DarkCodex.Components;
+using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Facts;
 using Kingmaker.Designers.Mechanics.Buffs;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using System;
 using System.Collections.Generic;
@@ -18,19 +24,44 @@ namespace DarkCodex
 {
     public class General
     {
+        [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.CanSelect))]
+        public class DEBUGTEST // todo: bugfix ability focus
+        {
+            public static bool Prefix(BlueprintParametrizedFeature __instance, ref bool __result, UnitDescriptor unit, LevelUpState state, FeatureSelectionState selectionState, IFeatureSelectionItem item)
+            {
+                if (__instance.ParameterType != FeatureParameterType.Custom)
+                    return true;
+
+                if (item.Param == null)
+                    __result = false;
+                //else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
+                //    __result = false;
+                else if (unit.GetFeature(__instance, item.Param) != null)
+                    __result = false;
+                else if (!unit.HasFact(item.Param.Blueprint as BlueprintFact))
+                    __result = false;
+                else
+                    __result = true;
+
+                return false;
+            }
+        }
+
         public static void createAbilityFocus()
         {
             Resource.Cache.Ensure();
+
+            return;
 
             var abilities = Resource.Cache.Ability.Where(ability =>
             {
                 if (ability.Type == AbilityType.Spell)
                     return false;
 
-                if (ability.m_Parent != null || !ability.m_Parent.IsEmpty())
+                if (ability.m_DisplayName.IsEmpty())
                     return false;
 
-                if (ability.m_DisplayName.IsEmpty())
+                if (ability.HasVariants)
                     return false;
 
                 var run = ability.GetComponent<AbilityEffectRunAction>();
@@ -41,7 +72,7 @@ namespace DarkCodex
             }).ToArray();
 
             var feat = Helper.CreateBlueprintParametrizedFeature(
-                "AbilityFocus",
+                "AbilityFocusCustom",
                 "Ability Focus",
                 "Choose one special attack. Add +2 to the DC for all saving throws against the special attack on which you focus.",
                 blueprints: abilities.ToRef3()
@@ -78,8 +109,11 @@ namespace DarkCodex
             mobility.Get().AddComponents(Helper.MakeAddFactSafe(dodge));
             dodge.Get().AddComponents(Helper.MakeAddFactSafe(mobility));
 
+            var twf = Helper.ToRef<BlueprintUnitFactReference>("ac8aaf29054f5b74eb18f2af950e752d"); //TwoWeaponFighting
             var twfi = Helper.ToRef<BlueprintUnitFactReference>("9af88f3ed8a017b45a6837eab7437629"); //TwoWeaponFightingImproved
             var twfg = Helper.ToRef<BlueprintUnitFactReference>("c126adbdf6ddd8245bda33694cd774e8"); //TwoWeaponFightingGreater
+            var multi = Helper.ToRef<BlueprintUnitFactReference>("8ac319e47057e2741b42229210eb43ed"); //Multiattack
+            twf.Get().AddComponents(Helper.MakeAddFactSafe(multi));
             twfi.Get().AddComponents(Helper.MakeAddFactSafe(twfg));
 
             //Deft Maneuvers
@@ -92,18 +126,35 @@ namespace DarkCodex
             //ImprovedSunder.9719015edcbf142409592e2cbaab7fe1
         }
 
-        public static void createQuickDraw()
+        public static void patchExtendSpells()
         {
-            var quickdraw = Helper.CreateBlueprintFeature(
-                "QuickDraw",
-                "Quick Draw",
-                "You can draw a weapon as a free action instead of as a move action. A character who has selected this feat may throw weapons at his full normal rate of attacks (much like a character with a bow)."
-                );
+            //2cadf6c6350e4684baa109d067277a45:ProtectionFromAlignmentCommunal only duration string
+            //93f391b0c5a99e04e83bbfbe3bb6db64:ProtectionFromEvilCommunal
+            //5bfd4cce1557d5744914f8f6d85959a4:ProtectionFromGoodCommunal
+            //8b8ccc9763e3cc74bbf5acc9c98557b9:ProtectionFromLawCommunal
+            //0ec75ec95d9e39d47a23610123ba1bad:ProtectionFromChaosCommunal
+        }
 
-            // reduce weapon change time
+        public static void createGangUp()
+        {
+            /*
+             Gang Up (Combat)
+             You are adept at using greater numbers against foes.
+             Prerequisites: Int 13, Combat Expertise.
+             Benefit: You are considered to be flanking an opponent if at least two of your allies are threatening that opponent, regardless of your actual positioning.
+             Normal: You must be positioned opposite an ally to flank an opponent.
+            */
+        }
 
-            // apply two weapon fighting to throwing weapons like javelin, throwing axe
-            // see TwoWeaponFightingImproved and TwoWeaponFightingBasicMechanics
+        public static void patchHideBuffs()
+        {
+            //MetamagicRodLesserKineticBuff.4677cfde5b184a94e898425d88a4665a.json
+            //ca55b55c4cbac7947b513ea0e76b01d2
+        }
+
+        public static void createBardStopSong()
+        {
+
         }
     }
 }

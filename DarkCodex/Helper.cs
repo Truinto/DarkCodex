@@ -8,8 +8,12 @@ using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
+using Kingmaker.Blueprints.Items;
+using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.Blueprints.Loot;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
+using Kingmaker.Designers.Mechanics.EquipmentEnchants;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.Designers.Mechanics.Prerequisites;
 using Kingmaker.ElementsSystem;
@@ -273,6 +277,9 @@ namespace DarkCodex
 
         #region Log
 
+        private static bool _sb2_flag;
+        private static StringBuilder _sb2 = new StringBuilder();
+
         /// <summary>Only prints message, if compiled on DEBUG.</summary>
         [System.Diagnostics.Conditional("DEBUG")]
         internal static void PrintDebug(string msg)
@@ -290,6 +297,42 @@ namespace DarkCodex
             Main.logger?.LogException(ex);
         }
 
+        [System.Diagnostics.Conditional("DEBUG")]
+        internal static void PrintJoinDebug(string msg = "", string delimiter = ", ", bool flush = false)
+        {
+            PrintJoin(msg, delimiter, flush);
+        }
+
+        /// <summary>
+        /// Joins text before printing.
+        /// </summary>
+        /// <param name="msg">Part of text to print.</param>
+        /// <param name="delimiter">Delimiter to use. Set null for prefix.</param>
+        /// <param name="flush">Flushes BEFORE appending msg.</param>
+        internal static void PrintJoin(string msg = "", string delimiter = ", ", bool flush = false)
+        {
+            if (flush)
+            {
+                if (_sb2_flag)
+                {
+                    Print(_sb2.ToString());
+                }
+
+                _sb2.Clear();
+                _sb2_flag = false;
+
+                _sb2.Append(msg);
+                return;
+            }
+
+            if (_sb2_flag && delimiter != null)
+                _sb2.Append(delimiter);
+            else if (delimiter != null)
+                _sb2_flag = true;
+
+            _sb2.Append(msg);
+        }
+
         #endregion
 
         #region Strings
@@ -300,7 +343,7 @@ namespace DarkCodex
         }
 
         private static SHA1 _SHA = SHA1Managed.Create();
-        private static StringBuilder _sb = new StringBuilder();
+        private static StringBuilder _sb1 = new StringBuilder();
         private static Locale _lastLocale = Locale.enGB;
         private static Dictionary<string, string> _mappedStrings;
         public static LocalizedString CreateString(this string value, string key = null)
@@ -312,9 +355,9 @@ namespace DarkCodex
             {
                 var sha = _SHA.ComputeHash(Encoding.UTF8.GetBytes(value));
                 for (int i = 0; i < sha.Length; i++)
-                    _sb.Append(sha[i].ToString("x2"));
-                key = _sb.ToString();
-                _sb.Clear();
+                    _sb1.Append(sha[i].ToString("x2"));
+                key = _sb1.ToString();
+                _sb1.Clear();
             }
 
             var pack = LocalizationManager.CurrentPack.Strings;
@@ -389,7 +432,7 @@ namespace DarkCodex
             return obj;
         }
 
-        public static void ReplaceComponent<T, TRep, TOrig>(this T obj, TRep replacement, TOrig tori) where T : BlueprintScriptableObject where TRep : BlueprintComponent
+        public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig tori, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
         {
             replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}";
 
@@ -401,6 +444,7 @@ namespace DarkCodex
                     break;
                 }
             }
+            return obj;
         }
 
         public static T RemoveComponents<T, TRemove>(this T obj, TRemove _) where T : BlueprintScriptableObject where TRemove : BlueprintComponent
@@ -519,6 +563,12 @@ namespace DarkCodex
         public static T Clone<T>(this T obj)
         {
             return (T)_memberwiseClone.Invoke(obj, null);
+            //var result = Activator.CreateInstance<T>();
+            //var fields = typeof(T).GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+            //foreach (var field in fields)
+            //    field.SetValue(result, field.GetValue(obj));
+
+            //return result;
         }
 
         public static BlueprintFeatureSelection _basicfeats;
@@ -611,6 +661,12 @@ namespace DarkCodex
             return buff;
         }
 
+        public static void AddArcaneVendorItem(BlueprintItemReference item, int amount = 1)
+        {
+            var vendor_table = ResourcesLibrary.TryGetBlueprint<BlueprintSharedVendorTable>("5450d563aab78134196ee9a932e88671"); //ArcaneScrollsVendorTableI
+            vendor_table.AddComponents(new LootItemsPackFixed() { m_Item = new LootItem() { m_Item = item }, m_Count = amount });
+        }
+
         public static ContextCondition[] MakeConditionHasNoBuff(params BlueprintBuff[] buffs)
         {
             if (buffs == null || buffs[0] == null) throw new ArgumentNullException();
@@ -646,6 +702,7 @@ namespace DarkCodex
 
         public static BlueprintAbility TargetPoint(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = false)
         {
+            ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
             ability.CanTargetEnemies = true;
             ability.CanTargetPoint = true;
             ability.CanTargetFriends = true;
@@ -655,10 +712,20 @@ namespace DarkCodex
         }
         public static BlueprintAbility TargetEnemy(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional)
         {
+            ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
             ability.CanTargetEnemies = true;
             ability.CanTargetPoint = false;
             ability.CanTargetFriends = false;
             ability.CanTargetSelf = false;
+            ability.Animation = animation;
+            return ability;
+        }
+        public static BlueprintAbility TargetSelf(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Omni)
+        {
+            ability.CanTargetEnemies = false;
+            ability.CanTargetPoint = false;
+            ability.CanTargetFriends = false;
+            ability.CanTargetSelf = true;
             ability.Animation = animation;
             return ability;
         }
@@ -676,7 +743,35 @@ namespace DarkCodex
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
         }
-                
+
+        public static ContextActionCastSpell CreateContextActionCastSpell(BlueprintAbilityReference spell, bool castByTarget = false)
+        {
+            var result = new ContextActionCastSpell();
+            result.m_Spell = spell;
+            result.CastByTarget = castByTarget;
+            return result;
+        }
+
+        public static ContextActionMeleeAttack CreateContextActionMeleeAttack(bool isPoint = false)
+        {
+            var result = new ContextActionMeleeAttack();
+            result.SelectNewTarget = isPoint;
+            result.AutoHit = false;
+            result.IgnoreStatBonus = false;
+            result.AutoCritThreat = false;
+            result.AutoCritConfirmation = false;
+            return result;
+        }
+
+        public static AddStatBonus CreateAddStatBonus(int value, StatType stat, ModifierDescriptor descriptor = ModifierDescriptor.UntypedStackable)
+        {
+            var result = new AddStatBonus();
+            result.Value = value;
+            result.Stat = stat;
+            result.Descriptor = descriptor;
+            return result;
+        }
+
         public static AddInitiatorAttackRollTrigger CreateAddInitiatorAttackRollTrigger(ActionList Action, bool OnOwner = false, bool SneakAttack = false, bool OnlyHit = true, bool CriticalHit = false, bool CheckWeapon = false, WeaponCategory WeaponCategory = 0)
         {
             var result = new AddInitiatorAttackRollTrigger();
@@ -719,7 +814,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static ContextRankConfig CreateContextRankConfig(ContextRankBaseValueType baseValueType = ContextRankBaseValueType.CasterLevel, ContextRankProgression progression = ContextRankProgression.AsIs, AbilityRankType type = AbilityRankType.Default, int? min = null, int? max = null, int startLevel = 0, int stepLevel = 0, bool exceptClasses = false, StatType stat = StatType.Unknown, BlueprintUnitPropertyReference customProperty = null, BlueprintCharacterClassReference[] classes = null, BlueprintArchetypeReference[] archetypes = null, BlueprintFeatureReference feature = null, BlueprintFeatureReference[] featureList = null/*, (int, int)[] customProgression = null*/)
+        public static ContextRankConfig CreateContextRankConfig(ContextRankBaseValueType baseValueType, ContextRankProgression progression = ContextRankProgression.AsIs, AbilityRankType type = AbilityRankType.Default, int? min = null, int? max = null, int startLevel = 0, int stepLevel = 0, bool exceptClasses = false, StatType stat = StatType.Unknown, BlueprintUnitPropertyReference customProperty = null, BlueprintCharacterClassReference[] classes = null, BlueprintArchetypeReference[] archetypes = null, BlueprintFeatureReference feature = null, BlueprintFeatureReference[] featureList = null/*, (int, int)[] customProgression = null*/)
         {
             var result = new ContextRankConfig();
             result.m_Type = type;
@@ -736,7 +831,7 @@ namespace DarkCodex
             result.m_Stat = stat;
             result.m_Class = classes ?? Array.Empty<BlueprintCharacterClassReference>();
             result.Archetype = ToRef<BlueprintArchetypeReference>(null);
-            result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>(); // TODO: check if this is ok, or if it should split 1 to Archetype instead
+            result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>();
             result.m_FeatureList = featureList ?? Array.Empty<BlueprintFeatureReference>();
 
             return result;
@@ -933,9 +1028,9 @@ namespace DarkCodex
             return result;
         }
 
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool dispellable = false, bool permanent = false)
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
-            return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: false, dispellable: dispellable, permanent: permanent);
+            return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: false, toCaster: toCaster, asChild: asChild, dispellable: dispellable, permanent: permanent);
         }
 
         public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
@@ -1097,14 +1192,14 @@ namespace DarkCodex
             result.m_Description = description.CreateString();
             result.m_Icon = icon;
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
-            result.ParameterType = FeatureParameterType.FeatureSelection;
+            result.ParameterType = FeatureParameterType.Custom; //FeatureParameterType.FeatureSelection
             result.BlueprintParameterVariants = blueprints;
 
             AddAsset(result, guid);
             return result;
         }
 
-        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(String name, String displayName, String description, out BlueprintBuff buff, string guid = null, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
+        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, string guid = null, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -1195,6 +1290,33 @@ namespace DarkCodex
 
                 result.AddComponents(runaction);
             }
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static BlueprintWeaponEnchantment CreateBlueprintWeaponEnchantment(string name, string enchantName = null, string description = null, string prefix = null, string suffix = null, string guid = null, int enchantValue = 0)
+        {
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = new BlueprintWeaponEnchantment();
+            result.name = name;
+            result.m_EnchantName = enchantName.CreateString();
+            result.m_Description = description.CreateString();
+            result.m_Prefix = prefix.CreateString();
+            result.m_Suffix = suffix.CreateString();
+            result.m_EnchantmentCost = enchantValue;
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static BlueprintUnitProperty CreateBlueprintUnitProperty(string name)
+        {
+            var guid = GuidManager.i.Get(name);
+            var result = new BlueprintUnitProperty();
+            result.name = name;
 
             AddAsset(result, guid);
             return result;
@@ -1464,7 +1586,7 @@ namespace DarkCodex
             }
             return result;
         }
-        
+
         public static BlueprintWeaponTypeReference ToRef(this BlueprintWeaponType feature)
         {
             if (feature == null) return null;
@@ -1484,6 +1606,24 @@ namespace DarkCodex
             return result;
         }
 
+        public static BlueprintWeaponEnchantmentReference ToRef(this BlueprintWeaponEnchantment feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintWeaponEnchantmentReference();
+            result.deserializedGuid = feature.AssetGuid;
+            return result;
+        }
+        public static BlueprintWeaponEnchantmentReference[] ToRef(this BlueprintWeaponEnchantment[] feature)
+        {
+            if (feature == null) return null;
+            var result = new BlueprintWeaponEnchantmentReference[feature.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new BlueprintWeaponEnchantmentReference();
+                result[i].deserializedGuid = feature[i].AssetGuid;
+            }
+            return result;
+        }
 
         public static BlueprintAbilityAreaEffectReference ToRef(this BlueprintAbilityAreaEffect feature)
         {
@@ -1508,6 +1648,19 @@ namespace DarkCodex
 
         #region Image
 
+        public static Sprite StealIcon(string guid)
+        {
+            try
+            {
+                return ResourcesLibrary.TryGetBlueprint<BlueprintUnitFact>(guid)?.Icon;
+            }
+            catch (Exception)
+            {
+                Helper.Print("Could not import icon from " + guid);
+                return null;
+            }
+        }
+
         public static Sprite CreateSprite(string filename, int width = 64, int height = 64)
         {
             try
@@ -1522,6 +1675,12 @@ namespace DarkCodex
                 PrintException(e);
                 return null;
             }
+        }
+
+        public static void SaveSprite(Sprite icon) // not working
+        {
+            Texture.allowThreadedTextureCreation = true;
+            File.WriteAllBytes(Path.Combine(Main.ModPath, "IconsExport", icon.name), ImageConversion.EncodeToPNG(icon.texture));
         }
 
         #endregion
