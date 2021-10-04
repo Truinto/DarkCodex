@@ -12,6 +12,7 @@ using DarkCodex.Components;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Mechanics.Properties;
+using Kingmaker.Blueprints.Classes.Spells;
 
 namespace DarkCodex
 {
@@ -42,6 +43,7 @@ namespace DarkCodex
                         ifTrue: new ContextActionIncreaseBleed(true),
                         ifFalse: new ContextActionIncreaseBleed(false))),
                     SneakAttack: true),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed),
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.CustomProperty, stat: StatType.SneakAttack, customProperty: PropertyGetterSneakAttack.Property)
                 );
             bleeding.Groups = new FeatureGroup[] { FeatureGroup.RogueTalent, FeatureGroup.SlayerTalent, FeatureGroup.VivisectionistDiscovery };

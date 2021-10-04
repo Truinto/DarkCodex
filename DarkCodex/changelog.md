@@ -2,6 +2,7 @@
 
 ## [1.0.7]
 - fix impale rolling individually
+- fix bleed working on bleed immune creatures
 
 ## [1.0.6]
 - added Mythic.createMagicItemAdept
