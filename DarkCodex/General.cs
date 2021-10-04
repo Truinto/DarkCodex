@@ -128,28 +128,34 @@ namespace DarkCodex
 
         public static void patchExtendSpells()
         {
-            //2cadf6c6350e4684baa109d067277a45:ProtectionFromAlignmentCommunal only duration string
-            //93f391b0c5a99e04e83bbfbe3bb6db64:ProtectionFromEvilCommunal
-            //5bfd4cce1557d5744914f8f6d85959a4:ProtectionFromGoodCommunal
-            //8b8ccc9763e3cc74bbf5acc9c98557b9:ProtectionFromLawCommunal
-            //0ec75ec95d9e39d47a23610123ba1bad:ProtectionFromChaosCommunal
-        }
-
-        public static void createGangUp()
-        {
-            /*
-             Gang Up (Combat)
-             You are adept at using greater numbers against foes.
-             Prerequisites: Int 13, Combat Expertise.
-             Benefit: You are considered to be flanking an opponent if at least two of your allies are threatening that opponent, regardless of your actual positioning.
-             Normal: You must be positioned opposite an ally to flank an opponent.
-            */
+            string[] guids = new string[] {
+                "2cadf6c6350e4684baa109d067277a45", //ProtectionFromAlignmentCommunal only duration string
+                "93f391b0c5a99e04e83bbfbe3bb6db64", //ProtectionFromEvilCommunal
+                "5bfd4cce1557d5744914f8f6d85959a4", //ProtectionFromGoodCommunal
+                "8b8ccc9763e3cc74bbf5acc9c98557b9", //ProtectionFromLawCommunal
+                "0ec75ec95d9e39d47a23610123ba1bad", //ProtectionFromChaosCommunal
+            };
         }
 
         public static void patchHideBuffs()
         {
-            //MetamagicRodLesserKineticBuff.4677cfde5b184a94e898425d88a4665a.json
-            //ca55b55c4cbac7947b513ea0e76b01d2
+            string[] guids = new string[] {
+                "ca55b55c4cbac7947b513ea0e76b01d2", //Artifact_RingOfSummonsItem
+                "4677cfde5b184a94e898425d88a4665a", //MetamagicRodLesserKineticBuff
+            };
+
+            foreach (var guid in guids)
+            {
+                try
+                {
+                    var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(guid);
+                    buff.Flags(hidden: true);
+                }
+                catch (Exception)
+                {
+                    Helper.Print(" error: couldn't load " + guid);
+                }
+            }
         }
 
         public static void createBardStopSong()

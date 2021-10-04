@@ -32,18 +32,16 @@ namespace DarkCodex.Components
         {
 			if (!this.WeaponStats.IsTriggered)
 			{
-				Rulebook.Trigger<RuleCalculateWeaponStats>(this.WeaponStats);
+				Rulebook.Trigger(this.WeaponStats);
 			}
-			bool flag = this.Target.Descriptor.State.HasCondition(UnitCondition.Confusion);
-			bool flag2 = !this.Target.IsEnemy(this.Initiator) && !this.Target.Faction.Neutral && !flag;
-			if (this.Initiator == this.Target || (this.AttackType.IsTouch() && flag2))
+            if (this.Initiator == this.Target || (this.AttackType.IsTouch() && !this.Target.IsEnemy(this.Initiator) && !this.Target.Faction.Neutral && !this.Target.Descriptor.State.HasCondition(UnitCondition.Confusion)))
 			{
 				this.AutoHit = true;
 			}
 			if (this.AutoHit)
 			{
 				this.Result = AttackResult.Hit;
-				this.IsCriticalConfirmed = (this.AutoCriticalThreat && this.AutoCriticalConfirmation);
+				this.IsCriticalConfirmed = this.AutoCriticalThreat && this.AutoCriticalConfirmation;
 			}
 			else if (this.AutoMiss)
 			{
@@ -51,7 +49,7 @@ namespace DarkCodex.Components
 			}
 			else if (this.TryOvercomeTargetConcealmentAndMissChance() || TacticalCombatHelper.IsActive)
 			{
-				this.ACRule = Rulebook.Trigger<RuleCalculateAC>(new RuleCalculateAC(this.Initiator, this.Target, this.AttackType)
+				this.ACRule = Rulebook.Trigger(new RuleCalculateAC(this.Initiator, this.Target, this.AttackType)
 				{
 					ForceFlatFooted = this.ForceFlatFooted
 				});
@@ -62,28 +60,27 @@ namespace DarkCodex.Components
 					TargetIsFlanked = this.TargetIsFlanked
 				};
 				this.AttackBonusRule.CopyModifiersFrom(this);
-				Rulebook.Trigger<RuleCalculateAttackBonus>(this.AttackBonusRule);
+				Rulebook.Trigger(this.AttackBonusRule);
 				this.AttackBonus = this.AttackBonusRule.Result;
-				this.D20 = (TacticalCombatHelper.IsActive ? new RuleRollD20(this.Initiator, 21) : RulebookEvent.Dice.D20);
-				bool flag3 = this.IsSuccessRoll(this.D20);
-				this.Result = (flag3 ? AttackResult.Hit : this.Target.Stats.AC.SelectMissReason(this.IsTargetFlatFooted, this.AttackType.IsTouch()));
-				this.IsSneakAttack = (this.IsHit && !this.ImmuneToSneakAttack && this.IsAttackRollSuitableForSneakAttack() && (this.IsTargetFlatFooted || this.Target.CombatState.IsFlanked) && this.Initiator.Stats.SneakAttack > 0);
+				//this.D20 = TacticalCombatHelper.IsActive ? new RuleRollD20(this.Initiator, 21) : RulebookEvent.Dice.D20;
+                this.Result = this.IsSuccessRoll(this.D20) ? AttackResult.Hit : this.Target.Stats.AC.SelectMissReason(this.IsTargetFlatFooted, this.AttackType.IsTouch());
+				this.IsSneakAttack = this.IsHit && !this.ImmuneToSneakAttack && this.IsAttackRollSuitableForSneakAttack() && (this.IsTargetFlatFooted || this.Target.CombatState.IsFlanked) && this.Initiator.Stats.SneakAttack > 0;
 				SettingsEntityEnum<CriticalHitPower> enemyCriticalHits = SettingsRoot.Difficulty.EnemyCriticalHits;
-				this.IsCriticalRoll = (TacticalCombatHelper.IsActive ? (!this.ImmuneToCriticalHit && this.AutoCriticalThreat) : (flag3 && !this.ImmuneToCriticalHit && (this.D20 >= this.WeaponStats.CriticalEdge || this.AutoCriticalThreat) && (!this.Target.IsPlayerFaction || enemyCriticalHits == CriticalHitPower.Weak || enemyCriticalHits == CriticalHitPower.Normal)));
+				this.IsCriticalRoll = TacticalCombatHelper.IsActive ? (!this.ImmuneToCriticalHit && this.AutoCriticalThreat) : (this.IsSuccessRoll(this.D20) && !this.ImmuneToCriticalHit && (this.D20 >= this.WeaponStats.CriticalEdge || this.AutoCriticalThreat) && (!this.Target.IsPlayerFaction || enemyCriticalHits == CriticalHitPower.Weak || enemyCriticalHits == CriticalHitPower.Normal));
 				if (this.IsCriticalRoll)
 				{
-					RuleCalculateAC ruleCalculateAC = Rulebook.Trigger<RuleCalculateAC>(new RuleCalculateAC(this.Initiator, this.Target, this.AttackType)
+					RuleCalculateAC ruleCalculateAC = Rulebook.Trigger(new RuleCalculateAC(this.Initiator, this.Target, this.AttackType)
 					{
 						IsCritical = true
 					});
 					this.TargetCriticalAC = ruleCalculateAC.Result;
-					this.CriticalConfirmationD20 = (this.AutoCriticalConfirmation ? new RuleRollD20(this.Initiator, 20) : RulebookEvent.Dice.D20);
-					this.IsCriticalConfirmed = (this.AutoCriticalConfirmation || this.CriticalConfirmationRoll >= this.TargetCriticalAC);
+					this.CriticalConfirmationD20 = this.AutoCriticalConfirmation ? new RuleRollD20(this.Initiator, 20) : RulebookEvent.Dice.D20;
+					this.IsCriticalConfirmed = this.AutoCriticalConfirmation || this.CriticalConfirmationRoll >= this.TargetCriticalAC;
 				}
 				if (this.IsSneakAttack || this.IsCriticalConfirmed || this.PreciseStrike > 0)
 				{
 					UnitPartFortification unitPartFortification = this.Target.Get<UnitPartFortification>();
-					this.FortificationChance = ((unitPartFortification != null) ? unitPartFortification.Value : 0);
+					this.FortificationChance = (unitPartFortification != null) ? unitPartFortification.Value : 0;
 					if (this.TargetUseFortification)
 					{
 						this.FortificationRoll = RulebookEvent.Dice.D100;
@@ -101,13 +98,12 @@ namespace DarkCodex.Components
 				{
 					this.Result = AttackResult.CriticalHit;
 				}
-				bool flag4 = !flag3 && this.TargetAC - this.D20 - this.AttackBonus <= 5;
-				if ((flag3 || flag4) && !this.Initiator.Descriptor.IsImmuneToVisualEffects)
+                if ((this.IsSuccessRoll(this.D20) || !this.IsSuccessRoll(this.D20) && this.TargetAC - this.D20 - this.AttackBonus <= 5) && !this.Initiator.Descriptor.IsImmuneToVisualEffects)
 				{
 					UnitPartMirrorImage unitPartMirrorImage = this.Target.Get<UnitPartMirrorImage>();
 					if (unitPartMirrorImage != null)
 					{
-						this.HitMirrorImageIndex = unitPartMirrorImage.TryAbsorbHit(flag4);
+						this.HitMirrorImageIndex = unitPartMirrorImage.TryAbsorbHit(!this.IsSuccessRoll(this.D20) && this.TargetAC - this.D20 - this.AttackBonus <= 5);
 						if (this.HitMirrorImageIndex > 0)
 						{
 							this.Result = AttackResult.MirrorImage;
@@ -132,7 +128,7 @@ namespace DarkCodex.Components
 				}
 			}
 			this.IsSneakAttack &= this.IsHit;
-			EventBus.RaiseEvent<IAttackHandler>(delegate (IAttackHandler h)
+			EventBus.RaiseEvent(delegate (IAttackHandler h)
 			{
 				h.HandleAttackHitRoll(this);
 			}, true);

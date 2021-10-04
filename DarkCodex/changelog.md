@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.0.7]
+- fix impale rolling individually
+
 ## [1.0.6]
 - added Mythic.createMagicItemAdept
 - added Items.createKineticArtifact
@@ -40,8 +43,6 @@
 - bugfixes
 
 ## [1.0.2]
-
-### Added
 - fix hexcrafter lv3 hex arcana selection; lv11 spell recall
 - cold iron arrows refresh after combat
 - a kineticist background
@@ -58,7 +59,4 @@
 - ability focus
 
 ## [1.0.1]
-
-### Added
-
 - first release
