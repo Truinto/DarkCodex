@@ -46,7 +46,7 @@ Content
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
 |Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
 |Mythic.createLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources|:construction:|
-|Mythic.createLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:x:|
+|Mythic.createLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:heavy_check_mark:|
 |Mythic.createLimitlessSmite|mythic ability: infinite Smites, requires Abundant Smite|:heavy_check_mark:|
 |Mythic.createLimitlessBombs|mythic ability: infinite alchemist bombs and incenses|:construction:|
 |Mythic.createLimitlessArcanePool|mythic ability: infinite arcane pool, expect spell recall|:construction:|

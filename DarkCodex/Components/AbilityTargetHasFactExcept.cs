@@ -35,14 +35,12 @@ namespace DarkCodex.Components
 			if (unit.Descriptor.HasFact(PassIfFact))
 				return true;
 
-			bool flag = false;
 			foreach (BlueprintUnitFact blueprint in this.CheckedFacts)
 			{
-				flag = unit.Descriptor.HasFact(blueprint);
-				if (flag)
-					break;
+				if (unit.Descriptor.HasFact(blueprint))
+					return true ^ this.Inverted;
 			}
-			return flag != this.Inverted;
+			return false ^ this.Inverted;
 		}
 
 		public string GetAbilityTargetRestrictionUIText(UnitEntityData caster, TargetWrapper target)

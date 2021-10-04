@@ -432,7 +432,7 @@ namespace DarkCodex
             return obj;
         }
 
-        public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig tori, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
+        public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig original, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
         {
             replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}";
 

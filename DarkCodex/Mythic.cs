@@ -72,7 +72,7 @@ namespace DarkCodex
                 checknew.Inverted = check.Inverted;
                 checknew.PassIfFact = limitless.ToRef2();
 
-                ability.ReplaceComponent(default(AbilityTargetHasFactExcept), check);
+                ability.ReplaceComponent(check, checknew);
             }
 
             Helper.PrintJoinDebug(flush: true);

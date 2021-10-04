@@ -18,7 +18,7 @@ namespace DarkCodex
 {
     public class Rogue
     {
-        public static void createBleedingAttack() // TODO: play test
+        public static void createBleedingAttack()
         {
             var RogueTalentSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
             var SneakAttack = Helper.ToRef<BlueprintFeatureReference>("9b9eac6709e1c084cb18c3a366e0ec87");
