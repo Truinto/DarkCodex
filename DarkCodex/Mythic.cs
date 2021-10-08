@@ -546,7 +546,14 @@ namespace DarkCodex
     {
         public static void Postfix(RuleSpellResistanceCheck __instance)
         {
-            Game.Instance.Rulebook.Context.m_AllEvents.Add(__instance);
+            try
+            {
+                __instance.Context.SourceAbilityContext?.RulebookContext?.m_AllEvents.Add(__instance);
+            }
+            catch (Exception e)
+            {
+                Helper.Print("Patch_ResourcefulCaster4 " + e);
+            }
         }
     }
 

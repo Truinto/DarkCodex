@@ -5,7 +5,7 @@
 - fix bleed working on bleed immune creatures
 - fix limitless hexes
 - added General.createPreferredSpell
-- addded Mythic.createResourcefulCaster
+- added Mythic.createResourcefulCaster
 - added Monk.createFeralCombatTraining
 - createAutoMetakinesis also removes quicken metakinesis after use
 

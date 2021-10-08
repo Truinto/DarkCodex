@@ -20,9 +20,7 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
-    /// <summary>
-    /// Must be manually patched. It crashes otherwise. Clears the 'has used mods before' flag and also pretends that no mods are active.
-    /// </summary>
+    /// <summary>Must be manually patched. It crashes otherwise. Clears the 'has used mods before' flag and also pretends that no mods are active.</summary>
     [HarmonyPatch(typeof(OwlcatModificationsManager), nameof(OwlcatModificationsManager.IsAnyModActive), MethodType.Getter)]
     public class Patch_AllowAchievements
     {
@@ -70,40 +68,6 @@ namespace DarkCodex
         [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.OnNewRound))]
         public static class ActivatableAbility_OnNewRoundPatch
         {
-            public static void OldPostfix(ActivatableAbility __instance)
-            {
-                var unit = __instance.Owner.Unit;
-
-                if (!unit.IsInCombat) // cooldowns are not refreshed out of combat, therefore must not increase cooldown out of combat
-                    return;
-
-                ActivatableAbilityUnitCommand ucommand = __instance.GetComponent<ActivatableAbilityUnitCommand>();
-                if (ucommand == null || ucommand.Type != UnitCommand.CommandType.Move) // we only care to modify move actions
-                    return;
-
-                if (__instance.m_ShouldBeDeactivatedInNextRound || !__instance.IsOn || !__instance.IsAvailable) // if the ability is about to cancel, we don't consume cooldowns
-                    return;
-
-                if (!AlreadySpendMove(unit.CombatState))
-                {
-                    Helper.PrintDebug("ActivatableAbility set Move Cooldown! old=" + unit.CombatState.Cooldown.MoveAction);
-                    unit.CombatState.Cooldown.MoveAction += 3f;
-                }
-                else
-                {
-                    Helper.PrintDebug("ActivatableAbility turn off because no move action left");
-                    __instance.IsOn = false;
-                }
-
-                bool AlreadySpendMove(UnitCombatState state)
-                {
-                    if (state.HasCooldownForCommand(UnitCommand.CommandType.Standard))
-                        return state.Cooldown.MoveAction > 0f;
-                    else
-                        return state.Cooldown.MoveAction > 3f;
-                }
-            }
-        
             public static void Postfix(ActivatableAbility __instance)
             {
                 var cd = __instance.Owner.Unit.CombatState.Cooldown;
@@ -207,6 +171,9 @@ namespace DarkCodex
 
     }
 
+    /// <summary>If a component causes an exception, it will try to resolve the asset name.
+    /// If that name is null or wrong formated, it will crash the report and hide any meaningful log entries.
+    /// This patch fills the missing data with nonsense to prevent that bug.</summary>
     [HarmonyPatch(typeof(Element), nameof(Element.AssetGuidShort), MethodType.Getter)]
     public class Patch_DebugReport
     {

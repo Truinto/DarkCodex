@@ -294,6 +294,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_ResourcefulCaster1));
                     PatchSafe(typeof(Patch_ResourcefulCaster2));
                     PatchSafe(typeof(Patch_ResourcefulCaster3));
+                    PatchSafe(typeof(Patch_ResourcefulCaster4));
                     PatchSafe(typeof(Patch_FeralCombat1));
                     PatchSafe(typeof(Patch_FeralCombat2));
                     PatchSafe(typeof(Patch_FeralCombat3));

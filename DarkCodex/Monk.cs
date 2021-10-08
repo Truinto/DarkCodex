@@ -84,7 +84,7 @@ namespace DarkCodex
         {
             List<CodeInstruction> list = instr.ToList();
             MethodInfo reference = AccessTools.PropertyGetter(typeof(BlueprintItemWeapon), "Category");
-            MethodInfo call = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack1), nameof(Call));
+            MethodInfo call = AccessTools.Method(typeof(Patch_FeralCombat1), nameof(Call));
 
             int index = list.FindIndex(f => f.Calls(reference)) + 2; //59
             int label = index - 1;

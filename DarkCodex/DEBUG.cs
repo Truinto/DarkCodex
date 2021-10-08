@@ -126,17 +126,17 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription))]
+        [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
         public class Enchantments
         {
-            public static void Postfix(ItemEntity item, ItemTooltipData itemTooltipData, ref string __result)
+            public static void Postfix(ItemEntity item, ItemTooltipData data, ref string __result)
             {
                 if (item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable)
                     return;
 
                 if (item.IsIdentified)
                 {
-                    itemTooltipData.Texts[TooltipElement.Qualities] = UIUtilityItem.GetQualities(item);
+                    data.Texts[TooltipElement.Qualities] = UIUtilityItem.GetQualities(item);
                     List<ItemEnchantment> visibleEnchantments = item.VisibleEnchantments;
                     foreach (ItemEnchantment itemEnchantment in visibleEnchantments)
                     {
@@ -145,13 +145,13 @@ namespace DarkCodex
                             __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
                         }
                     }
-                    if (visibleEnchantments.Any() && !itemTooltipData.Texts.ContainsKey(TooltipElement.Qualities))
+                    if (visibleEnchantments.Any() && !data.Texts.ContainsKey(TooltipElement.Qualities))
                     {
-                        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
+                        data.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
                     }
                     if (GameHelper.GetItemEnhancementBonus(item) > 0)
                     {
-                        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
+                        data.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
                     }
                 }
             }
