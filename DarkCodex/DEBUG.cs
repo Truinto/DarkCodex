@@ -10,6 +10,7 @@ using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.Designers;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
@@ -19,7 +20,11 @@ using Kingmaker.Kingdom;
 using Kingmaker.Kingdom.Settlements;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
+using Kingmaker.UI.Common;
 using Kingmaker.UI.Loot;
+using Kingmaker.UI.MVVM._VM.Loot;
+using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
+using Kingmaker.UI.Tooltip;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Class.Kineticist;
@@ -41,42 +46,6 @@ namespace DarkCodex
 {
     public class DEBUG
     {
-        [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
-        public static class Patch_RuleRollD20 // todo remove code
-        {
-            // patch RuleAttackRoll.OnTrigger
-            // transpile replace RulebookEvent.Dice.D20 with custom method
-
-            public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
-            {
-                List<CodeInstruction> list = instr.ToList();
-                MethodInfo original = AccessTools.PropertyGetter(typeof(RulebookEvent.Dice), nameof(RulebookEvent.Dice.D20));
-                MethodInfo replacement = AccessTools.Method(typeof(Patch_RuleRollD20), nameof(D20));
-
-                for (int i = 0; i < list.Count; i++)
-                {
-                    var mi = list[i].operand as MethodInfo;
-                    if (mi != null && mi == original)
-                    {
-                        Helper.PrintDebug("Patch_RuleRollD20 at " + i);
-                        list[i].operand = replacement;
-                    }
-                }
-
-                return list;
-            }
-
-            public static RuleRollD20 D20()
-            {
-                RuleRollD20 ruleRollD = new RuleRollD20(Rulebook.CurrentContext.CurrentEvent?.Initiator);
-                ruleRollD.PreRollDice();
-                Rulebook.Trigger(ruleRollD);
-                return ruleRollD;
-            }
-
-            public static List<int> FakeRolls = new List<int>();
-        }
-
         public static void ExportAllIconTextures()
         {
             foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
@@ -114,24 +83,77 @@ namespace DarkCodex
             {
                 Helper.PrintDebug("opening shared stash with items " + Game.Instance.Player.SharedStash.Count());
 
-                UnityModManager.UI.Instance.ToggleWindow();
+                Helper.PrintDebug("Stash: " + Game.Instance.Player.SharedStash.Select(s => s.Blueprint.name).Join());
+                Helper.PrintDebug("Inventory: " + Game.Instance.Player.Inventory.Select(s => s.Blueprint.name).Join());
 
-                Kingmaker.UI.Loot.LootWindowController window = Game.Instance.UI.LootWindowController;
-                //window.HandleLootInterraction(Game.Instance.Player.MainCharacter.Value, Game.Instance.Player.SharedStash, "Remote Stash");
-                window.WindowMode = LootWindowMode.PlayerChest;
-                window.m_Collector.SetData(Game.Instance.Player.SharedStash, "Remote Stash");
-                window.Show(true);
+                try
+                {
+                    UnityModManager.UI.Instance.ToggleWindow();
+                    
+                    if (Game.Instance.UI.LootWindowController == null)
+                    {
+                        Helper.PrintDebug("MainCharacter is null");
+                        Game.Instance.UI.LootWindowController.Initialize();
+                    }
+
+                    if (Game.Instance == null)
+                        Helper.PrintDebug("Instance is null");
+                    if (Game.Instance.UI == null)
+                        Helper.PrintDebug("UI is null");
+                    if (Game.Instance.UI?.LootWindowController == null)
+                        Helper.PrintDebug("LootWindowController is null");
+                    if (Game.Instance.UI?.LootWindowController?.m_Collector == null)
+                        Helper.PrintDebug("m_Collector is null");
+                    if (Game.Instance.Player?.MainCharacter.Value == null)
+                        Helper.PrintDebug("MainCharacter is null");
+                    if (Game.Instance.Player.Party.FirstOrDefault() == null)
+                        Helper.PrintDebug("Party is empty");
+
+                    //Kingmaker.UI.Loot.LootWindowController window = Game.Instance.UI.LootWindowController;
+                    //window.HandleLootInterraction(Game.Instance.Player.Party.First(), Game.Instance.Player.SharedStash, "Remote Stash");
+
+
+                }
+                catch (Exception e)
+                {
+                    Helper.Print(e.ToString());
+                }
+
+                //window.WindowMode = LootWindowMode.PlayerChest;
+                //window.m_Collector.SetData(Game.Instance.Player.SharedStash, "Remote Stash");
+                //window.Show(true);
 
             }
         }
 
-        // #364 -> toggle UI open/close, if open show all judgments and put in list in order they are enabled, print numbers to show order
-
+        [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription))]
         public class Enchantments
         {
-            public static void X()
+            public static void Postfix(ItemEntity item, ItemTooltipData itemTooltipData, ref string __result)
             {
-                //UIUtilityItem.FillEnchantmentDescription
+                if (item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable)
+                    return;
+
+                if (item.IsIdentified)
+                {
+                    itemTooltipData.Texts[TooltipElement.Qualities] = UIUtilityItem.GetQualities(item);
+                    List<ItemEnchantment> visibleEnchantments = item.VisibleEnchantments;
+                    foreach (ItemEnchantment itemEnchantment in visibleEnchantments)
+                    {
+                        if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
+                        {
+                            __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
+                        }
+                    }
+                    if (visibleEnchantments.Any() && !itemTooltipData.Texts.ContainsKey(TooltipElement.Qualities))
+                    {
+                        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
+                    }
+                    if (GameHelper.GetItemEnhancementBonus(item) > 0)
+                    {
+                        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
+                    }
+                }
             }
 
             public static void NameAll()
@@ -162,6 +184,7 @@ namespace DarkCodex
                     enchantment.m_EnchantName = sb.ToString().CreateString();
                 }
             }
+        
         }
 
         [HarmonyPatch(typeof(TacticalCombatTurnController), nameof(TacticalCombatTurnController.ReadyToStartNextTurn), MethodType.Getter)]

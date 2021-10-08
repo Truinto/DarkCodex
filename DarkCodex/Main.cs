@@ -271,7 +271,7 @@ namespace DarkCodex
                     Helper.Print("Loading Dark Codex");
 
                     // Debug
-                    LoadSafe(DEBUG.Enchantments.NameAll); // todo: change item description strings
+                    LoadSafe(DEBUG.Enchantments.NameAll);
                     PatchSafe(typeof(DEBUG.Enchantments));
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));

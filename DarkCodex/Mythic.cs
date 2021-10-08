@@ -517,6 +517,7 @@ namespace DarkCodex
             if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
             {
                 // refund spell if all targets resisted
+                Helper.PrintDebug("Refunding spell");
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
                 {

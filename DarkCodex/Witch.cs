@@ -68,10 +68,9 @@ namespace DarkCodex
 
         public static void createSplitHex()
         {
-
+            //DublicateSpellComponent
         }
 
-        // known issues: activatable doesn't cost any time
         public static void createCackleActivatable()
         {
             var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("36f2467103d4635459d412fb418276f4");
