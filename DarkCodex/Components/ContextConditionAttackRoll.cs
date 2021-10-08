@@ -33,28 +33,25 @@ namespace DarkCodex.Components
 
             if (ShareD20 && this.AbilityContext.AttackRoll == null)
             {
-                Helper.PrintDebug("first attack roll");
+                //Helper.PrintDebug("first attack roll");
                 var attack1 = new RuleAttackRoll(this.Context.MaybeCaster, this.Target.Unit, weapon, 0);
                 attack1.DoNotProvokeAttacksOfOpportunity = IgnoreAoO;
                 this.Context.TriggerRule(attack1);
 
                 this.AbilityContext.AttackRoll = attack1;
+                return attack1.IsHit;
             }
             else
             {
-                Helper.PrintDebug("successive attack roll");
+                //Helper.PrintDebug("successive attack roll");
                 var attack2 = new RuleAttackRoll2(this.Context.MaybeCaster, this.Target.Unit, weapon, 0);
                 attack2.DoNotProvokeAttacksOfOpportunity = true;
                 attack2.D20 = this.AbilityContext.AttackRoll.D20;
                 attack2.CriticalConfirmationD20 = this.AbilityContext.AttackRoll.CriticalConfirmationD20;
                 this.Context.TriggerRule(attack2);
+
+                return attack2.IsHit;
             }
-
-            //this.Context[AbilitySharedValue.Heal] = 1;
-            //int d20 = attack.D20;
-            //int d20crit = attack.CriticalConfirmationD20;
-
-            return this.AbilityContext.AttackRoll.IsHit;
         }
 
         public static RuleRollD20 LastAttack;

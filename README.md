@@ -27,6 +27,7 @@ Content
 | Option | Description | Status |
 | ------ | ----------- | ------ |
 |General.createAbilityFocus|basic feat: Ability Focus to increase DC of one ability by +2|:x:|
+|General.createPreferredSpell|basic feat: Preferred Spell|:construction:|
 |General.patchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:heavy_check_mark:|
 |General.patchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/ |:heavy_check_mark:|
 |Hexcrafter.fixProgression|Hexcrafter can select Hex with any Arcana and get Spell Recall at level 11|:heavy_check_mark:|
@@ -35,7 +36,7 @@ Content
 |Items.createKineticArtifact|new weapon for Kineticists|:heavy_check_mark:|
 |Kineticist.createExtraWildTalentFeat|Kineticist Extra Wild Talent|:heavy_check_mark:|
 |Kineticist.createImpaleInfusion|Infusion: Impale|:heavy_check_mark: only earth|
-|Kineticist.createWhipInfusion|Infusion: Kinetic Whip, works with Blade Whirlwind, expands Kinetic Knight|:heavy_check_mark:|
+|Kineticist.createWhipInfusion|Infusion: Kinetic Whip, expands Kinetic Knight|:heavy_check_mark:|
 |Kineticist.createBladeRushInfusion|Infusion: Blade Rush, expands Kinetic Knight|:construction:|
 |Kineticist.createKineticistBackground|Regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:heavy_check_mark:|
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:heavy_check_mark:|
@@ -45,6 +46,7 @@ Content
 |Kineticist.patchDemonCharge|Demon Charge also gathers power|:heavy_check_mark:|
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
 |Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
+|Monk.createFeralCombatTraining|basic feat: FeralCombat Training|:construction:|
 |Mythic.createLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources|:construction:|
 |Mythic.createLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:heavy_check_mark:|
 |Mythic.createLimitlessSmite|mythic ability: infinite Smites, requires Abundant Smite|:heavy_check_mark:|
@@ -55,9 +57,10 @@ Content
 |Mythic.createLimitlessDomain|mythic ability: use domain powers at will|:heavy_check_mark:|
 |Mythic.createLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:construction:|
 |Mythic.createLimitlessWarpriest|mythic ability: infinite scared weapon uses|:construction:|
+|Mythic.createResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:construction:|
 |Mythic.createKineticMastery|mythic feat: physical Kinetic Blasts gain bonus equal to mythic level, or half with energy Blasts|:heavy_check_mark:|
 |Mythic.createMagicItemAdept|mythic feat: trinket items use character level as caster level|:construction:|
-|Mythic.createExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:construction:|
+|Mythic.createExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:heavy_check_mark:|
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:construction:|
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:construction:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|
@@ -66,9 +69,9 @@ Content
 |Witch.createIceTomb|Hex: Ice Tomb|:x:|
 |Witch.createExtraHex|basic feat: Extra Hex|:heavy_check_mark:|
 
-:heavy_check_mark: works \
-:construction: not tested \
-:x: does not work
+:heavy_check_mark: works, please report bugs you find \
+:construction: not tested, please let me know if this works or not \
+:x: does not work, avoid taking these feats
 
 FAQ
 -----------

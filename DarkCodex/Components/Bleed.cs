@@ -79,9 +79,9 @@ namespace DarkCodex.Components
             if (context == null)
                 return;
 
-            Buff buff = this.Target.Unit.Buffs.GetBuff(BleedBlueprint);
+            Buff buff = this.Target.Unit.Buffs.GetBuff(Resource.Cache.BuffBleed);
             if (buff == null)
-                buff = this.Target.Unit.Descriptor.AddBuff(BleedBlueprint, context);
+                buff = this.Target.Unit.Descriptor.AddBuff(Resource.Cache.BuffBleed, context);
 
             var bleed = buff.GetComponent<BleedBuff>();
             if (bleed == null)
@@ -156,7 +156,7 @@ namespace DarkCodex.Components
 
         internal static void createBleedBuff()
         {
-            BleedBlueprint = Helper.CreateBlueprintBuff(
+            Resource.Cache.BuffBleed = Helper.CreateBlueprintBuff(
                 "BleedVariableBuff",
                 "Bleed",
                 "This creature takes hit point damage each turn. Bleeding can be stopped through the application of any spell that cures hit point damage.",
@@ -170,6 +170,5 @@ namespace DarkCodex.Components
         public ContextDiceValue Value;
         public bool IsFlensing; // reduce natural armor by dice count
         public bool IsStacking; // false = apply higher value; true = add value
-        public static BlueprintBuff BleedBlueprint;
     }
 }

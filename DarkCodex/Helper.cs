@@ -50,6 +50,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -295,6 +296,17 @@ namespace DarkCodex
         internal static void PrintException(Exception ex)
         {
             Main.logger?.LogException(ex);
+        }
+
+        private static readonly FieldInfo _fieldLabel = AccessTools.Field(typeof(Label), "label");
+        [System.Diagnostics.Conditional("DEBUG")]
+        internal static void PrintInstruction(CodeInstruction code, string str = "")
+        {
+            var labels = code.labels.Select(s => (int)_fieldLabel.GetValue(s)).Join();
+            if (code.operand is Label label)
+                Print($"{str} code:{code.opcode} goto:{_fieldLabel.GetValue(label)} labels:{labels}");
+            else
+                Print($"{str} code:{code.opcode} operand:{code.operand} type:{code.operand?.GetType().FullName} labels:{labels}");
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
@@ -1180,7 +1192,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, AnyBlueprintReference[] blueprints = null)
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, AnyBlueprintReference[] blueprints = null)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -1192,7 +1204,7 @@ namespace DarkCodex
             result.m_Description = description.CreateString();
             result.m_Icon = icon;
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
-            result.ParameterType = FeatureParameterType.Custom; //FeatureParameterType.FeatureSelection
+            result.ParameterType = parameterType; //FeatureParameterType.FeatureSelection
             result.BlueprintParameterVariants = blueprints;
 
             AddAsset(result, guid);

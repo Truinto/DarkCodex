@@ -28,7 +28,7 @@ namespace DarkCodex.Components
             KineticistAbilityBurnCost.DecreaseWithPool(burn.InfusionBase + burn.InfusionIncrease - burn.InfusionDecrease, ref pool);
             KineticistAbilityBurnCost.DecreaseWithPool(burn.MetakinesisBase + burn.MetakinesisIncrease - burn.MetakinesisDecrease, ref pool);
 
-            int costmax = evt.Initiator.HasFact(_master_maximize) ? 1 : 2;
+            int costmax = evt.Initiator.Descriptor.HasFact(_master_maximize) ? 1 : 2;
 
             if (pool >= costmax && !evt.HasMetamagic(Metamagic.Maximize))
             {

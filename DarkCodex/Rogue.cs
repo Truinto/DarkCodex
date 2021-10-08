@@ -44,7 +44,7 @@ namespace DarkCodex
                         ifFalse: new ContextActionIncreaseBleed(false))),
                     SneakAttack: true),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed),
-                Helper.CreateContextRankConfig(ContextRankBaseValueType.CustomProperty, stat: StatType.SneakAttack, customProperty: PropertyGetterSneakAttack.Property)
+                Helper.CreateContextRankConfig(ContextRankBaseValueType.StatBonus, stat: StatType.SneakAttack, customProperty: Resource.Cache.PropertySneakAttackDice)
                 );
             bleeding.Groups = new FeatureGroup[] { FeatureGroup.RogueTalent, FeatureGroup.SlayerTalent, FeatureGroup.VivisectionistDiscovery };
 

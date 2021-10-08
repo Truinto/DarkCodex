@@ -1,7 +1,12 @@
 ﻿using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.EntitySystem.Persistence.JsonUtility;
+using Kingmaker.Items;
 using Kingmaker.Localization;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +21,24 @@ namespace DarkCodex
         {
             public static List<BlueprintAbility> Ability;
             public static List<BlueprintActivatableAbility> Activatable;
+
+            public static BlueprintItemWeapon WeaponUnarmed;
+            public static BlueprintBuff BuffBleed;
+            public static BlueprintUnitPropertyReference PropertySneakAttackDice;
+            public static BlueprintFeature FeatureFeralCombat;
+            public static BlueprintFeature FeatureResourcefulCaster;
+
+            static Cache()
+            {
+                try
+                {
+                    WeaponUnarmed = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
+                }
+                catch (Exception e)
+                {
+                    Helper.Print("Cache crashed! " + e.ToString());
+                }
+            }
 
             public static void Ensure()
             {

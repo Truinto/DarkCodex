@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace DarkCodex
 {
@@ -51,8 +52,6 @@ namespace DarkCodex
         {
             Resource.Cache.Ensure();
 
-            return;
-
             var abilities = Resource.Cache.Ability.Where(ability =>
             {
                 if (ability.Type == AbilityType.Spell)
@@ -80,6 +79,8 @@ namespace DarkCodex
                 new AbilityFocusParametrized()
                 );
             feat.Ranks = 10;
+
+            return;
 
             Helper.AddFeats(feat);
         }
@@ -125,6 +126,31 @@ namespace DarkCodex
             //ImprovedBullRush.b3614622866fe7046b787a548bbd7f59
             //ImprovedSunder.9719015edcbf142409592e2cbaab7fe1
         }
+
+        public static void createPreferredSpell()
+        {
+            var specialization = ResourcesLibrary.TryGetBlueprint<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
+            var wizard = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8c3102c2ff3b69444b139a98521a4899"); //WizardFeatSelection
+            var heighten = Helper.ToRef<BlueprintFeatureReference>("2f5d1e705c7967546b72ad8218ccf99c"); //HeightenSpellFeat
+
+            var feat = Helper.CreateBlueprintParametrizedFeature(
+                "PreferredSpellFeature",
+                "Preferred Spell",
+                "Choose one spell which you have the ability to cast. You can cast that spell spontaneously by sacrificing a prepared spell or spell slot of equal or higher level. You can apply any metamagic feats you possess to this spell when you cast it. This increases the minimum level of the prepared spell or spell slot you must sacrifice in order to cast it but does not affect the casting time.\nSpecial: You can gain this feat multiple times.Its effects do not stack. Each time you take the feat, it applies to a different spell.",
+                icon: null,
+                parameterType: FeatureParameterType.SpellSpecialization,
+                blueprints: specialization.BlueprintParameterVariants
+                ).SetComponents(
+                new PreferredSpell(),
+                Helper.CreatePrerequisiteFullStatValue(StatType.SkillKnowledgeArcana, 5),
+                Helper.CreatePrerequisiteFeature(heighten)
+                );
+            feat.Groups = new FeatureGroup[] { FeatureGroup.Feat, FeatureGroup.WizardFeat };
+            feat.Ranks = 10;
+
+            Helper.AddFeats(feat);
+            Helper.AppendAndReplace(ref wizard.m_AllFeatures, feat.ToRef());
+        }     
 
         public static void patchExtendSpells()
         {

@@ -4,6 +4,10 @@
 - fix impale rolling individually
 - fix bleed working on bleed immune creatures
 - fix limitless hexes
+- added General.createPreferredSpell
+- addded Mythic.createResourcefulCaster
+- added Monk.createFeralCombatTraining
+- createAutoMetakinesis also removes quicken metakinesis after use
 
 ## [1.0.6]
 - added Mythic.createMagicItemAdept

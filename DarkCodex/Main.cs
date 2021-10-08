@@ -55,6 +55,7 @@ namespace DarkCodex
             "Rogue.*",
             "Witch.*",
             "General.createAbilityFocus",
+            "General.createPreferredSpell",
             "General.patchAngelsLight",
             "General.patchBasicFreebieFeats",
             "Hexcrafter.fixProgression",
@@ -73,6 +74,7 @@ namespace DarkCodex
             "Kineticist.patchDemonCharge",
             "Kineticist.fixWallInfusion",
             "Kineticist.createSelectiveMetakinesis",
+            "Monk.createFeralCombatTraining",
             "Mythic.createLimitlessBardicPerformance",
             "Mythic.createLimitlessWitchHexes",
             "Mythic.createLimitlessSmite",
@@ -86,6 +88,7 @@ namespace DarkCodex
             "Mythic.createKineticMastery",
             "Mythic.createMagicItemAdept",
             "Mythic.createExtraMythicFeats",
+            "Mythic.createResourcefulCaster",
             "Mythic.patchKineticOvercharge",
             "Mythic.patchLimitlessDemonRage",
             "Rogue.createBleedingAttack",
@@ -268,7 +271,8 @@ namespace DarkCodex
                     Helper.Print("Loading Dark Codex");
 
                     // Debug
-                    LoadSafe(DEBUG.Enchantments.NameAll);
+                    LoadSafe(DEBUG.Enchantments.NameAll); // todo: change item description strings
+                    PatchSafe(typeof(DEBUG.Enchantments));
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
@@ -278,7 +282,7 @@ namespace DarkCodex
                     PatchUnique(typeof(Patch_AllowAchievements));
                     PatchUnique(typeof(Patch_DebugReport));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
-                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
+                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack1));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack2));
                     PatchSafe(typeof(Patch_MagicItemAdept));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnNewRoundPatch));
@@ -287,6 +291,13 @@ namespace DarkCodex
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbilityUnitCommand_ApplyValidation));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_TryStart));
                     PatchSafe(typeof(Patches_Activatable.ActionBar));
+                    PatchSafe(typeof(Patch_ResourcefulCaster1));
+                    PatchSafe(typeof(Patch_ResourcefulCaster2));
+                    PatchSafe(typeof(Patch_ResourcefulCaster3));
+                    PatchSafe(typeof(Patch_FeralCombat1));
+                    PatchSafe(typeof(Patch_FeralCombat2));
+                    PatchSafe(typeof(Patch_FeralCombat3));
+                    PatchSafe(typeof(Patch_FeralCombat4));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
@@ -310,6 +321,7 @@ namespace DarkCodex
                     LoadSafe(Mythic.createLimitlessWarpriest);
                     LoadSafe(Mythic.createKineticMastery);
                     LoadSafe(Mythic.createMagicItemAdept);
+                    LoadSafe(Mythic.createResourcefulCaster);
                     LoadSafe(Mythic.patchKineticOvercharge);
                     LoadSafe(Mythic.patchLimitlessDemonRage);
 
@@ -325,7 +337,10 @@ namespace DarkCodex
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat
                     LoadSafe(Kineticist.createSelectiveMetakinesis); // keep late
-                    
+
+                    // Monk
+                    LoadSafe(Monk.createFeralCombatTraining);
+
                     // Witch
                     LoadSafe(Witch.createIceTomb);
 
@@ -338,6 +353,7 @@ namespace DarkCodex
                     LoadSafe(Rogue.createBleedingAttack);
 
                     // Extra Features - keep last
+                    LoadSafe(General.createPreferredSpell); // keep last
                     LoadSafe(General.createAbilityFocus); // keep last
                     LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
                     LoadSafe(Witch.createExtraHex); // keep last

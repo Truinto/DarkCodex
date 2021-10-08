@@ -1,15 +1,23 @@
 ﻿using DarkCodex.Components;
 using HarmonyLib;
+using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Controllers;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
+using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules;
+using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Commands;
+using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using System;
@@ -317,7 +325,7 @@ namespace DarkCodex
             var base_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81"); //MythicFeatSelection
             var base_selection2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d"); //MythicAbilitySelection
             var extra_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8"); //ExtraMythicAbilityMythicFeat
-            
+
             extra_selection1.Ranks = 10;
 
             var extra_selection2 = Helper.CreateBlueprintFeatureSelection(
@@ -351,6 +359,18 @@ namespace DarkCodex
             var limitless = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
 
             rage.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
+        }
+
+        public static void createResourcefulCaster()
+        {
+            // check if this works with Preferred Spell
+            Resource.Cache.FeatureResourcefulCaster = Helper.CreateBlueprintFeature(
+                "ResourcefulCasterFeature",
+                "Resourceful Caster",
+                "You can repurpose magic energy of failed spell. You don't expend a spell slot, if you fail to cast a spell due to arcane spell failure or concentration checks. Furthermore you regain your spell slot, whenever all targets of your spells resist due to spell resistance or succeed on their saving throws."
+                );
+
+            Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
         }
 
         #region Helper
@@ -398,6 +418,137 @@ namespace DarkCodex
 
     #region Patches
 
+    [HarmonyPatch(typeof(RuleCastSpell), nameof(RuleCastSpell.ShouldSpendResource), MethodType.Getter)]
+    public class Patch_ResourcefulCaster1 // arcane spell failure
+    {
+        public static void Postfix(RuleCastSpell __instance, ref bool __result)
+        {
+            if (__result == false)
+                return;
+
+            if (!__instance.IsSpellFailed && !__instance.IsArcaneSpellFailed)
+                return;
+
+            if (__instance.Initiator.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
+                __result = false;
+        }
+    }
+    [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.FailIfConcentrationCheckFailed))]
+    public class Patch_ResourcefulCaster2 // concentration failed
+    {
+        public static bool Prefix(UnitUseAbility __instance, ref bool __result)
+        {
+            if (__instance.ConcentrationCheckFailed)
+            {
+                __instance.SpawnInterruptFx();
+                __instance.ForceFinish(UnitCommand.ResultType.Fail);
+                if (!__instance.Executor.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
+                    __instance.Ability.Spend();
+                if (__instance.AiAction != null)
+                    __instance.Executor.CombatState.AIData.UseAction(__instance.AiAction, __instance);
+            }
+            __result = __instance.ConcentrationCheckFailed;
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(AbilityExecutionProcess), nameof(AbilityExecutionProcess.Tick))]
+    public class Patch_ResourcefulCaster3 // all targets resisted
+    {
+        public static List<UnitEntityData> unitsSpellNotResisted = new List<UnitEntityData>();
+        public static void Postfix(AbilityExecutionProcess __instance)
+        {
+            if (!__instance.IsEnded)
+                return;
+
+            Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster?.CharacterName}");
+#if !DEBUG
+            if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
+                return;
+#endif
+            if (__instance.Context.IsDuplicateSpellApplied)
+                return;
+
+            var spell = __instance.Context.Ability;
+            if (spell == null)
+                return;
+
+            var spellbook = __instance.Context.Ability.Spellbook;
+            if (spellbook == null)
+                return;
+
+            bool hasSaves = false;
+            bool allSavesPassed = true;
+            foreach (var rule in __instance.Context.RulebookContext.AllEvents)
+            {
+                if (rule is RuleSpellResistanceCheck resistance)
+                {
+                    Helper.PrintDebug($" -SR {resistance.Target}");
+                    hasSaves = true;
+                    if (!resistance.IsSpellResisted)
+                    {
+                        unitsSpellNotResisted.Add(resistance.Target);
+                    }
+                }
+
+                else if (rule is RuleSavingThrow save)
+                {
+                    Helper.PrintDebug($" -{save.Type} Save {save.Initiator}");
+                    hasSaves = true;
+                    if (save.IsPassed)
+                    {
+                        unitsSpellNotResisted.Remove(save.Initiator);
+                    }
+                    else
+                    {
+                        allSavesPassed = false;
+#if !DEBUG
+                        break;
+#endif
+                    }
+                }
+
+                else
+                    Helper.PrintDebug(" -" + rule.GetType().FullName);
+            }
+#if DEBUG
+            if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
+                return;
+#endif
+            if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
+            {
+                // refund spell if all targets resisted
+                int level = spellbook.GetSpellLevel(spell);
+                if (spellbook.Blueprint.Spontaneous)
+                {
+                    if (level > 0)
+                        spellbook.m_SpontaneousSlots[level]++;
+                }
+                else
+                {
+                    foreach (var slot in spellbook.m_MemorizedSpells[level])
+                    {
+                        if (!slot.Available && slot.Spell == spell)
+                        {
+                            slot.Available = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            unitsSpellNotResisted.Clear();
+        }
+    }
+
+    [HarmonyPatch(typeof(RuleSpellResistanceCheck), nameof(RuleSpellResistanceCheck.OnTrigger))]
+    public class Patch_ResourcefulCaster4 // push SR checks into history
+    {
+        public static void Postfix(RuleSpellResistanceCheck __instance)
+        {
+            Game.Instance.Rulebook.Context.m_AllEvents.Add(__instance);
+        }
+    }
+
     [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetParamsFromItem))]
     public class Patch_MagicItemAdept
     {
@@ -413,5 +564,5 @@ namespace DarkCodex
         }
     }
 
-    #endregion
+#endregion
 }

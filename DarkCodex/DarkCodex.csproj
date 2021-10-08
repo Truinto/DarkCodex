@@ -44,6 +44,7 @@
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\DiceValue.cs" />
+    <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyGetterSneakAttack.cs" />
     <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
     <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Attributes\ManualPatchAttribute.cs" />
     <Compile Include="Items.cs" />
     <Compile Include="Kineticist.cs" />
+    <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

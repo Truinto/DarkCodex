@@ -550,6 +550,7 @@ namespace DarkCodex
         public static void createAutoMetakinesis()
         {
             var empower = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("70322f5a2a294e54a9552f77ee85b0a7"); //MetakinesisEmpowerFeature
+            var quickenbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"); //MetakinesisQuickenBuff
 
             var auto = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisAutoAbility",
@@ -564,6 +565,9 @@ namespace DarkCodex
             autobuff.Flags(hidden: true);
 
             Helper.AppendAndReplace(ref empower.GetComponent<AddFacts>().m_Facts, auto.ToRef());
+
+            // quicken removes itself after use
+            quickenbuff.GetComponent<AutoMetamagic>().Once = true;
         }
 
         #region Helper
@@ -756,13 +760,13 @@ namespace DarkCodex
     }
 
     [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
-    public class Patch_KineticistAllowOpportunityAttack
+    public class Patch_KineticistAllowOpportunityAttack1
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
             List<CodeInstruction> list = instr.ToList();
             MethodInfo original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
-            MethodInfo replacement = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
+            MethodInfo replacement = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack1), nameof(NullReplacement));
 
             for (int i = 0; i < list.Count; i++)
             {
