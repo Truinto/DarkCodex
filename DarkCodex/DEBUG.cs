@@ -89,7 +89,7 @@ namespace DarkCodex
                 try
                 {
                     UnityModManager.UI.Instance.ToggleWindow();
-                    
+
                     if (Game.Instance.UI.LootWindowController == null)
                     {
                         Helper.PrintDebug("MainCharacter is null");
@@ -129,31 +129,56 @@ namespace DarkCodex
         [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
         public class Enchantments
         {
-            public static void Postfix(ItemEntity item, ItemTooltipData data, ref string __result)
+            public static void Postfix(ItemEntity item, ItemTooltipData itemTooltipData, ref string __result)
             {
-                if (item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable)
+                if (!item.IsIdentified)
                     return;
 
-                if (item.IsIdentified)
+                //if (!(item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable))
+                //{
+                //    itemTooltipData.Texts[TooltipElement.Qualities] = UIUtilityItem.GetQualities(item);
+                //    List<ItemEnchantment> visibleEnchantments = item.VisibleEnchantments;
+                //    foreach (ItemEnchantment itemEnchantment in visibleEnchantments)
+                //    {
+                //        if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
+                //        {
+                //            __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
+                //        }
+                //    }
+                //    if (visibleEnchantments.Any() && !itemTooltipData.Texts.ContainsKey(TooltipElement.Qualities))
+                //    {
+                //        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
+                //    }
+                //    if (GameHelper.GetItemEnhancementBonus(item) > 0)
+                //    {
+                //        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
+                //    }
+                //}
+
+                itemTooltipData.Texts.TryGetValue(TooltipElement.Qualities, out string text);
+                StringBuilder sb = new StringBuilder(text);
+                if (text == null)
+                    sb.Append(UIUtilityItem.GetQualities(item));
+
+                if (item.Ability != null)
                 {
-                    data.Texts[TooltipElement.Qualities] = UIUtilityItem.GetQualities(item);
-                    List<ItemEnchantment> visibleEnchantments = item.VisibleEnchantments;
-                    foreach (ItemEnchantment itemEnchantment in visibleEnchantments)
-                    {
-                        if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
-                        {
-                            __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
-                        }
-                    }
-                    if (visibleEnchantments.Any() && !data.Texts.ContainsKey(TooltipElement.Qualities))
-                    {
-                        data.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
-                    }
-                    if (GameHelper.GetItemEnhancementBonus(item) > 0)
-                    {
-                        data.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
-                    }
+                    UIUtilityTexts.AddWord(sb, "Ability: ");
+                    sb.Append(item.Ability.Name);
                 }
+
+                if (item.ActivatableAbility != null)
+                {
+                    UIUtilityTexts.AddWord(sb, "Activatable: ");
+                    sb.Append(item.ActivatableAbility.Name);
+                }
+
+                if (sb.Length > 0)
+                    itemTooltipData.Texts[TooltipElement.Qualities] = sb.ToString();
+
+                //if (item.Ability != null)
+                //    __result += string.Format("<b><align=\"center\">Ability: {0}</align></b>\n{1}\n\n", item.Ability.Name, "");
+                //else if (item.ActivatableAbility != null)
+                //    __result += string.Format("<b><align=\"center\">Activatable: {0}</align></b>\n{1}\n\n", item.ActivatableAbility.Name, "");
             }
 
             public static void NameAll()
@@ -184,7 +209,7 @@ namespace DarkCodex
                     enchantment.m_EnchantName = sb.ToString().CreateString();
                 }
             }
-        
+
         }
 
         [HarmonyPatch(typeof(TacticalCombatTurnController), nameof(TacticalCombatTurnController.ReadyToStartNextTurn), MethodType.Getter)]

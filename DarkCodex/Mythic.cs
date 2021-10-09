@@ -516,7 +516,7 @@ namespace DarkCodex
             if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
             {
                 // refund spell if all targets resisted
-                Helper.PrintDebug("Refunding spell");
+                Helper.Print("Refunding spell");
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
                 {
@@ -547,7 +547,8 @@ namespace DarkCodex
         {
             try
             {
-                __instance.Context.SourceAbilityContext.RulebookContext.m_AllEvents.Add(__instance);
+                __instance.Context?.SourceAbilityContext?.RulebookContext?.m_AllEvents.Add(__instance);
+                Helper.PrintDebug("added SR check to stack");
             }
             catch (Exception e)
             {
