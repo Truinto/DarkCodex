@@ -1107,8 +1107,16 @@ namespace DarkCodex
             var result = new PrerequisiteArchetypeLevel();
             result.m_Archetype = m_Archetype;
             result.m_CharacterClass = m_CharacterClass ?? m_Archetype.Get().GetParentClass().ToRef();
-            result.Level = 1;
+            result.Level = level;
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
+            return result;
+        }
+
+        public static PrerequisiteNoArchetype CreatePrerequisiteNoArchetype(BlueprintArchetypeReference m_Archetype, BlueprintCharacterClassReference m_CharacterClass = null)
+        {
+            var result = new PrerequisiteNoArchetype();
+            result.m_Archetype = m_Archetype;
+            result.m_CharacterClass = m_CharacterClass ?? m_Archetype.Get().GetParentClass().ToRef();
             return result;
         }
 

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Items.Armors;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Enums;
@@ -11,6 +12,7 @@ using Kingmaker.RuleSystem.Rules;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Parts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,17 +34,25 @@ namespace DarkCodex
             Benefit: Choose one of your natural weapons. While using the selected natural weapon, you can apply the effects of feats that have Improved Unarmed Strike as a prerequisite.
             Special: If you are a monk, you can use the selected natural weapon with your flurry of blows class feature.
              */
+            var unarmedstrike = Helper.ToRef<BlueprintFeatureReference>("7812ad3672a4b9a4fb894ea402095167"); //ImprovedUnarmedStrike
+            var weaponfocus = Helper.ToRef<BlueprintFeatureReference>("1e1f627d26ad36f43bbd26cc2bf8ac7e"); //WeaponFocus
+            var zenarcher = Helper.ToRef<BlueprintArchetypeReference>("2b1a58a7917084f49b097e86271df21c"); //ZenArcherArchetype
+
             string name = "Feral Combat Training";
             string description = "While using any natural weapon, you can apply the effects of feats that have Improved Unarmed Strike as a prerequisite. Special: If you are a monk, you can use natural weapons with your flurry of blows class feature.";
 
-            var feral = Helper.CreateBlueprintFeature(
+            Resource.Cache.FeatureFeralCombat = Helper.CreateBlueprintFeature(
                 "FeralCombatTrainingFeature",
                 name,
                 description,
                 group: FeatureGroup.Feat
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature(unarmedstrike),
+                Helper.CreatePrerequisiteFeature(weaponfocus),
+                Helper.CreatePrerequisiteNoArchetype(zenarcher)
                 );
 
-            Helper.AddFeats(feral);
+            Helper.AddFeats(Resource.Cache.FeatureFeralCombat);
         }
     }
 
@@ -107,7 +117,7 @@ namespace DarkCodex
     }
 
     [HarmonyPatch(typeof(AbilityCasterMainWeaponCheck), nameof(AbilityCasterMainWeaponCheck.IsCasterRestrictionPassed))]
-    public class Patch_FeralCombat2
+    public class Patch_FeralCombat2 // stunning fist & co
     {
         public static void Postfix(UnitEntityData caster, AbilityCasterMainWeaponCheck __instance, ref bool __result)
         {
@@ -126,20 +136,28 @@ namespace DarkCodex
             if (!__instance.Owner.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                 return true;
 
-            if (__instance.IsZenArcher || __instance.IsSohei)
+            if (__instance.IsZenArcher)
                 return true;
 
-            Kingmaker.Items.UnitBody body = __instance.Owner.Body;
+            var body = __instance.Owner.Body;
+
+            if (__instance.IsSohei)
+            {
+                if (!body.SecondaryHand.HasShield
+                && (!body.Armor.HasArmor || body.Armor.Armor.Blueprint.ProficiencyGroup == ArmorProficiencyGroup.Light)
+                && (body.PrimaryHand.Weapon.Blueprint.IsMonk || body.PrimaryHand.Weapon.Blueprint.IsNatural) || (bool)__instance.Owner.Get<UnitPartWeaponTraining>()?.IsSuitableWeapon(body.PrimaryHand.MaybeWeapon))
+                    __instance.AddFact();
+                else
+                    __instance.RemoveFact();
+                return false;
+            }
+
             if (!body.SecondaryHand.HasShield
-                && (!body.Armor.HasArmor || !body.Armor.Armor.Blueprint.IsArmor)
-                && body.PrimaryHand.Weapon.Blueprint.IsMonk || body.PrimaryHand.Weapon.Blueprint.IsNatural)
-            {
+            && (!body.Armor.HasArmor || !body.Armor.Armor.Blueprint.IsArmor)
+            && (body.PrimaryHand.Weapon.Blueprint.IsMonk || body.PrimaryHand.Weapon.Blueprint.IsNatural))
                 __instance.AddFact();
-            }
             else
-            {
                 __instance.RemoveFact();
-            }
 
             return false;
         }

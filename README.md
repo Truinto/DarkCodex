@@ -46,8 +46,8 @@ Content
 |Kineticist.patchDemonCharge|Demon Charge also gathers power|:heavy_check_mark:|
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
 |Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
-|Monk.createFeralCombatTraining|basic feat: FeralCombat Training|:construction:|
-|Mythic.createLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources|:construction:|
+|Monk.createFeralCombatTraining|basic feat: FeralCombat Training|:heavy_check_mark:|
+|Mythic.createLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources|:heavy_check_mark:|
 |Mythic.createLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:heavy_check_mark:|
 |Mythic.createLimitlessSmite|mythic ability: infinite Smites, requires Abundant Smite|:heavy_check_mark:|
 |Mythic.createLimitlessBombs|mythic ability: infinite alchemist bombs and incenses|:construction:|
@@ -57,12 +57,12 @@ Content
 |Mythic.createLimitlessDomain|mythic ability: use domain powers at will|:heavy_check_mark:|
 |Mythic.createLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:construction:|
 |Mythic.createLimitlessWarpriest|mythic ability: infinite scared weapon uses|:construction:|
-|Mythic.createResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:construction:|
+|Mythic.createResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:heavy_check_mark:|
 |Mythic.createKineticMastery|mythic feat: physical Kinetic Blasts gain bonus equal to mythic level, or half with energy Blasts|:heavy_check_mark:|
-|Mythic.createMagicItemAdept|mythic feat: trinket items use character level as caster level|:construction:|
+|Mythic.createMagicItemAdept|mythic feat: trinket items use character level as caster level|:heavy_check_mark:|
 |Mythic.createExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:heavy_check_mark:|
-|Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:construction:|
-|Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:construction:|
+|Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:heavy_check_mark:|
+|Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:heavy_check_mark:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|
 |Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:construction:|
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|

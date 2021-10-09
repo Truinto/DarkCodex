@@ -507,8 +507,7 @@ namespace DarkCodex
                     }
                 }
 
-                else
-                    Helper.PrintDebug(" -" + rule.GetType().FullName);
+                //else Helper.PrintDebug(" -" + rule.GetType().FullName);
             }
 #if DEBUG
             if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
@@ -548,7 +547,7 @@ namespace DarkCodex
         {
             try
             {
-                __instance.Context.SourceAbilityContext?.RulebookContext?.m_AllEvents.Add(__instance);
+                __instance.Context.SourceAbilityContext.RulebookContext.m_AllEvents.Add(__instance);
             }
             catch (Exception e)
             {
