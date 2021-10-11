@@ -13,6 +13,8 @@ using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
+using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using System;
 using System.Collections.Generic;
@@ -166,8 +168,9 @@ namespace DarkCodex
         public static void patchHideBuffs()
         {
             string[] guids = new string[] {
-                "ca55b55c4cbac7947b513ea0e76b01d2", //Artifact_RingOfSummonsItem
+                "359e8fc68f81b5d4e96fae22be5e439f", //Artifact_RingOfSummonsBuff
                 "4677cfde5b184a94e898425d88a4665a", //MetamagicRodLesserKineticBuff
+                "7c4ebf464651bbe4798f25e839cead25", //HatOfHearteningSongEffectBuff
             };
 
             foreach (var guid in guids)
@@ -181,6 +184,36 @@ namespace DarkCodex
                 {
                     Helper.Print(" error: couldn't load " + guid);
                 }
+            }
+        }
+
+        public static void patchVarious()
+        {
+            // remove penalty on Precious Treat item
+            var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("ee8ee3c5c8f055e48a1ec1bfb92778f1"); //PreciousTreatBuff
+            buff.RemoveComponents(default(AddStatBonus));
+
+            // extend protection from X to 10 minutes
+            var pfa = new string[] {
+                "2cadf6c6350e4684baa109d067277a45", //ProtectionFromAlignmentCommunal
+                "8b8ccc9763e3cc74bbf5acc9c98557b9", //ProtectionFromLawCommunal
+                "0ec75ec95d9e39d47a23610123ba1bad", //ProtectionFromChaosCommunal
+                "93f391b0c5a99e04e83bbfbe3bb6db64", //ProtectionFromEvilCommunal
+                "5bfd4cce1557d5744914f8f6d85959a4", //ProtectionFromGoodCommunal
+                "3026de673d4d8fe45baf40e0b5edd718", //ProtectionFromChaosEvilCommunal
+                "b6da529f710491b4fa789a5838c1ae8f", //ProtectionFromChaosCommunalChaosEvil
+                "224f03e74d1dd4648a81242c01e65f41", //ProtectionFromEvilCommunalChaosEvil
+            };
+            foreach (var guid in pfa)
+            {
+                try
+                {
+                    var ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>(guid);
+                    ab.LocalizedDuration = Resource.Strings.TenMinutes;
+                    if (ab != null)
+                        (ab.GetComponent<AbilityEffectRunAction>().Actions.Actions[0] as ContextActionApplyBuff).DurationValue.BonusValue = 10;
+                }
+                catch (Exception) { }
             }
         }
 

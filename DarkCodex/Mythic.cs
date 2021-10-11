@@ -4,7 +4,9 @@ using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Controllers;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
@@ -361,6 +363,19 @@ namespace DarkCodex
             rage.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
         }
 
+        public static void patchUnstoppable()
+        {
+            var unstoppable = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("74afc3465db56924c9618a42d84efab8"); //Unstoppable
+            var dominate = Helper.ToRef<BlueprintBuffReference>("c0f4e1c24c9cd334ca988ed1bd9d201f"); //DominatePersonBuff
+            var entangle = Helper.ToRef<BlueprintBuffReference>("f7f6330726121cf4b90a6086b05d2e38"); //EntangleBuff
+
+            unstoppable.GetComponents<BuffSubstitutionOnApply>().FirstOrDefault(f => f.SpellDescriptor.HasAnyFlag(SpellDescriptor.Paralysis))
+                .SpellDescriptor |= SpellDescriptor.Stun | SpellDescriptor.Daze | SpellDescriptor.Confusion | SpellDescriptor.Petrified;
+
+            //MindAffecting or Compulsion or DominatePersonBuff
+            unstoppable.AddComponents(new BuffSubstitutionOnApply() { m_GainedFact = dominate, m_SubstituteBuff = entangle });
+        }
+
         public static void createResourcefulCaster()
         {
             // check if this works with Preferred Spell
@@ -516,6 +531,7 @@ namespace DarkCodex
             if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
             {
                 // refund spell if all targets resisted
+                // todo make combat entry for this
                 Helper.Print("Refunding spell");
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
@@ -562,7 +578,7 @@ namespace DarkCodex
     {
         public static void Postfix(AbilityData __instance, AbilityParams __result)
         {
-            if (__instance.Caster == null || Mythic._itemAdept == null)
+            if (__instance.Caster == null || Mythic._itemAdept == null) // todo move to resource.cache
                 return;
 
             if (!__instance.Caster.Unit.Descriptor.HasFact(Mythic._itemAdept))

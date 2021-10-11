@@ -134,27 +134,10 @@ namespace DarkCodex
                 if (!item.IsIdentified)
                     return;
 
-                //if (!(item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable))
-                //{
-                //    itemTooltipData.Texts[TooltipElement.Qualities] = UIUtilityItem.GetQualities(item);
-                //    List<ItemEnchantment> visibleEnchantments = item.VisibleEnchantments;
-                //    foreach (ItemEnchantment itemEnchantment in visibleEnchantments)
-                //    {
-                //        if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
-                //        {
-                //            __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
-                //        }
-                //    }
-                //    if (visibleEnchantments.Any() && !itemTooltipData.Texts.ContainsKey(TooltipElement.Qualities))
-                //    {
-                //        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
-                //    }
-                //    if (GameHelper.GetItemEnhancementBonus(item) > 0)
-                //    {
-                //        itemTooltipData.Texts[TooltipElement.Enhancement] = UIUtilityItem.GetEnhancementBonus(item);
-                //    }
-                //}
+                if (item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable)
+                    return;
 
+                // append enchantment qualities for items that don't usually display them
                 itemTooltipData.Texts.TryGetValue(TooltipElement.Qualities, out string text);
                 StringBuilder sb = new StringBuilder(text);
                 if (text == null)
@@ -173,12 +156,17 @@ namespace DarkCodex
                 }
 
                 if (sb.Length > 0)
+                {
                     itemTooltipData.Texts[TooltipElement.Qualities] = sb.ToString();
+                }
 
-                //if (item.Ability != null)
-                //    __result += string.Format("<b><align=\"center\">Ability: {0}</align></b>\n{1}\n\n", item.Ability.Name, "");
-                //else if (item.ActivatableAbility != null)
-                //    __result += string.Format("<b><align=\"center\">Activatable: {0}</align></b>\n{1}\n\n", item.ActivatableAbility.Name, "");
+                foreach (ItemEnchantment itemEnchantment in item.VisibleEnchantments)
+                {
+                    if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
+                    {
+                        __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
+                    }
+                }
             }
 
             public static void NameAll()

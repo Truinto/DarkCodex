@@ -193,7 +193,7 @@ namespace DarkCodex
                     Helper.CreateContextActionCastSpell(dimensiondoor),
                     Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true),
                     Helper.CreateContextActionMeleeAttack(true)),
-                step5_burn(null, 1),
+                Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
 
@@ -359,7 +359,7 @@ namespace DarkCodex
                 );
 
             // earth ability
-            var step1 = step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
+            var step1 = Step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
             var earth_impale_ab = Helper.CreateBlueprintAbility(
                 "ImpaleEarthBlastAbility",
                 impale_feat.m_DisplayName,
@@ -373,21 +373,21 @@ namespace DarkCodex
                 savingThrow: null
                 ).SetComponents(
                 step1,
-                step2_rank_dice(twice: false),
-                step3_rank_bonus(half_bonus: false),
+                Step2_rank_dice(twice: false),
+                Step3_rank_bonus(half_bonus: false),
                 step4_dc(),
-                step5_burn(step1.Actions.Actions, infusion: 2, blast: 0),
-                step6_feat(impale_feat),
-                step7_projectile(Resource.Projectile.Kinetic_EarthBlastLine00, true, AbilityProjectileType.Line, 30, 5),
-                step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
-                step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
+                Step5_burn(step1.Actions.Actions, infusion: 2, blast: 0),
+                Step6_feat(impale_feat),
+                Step7_projectile(Resource.Projectile.Kinetic_EarthBlastLine00, true, AbilityProjectileType.Line, 30, 5),
+                Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
+                Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
             var attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
             attack.IfTrue = step1.Actions;
             step1.Actions = Helper.CreateActionList(attack);
 
             // metal ability
-            step1 = step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
+            step1 = Step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
             var metal_impale_ab = Helper.CreateBlueprintAbility(
                 "ImpaleMetalBlastAbility",
                 impale_feat.m_DisplayName,
@@ -401,21 +401,21 @@ namespace DarkCodex
                 savingThrow: null
                 ).SetComponents(
                 step1,
-                step2_rank_dice(twice: true),
-                step3_rank_bonus(half_bonus: false),
+                Step2_rank_dice(twice: true),
+                Step3_rank_bonus(half_bonus: false),
                 step4_dc(),
-                step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
-                step6_feat(impale_feat),
-                step7_projectile(Resource.Projectile.Kinetic_MetalBlastLine00, true, AbilityProjectileType.Line, 30, 5),
-                step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
-                step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
+                Step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
+                Step6_feat(impale_feat),
+                Step7_projectile(Resource.Projectile.Kinetic_MetalBlastLine00, true, AbilityProjectileType.Line, 30, 5),
+                Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
+                Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
             attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
             attack.IfTrue = step1.Actions;
             step1.Actions = Helper.CreateActionList(attack);
 
             // ice ability
-            step1 = step1_run_damage(p: PhysicalDamageForm.Piercing, e: DamageEnergyType.Cold, isAOE: true, half: false);
+            step1 = Step1_run_damage(p: PhysicalDamageForm.Piercing, e: DamageEnergyType.Cold, isAOE: true, half: false);
             var ice_impale_ab = Helper.CreateBlueprintAbility(
                 "ImpaleIceBlastAbility",
                 impale_feat.m_DisplayName,
@@ -429,15 +429,15 @@ namespace DarkCodex
                 savingThrow: null
                 ).SetComponents(
                 step1,
-                step2_rank_dice(twice: true),
-                step3_rank_bonus(half_bonus: false),
+                Step2_rank_dice(twice: true),
+                Step3_rank_bonus(half_bonus: false),
                 step4_dc(),
-                step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
-                step6_feat(impale_feat),
-                step7_projectile(Resource.Projectile.Kinetic_IceBlastLine00, true, AbilityProjectileType.Line, 30, 5),
-                step8_spell_description(SpellDescriptor.Cold),
-                step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
-                step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
+                Step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
+                Step6_feat(impale_feat),
+                Step7_projectile(Resource.Projectile.Kinetic_IceBlastLine00, true, AbilityProjectileType.Line, 30, 5),
+                Step8_spell_description(SpellDescriptor.Cold),
+                Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
+                Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
             attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
             attack.IfTrue = step1.Actions;
@@ -469,13 +469,28 @@ namespace DarkCodex
         /// <summary>QoL Soul Power.</summary>
         public static void patchDarkElementalist()
         {
-            var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c");    //DarkElementalistSoulPowerAbility
+            var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c"); //DarkElementalistSoulPowerAbility
             soulability.ActionType = UnitCommand.CommandType.Free;
             soulability.m_IsFullRoundAction = false;
             soulability.HasFastAnimation = true;
             var targets = soulability.GetComponent<AbilityTargetsAround>();
             targets.m_Condition.Conditions = Array.Empty<Condition>();
             soulability.AddComponents(new AbilityRequirementOnlyCombat { Not = true });
+        }
+
+        public static void patchVarious()
+        {
+            // allow bowling infusion on sandblasts
+            var bowling = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("918b2524af5c3f647b5daa4f4e985411"); //BowlingInfusionBuff
+            var sandstorm = Helper.ToRef<BlueprintAbilityReference>("b93e1f0540a4fa3478a6b47ae3816f32"); //SandstormBlastBase
+
+            ExpandSubstance(bowling, sandstorm);
+        }
+
+        public static void fixBlastsAreSpellLike()
+        {
+            foreach (var blast in Blasts.GetBaseAndVariants())
+                blast.Get().Type = AbilityType.SpellLike;
         }
 
         public static void fixWallInfusion()
@@ -579,7 +594,7 @@ namespace DarkCodex
         /// 4) make components with helpers (step1 to 9)
         /// Logic for dealing damage. Will make a composite blast, if both p and e are set. How much damage is dealt is defined in step 2.
         /// </summary>
-        public static AbilityEffectRunAction step1_run_damage(PhysicalDamageForm p = 0, DamageEnergyType e = (DamageEnergyType)255, SavingThrowType save = SavingThrowType.Unknown, bool isAOE = false, bool half = false)
+        public static AbilityEffectRunAction Step1_run_damage(PhysicalDamageForm p = 0, DamageEnergyType e = (DamageEnergyType)255, SavingThrowType save = SavingThrowType.Unknown, bool isAOE = false, bool half = false)
         {
             ContextDiceValue dice = Helper.CreateContextDiceValue(DiceType.D6, AbilityRankType.DamageDice, AbilityRankType.DamageBonus);
 
@@ -600,7 +615,7 @@ namespace DarkCodex
         /// <summary>
         /// Defines damage dice. Set twice for composite blasts. You shouldn't need half at all.
         /// </summary>
-        public static ContextRankConfig step2_rank_dice(bool twice = false, bool half = false)
+        public static ContextRankConfig Step2_rank_dice(bool twice = false, bool half = false)
         {
             var progression = ContextRankProgression.AsIs;
             if (half) progression = ContextRankProgression.Div2;
@@ -618,7 +633,7 @@ namespace DarkCodex
         /// <summary>
         /// Defines bonus damage. Set half_bonus for energy blasts.
         /// </summary>
-        public static ContextRankConfig step3_rank_bonus(bool half_bonus = false)
+        public static ContextRankConfig Step3_rank_bonus(bool half_bonus = false)
         {
             var rankdice = Helper.CreateContextRankConfig(
                 baseValueType: ContextRankBaseValueType.CustomProperty,
@@ -643,7 +658,7 @@ namespace DarkCodex
         /// <summary>
         /// Creates damage tooltip from the run-action. Defines burn cost. Blast cost is 0, except for composite blasts which is 2. Talent is not used.
         /// </summary>
-        public static AbilityKineticist step5_burn(GameAction[] actions, int infusion = 0, int blast = 0, int talent = 0)
+        public static AbilityKineticist Step5_burn(GameAction[] actions, int infusion = 0, int blast = 0, int talent = 0)
         {
             var comp = new AbilityKineticist();
             comp.InfusionBurnCost = infusion;
@@ -666,7 +681,7 @@ namespace DarkCodex
         /// <summary>
         /// Required feat for this ability to show up.
         /// </summary>
-        public static AbilityShowIfCasterHasFact step6_feat(BlueprintFeature fact)
+        public static AbilityShowIfCasterHasFact Step6_feat(BlueprintFeature fact)
         {
             return Helper.CreateAbilityShowIfCasterHasFact(fact.ToRef2());
         }
@@ -674,7 +689,7 @@ namespace DarkCodex
         /// <summary>
         /// Defines projectile.
         /// </summary>
-        public static AbilityDeliverProjectile step7_projectile(string projectile_guid, bool isPhysical, AbilityProjectileType type, float length, float width)
+        public static AbilityDeliverProjectile Step7_projectile(string projectile_guid, bool isPhysical, AbilityProjectileType type, float length, float width)
         {
             string weapon = isPhysical ? "65951e1195848844b8ab8f46d942f6e8" : "4d3265a5b9302ee4cab9c07adddb253f"; //KineticBlastPhysicalWeapon //KineticBlastEnergyWeapon
             //KineticBlastPhysicalBlade b05a206f6c1133a469b2f7e30dc970ef
@@ -692,7 +707,7 @@ namespace DarkCodex
         /// <summary>
         /// Element descriptor for energy blasts.
         /// </summary>
-        public static SpellDescriptorComponent step8_spell_description(SpellDescriptor descriptor)
+        public static SpellDescriptorComponent Step8_spell_description(SpellDescriptor descriptor)
         {
             return new SpellDescriptorComponent
             {
@@ -712,12 +727,19 @@ namespace DarkCodex
         /// Defines sfx for casting.
         /// Use either use either OnPrecastStart or OnStart for time.
         /// </summary>
-        public static AbilitySpawnFx step_sfx(AbilitySpawnFxTime time, string sfx_guid)
+        public static AbilitySpawnFx Step_sfx(AbilitySpawnFxTime time, string sfx_guid)
         {
             var sfx = new AbilitySpawnFx();
             sfx.Time = time;
             sfx.PrefabLink = new PrefabLink() { AssetId = sfx_guid };
             return sfx;
+        }
+
+        public static BlueprintBuff ExpandSubstance(BlueprintBuff buff, BlueprintAbilityReference baseBlast)
+        {
+            Helper.AppendAndReplace(ref buff.GetComponent<AddKineticistInfusionDamageTrigger>().m_AbilityList, baseBlast);
+            Helper.AppendAndReplace(ref buff.GetComponent<AddKineticistBurnModifier>().m_AppliableTo, baseBlast);
+            return buff;
         }
 
         #endregion

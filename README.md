@@ -30,6 +30,8 @@ Content
 |General.createPreferredSpell|basic feat: Preferred Spell|:construction:|
 |General.patchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:heavy_check_mark:|
 |General.patchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/ |:heavy_check_mark:|
+|General.patchHideBuffs|unclogs UI by hidding a few buffs|:construction:|
+|General.patchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:construction:|
 |Hexcrafter.fixProgression|Hexcrafter can select Hex with any Arcana and get Spell Recall at level 11|:heavy_check_mark:|
 |Items.patchArrows|recollect Cold Iron Arrows after combat|:heavy_check_mark:|
 |Items.patchTerendelevScale|Terendelev´s Scale can be used once daily|:heavy_check_mark:|
@@ -41,11 +43,13 @@ Content
 |Kineticist.createKineticistBackground|Regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:heavy_check_mark:|
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:heavy_check_mark:|
 |Kineticist.createAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:heavy_check_mark:|
+|Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
 |Kineticist.patchDarkElementalist|Dark Elementalist QoL, faster animation and use anywhere, but only out of combat|:heavy_check_mark:|
 |Kineticist.patchGatherPower|Kineticist Gather Power can be used manually|:heavy_check_mark:|
 |Kineticist.patchDemonCharge|Demon Charge also gathers power|:heavy_check_mark:|
+|Kineticist.patchVarious|small tweaks: bowling works with sandstorm blast|:construction:|
+|Kineticist.fixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:construction:|
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
-|Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
 |Monk.createFeralCombatTraining|basic feat: FeralCombat Training|:heavy_check_mark:|
 |Mythic.createLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources|:heavy_check_mark:|
 |Mythic.createLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:heavy_check_mark:|
@@ -63,6 +67,7 @@ Content
 |Mythic.createExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:heavy_check_mark:|
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:heavy_check_mark:|
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:heavy_check_mark:|
+|Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:construction:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|
 |Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:construction:|
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|

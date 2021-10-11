@@ -467,6 +467,25 @@ namespace DarkCodex
             return obj;
         }
 
+        public static List<BlueprintAbilityReference> GetBaseAndVariants(this List<BlueprintAbilityReference> source, Func<BlueprintAbility, bool> predicate = null)
+        {
+            var result = new List<BlueprintAbilityReference>();
+
+            for (int i = 0; i < source.Count; i++)
+            {
+                result.Add(source[i]);
+
+                var variants = source[i].Get().GetComponent<AbilityVariants>()?.m_Variants ?? Array.Empty<BlueprintAbilityReference>();
+                foreach (var variant in variants)
+                {
+                    if (predicate == null || predicate(variant.Get()))
+                        result.Add(variant);
+                }
+            }
+
+            return result;
+        }
+
         public static List<BlueprintAbilityReference> GetVariants(this List<BlueprintAbilityReference> source, Func<BlueprintAbility, bool> predicate = null)
         {
             var result = new List<BlueprintAbilityReference>();
@@ -474,7 +493,6 @@ namespace DarkCodex
             for (int i = 0; i < source.Count; i++)
             {
                 var variants = source[i].Get().GetComponent<AbilityVariants>()?.m_Variants ?? Array.Empty<BlueprintAbilityReference>();
-
                 foreach (var variant in variants)
                 {
                     if (predicate == null || predicate(variant.Get()))
@@ -653,7 +671,7 @@ namespace DarkCodex
             return true;
         }
 
-        public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = false, bool? stayOnDeath = false)
+        public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = null, bool? stayOnDeath = null)
         {
             if (hidden != null)
             {

@@ -1,5 +1,12 @@
 # Changelog
 
+- added General.patchVarious
+- added General.patchHideBuffs
+- added Kineticist.fixBlastsAreSpellLike
+- added Mythic.patchUnstoppable
+- added Kineticist.patchVarious: bowling sandstorm
+- General various: extend protection from X to 10 minutes
+
 ## [1.0.7]
 - fix impale rolling individually
 - fix bleed working on bleed immune creatures

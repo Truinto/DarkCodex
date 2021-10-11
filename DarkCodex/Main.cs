@@ -58,6 +58,8 @@ namespace DarkCodex
             "General.createPreferredSpell",
             "General.patchAngelsLight",
             "General.patchBasicFreebieFeats",
+            "General.patchHideBuffs",
+            "General.patchVarious",
             "Hexcrafter.fixProgression",
             "Items.patchArrows",
             "Items.patchTerendelevScale",
@@ -72,6 +74,8 @@ namespace DarkCodex
             "Kineticist.patchDarkElementalist",
             "Kineticist.patchGatherPower",
             "Kineticist.patchDemonCharge",
+            "Kineticist.patchVarious",
+            "Kineticist.fixBlastsAreSpellLike",
             "Kineticist.fixWallInfusion",
             "Kineticist.createSelectiveMetakinesis",
             "Monk.createFeralCombatTraining",
@@ -91,6 +95,7 @@ namespace DarkCodex
             "Mythic.createResourcefulCaster",
             "Mythic.patchKineticOvercharge",
             "Mythic.patchLimitlessDemonRage",
+            "Mythic.patchUnstoppable",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
             "Witch.createCackleActivatable",
@@ -303,6 +308,8 @@ namespace DarkCodex
                     // General
                     LoadSafe(General.patchAngelsLight);
                     LoadSafe(General.patchBasicFreebieFeats);
+                    LoadSafe(General.patchHideBuffs);
+                    LoadSafe(General.patchVarious);
 
                     // Items
                     LoadSafe(Items.patchArrows);
@@ -325,6 +332,7 @@ namespace DarkCodex
                     LoadSafe(Mythic.createResourcefulCaster);
                     LoadSafe(Mythic.patchKineticOvercharge);
                     LoadSafe(Mythic.patchLimitlessDemonRage);
+                    LoadSafe(Mythic.patchUnstoppable);
 
                     // Kineticist
                     LoadSafe(Kineticist.fixWallInfusion);
@@ -337,6 +345,8 @@ namespace DarkCodex
                     LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat
+                    LoadSafe(Kineticist.patchVarious);
+                    LoadSafe(Kineticist.fixBlastsAreSpellLike);
                     LoadSafe(Kineticist.createSelectiveMetakinesis); // keep late
 
                     // Monk
