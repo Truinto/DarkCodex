@@ -6,6 +6,7 @@
 - added Mythic.patchUnstoppable
 - added Kineticist.patchVarious: bowling sandstorm
 - General various: extend protection from X to 10 minutes
+- fix gather power blocked during polymorph, as well as kitsune human form being unable to use kinetic blade
 
 ## [1.0.7]
 - fix impale rolling individually

@@ -126,6 +126,28 @@ namespace DarkCodex
             }
         }
 
+        [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.OnActivate))]
+        public class PolymorphTest1
+        {
+            public static bool On;
+            public static void Prefix(Polymorph __instance)
+            {
+                //if (On)
+                //    __instance.m_KeepSlots = true;
+                __instance.m_KeepSlots = On;
+            }
+        }
+
+        [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.TryReplaceView))]
+        public class PolymorphTest2
+        {
+            public static bool On;
+            public static bool Prefix(Polymorph __instance)
+            {
+                return !On;
+            }
+        }
+
         [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
         public class Enchantments
         {

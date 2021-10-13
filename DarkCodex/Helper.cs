@@ -412,9 +412,22 @@ namespace DarkCodex
             if (_mappedStrings == null)
                 return;
 
+            Dictionary<string, string> oldmap = null;
+
             try
             {
-                new JsonManager().Serialize(_mappedStrings, Path.Combine(Main.ModPath, "enGB.json"));
+                oldmap = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, "enGB.json"));
+
+                foreach (var entry in _mappedStrings)
+                    if (!oldmap.ContainsKey(entry.Key))
+                        oldmap.Add(entry.Key, entry.Value);
+            }
+            catch (Exception) { }
+
+            try
+            {
+                new JsonManager().Serialize(oldmap ?? _mappedStrings, Path.Combine(Main.ModPath, "enGB.json"));
+                _mappedStrings = null;
             }
             catch (Exception e)
             {
@@ -590,14 +603,19 @@ namespace DarkCodex
         #region Create Advanced
 
         private static MethodInfo _memberwiseClone = AccessTools.Method(typeof(object), "MemberwiseClone");
-        public static T Clone<T>(this T obj)
+        public static T Clone<T>(this T obj, string name, string guid = null) where T : SimpleBlueprint
         {
-            return (T)_memberwiseClone.Invoke(obj, null);
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+
+            var result = (T)_memberwiseClone.Invoke(obj, null);
+            AddAsset(result, guid);
+            return result;
+
             //var result = Activator.CreateInstance<T>();
             //var fields = typeof(T).GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
             //foreach (var field in fields)
             //    field.SetValue(result, field.GetValue(obj));
-
             //return result;
         }
 

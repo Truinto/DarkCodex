@@ -143,6 +143,8 @@ namespace DarkCodex
                 DEBUG.Loot.Open();
             //if (GUILayout.Button("Debug: Export Icons", GUILayout.ExpandWidth(false)))
             //    DEBUG.ExportAllIconTextures();
+            Checkbox(ref DEBUG.PolymorphTest1.On, "Debug: Enable polymorph equipment");
+            Checkbox(ref DEBUG.PolymorphTest2.On, "Debug. Disable polymorph transformation");
 
             GUILayout.Label("");
 
@@ -281,14 +283,21 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
+                    PatchSafe(typeof(DEBUG.PolymorphTest1));
+                    PatchSafe(typeof(DEBUG.PolymorphTest2));
                     //PatchSafe(typeof(General.DEBUGTEST));
+
+                    // Cache
+                    LoadSafe(PropertyMaxAttribute.createPropertyMaxMentalAttribute);
+                    LoadSafe(PropertyGetterSneakAttack.createPropertyGetterSneakAttack);
+                    LoadSafe(ContextActionIncreaseBleed.createBleedBuff);
 
                     // Harmony Patches
                     PatchUnique(typeof(Patch_AllowAchievements));
                     PatchUnique(typeof(Patch_DebugReport));
+                    PatchSafe(typeof(Patch_FixPolymorphGather));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
-                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack1));
-                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack2));
+                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
                     PatchSafe(typeof(Patch_MagicItemAdept));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnNewRoundPatch));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_HandleUnitRunCommand));
@@ -296,7 +305,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbilityUnitCommand_ApplyValidation));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_TryStart));
                     PatchSafe(typeof(Patches_Activatable.ActionBar));
-                    PatchSafe(typeof(Patch_ResourcefulCaster1));
+                    PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_ResourcefulCaster2));
                     PatchSafe(typeof(Patch_ResourcefulCaster3));
                     PatchSafe(typeof(Patch_ResourcefulCaster4));
@@ -359,8 +368,6 @@ namespace DarkCodex
                     LoadSafe(Hexcrafter.fixProgression);
 
                     // Rogue
-                    LoadSafe(PropertyGetterSneakAttack.createPropertyGetterSneakAttack);
-                    LoadSafe(ContextActionIncreaseBleed.createBleedBuff);
                     LoadSafe(Rogue.createBleedingAttack);
 
                     // Extra Features - keep last

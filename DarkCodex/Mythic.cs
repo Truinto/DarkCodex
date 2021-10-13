@@ -6,8 +6,10 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Controllers;
+using Kingmaker.Craft;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
@@ -18,6 +20,7 @@ using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
@@ -343,6 +346,36 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref base_selection2.m_AllFeatures, extra_selection2.ToRef());
         }
 
+        public static void createDemonLord()
+        {
+            var dp = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("d7cbd2004ce66a042aeab2e95a3c5c61"); //DominatePerson
+            var dpbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("c0f4e1c24c9cd334ca988ed1bd9d201f"); //DominatePersonBuff
+            var typedemon = Helper.ToRef<BlueprintUnitFactReference>("dc960a234d365cb4f905bdc5937e623a"); //SubtypeDemon
+
+            var ddbuff = dpbuff.Clone("DominateDemonBuff")
+                .RemoveComponents(default(AddFactContextActions));
+
+            var dd = dp.Clone("DominateDemon")
+                .RemoveComponents(default(SpellListComponent))
+                .RemoveComponents(default(CraftInfoComponent))
+                .RemoveComponents(default(AbilityTargetHasNoFactUnless))
+                .ReplaceComponent(default(AbilityTargetHasFact), new AbilityTargetHasFact()
+                {
+                    m_CheckedFacts = new BlueprintUnitFactReference[] { typedemon } //SubtypeDemon, DemonOfMagicFeature, DemonOfSlaughterFeature, DemonOfStrengthFeature
+                })
+                .ReplaceComponent(default(AbilityEffectRunAction),
+                    Helper.CreateAbilityEffectRunAction(SavingThrowType.Will, Helper.CreateContextActionApplyBuff(ddbuff, permanent: true)));
+
+            var x = new ContextCalculateAbilityParams()
+            {
+                StatTypeFromCustomProperty = true,
+                m_CustomProperty = Resource.Cache.PropertyMaxMentalAttribute
+            };
+
+            // DC = 10 + HD + Mythic Rank + Mental Stat
+            // works only on demons with HD < player HD
+        }
+
         public static void patchKineticOvercharge()
         {
             var overcharge = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("4236ca275c6fa9b4a9945b2645262616");
@@ -433,10 +466,12 @@ namespace DarkCodex
 
     #region Patches
 
-    [HarmonyPatch(typeof(RuleCastSpell), nameof(RuleCastSpell.ShouldSpendResource), MethodType.Getter)]
-    public class Patch_ResourcefulCaster1 // arcane spell failure
+    [HarmonyPatch]
+    public class Patch_ResourcefulCaster
     {
-        public static void Postfix(RuleCastSpell __instance, ref bool __result)
+        [HarmonyPatch(typeof(RuleCastSpell), nameof(RuleCastSpell.ShouldSpendResource), MethodType.Getter)]
+        [HarmonyPostfix]
+        public static void Postfix1(RuleCastSpell __instance, ref bool __result) // arcane spell failure
         {
             if (__result == false)
                 return;
@@ -447,8 +482,24 @@ namespace DarkCodex
             if (__instance.Initiator.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
                 __result = false;
         }
+
+        [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.FailIfConcentrationCheckFailed))]
+        [HarmonyPrefix]
+        public static bool Prefix2(UnitUseAbility __instance, ref bool __result) // concentration failed
+        {
+            if (__instance.ConcentrationCheckFailed)
+            {
+                __instance.SpawnInterruptFx();
+                __instance.ForceFinish(UnitCommand.ResultType.Fail);
+                if (!__instance.Executor.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
+                    __instance.Ability.Spend();
+                if (__instance.AiAction != null)
+                    __instance.Executor.CombatState.AIData.UseAction(__instance.AiAction, __instance);
+            }
+            __result = __instance.ConcentrationCheckFailed;
+            return false;
+        }
     }
-    [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.FailIfConcentrationCheckFailed))]
     public class Patch_ResourcefulCaster2 // concentration failed
     {
         public static bool Prefix(UnitUseAbility __instance, ref bool __result)
@@ -588,5 +639,5 @@ namespace DarkCodex
         }
     }
 
-#endregion
+    #endregion
 }

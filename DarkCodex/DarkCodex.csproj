@@ -46,6 +46,7 @@
     <Compile Include="Components\DiceValue.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyGetterSneakAttack.cs" />
+    <Compile Include="Components\PropertyMaxAttribute.cs" />
     <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
     <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
     <Compile Include="Components\ContextActionUndoAction.cs" />

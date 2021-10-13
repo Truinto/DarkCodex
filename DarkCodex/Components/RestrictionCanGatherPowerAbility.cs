@@ -32,8 +32,6 @@ namespace DarkCodex.Components
                 return false;
 
             UnitBody body = caster.Body;
-            if (body.IsPolymorphed)
-                return false;
 
             ItemEntity maybeItem = body.PrimaryHand.MaybeItem;
             ItemEntityWeapon itemEntityWeapon = maybeItem as ItemEntityWeapon;

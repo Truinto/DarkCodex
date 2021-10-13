@@ -52,6 +52,8 @@ using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.Blueprints.Root;
 using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
 using Kingmaker.RuleSystem.Rules;
+using Kingmaker.Items;
+using Kingmaker.Blueprints.Items.Armors;
 
 namespace DarkCodex
 {
@@ -264,7 +266,7 @@ namespace DarkCodex
             var two2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff2).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff2), Helper.CreateContextActionApplyBuff(buff3, 2) });
             var one2two = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff2, 2) });
             var zero2one = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff1, 2) });
-            var regain_halfmove = new ContextActionUndoAction(command: UnitCommand.CommandType.Move);
+            var regain_halfmove = new ContextActionUndoAction(command: UnitCommand.CommandType.Move, amount: 1.5f);
             var mobile_gathering_short_ab = Helper.CreateBlueprintAbility(
                 "MobileGatheringShort",
                 "Mobile Gathering (Move Action)",
@@ -278,7 +280,8 @@ namespace DarkCodex
                 null
                 ).SetComponents(
                 can_gather,
-                Helper.CreateAbilityEffectRunAction(0, regain_halfmove, apply_debuff, three2three, two2three, one2two, zero2one));
+                Helper.CreateAbilityEffectRunAction(0, regain_halfmove, apply_debuff, three2three, two2three, one2two, zero2one),
+                new RestrictionCanGatherPowerAbility());
             mobile_gathering_short_ab.CanTargetSelf = true;
             mobile_gathering_short_ab.Animation = CastAnimationStyle.Self;//UnitAnimationActionCastSpell.CastAnimationStyle.Kineticist;
             mobile_gathering_short_ab.HasFastAnimation = true;
@@ -317,9 +320,9 @@ namespace DarkCodex
                 FeatureGroup.Feat
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 7, true),
-                Helper.CreateAddFacts(mobile_gathering_short_ab.ToRef2(), mobile_gathering_long_ab.ToRef2()),
-                new RestrictionCanGatherPowerAbility());
+                Helper.CreateAddFacts(mobile_gathering_short_ab.ToRef2(), mobile_gathering_long_ab.ToRef2()));
             mobile_gathering_feat.Ranks = 1;
+
             Helper.AddFeats(mobile_gathering_feat);
 
             // make original gather ability visible for manual gathering and allow to extend buff3
@@ -747,6 +750,92 @@ namespace DarkCodex
 
     #region Patches
 
+    [HarmonyPatch]
+    public class Patch_FixPolymorphGather
+    {
+        [HarmonyPatch(typeof(RestrictionCanGatherPower), nameof(RestrictionCanGatherPower.IsAvailable))]
+        [HarmonyPrefix]
+        public static bool Prefix1(RestrictionCanGatherPower __instance, ref bool __result)
+        {
+            UnitPartKineticist unitPartKineticist = __instance.Owner.Get<UnitPartKineticist>();
+            if (!unitPartKineticist)
+            {
+                __result = false;
+                return false;
+            }
+            UnitBody body = __instance.Owner.Body;
+            ItemEntityWeapon weapon = body.PrimaryHand.MaybeItem as ItemEntityWeapon;
+            if (weapon != null && !weapon.IsMonkUnarmedStrike && !(weapon != null && weapon.Blueprint.Category == WeaponCategory.KineticBlast))
+            {
+                __result = false;
+                return false;
+            }
+            ItemEntity weapon2 = body.SecondaryHand.MaybeItem;
+            if (weapon2 != null)
+            {
+                ArmorProficiencyGroup? armorProficiencyGroup = body.SecondaryHand.MaybeShield?.Blueprint.Type.ProficiencyGroup;
+                if (armorProficiencyGroup != null)
+                {
+                    if (!(armorProficiencyGroup.GetValueOrDefault() == ArmorProficiencyGroup.TowerShield & armorProficiencyGroup != null))
+                    {
+                        __result = unitPartKineticist.CanGatherPowerWithShield;
+                        return false;
+                    }
+                }
+                __result = false;
+                return false;
+            }
+            __result = true;
+            return false;
+        }
+
+        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[0])]
+        [HarmonyPrefix]
+        public static bool Prefix2(RestrictionCanUseKineticBlade __instance, ref bool __result)
+        {
+            var unit = __instance.Owner;
+            var body = unit.Body;
+            if (body.IsPolymorphed && !body.IsPolymorphKeepSlots || !body.HandsAreEnabled)
+            {
+                __result = false;
+                return false;
+            }
+            UnitPartKineticist unitPartKineticist = unit.Get<UnitPartKineticist>();
+            if (!unitPartKineticist)
+            {
+                __result = false;
+                return false;
+            }
+            ItemEntityWeapon maybeWeapon = body.PrimaryHand.MaybeWeapon;
+            BlueprintItemWeapon blueprintItemWeapon = maybeWeapon?.Blueprint;
+            bool flag = blueprintItemWeapon.GetComponent<WeaponKineticBlade>() != null;
+            if (body.PrimaryHand.MaybeItem != null && !flag)
+            {
+                __result = false;
+                return false;
+            }
+            AddKineticistBlade addKineticistBlade = __instance.Fact.Blueprint.Buff.GetComponent<AddKineticistBlade>().Or(null);
+            BlueprintItemWeapon blueprintItemWeapon2 = addKineticistBlade?.Blade;
+            if (blueprintItemWeapon2 == null)
+            {
+                __result = false;
+                return false;
+            }
+            if (blueprintItemWeapon != blueprintItemWeapon2 || !unitPartKineticist.IsBladeActivated)
+            {
+                WeaponKineticBlade weaponKineticBlade = blueprintItemWeapon2.GetComponent<WeaponKineticBlade>().Or(null);
+                KineticistAbilityBurnCost? kineticistAbilityBurnCost = null;
+                if (((AbilityKineticist.CalculateAbilityBurnCost(weaponKineticBlade?.GetActivationAbility(unit)) != null) ? kineticistAbilityBurnCost.GetValueOrDefault().Total : 0) > unitPartKineticist.LeftBurnThisRound)
+                {
+                    __result = false;
+                    return false;
+                }
+            }
+            __result = true;
+            return false;
+        }
+    }
+
     /// <summary>
     /// Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost.
     /// Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.
@@ -781,14 +870,20 @@ namespace DarkCodex
         }
     }
 
-    [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
-    public class Patch_KineticistAllowOpportunityAttack1
+    [HarmonyPatch]
+    public class Patch_KineticistAllowOpportunityAttack
     {
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        private static BlueprintGuid blade_p = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
+        private static BlueprintGuid blade_e = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0"); //KineticBlastEnergyBlade
+        public static BlueprintBuff whip_buff;
+
+        [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
         {
             List<CodeInstruction> list = instr.ToList();
             MethodInfo original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
-            MethodInfo replacement = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack1), nameof(NullReplacement));
+            MethodInfo replacement = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
 
             for (int i = 0; i < list.Count; i++)
             {
@@ -802,20 +897,13 @@ namespace DarkCodex
 
             return list;
         }
-
         public static void NullReplacement(UnitState state, UnitCondition condition, Buff sourceBuff)
         {
         }
-    }
 
-    [HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
-    public class Patch_KineticistAllowOpportunityAttack2
-    {
-        private static BlueprintGuid blade_p = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
-        private static BlueprintGuid blade_e = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0"); //KineticBlastEnergyBlade
-        public static BlueprintBuff whip_buff;
-
-        public static bool Prefix(UnitEntityData unit, WeaponSlot hand, ref bool __result)
+        [HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
+        [HarmonyPrefix]
+        public static bool Prefix2(UnitEntityData unit, WeaponSlot hand, ref bool __result)
         {
             if (!hand.HasWeapon)
                 __result = false;
@@ -835,6 +923,7 @@ namespace DarkCodex
 
             return false;
         }
+
     }
 
     //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]

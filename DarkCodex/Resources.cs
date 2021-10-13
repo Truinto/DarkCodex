@@ -7,6 +7,7 @@ using Kingmaker.Localization;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Mechanics.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,13 @@ namespace DarkCodex
             public static List<BlueprintAbility> Ability;
             public static List<BlueprintActivatableAbility> Activatable;
 
+            // Base
             public static BlueprintItemWeapon WeaponUnarmed;
+
+            // Mods
             public static BlueprintBuff BuffBleed;
             public static BlueprintUnitPropertyReference PropertySneakAttackDice;
+            public static BlueprintUnitPropertyReference PropertyMaxMentalAttribute;
             public static BlueprintFeature FeatureFeralCombat;
             public static BlueprintFeature FeatureResourcefulCaster;
 
