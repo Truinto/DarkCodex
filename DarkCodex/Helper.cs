@@ -193,30 +193,21 @@ namespace DarkCodex
         public static T Create<T>(Action<T> action = null) where T : ScriptableObject
         {
             var result = ScriptableObject.CreateInstance<T>();
-            if (action != null)
-            {
-                action(result);
-            }
+            action?.Invoke(result);
             return result;
         }
 
         public static T Instantiate<T>(T obj, Action<T> action = null) where T : ScriptableObject
         {
             var result = ScriptableObject.Instantiate<T>(obj);
-            if (action != null)
-            {
-                action(result);
-            }
+            action?.Invoke(result);
             return result;
         }
 
         public static T CreateCopy<T>(T original, Action<T> action = null) where T : UnityEngine.Object
         {
             var clone = UnityEngine.Object.Instantiate(original);
-            if (action != null)
-            {
-                action(clone);
-            }
+            action?.Invoke(clone);
             return clone;
         }
 
@@ -603,12 +594,16 @@ namespace DarkCodex
         #region Create Advanced
 
         private static MethodInfo _memberwiseClone = AccessTools.Method(typeof(object), "MemberwiseClone");
-        public static T Clone<T>(this T obj, string name, string guid = null) where T : SimpleBlueprint
+        public static T Clone<T>(this T obj, string name, string guid = null, string guid2 = null) where T : SimpleBlueprint
         {
+            if (guid2 != null)
+                guid = MergeIds(obj.AssetGuid.ToString(), guid2);
+
             if (guid == null)
                 guid = GuidManager.i.Get(name);
 
             var result = (T)_memberwiseClone.Invoke(obj, null);
+            result.name = name;
             AddAsset(result, guid);
             return result;
 
@@ -617,6 +612,27 @@ namespace DarkCodex
             //foreach (var field in fields)
             //    field.SetValue(result, field.GetValue(obj));
             //return result;
+        }
+        private static ulong ParseGuidLow(string id) => ulong.Parse(id.Substring(id.Length - 16), System.Globalization.NumberStyles.HexNumber);
+        private static ulong ParseGuidHigh(string id) => ulong.Parse(id.Substring(0, id.Length - 16), System.Globalization.NumberStyles.HexNumber);
+        public static string MergeIds(string guid1, string guid2, string guid3 = null)
+        {
+            // Parse into low/high 64-bit numbers, and then xor the two halves.
+            ulong low = ParseGuidLow(guid1);
+            ulong high = ParseGuidHigh(guid1);
+
+            low ^= ParseGuidLow(guid2);
+            high ^= ParseGuidHigh(guid2);
+
+            if (guid3 != null)
+            {
+                low ^= ParseGuidLow(guid3);
+                high ^= ParseGuidHigh(guid3);
+            }
+
+            var result = high.ToString("x16") + low.ToString("x16");
+            PrintDebug($"MergeIds {guid1} + {guid2} + {guid3} = {result}");
+            return result;
         }
 
         public static BlueprintFeatureSelection _basicfeats;
@@ -974,7 +990,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(BlueprintProjectileReference projectile, AbilityProjectileType type = AbilityProjectileType.Simple, BlueprintItemWeaponReference weapon = null, Feet length = default(Feet), Feet width = default(Feet))
+        public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(BlueprintProjectileReference projectile, AbilityProjectileType type = AbilityProjectileType.Simple, BlueprintItemWeaponReference weapon = null, Feet length = default, Feet width = default)
         {
             var result = new AbilityDeliverProjectile();
             result.m_Projectiles = projectile.ObjToArray();
@@ -1305,7 +1321,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintAbilityAreaEffect CreateBlueprintAbilityAreaEffect(string name, string guid = null, bool applyEnemy = false, bool applyAlly = false, AreaEffectShape shape = AreaEffectShape.Cylinder, Feet size = default(Feet), PrefabLink sfx = null, BlueprintBuffReference buffWhileInside = null, ActionList unitEnter = null, ActionList unitExit = null, ActionList unitMove = null, ActionList unitRound = null)
+        public static BlueprintAbilityAreaEffect CreateBlueprintAbilityAreaEffect(string name, string guid = null, bool applyEnemy = false, bool applyAlly = false, AreaEffectShape shape = AreaEffectShape.Cylinder, Feet size = default, PrefabLink sfx = null, BlueprintBuffReference buffWhileInside = null, ActionList unitEnter = null, ActionList unitExit = null, ActionList unitMove = null, ActionList unitRound = null)
         {
             if (!applyAlly && !applyEnemy)
                 throw new ArgumentException("area must effect either allies or enemies");

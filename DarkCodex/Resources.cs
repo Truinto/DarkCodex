@@ -40,8 +40,11 @@ namespace DarkCodex
                 {
                     BuffKineticWhip = new BlueprintBuffReference();
                     BuffBleed = new BlueprintBuffReference();
+                    PropertySneakAttackDice = new BlueprintUnitPropertyReference();
+                    PropertyMaxMentalAttribute = new BlueprintUnitPropertyReference();
                     FeatureFeralCombat = new BlueprintFeatureReference();
                     FeatureResourcefulCaster = new BlueprintFeatureReference();
+
                     WeaponUnarmed = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
                 }
                 catch (Exception e)
