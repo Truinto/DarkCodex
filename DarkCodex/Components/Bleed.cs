@@ -156,7 +156,7 @@ namespace DarkCodex.Components
 
         internal static void createBleedBuff()
         {
-            Resource.Cache.BuffBleed = Helper.CreateBlueprintBuff(
+            var buff = Helper.CreateBlueprintBuff(
                 "BleedVariableBuff",
                 "Bleed",
                 "This creature takes hit point damage each turn. Bleeding can be stopped through the application of any spell that cures hit point damage.",
@@ -165,6 +165,8 @@ namespace DarkCodex.Components
                 ).SetComponents(
                 new BleedBuff()
                 );
+
+            Resource.Cache.BuffBleed.SetReference(buff);
         }
 
         public ContextDiceValue Value;

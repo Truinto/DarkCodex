@@ -41,7 +41,7 @@ namespace DarkCodex
             string name = "Feral Combat Training";
             string description = "While using any natural weapon, you can apply the effects of feats that have Improved Unarmed Strike as a prerequisite. Special: If you are a monk, you can use natural weapons with your flurry of blows class feature.";
 
-            Resource.Cache.FeatureFeralCombat = Helper.CreateBlueprintFeature(
+            var feature = Helper.CreateBlueprintFeature(
                 "FeralCombatTrainingFeature",
                 name,
                 description,
@@ -52,49 +52,31 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteNoArchetype(zenarcher)
                 );
 
+            Resource.Cache.FeatureFeralCombat.SetReference(feature);
+
             Helper.AddFeats(Resource.Cache.FeatureFeralCombat);
         }
     }
 
     #region Patches
 
-    /*
-    search for: ImprovedUnarmedStrike
-    skip: PummelingCharge, Patch_DeflectArrows_CheckRestriction_Patch
-    OK: AddInitiatorAttackWithWeaponTrigger		AddInitiatorAttackWithWeaponTriggerOrFeralTraining
-    OK: AbilityCasterMainWeaponCheck			AbilityCasterMainWeaponCheckOrFeralCombat
-    OK: MonkNoArmorAndMonkWeaponFeatureUnlock	MonkNoArmorAndMonkWeaponOrFeralCombatFeatureUnlock
-    OK: AdditionalStatBonusOnAttackDamage		AdditionalStatBonusOnAttackDamageOrFeralCombat
-     */
-
-    [HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), new Type[] { typeof(RuleAttackWithWeapon) })]
-    public class Patch_FeralCombat1
+    [HarmonyPatch]
+    public class Patch_FeralCombat
     {
-        public static void _Prefix(RuleAttackWithWeapon evt, AddInitiatorAttackWithWeaponTrigger __instance, out bool __state)
-        {
-            __state = false;
-            if (!__instance.CheckWeaponCategory)
-                return;
-            if (__instance.Category != WeaponCategory.UnarmedStrike)
-                return;
-            if (!evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return;
+        //search for: ImprovedUnarmedStrike
+        //skip: PummelingCharge, Patch_DeflectArrows_CheckRestriction_Patch
+        //OK: AddInitiatorAttackWithWeaponTrigger		AddInitiatorAttackWithWeaponTriggerOrFeralTraining
+        //OK: AbilityCasterMainWeaponCheck			AbilityCasterMainWeaponCheckOrFeralCombat
+        //OK: MonkNoArmorAndMonkWeaponFeatureUnlock	MonkNoArmorAndMonkWeaponOrFeralCombatFeatureUnlock
+        //OK: AdditionalStatBonusOnAttackDamage		AdditionalStatBonusOnAttackDamageOrFeralCombat
 
-            __instance.CheckWeaponCategory = false;
-            __state = true;
-        }
-
-        public static void _Postfix(AddInitiatorAttackWithWeaponTrigger __instance, bool __state)
-        {
-            if (__state)
-                __instance.CheckWeaponCategory = true;
-        }
-
+        [HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), new Type[] { typeof(RuleAttackWithWeapon) })]
+        [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
             List<CodeInstruction> list = instr.ToList();
             MethodInfo reference = AccessTools.PropertyGetter(typeof(BlueprintItemWeapon), "Category");
-            MethodInfo call = AccessTools.Method(typeof(Patch_FeralCombat1), nameof(Call));
+            MethodInfo call = AccessTools.Method(typeof(Patch_FeralCombat), nameof(Call));
 
             int index = list.FindIndex(f => f.Calls(reference)) + 2; //59
             int label = index - 1;
@@ -103,35 +85,31 @@ namespace DarkCodex
                 Helper.PrintInstruction(list[i], i.ToString());
             Helper.Print("Patching at " + index);
 
+            list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
             list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_1));
             list.Insert(index++, new CodeInstruction(OpCodes.Call, call));
             list.Insert(index++, new CodeInstruction(OpCodes.Brtrue_S, list[label].operand)); //label=11
 
             return list;
         }
-
-        public static bool Call(RuleAttackWithWeapon evt) //ldarg.1
+        public static bool Call(AddInitiatorAttackWithWeaponTrigger instance, RuleAttackWithWeapon evt) //ldarg.1
         {
-            return evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat);
+            return instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat);
         }
-    }
 
-    [HarmonyPatch(typeof(AbilityCasterMainWeaponCheck), nameof(AbilityCasterMainWeaponCheck.IsCasterRestrictionPassed))]
-    public class Patch_FeralCombat2 // stunning fist & co
-    {
-        public static void Postfix(UnitEntityData caster, AbilityCasterMainWeaponCheck __instance, ref bool __result)
+        [HarmonyPatch(typeof(AbilityCasterMainWeaponCheck), nameof(AbilityCasterMainWeaponCheck.IsCasterRestrictionPassed))]
+        [HarmonyPostfix]
+        public static void Postfix2(UnitEntityData caster, AbilityCasterMainWeaponCheck __instance, ref bool __result) // stunning fist & co
         {
             __result = __result ||
                 caster.Body.PrimaryHand.Weapon.Blueprint.IsNatural
                 && __instance.Category.Contains(WeaponCategory.UnarmedStrike)
                 && caster.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat);
         }
-    }
 
-    [HarmonyPatch(typeof(MonkNoArmorAndMonkWeaponFeatureUnlock), nameof(MonkNoArmorAndMonkWeaponFeatureUnlock.CheckEligibility))]
-    public class Patch_FeralCombat3 // flurry of blows
-    {
-        public static bool Prefix(MonkNoArmorAndMonkWeaponFeatureUnlock __instance)
+        [HarmonyPatch(typeof(MonkNoArmorAndMonkWeaponFeatureUnlock), nameof(MonkNoArmorAndMonkWeaponFeatureUnlock.CheckEligibility))]
+        [HarmonyPrefix]
+        public static bool Prefix3(MonkNoArmorAndMonkWeaponFeatureUnlock __instance) // flurry of blows
         {
             if (!__instance.Owner.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                 return true;
@@ -161,12 +139,10 @@ namespace DarkCodex
 
             return false;
         }
-    }
 
-    [HarmonyPatch(typeof(AdditionalStatBonusOnAttackDamage), nameof(AdditionalStatBonusOnAttackDamage.CheckConditions))]
-    public class Patch_FeralCombat4 // dragon style
-    {
-        public static bool Prefix(RuleCalculateWeaponStats evt, AdditionalStatBonusOnAttackDamage __instance, ref bool __result)
+        [HarmonyPatch(typeof(AdditionalStatBonusOnAttackDamage), nameof(AdditionalStatBonusOnAttackDamage.CheckConditions))]
+        [HarmonyPrefix]
+        public static bool Prefix4(RuleCalculateWeaponStats evt, AdditionalStatBonusOnAttackDamage __instance, ref bool __result) // dragon style
         {
             __result = false;
 
@@ -203,6 +179,7 @@ namespace DarkCodex
             return false;
 
         }
+
     }
 
     #endregion

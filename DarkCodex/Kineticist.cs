@@ -165,8 +165,8 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, whip.ToRef());
             knight.AddFeature(5, whip);
             knight.AddFeature(5, maneuver);
-            Patch_KineticistAllowOpportunityAttack2.whip_buff = buff;
 
+            Resource.Cache.BuffKineticWhip.SetReference(buff);
         }
 
         public static void createBladeRushInfusion()
@@ -875,7 +875,6 @@ namespace DarkCodex
     {
         private static BlueprintGuid blade_p = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
         private static BlueprintGuid blade_e = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0"); //KineticBlastEnergyBlade
-        public static BlueprintBuff whip_buff;
 
         [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
         [HarmonyTranspiler]
@@ -915,7 +914,7 @@ namespace DarkCodex
                 __result = false;
 
             else if ((hand.Weapon.Blueprint.Type.AssetGuid == blade_p || hand.Weapon.Blueprint.Type.AssetGuid == blade_e)
-                     && unit.Buffs.GetBuff(whip_buff) == null)
+                     && unit.Buffs.GetBuff(Resource.Cache.BuffKineticWhip) == null)
                 __result = false;
 
             else

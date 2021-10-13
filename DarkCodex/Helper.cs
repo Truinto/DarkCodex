@@ -1382,6 +1382,13 @@ namespace DarkCodex
 
         #region ToReference
 
+        public static void SetReference(this BlueprintReferenceBase reference, SimpleBlueprint bp)
+        {
+            reference.Cached = bp;
+            reference.deserializedGuid = bp.AssetGuid;
+            reference.guid = bp.AssetGuid.ToString();
+        }
+
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
         {
             T tref = Activator.CreateInstance<T>();

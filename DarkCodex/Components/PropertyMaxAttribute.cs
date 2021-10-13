@@ -13,10 +13,11 @@ namespace DarkCodex.Components
     {
         public static void createPropertyMaxMentalAttribute()
         {
-            Resource.Cache.PropertyMaxMentalAttribute = Helper.CreateBlueprintUnitProperty(
+            var prop = Helper.CreateBlueprintUnitProperty(
                 "MaxMentalAttributePropertyGetter"
-                ).SetComponents(new PropertyMaxAttribute() { PhysicalStat = false, MentalStat = true })
-                .ToRef();
+                ).SetComponents(new PropertyMaxAttribute() { PhysicalStat = false, MentalStat = true });
+
+            Resource.Cache.PropertyMaxMentalAttribute.SetReference(prop);
         }
 
         public override int GetBaseValue(UnitEntityData unit)

@@ -20,10 +20,11 @@ namespace DarkCodex.Components
 
         public static void createPropertyGetterSneakAttack()
         {
-            Resource.Cache.PropertySneakAttackDice = Helper.CreateBlueprintUnitProperty(
+            var prop = Helper.CreateBlueprintUnitProperty(
                 "SneakAttackPropertyGetter"
-                ).SetComponents(new PropertyGetterSneakAttack())
-                .ToRef();
+                ).SetComponents(new PropertyGetterSneakAttack());
+
+            Resource.Cache.PropertySneakAttackDice.SetReference(prop);
         }
     }
 }

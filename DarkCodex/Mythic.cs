@@ -412,11 +412,13 @@ namespace DarkCodex
         public static void createResourcefulCaster()
         {
             // check if this works with Preferred Spell
-            Resource.Cache.FeatureResourcefulCaster = Helper.CreateBlueprintFeature(
+            var feature = Helper.CreateBlueprintFeature(
                 "ResourcefulCasterFeature",
                 "Resourceful Caster",
                 "You can repurpose magic energy of failed spell. You don't expend a spell slot, if you fail to cast a spell due to arcane spell failure or concentration checks. Furthermore you regain your spell slot, whenever all targets of your spells resist due to spell resistance or succeed on their saving throws."
                 );
+
+            Resource.Cache.FeatureResourcefulCaster.SetReference(feature);
 
             Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
         }
@@ -499,29 +501,11 @@ namespace DarkCodex
             __result = __instance.ConcentrationCheckFailed;
             return false;
         }
-    }
-    public class Patch_ResourcefulCaster2 // concentration failed
-    {
-        public static bool Prefix(UnitUseAbility __instance, ref bool __result)
-        {
-            if (__instance.ConcentrationCheckFailed)
-            {
-                __instance.SpawnInterruptFx();
-                __instance.ForceFinish(UnitCommand.ResultType.Fail);
-                if (!__instance.Executor.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
-                    __instance.Ability.Spend();
-                if (__instance.AiAction != null)
-                    __instance.Executor.CombatState.AIData.UseAction(__instance.AiAction, __instance);
-            }
-            __result = __instance.ConcentrationCheckFailed;
-            return false;
-        }
-    }
-    [HarmonyPatch(typeof(AbilityExecutionProcess), nameof(AbilityExecutionProcess.Tick))]
-    public class Patch_ResourcefulCaster3 // all targets resisted
-    {
+
         public static List<UnitEntityData> unitsSpellNotResisted = new List<UnitEntityData>();
-        public static void Postfix(AbilityExecutionProcess __instance)
+        [HarmonyPatch(typeof(AbilityExecutionProcess), nameof(AbilityExecutionProcess.Tick))]
+        [HarmonyPostfix]
+        public static void Postfix3(AbilityExecutionProcess __instance) // all targets resisted
         {
             if (!__instance.IsEnded)
                 return;
@@ -605,12 +589,10 @@ namespace DarkCodex
 
             unitsSpellNotResisted.Clear();
         }
-    }
-
-    [HarmonyPatch(typeof(RuleSpellResistanceCheck), nameof(RuleSpellResistanceCheck.OnTrigger))]
-    public class Patch_ResourcefulCaster4 // push SR checks into history
-    {
-        public static void Postfix(RuleSpellResistanceCheck __instance)
+        
+        [HarmonyPatch(typeof(RuleSpellResistanceCheck), nameof(RuleSpellResistanceCheck.OnTrigger))]
+        [HarmonyPostfix]
+        public static void Postfix4(RuleSpellResistanceCheck __instance) // push SR checks into history
         {
             try
             {

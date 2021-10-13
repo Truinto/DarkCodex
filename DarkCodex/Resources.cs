@@ -27,16 +27,21 @@ namespace DarkCodex
             public static BlueprintItemWeapon WeaponUnarmed;
 
             // Mods
-            public static BlueprintBuff BuffBleed;
-            public static BlueprintUnitPropertyReference PropertySneakAttackDice;
-            public static BlueprintUnitPropertyReference PropertyMaxMentalAttribute;
-            public static BlueprintFeature FeatureFeralCombat;
-            public static BlueprintFeature FeatureResourcefulCaster;
+            public static readonly BlueprintBuffReference BuffKineticWhip;
+            public static readonly BlueprintBuffReference BuffBleed;
+            public static readonly BlueprintUnitPropertyReference PropertySneakAttackDice;
+            public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute;
+            public static readonly BlueprintFeatureReference FeatureFeralCombat;
+            public static readonly BlueprintFeatureReference FeatureResourcefulCaster;
 
             static Cache()
             {
                 try
                 {
+                    BuffKineticWhip = new BlueprintBuffReference();
+                    BuffBleed = new BlueprintBuffReference();
+                    FeatureFeralCombat = new BlueprintFeatureReference();
+                    FeatureResourcefulCaster = new BlueprintFeatureReference();
                     WeaponUnarmed = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
                 }
                 catch (Exception e)
@@ -397,7 +402,7 @@ namespace DarkCodex
             public static string WindProjectile00 = "e093b08cd4cafe946962b339faf2310a";
             public static string WindProjectile00_Up = "6648c0c15eda1f14eb80e260f87c55ea";
         }
-    
+
         public class Sfx
         {
             public static string PreStart_Earth = "69a83b56c1265464f8626a2ab414364a";

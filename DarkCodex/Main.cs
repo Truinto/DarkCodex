@@ -306,13 +306,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_TryStart));
                     PatchSafe(typeof(Patches_Activatable.ActionBar));
                     PatchSafe(typeof(Patch_ResourcefulCaster));
-                    PatchSafe(typeof(Patch_ResourcefulCaster2));
-                    PatchSafe(typeof(Patch_ResourcefulCaster3));
-                    PatchSafe(typeof(Patch_ResourcefulCaster4));
-                    PatchSafe(typeof(Patch_FeralCombat1));
-                    PatchSafe(typeof(Patch_FeralCombat2));
-                    PatchSafe(typeof(Patch_FeralCombat3));
-                    PatchSafe(typeof(Patch_FeralCombat4));
+                    PatchSafe(typeof(Patch_FeralCombat));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
