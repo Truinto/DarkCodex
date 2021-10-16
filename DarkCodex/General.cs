@@ -3,6 +3,7 @@ using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -152,7 +153,7 @@ namespace DarkCodex
 
             Helper.AddFeats(feat);
             Helper.AppendAndReplace(ref wizard.m_AllFeatures, feat.ToRef());
-        }     
+        }
 
         public static void patchExtendSpells()
         {
@@ -222,4 +223,36 @@ namespace DarkCodex
 
         }
     }
+
+    #region Patches
+
+    [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.ExtractItemsFromSpellbooks))]
+    public class Patch_SpellSelectionParametrized
+    {
+        public static bool Prefix(UnitDescriptor unit, BlueprintParametrizedFeature __instance, ref IEnumerable<FeatureUIData> __result)
+        {
+            if (__instance.Prerequisite != null)
+                return true;
+
+            var list = new List<FeatureUIData>();
+
+            foreach (Spellbook spellbook in unit.Spellbooks)
+            {
+                foreach (SpellLevelList spellLevel in spellbook.Blueprint.SpellList.SpellsByLevel)
+                {
+                    if (spellLevel.SpellLevel <= spellbook.MaxSpellLevel)
+                    {
+                        foreach (BlueprintAbility blueprintAbility in spellLevel.SpellsFiltered)
+                        {
+                            list.Add(new FeatureUIData(__instance, blueprintAbility, blueprintAbility.Name, blueprintAbility.Description, blueprintAbility.Icon, blueprintAbility.name));
+                        }
+                    }
+                }
+            }
+            __result = list;
+            return false;
+        }
+    }
+
+    #endregion
 }

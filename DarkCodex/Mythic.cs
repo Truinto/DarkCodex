@@ -511,10 +511,10 @@ namespace DarkCodex
                 return;
 
             Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster?.CharacterName}");
-#if !DEBUG
+
             if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
                 return;
-#endif
+
             if (__instance.Context.IsDuplicateSpellApplied)
                 return;
 
@@ -528,6 +528,7 @@ namespace DarkCodex
 
             bool hasSaves = false;
             bool allSavesPassed = true;
+            unitsSpellNotResisted.Clear();
             foreach (var rule in __instance.Context.RulebookContext.AllEvents)
             {
                 if (rule is RuleSpellResistanceCheck resistance)
@@ -559,15 +560,15 @@ namespace DarkCodex
 
                 //else Helper.PrintDebug(" -" + rule.GetType().FullName);
             }
-#if DEBUG
-            if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
-                return;
-#endif
+
             if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
             {
                 // refund spell if all targets resisted
                 // todo make combat entry for this
                 Helper.Print("Refunding spell");
+
+                spell = spell.ConvertedFrom ?? spell;
+
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
                 {
@@ -586,8 +587,6 @@ namespace DarkCodex
                     }
                 }
             }
-
-            unitsSpellNotResisted.Clear();
         }
         
         [HarmonyPatch(typeof(RuleSpellResistanceCheck), nameof(RuleSpellResistanceCheck.OnTrigger))]

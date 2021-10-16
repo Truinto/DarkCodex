@@ -17,6 +17,12 @@ namespace DarkCodex
             "General.patchBasicFreebieFeats",
         };
 
+        [JsonProperty]
+        public bool polymorphKeepInventory = false;
+
+        [JsonProperty]
+        public bool polymorphKeepModel = false;
+
         public static Config.Manager<Settings> StateManager = new Config.Manager<Settings>(Path.Combine(Main.ModPath, "settings.json"));
     }
 }

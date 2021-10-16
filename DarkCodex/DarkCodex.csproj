@@ -33,11 +33,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Classes\AbilityRegister.cs" />
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
+    <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />
     <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
     <Compile Include="Components\KineticistReduceBurnPooled.cs" />

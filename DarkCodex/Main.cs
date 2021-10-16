@@ -135,16 +135,18 @@ namespace DarkCodex
                 }
             }
 
+            GUILayout.Label("");
+
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
-            if (GUILayout.Button("Debug: Date minus 1", GUILayout.ExpandWidth(false)))
-                DEBUG.Date.SetDate();
-            if (GUILayout.Button("Debug: Open Shared Stash", GUILayout.ExpandWidth(false)))
-                DEBUG.Loot.Open();
+            //if (GUILayout.Button("Debug: Date minus 1", GUILayout.ExpandWidth(false)))
+            //    DEBUG.Date.SetDate();
+            //if (GUILayout.Button("Debug: Open Shared Stash", GUILayout.ExpandWidth(false)))
+            //    DEBUG.Loot.Open();
             //if (GUILayout.Button("Debug: Export Icons", GUILayout.ExpandWidth(false)))
             //    DEBUG.ExportAllIconTextures();
-            Checkbox(ref DEBUG.PolymorphTest1.On, "Debug: Enable polymorph equipment");
-            Checkbox(ref DEBUG.PolymorphTest2.On, "Debug. Disable polymorph transformation");
+            Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
+            Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
 
             GUILayout.Label("");
 
@@ -307,6 +309,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patches_Activatable.ActionBar));
                     PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_FeralCombat));
+                    PatchSafe(typeof(Patch_SpellSelectionParametrized));
 
                     // General
                     LoadSafe(General.patchAngelsLight);

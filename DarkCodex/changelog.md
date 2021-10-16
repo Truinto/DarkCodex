@@ -1,5 +1,6 @@
 # Changelog
 
+## [1.0.8]
 - added General.patchVarious
 - added General.patchHideBuffs
 - added Kineticist.fixBlastsAreSpellLike
@@ -8,6 +9,11 @@
 - General various: extend protection from X to 10 minutes
 - fixed gather power blocked during polymorph, as well as kitsune human form being unable to use kinetic blade
 - fixed feral combat applying to all weapon checks, instead of only unarmed checks
+- fixed blade rush attacking at the start point, instead of the end point
+- fixed preferred spell
+- added debug options to enable inventory while polymorphed
+- fixed resourceful caster now refunds converted spells
+- fixed quicken blade rush not working for regular kineticist
 
 ## [1.0.7]
 - fix impale rolling individually

@@ -59,17 +59,13 @@ namespace DarkCodex
 {
     public class Kineticist
     {
-        private static List<BlueprintAbilityReference> _allAbilities;
-        public static List<BlueprintAbilityReference> Blasts
-        {
-            get
-            {
-                if (_allAbilities != null)
-                    return _allAbilities;
-                _allAbilities = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f690edc756b748e43bba232e0eabd004").GetComponent<AddKineticistBurnModifier>().m_AppliableTo.ToList();
-                return _allAbilities;
-            }
-        }
+        public static AbilityRegister Blasts = new AbilityRegister(
+            "c4b74e4448b81d04f9df89ed14c38a95",  //MetakinesisQuickenCheaperBuff
+            "f690edc756b748e43bba232e0eabd004",  //MetakinesisQuickenBuff
+            "b8f43f0040155c74abd1bc794dbec320",  //MetakinesisMaximizedCheaperBuff
+            "870d7e67e97a68f439155bdf465ea191",  //MetakinesisMaximizedBuff
+            "f8d0f7099e73c95499830ec0a93e2eeb",  //MetakinesisEmpowerCheaperBuff
+            "f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
 
         public static void createKineticistBackground()
         {
@@ -194,10 +190,12 @@ namespace DarkCodex
                 Helper.CreateAbilityEffectRunAction(0,
                     Helper.CreateContextActionCastSpell(dimensiondoor),
                     Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true),
-                    Helper.CreateContextActionMeleeAttack(true)),
+                    new ContextActionMeleeAttackPoint()),
+                    //Helper.CreateContextActionMeleeAttack(true)),
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
+            ability.AvailableMetamagic = Metamagic.Quicken;
 
             var rush = Helper.CreateBlueprintFeature(
                 "KineticBladeRush",
@@ -222,6 +220,7 @@ namespace DarkCodex
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, rush.ToRef());
             knight.AddFeature(13, quickblade);
+            Blasts.Add(ability);
         }
 
         public static void createMobileGatheringFeat()

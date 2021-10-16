@@ -27,11 +27,11 @@ Content
 | Option | Description | Status |
 | ------ | ----------- | ------ |
 |General.createAbilityFocus|basic feat: Ability Focus to increase DC of one ability by +2|:x:|
-|General.createPreferredSpell|basic feat: Preferred Spell|:construction:|
+|General.createPreferredSpell|basic feat: Preferred Spell|:heavy_check_mark:|
 |General.patchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:heavy_check_mark:|
 |General.patchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/ |:heavy_check_mark:|
 |General.patchHideBuffs|unclogs UI by hidding a few buffs|:construction:|
-|General.patchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:construction:|
+|General.patchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:heavy_check_mark:|
 |Hexcrafter.fixProgression|Hexcrafter can select Hex with any Arcana and get Spell Recall at level 11|:heavy_check_mark:|
 |Items.patchArrows|recollect Cold Iron Arrows after combat|:heavy_check_mark:|
 |Items.patchTerendelevScale|Terendelev´s Scale can be used once daily|:heavy_check_mark:|
@@ -47,8 +47,8 @@ Content
 |Kineticist.patchDarkElementalist|Dark Elementalist QoL, faster animation and use anywhere, but only out of combat|:heavy_check_mark:|
 |Kineticist.patchGatherPower|Kineticist Gather Power can be used manually|:heavy_check_mark:|
 |Kineticist.patchDemonCharge|Demon Charge also gathers power|:heavy_check_mark:|
-|Kineticist.patchVarious|small tweaks: bowling works with sandstorm blast|:construction:|
-|Kineticist.fixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:construction:|
+|Kineticist.patchVarious|small tweaks: bowling works with sandstorm blast|:heavy_check_mark:|
+|Kineticist.fixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:heavy_check_mark:|
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:heavy_check_mark:|
 |Monk.createFeralCombatTraining|basic feat: FeralCombat Training|:heavy_check_mark:|
 |Mythic.createLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources|:heavy_check_mark:|

@@ -129,22 +129,18 @@ namespace DarkCodex
         [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.OnActivate))]
         public class PolymorphTest1
         {
-            public static bool On;
             public static void Prefix(Polymorph __instance)
             {
-                //if (On)
-                //    __instance.m_KeepSlots = true;
-                __instance.m_KeepSlots = On;
+                __instance.m_KeepSlots = __instance.m_KeepSlots || Settings.StateManager.State.polymorphKeepInventory;
             }
         }
 
         [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.TryReplaceView))]
         public class PolymorphTest2
         {
-            public static bool On;
             public static bool Prefix(Polymorph __instance)
             {
-                return !On;
+                return !Settings.StateManager.State.polymorphKeepModel;
             }
         }
 
