@@ -34,6 +34,7 @@ namespace DarkCodex.Components
             if (unitEntityData == null)
                 return;
 
+            Helper.PrintDebug($"Blade Rush: {unitEntityData}");
             RuleAttackWithWeapon ruleAttackWithWeapon = new RuleAttackWithWeapon(caster, unitEntityData, threatHandMelee.Weapon, 0)
             {
                 Reason = this.Context,

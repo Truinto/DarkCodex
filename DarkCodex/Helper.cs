@@ -426,6 +426,29 @@ namespace DarkCodex
             }
         }
 
+        public static bool IsNumber(this char c)
+        {
+            return c >= 48 && c <= 57;
+        }
+
+        public static bool IsUppercase(this char c)
+        {
+            return c >= 65 && c <= 90;
+        }
+
+        public static bool IsLowercase(this char c)
+        {
+            return c >= 97 && c <= 122;
+        }
+
+        public static bool IsNotSpaced(this StringBuilder sb)
+        {
+            if (sb.Length == 0)
+                return false;
+
+            return sb[sb.Length - 1] != ' ';
+        }
+
         #endregion
 
         #region Components
@@ -578,8 +601,17 @@ namespace DarkCodex
             };
         }
 
-        public static ContextDurationValue CreateContextDurationValue(AbilityRankType diceRank, DiceType dice = DiceType.One, int bonus = 0, DurationRate rate = DurationRate.Rounds)
+        public static ContextDurationValue CreateContextDurationValue(AbilityRankType diceRank, DiceType dice = DiceType.Zero, int bonus = 0, DurationRate rate = DurationRate.Rounds)
         {
+            if ((int)dice <= 1 && bonus == 0)
+                return new ContextDurationValue()
+                {
+                    DiceCountValue = 0,
+                    DiceType = DiceType.Zero,
+                    BonusValue = CreateContextValue(diceRank),
+                    Rate = rate
+                };
+
             return new ContextDurationValue()
             {
                 DiceCountValue = CreateContextValue(diceRank),
@@ -635,12 +667,34 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintFeatureSelection _basicfeats;
+        public static BlueprintFeatureSelection _basicfeats1;
+        public static BlueprintFeatureSelection _basicfeats2;
+        public static BlueprintFeatureSelection _combatfeats1;
+        public static BlueprintFeatureSelection _combatfeats2;
+        public static BlueprintFeatureSelection _combatfeats3;
         public static void AddFeats(params BlueprintFeature[] feats)
         {
-            if (_basicfeats == null)
-                _basicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45");
-            Helper.AppendAndReplace(ref _basicfeats.m_AllFeatures, feats.ToRef());
+            if (_basicfeats1 == null) //BasicFeatSelection
+                _basicfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45");
+            Helper.AppendAndReplace(ref _basicfeats1.m_AllFeatures, feats.ToRef());
+
+            if (_basicfeats2 == null) //ExtraFeatMythicFeat
+                _basicfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
+            Helper.AppendAndReplace(ref _basicfeats2.m_AllFeatures, feats.ToRef());
+        }
+        public static void AddCombatFeat(BlueprintFeature feats)
+        {
+            if (_combatfeats1 == null) //FighterFeatSelection
+                _combatfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("41c8486641f7d6d4283ca9dae4147a9f");
+            Helper.AppendAndReplace(ref _combatfeats1.m_AllFeatures, feats.ToRef());
+
+            if (_combatfeats2 == null) //CombatTrick
+                _combatfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c5158a6622d0b694a99efb1d0025d2c1");
+            Helper.AppendAndReplace(ref _combatfeats2.m_AllFeatures, feats.ToRef());
+
+            if (_combatfeats3 == null) //ExtraFeatMythicFeat
+                _combatfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
+            Helper.AppendAndReplace(ref _combatfeats3.m_AllFeatures, feats.ToRef());
         }
 
         private static BlueprintFeatureSelection _mythicfeats;
@@ -806,6 +860,24 @@ namespace DarkCodex
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static AutoMetamagic CreateAutoMetamagic(Metamagic metamagic, List<BlueprintAbilityReference> abilities = null, AutoMetamagic.AllowedType type = AutoMetamagic.AllowedType.Any)
+        {
+            var result = new AutoMetamagic();
+            result.m_AllowedAbilities = type;
+            result.Metamagic = Metamagic.CompletelyNormal;
+            result.Abilities = abilities ?? new List<BlueprintAbilityReference>();
+            return result;
+        }
+
+        public static AddFactContextActions CreateAddFactContextActions(GameAction[] on = null, GameAction[] off = null, GameAction[] round = null)
+        {
+            var result = new AddFactContextActions();
+            result.Activated = CreateActionList(on);
+            result.Deactivated = CreateActionList(off);
+            result.NewRound = CreateActionList(round);
+            return result;
         }
 
         public static ContextActionCastSpell CreateContextActionCastSpell(BlueprintAbilityReference spell, bool castByTarget = false)
@@ -1043,6 +1115,20 @@ namespace DarkCodex
             return hasBuff;
         }
 
+        public static ContextConditionHasFact CreateContextConditionHasFact(BlueprintUnitFactReference fact)
+        {
+            var result = new ContextConditionHasFact();
+            result.m_Fact = fact;
+            return result;
+        }
+
+        public static ContextConditionCasterHasFact CreateContextConditionCasterHasFact(BlueprintUnitFactReference fact)
+        {
+            var result = new ContextConditionCasterHasFact();
+            result.m_Fact = fact;
+            return result;
+        }
+
         public static ActionList CreateActionList(params GameAction[] actions)
         {
             if (actions == null || actions.Length == 1 && actions[0] == null) actions = Array.Empty<GameAction>();
@@ -1092,9 +1178,9 @@ namespace DarkCodex
             return result;
         }
 
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool fromSpell = false, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
-            return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: false, toCaster: toCaster, asChild: asChild, dispellable: dispellable, permanent: permanent);
+            return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: fromSpell, toCaster: toCaster, asChild: asChild, dispellable: dispellable, permanent: permanent);
         }
 
         public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
@@ -1102,6 +1188,20 @@ namespace DarkCodex
             var result = new ContextActionApplyBuff();
             result.m_Buff = buff.ToRef();
             result.DurationValue = duration;
+            result.IsFromSpell = fromSpell;
+            result.IsNotDispelable = !dispellable;
+            result.ToCaster = toCaster;
+            result.AsChild = asChild;
+            result.Permanent = permanent;
+            return result;
+        }
+
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, float durationInSeconds, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
+        {
+            var result = new ContextActionApplyBuff();
+            result.m_Buff = buff.ToRef();
+            result.UseDurationSeconds = true;
+            result.DurationSeconds = durationInSeconds;
             result.IsFromSpell = fromSpell;
             result.IsNotDispelable = !dispellable;
             result.ToCaster = toCaster;
@@ -1729,6 +1829,8 @@ namespace DarkCodex
 
         public static Sprite StealIcon(string guid)
         {
+            //var res = ResourcesLibrary.TryGetBlueprint(BlueprintGuid.Parse(guid));            
+            //if (res is BlueprintUnitFact res1)
             try
             {
                 return ResourcesLibrary.TryGetBlueprint<BlueprintUnitFact>(guid)?.Icon;

@@ -2,6 +2,7 @@
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace DarkCodex.Components
 {
     [AllowedOn(typeof(BlueprintParametrizedFeature), false)]
-    public class PreferredSpell : UnitFactComponentDelegate, IUnitReapplyFeaturesOnLevelUpHandler, IUnitSubscriber, ISubscriber
+    public class PreferredSpell : UnitFactComponentDelegate, IUnitReapplyFeaturesOnLevelUpHandler, ISpellBookCustomSpell, IUnitSubscriber, ISubscriber
     {
         public override void OnTurnOn()
         {
@@ -34,6 +35,15 @@ namespace DarkCodex.Components
                     array[i] = spell;
 
                 spellbook.AddSpellConversionList("PreferredSpell#" + spell.name, array);
+
+                if (spellbook.m_CustomSpells == null)
+                    continue;
+
+                List<AbilityData> metamagics = new List<AbilityData>();
+                foreach (var customSL in spellbook.m_CustomSpells)
+                    foreach (var custom in customSL)
+                        if (custom.Blueprint == spell)
+                            metamagics.Add(custom);
             }
         }
 
@@ -45,6 +55,19 @@ namespace DarkCodex.Components
         }
 
         public void HandleUnitReapplyFeaturesOnLevelUp()
+        {
+            OnTurnOff();
+            OnTurnOn();
+        }
+
+        public void AddSpellHandler(AbilityData ability)
+        {
+            Helper.PrintDebug("PreferredSpell AddSpellHandler");
+            OnTurnOff();
+            OnTurnOn();
+        }
+
+        public void RemoveSpellHandler(AbilityData ability)
         {
             OnTurnOff();
             OnTurnOn();

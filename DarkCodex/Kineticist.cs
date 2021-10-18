@@ -177,6 +177,14 @@ namespace DarkCodex
             string description = "Element: universal\nType: form infusion\nLevel: 2\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou use your element’s power to instantly move 30 feet, manifest a kinetic blade, and attack once. You gain a +2 bonus on the attack roll and take a –2 penalty to your AC until the start of your next turn. The movement doesn’t provoke attacks of opportunity, though activating blade rush does.";
             Sprite icon = Helper.StealIcon("4c349361d720e844e846ad8c19959b1e");
 
+            var buff = Helper.CreateBlueprintBuff(
+                "KineticBladeRushBuff",
+                "KineticBladeRushBuff",
+                ""
+                ).SetComponents(
+                Helper.CreateAddFactContextActions(on: Helper.CreateContextActionMeleeAttack(true).ObjToArray())
+                ).Flags(hidden: true);
+
             var ability = Helper.CreateBlueprintAbility(
                 "KineticBladeRushAbility",
                 name,
@@ -190,12 +198,15 @@ namespace DarkCodex
                 Helper.CreateAbilityEffectRunAction(0,
                     Helper.CreateContextActionCastSpell(dimensiondoor),
                     Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true),
-                    new ContextActionMeleeAttackPoint()),
+                    Helper.CreateContextActionApplyBuff(buff, 3f, toCaster: true)),
+                    //new ContextActionMeleeAttackPoint()),
                     //Helper.CreateContextActionMeleeAttack(true)),
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
             ability.AvailableMetamagic = Metamagic.Quicken;
+
+            //AbilityCustomTeleportation
 
             var rush = Helper.CreateBlueprintFeature(
                 "KineticBladeRush",
@@ -215,7 +226,7 @@ namespace DarkCodex
                 "Blade Rush — Quicken",
                 "At 13th level as a swift action, a Kinetic Knight can accept 2 points of burn to unleash a kinetic blast with the blade rush infusion."
                 ).SetComponents(
-                new AutoMetamagic() { Metamagic = Metamagic.Quicken, m_AllowedAbilities = AutoMetamagic.AllowedType.KineticistBlast, Abilities = new List<BlueprintAbilityReference>() { ability.ToRef() } }
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { ability.ToRef() }, AutoMetamagic.AllowedType.KineticistBlast)
                 );
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, rush.ToRef());
@@ -548,8 +559,8 @@ namespace DarkCodex
                 );
             buff1.SetComponents(
                 new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Metakinesis, Value = 1, m_AppliableTo = applicable.ToArray() },
-                new AutoMetamagic() { m_AllowedAbilities = AutoMetamagic.AllowedType.KineticistBlast, Metamagic = Metamagic.Selective, Abilities = applicable }
-                );
+                Helper.CreateAutoMetamagic(Metamagic.Selective, applicable, AutoMetamagic.AllowedType.KineticistBlast)
+                ).Flags(hidden: true, stayOnDeath: true);
 
             var feature1 = Helper.CreateBlueprintFeature(
                 "MetakinesisSelectiveFeature",
@@ -579,7 +590,7 @@ namespace DarkCodex
                 );
 
             autobuff.SetComponents(new AutoMetakinesis());
-            autobuff.Flags(hidden: true);
+            autobuff.Flags(hidden: true, stayOnDeath: true);
 
             Helper.AppendAndReplace(ref empower.GetComponent<AddFacts>().m_Facts, auto.ToRef());
 

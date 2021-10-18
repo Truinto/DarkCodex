@@ -216,6 +216,17 @@ namespace DarkCodex
                 }
                 catch (Exception) { }
             }
+
+            // demon graft respects immunities
+            var discordRage = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("5d3029eb16956124da2c6b79ed32c675"); //SongOfDiscordEnragedBuff
+            discordRage.AddComponents(Helper.CreateSpellDescriptorComponent(SpellDescriptor.MindAffecting | SpellDescriptor.Compulsion));
+
+            // fix BloodlineUndeadArcana and DirgeBardSecretsOfTheGraveFeature not allowing shaken/confusion
+            var undeadImmunities = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("8a75eb16bfff86949a4ddcb3dd2f83ae"); //UndeadImmunities
+            undeadImmunities.GetComponents<BuffDescriptorImmunity>().First(f => f.IgnoreFeature == null)
+                .Descriptor &= ~SpellDescriptor.Shaken & ~SpellDescriptor.Confusion;
+            undeadImmunities.GetComponents<SpellImmunityToSpellDescriptor>().First(f => f.CasterIgnoreImmunityFact == null)
+                .Descriptor &= ~SpellDescriptor.Shaken & ~SpellDescriptor.Confusion;
         }
 
         public static void createBardStopSong()

@@ -6,6 +6,7 @@ using Kingmaker.Armies.TacticalCombat;
 using Kingmaker.Armies.TacticalCombat.Controllers;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Facts;
+using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Items.Weapons;
@@ -18,6 +19,7 @@ using Kingmaker.Items;
 using Kingmaker.Items.Slots;
 using Kingmaker.Kingdom;
 using Kingmaker.Kingdom.Settlements;
+using Kingmaker.Localization;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.UI.Common;
@@ -152,12 +154,9 @@ namespace DarkCodex
                 if (!item.IsIdentified)
                     return;
 
-                if (item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable)
-                    return;
-
                 // append enchantment qualities for items that don't usually display them
                 itemTooltipData.Texts.TryGetValue(TooltipElement.Qualities, out string text);
-                StringBuilder sb = new StringBuilder(text);
+                var sb = new StringBuilder(text);
                 if (text == null)
                     sb.Append(UIUtilityItem.GetQualities(item));
 
@@ -178,12 +177,25 @@ namespace DarkCodex
                     itemTooltipData.Texts[TooltipElement.Qualities] = sb.ToString();
                 }
 
-                foreach (ItemEnchantment itemEnchantment in item.VisibleEnchantments)
+                if (!(item is ItemEntityWeapon || item is ItemEntityArmor || item is ItemEntityShield || item is ItemEntityUsable))
                 {
-                    if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
+                    foreach (ItemEnchantment itemEnchantment in item.VisibleEnchantments)
                     {
-                        __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
+                        if (!string.IsNullOrEmpty(itemEnchantment.Blueprint.Description))
+                        {
+                            __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", itemEnchantment.Blueprint.Name, itemEnchantment.Blueprint.Description);
+                        }
                     }
+                }
+
+                if (item.Ability != null && !item.Ability.Blueprint.m_Description.IsEmpty())
+                {
+                    __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", item.Ability.Name, item.Ability.Description);
+                }
+
+                if (item.ActivatableAbility != null && !item.ActivatableAbility.Blueprint.m_Description.IsEmpty())
+                {
+                    __result += string.Format("<b><align=\"center\">{0}</align></b>\n{1}\n\n", item.ActivatableAbility.Name, item.ActivatableAbility.Description);
                 }
             }
 
@@ -200,20 +212,39 @@ namespace DarkCodex
                     if (name == null) continue;
                     name = name.Replace("Enchantment", "");
                     name = name.Replace("Enchant", "");
+                    name = name.Replace("Plus", "");
                     if (name.Length < 1) continue;
                     sb.Clear();
                     sb.Append(name[0]);
                     for (int i = 1; i < name.Length; i++)
                     {
-                        if (name[i] <= 90)
+                        // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
+                        if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
                             sb.Append(' ');
-                        if (name[i] <= 57)
+
+                        if (name[i].IsNumber() && !name[i-1].IsNumber()) // prefix number blocks with '+'
                             sb.Append('+');
-                        sb.Append(name[i]);
+
+                        if (name[i] != '_')         // print char, except '_'
+                            sb.Append(name[i]);
+                        else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
+                            sb.Append(' ');
                     }
 
                     enchantment.m_EnchantName = sb.ToString().CreateString();
                 }
+
+                //foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                //{
+                //    var item = bp.Blueprint as BlueprintItem;
+                //    if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty())
+                //        continue;
+
+                //    foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty()))
+                //    {
+                //        enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
+                //    }
+                //}
             }
 
         }

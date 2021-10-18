@@ -8,6 +8,7 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Modding;
 using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
@@ -181,6 +182,36 @@ namespace DarkCodex
         {
             if (__instance.name == null)
                 __instance.name = "$$empty";
+        }
+    }
+
+    [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
+    public class Patch_PreferredSpellMetamagic
+    {
+        public static void Postfix(AbilityData __instance, ref IEnumerable<AbilityData> __result)
+        {
+            if (__instance.Spellbook == null)
+                return;
+
+            var list = new List<AbilityData>(__result);
+
+            try
+            {
+                foreach (var conlist in __instance.Spellbook.m_SpellConversionLists)
+                {
+                    if (!conlist.Key.StartsWith("PreferredSpell#"))
+                        continue;
+
+                    var spell = conlist.Value.Last();
+                    list.AddRange(__instance.Spellbook.GetCustomSpells(__instance.Spellbook.GetSpellLevel(__instance)).Where(w => w.Blueprint == spell));
+                }
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+
+            __result = list;
         }
     }
 }

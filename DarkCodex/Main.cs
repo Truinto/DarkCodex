@@ -93,9 +93,11 @@ namespace DarkCodex
             "Mythic.createMagicItemAdept",
             "Mythic.createExtraMythicFeats",
             "Mythic.createResourcefulCaster",
+            "Mythic.createSwiftHuntersBond",
             "Mythic.patchKineticOvercharge",
             "Mythic.patchLimitlessDemonRage",
             "Mythic.patchUnstoppable",
+            "Ranger.createImprovedHuntersBond",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
             "Witch.createCackleActivatable",
@@ -310,6 +312,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
+                    PatchSafe(typeof(Patch_PreferredSpellMetamagic));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
@@ -336,6 +339,7 @@ namespace DarkCodex
                     LoadSafe(Mythic.createKineticMastery);
                     LoadSafe(Mythic.createMagicItemAdept);
                     LoadSafe(Mythic.createResourcefulCaster);
+                    LoadSafe(Mythic.createSwiftHuntersBond);
                     LoadSafe(Mythic.patchKineticOvercharge);
                     LoadSafe(Mythic.patchLimitlessDemonRage);
                     LoadSafe(Mythic.patchUnstoppable);
@@ -366,6 +370,9 @@ namespace DarkCodex
 
                     // Rogue
                     LoadSafe(Rogue.createBleedingAttack);
+
+                    // Ranger
+                    LoadSafe(Ranger.createImprovedHuntersBond);
 
                     // Extra Features - keep last
                     LoadSafe(General.createPreferredSpell); // keep last

@@ -346,6 +346,23 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref base_selection2.m_AllFeatures, extra_selection2.ToRef());
         }
 
+        public static void createSwiftHuntersBond()
+        {
+            var hunterfeat = Helper.ToRef<BlueprintFeatureReference>("6dddf5ba2291f41498df2df7f8fa2b35"); //HuntersBondFeature
+            var huntersab = Helper.ToRef<BlueprintAbilityReference>("cd80ea8a7a07a9d4cb1a54e67a9390a5"); //HuntersBondAbility
+
+            var feat = Helper.CreateBlueprintFeature(
+                "SwiftHuntersBond",
+                "Swift Hunters Bond",
+                "Benefit: You can use Hunter's Bond as a swift action."
+                ).SetComponents(
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { huntersab }),
+                Helper.CreatePrerequisiteFeature(hunterfeat)
+                );
+
+            Helper.AddMythicTalent(feat);
+        }
+
         public static void createDemonLord()
         {
             var dp = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("d7cbd2004ce66a042aeab2e95a3c5c61"); //DominatePerson
