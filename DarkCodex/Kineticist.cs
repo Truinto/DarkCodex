@@ -169,6 +169,7 @@ namespace DarkCodex
         {
             var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var demoncharge = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
             var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
             var dimensiondoor = Helper.ToRef<BlueprintAbilityReference>("a9b8be9b87865744382f7c64e599aeb2"); //DimensionDoorCasterOnly
@@ -195,12 +196,14 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close
                 ).SetComponents(
-                Helper.CreateAbilityEffectRunAction(0,
-                    Helper.CreateContextActionCastSpell(dimensiondoor),
+                Helper.CreateAbilityExecuteActionOnCast(
                     Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true),
-                    Helper.CreateContextActionApplyBuff(buff, 3f, toCaster: true)),
-                    //new ContextActionMeleeAttackPoint()),
-                    //Helper.CreateContextActionMeleeAttack(true)),
+                    Helper.CreateContextActionApplyBuff(buff, 3f, toCaster: true)
+                    //Helper.CreateContextActionCastSpell(dimensiondoor),
+                    //new ContextActionMeleeAttackPoint()
+                    //Helper.CreateContextActionMeleeAttack(true)
+                    ),
+                demoncharge.GetComponent<AbilityCustomTeleportation>(),
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();

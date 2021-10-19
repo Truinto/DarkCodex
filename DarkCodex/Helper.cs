@@ -1100,6 +1100,22 @@ namespace DarkCodex
             return result;
         }
 
+        public static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(params GameAction[] actions)
+        {
+            var result = new AbilityExecuteActionOnCast();
+            result.Actions = CreateActionList(actions);
+            result.Conditions = new ConditionsChecker() { Operation = Operation.And, Conditions = Array.Empty<Condition>() };
+            return result;
+        }
+
+        public static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(GameAction[] actions, Condition[] conditions = null, Operation operation = Operation.And)
+        {
+            var result = new AbilityExecuteActionOnCast();
+            result.Actions = CreateActionList(actions);
+            result.Conditions = new ConditionsChecker() { Operation = operation, Conditions = conditions ?? Array.Empty<Condition>() };
+            return result;
+        }
+
         public static ContextActionRemoveBuff CreateContextActionRemoveBuff(BlueprintBuff buff, bool toCaster = false)
         {
             var result = new ContextActionRemoveBuff();
