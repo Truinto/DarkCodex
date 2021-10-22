@@ -3,7 +3,11 @@
 - fixed duplicate undead immunity that blocked dirge bard archetype and undead bloodline
 - added Mythic.createSwiftHuntersBond
 - added Ranger.createImprovedHuntersBond
-- added metamagic to preferred spell 
+- added metamagic to preferred spell
+- fixed LimitlessDemonRage not working
+- fixed limitless hexes only working when targeting self
+- fixed BoundlessHealing not working with witch healing hexes
+- fixed all enemies getting notably stronger from freebie feats
 
 ## [1.0.8]
 - added General.patchVarious

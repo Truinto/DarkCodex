@@ -1,22 +1,29 @@
 ﻿using DarkCodex.Components;
 using HarmonyLib;
+using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
+using Kingmaker.Blueprints.Root;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.View.MapObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,24 +108,40 @@ namespace DarkCodex
         {
             //https://michaeliantorno.com/feat-taxes-in-pathfinder/
 
-            var basics = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("5b72dd2ca2cb73b49903806ee8986325").LevelEntries[0].m_Features; //BasicFeatsProgression
-            basics.Add(Helper.ToRef<BlueprintFeatureBaseReference>("9972f33f977fc724c838e59641b2fca5")); //PowerAttackFeature
-            basics.Add(Helper.ToRef<BlueprintFeatureBaseReference>("0da0c194d6e1d43419eb8d990b28e0ab")); //PointBlankShot
-            basics.Add(Helper.ToRef<BlueprintFeatureBaseReference>("4c44724ffa8844f4d9bedb5bb27d144a")); //CombatExpertiseFeature
-            basics.Add(Helper.ToRef<BlueprintFeatureBaseReference>("90e54424d682d104ab36436bd527af09")); //WeaponFinesse
-            basics.Add(Helper.ToRef<BlueprintFeatureBaseReference>("f47df34d53f8c904f9981a3ee8e84892")); //DeadlyAimFeature
+            var basics = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("5b72dd2ca2cb73b49903806ee8986325"); //BasicFeatsProgression
+            basics.AddComponents(
+                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("9972f33f977fc724c838e59641b2fca5")), //PowerAttackFeature
+                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("0da0c194d6e1d43419eb8d990b28e0ab")), //PointBlankShot
+                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("4c44724ffa8844f4d9bedb5bb27d144a")), //CombatExpertiseFeature
+                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("90e54424d682d104ab36436bd527af09")), //WeaponFinesse
+                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("f47df34d53f8c904f9981a3ee8e84892")) //DeadlyAimFeature
+                );
+
+            var powerattack = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("a7b339e4f6ff93a4697df5d7a87ff619"); //PowerAttackToggleAbility
+            powerattack.IsOnByDefault = false;
+            powerattack.DoNotTurnOffOnRest = true;
+            var combatexpertise = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("a75f33b4ff41fc846acbac75d1a88442"); //CombatExpertiseToggleAbility
+            combatexpertise.IsOnByDefault = false;
+            combatexpertise.DoNotTurnOffOnRest = true;
+            combatexpertise.DeactivateIfCombatEnded = false;
+            combatexpertise.DeactivateAfterFirstRound = false;
+            combatexpertise.ActivationType = AbilityActivationType.Immediately;
+            combatexpertise.DeactivateIfOwnerDisabled = true;
+            var deadlyaim = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("ccde5ab6edb84f346a74c17ea3e3a70c"); //DeadlyAimToggleAbility
+            deadlyaim.IsOnByDefault = false;
+            deadlyaim.DoNotTurnOffOnRest = true;
 
             var mobility = Helper.ToRef<BlueprintUnitFactReference>("2a6091b97ad940943b46262600eaeaeb"); //Mobility
             var dodge = Helper.ToRef<BlueprintUnitFactReference>("97e216dbb46ae3c4faef90cf6bbe6fd5"); //Dodge
-            mobility.Get().AddComponents(Helper.MakeAddFactSafe(dodge));
-            dodge.Get().AddComponents(Helper.MakeAddFactSafe(mobility));
+            mobility.Get().AddComponents(Helper.CreateAddFactOnlyParty(dodge));
+            dodge.Get().AddComponents(Helper.CreateAddFactOnlyParty(mobility));
 
             var twf = Helper.ToRef<BlueprintUnitFactReference>("ac8aaf29054f5b74eb18f2af950e752d"); //TwoWeaponFighting
             var twfi = Helper.ToRef<BlueprintUnitFactReference>("9af88f3ed8a017b45a6837eab7437629"); //TwoWeaponFightingImproved
             var twfg = Helper.ToRef<BlueprintUnitFactReference>("c126adbdf6ddd8245bda33694cd774e8"); //TwoWeaponFightingGreater
             var multi = Helper.ToRef<BlueprintUnitFactReference>("8ac319e47057e2741b42229210eb43ed"); //Multiattack
-            twf.Get().AddComponents(Helper.MakeAddFactSafe(multi));
-            twfi.Get().AddComponents(Helper.MakeAddFactSafe(twfg));
+            twf.Get().AddComponents(Helper.CreateAddFactOnlyParty(multi));
+            twfi.Get().AddComponents(Helper.CreateAddFactOnlyParty(twfg));
 
             //Deft Maneuvers
             //ImprovedTrip.0f15c6f70d8fb2b49aa6cc24239cc5fa
@@ -227,6 +250,25 @@ namespace DarkCodex
                 .Descriptor &= ~SpellDescriptor.Shaken & ~SpellDescriptor.Confusion;
             undeadImmunities.GetComponents<SpellImmunityToSpellDescriptor>().First(f => f.CasterIgnoreImmunityFact == null)
                 .Descriptor &= ~SpellDescriptor.Shaken & ~SpellDescriptor.Confusion;
+
+            // add icon to CompletelyNormal metamagic
+            if (UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal == null)
+            {
+                var cnfeat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("094b6278f7b570f42aeaa98379f07cf2"); //CompletelyNormalSpellFeat
+                cnfeat.m_Icon = Helper.CreateSprite("CompletelyNormal.png");
+                UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal = cnfeat.m_Icon;
+            }
+
+            // disable area effects during cutscenes?
+            // AreaEffectView.SpawnFxs()
+            //AreaEffectsController.Spawn
+            //AreaEffectEntityData a = null;
+            //a.IsDisposed
+            //a.View.m_SpawnedFx.SetActive(false);
+
+            // attempt to have symbol stay activated
+            var holysymbol = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("e67dc14ff73014547920dc92bc8e1bfc"); //Artifact_HolySymbolOfIomedaeToggleAbility
+            holysymbol.DoNotTurnOffOnRest = true;
         }
 
         public static void createBardStopSong()
@@ -235,7 +277,81 @@ namespace DarkCodex
         }
     }
 
+    public class Control_AreaEffects
+    {
+        private static readonly List<AreaEffectEntityData> paused = new List<AreaEffectEntityData>();
+
+        public static void Stop()
+        {
+            foreach (var effect in Game.Instance.State.AreaEffects)
+            {
+                var caster = (effect.Context.ParentContext as AbilityExecutionContext)?.MaybeCaster;
+                if (caster == null || !caster.IsPlayerFaction)
+                    continue;
+
+                var fx = effect.View.m_SpawnedFx;
+                if (fx == null || !fx.activeSelf)
+                    continue;
+
+                fx.SetActive(false);
+                paused.Add(effect);
+            }
+        }
+
+        public static void Continue()
+        {
+            for (int i = paused.Count -1; i >= 0; i--)
+            {
+                if (!paused[i].Destroyed && !paused[i].DestroyMark)
+                    paused[i].View.m_SpawnedFx?.SetActive(true);
+                paused.RemoveAt(i);
+            }
+        }
+        //
+    }
+
     #region Patches
+
+    [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
+    public class Patch_PreferredSpellMetamagic
+    {
+        public static void Postfix(AbilityData __instance, ref IEnumerable<AbilityData> __result)
+        {
+            if (__instance.Spellbook == null)
+                return;
+
+            var list = new List<AbilityData>(__result);
+
+            try
+            {
+                foreach (var conlist in __instance.Spellbook.m_SpellConversionLists)
+                {
+                    if (!conlist.Key.StartsWith("PreferredSpell#"))
+                        continue;
+
+                    var targetspell = conlist.Value.Last();
+                    var metamagics = __instance.Spellbook.GetCustomSpells(__instance.Spellbook.GetSpellLevel(__instance)).Where(w => w.Blueprint == targetspell);
+
+                    foreach (var metamagic in metamagics)
+                    {
+                        list.Add(new AbilityData(targetspell, __instance.Caster)
+                        {
+                            m_ConvertedFrom = __instance,
+                            MetamagicData = metamagic.MetamagicData?.Clone(),
+                            DecorationBorderNumber = metamagic.DecorationBorderNumber,
+                            DecorationColorNumber = metamagic.DecorationColorNumber
+                        });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+
+            __result = list;
+        }
+    }
 
     [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.ExtractItemsFromSpellbooks))]
     public class Patch_SpellSelectionParametrized

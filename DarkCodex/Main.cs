@@ -102,6 +102,7 @@ namespace DarkCodex
             "Rogue.createExtraRogueTalent",
             "Witch.createCackleActivatable",
             "Witch.createIceTomb",
+            "Witch.fixBoundlessHealing",
         };
 
         /// <summary>Draws the GUI</summary>
@@ -147,6 +148,10 @@ namespace DarkCodex
             //    DEBUG.Loot.Open();
             //if (GUILayout.Button("Debug: Export Icons", GUILayout.ExpandWidth(false)))
             //    DEBUG.ExportAllIconTextures();
+            if (GUILayout.Button("Debug: Pause Area Fxs", GUILayout.ExpandWidth(false)))
+                Control_AreaEffects.Stop();
+            if (GUILayout.Button("Debug: Continue Area Fxs", GUILayout.ExpandWidth(false)))
+                Control_AreaEffects.Continue();
             Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
 
@@ -302,6 +307,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_FixPolymorphGather));
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
+                    PatchSafe(typeof(Patch_EnvelopingWindsCap));
                     PatchSafe(typeof(Patch_MagicItemAdept));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnNewRoundPatch));
                     PatchSafe(typeof(Patches_Activatable.ActivatableAbility_HandleUnitRunCommand));
@@ -312,7 +318,8 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
-                    PatchSafe(typeof(Patch_PreferredSpellMetamagic));
+                    PatchSafe(typeof(Patch_FixAreaEffects));
+                    PatchSafe(typeof(Patch_PreferredSpellMetamagic)); // TODO: play test again
 
                     // General
                     LoadSafe(General.patchAngelsLight);
@@ -364,6 +371,7 @@ namespace DarkCodex
 
                     // Witch
                     LoadSafe(Witch.createIceTomb);
+                    LoadSafe(Witch.fixBoundlessHealing);
 
                     // Hexcrafter
                     LoadSafe(Hexcrafter.fixProgression);

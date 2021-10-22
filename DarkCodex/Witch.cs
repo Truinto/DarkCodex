@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using DarkCodex.Components;
+using Kingmaker.Designers.Mechanics.Facts;
 
 namespace DarkCodex
 {
@@ -138,11 +139,15 @@ namespace DarkCodex
 
             var icetomb_cooldown = Helper.CreateBlueprintBuff("WitchHexIceTombCooldownBuff", "", "").Flags(hidden: true);
 
-            var icetomb_debuff = Helper.CreateBlueprintBuff("WitchHexIceTombBuff", "Frozen", "A storm of ice and freezing wind enveloped the creature.", null, null, null
+            var icetomb_debuff = Helper.CreateBlueprintBuff(
+                "WitchHexIceTombBuff",
+                "Frozen",
+                "A storm of ice and freezing wind enveloped the creature.",
+                fxOnStart: Helper.GetPrefabLink("21b65d177b9db1d4ca4961de15645d95") //IcyPrisonParalyzedBuff
                 ).SetComponents(
                 Helper.CreateAddCondition(UnitCondition.Paralyzed),
                 Helper.CreateAddCondition(UnitCondition.Unconscious)
-                );
+                ).Flags(isFromSpell: true, harmful: true);
 
             var runaction = Helper.CreateAbilityEffectRunAction(
                 SavingThrowType.Fortitude,
@@ -169,7 +174,7 @@ namespace DarkCodex
                 runaction,
                 Helper.CreateAbilityTargetHasFact(true, icetomb_cooldown.ToRef2()),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Hex | SpellDescriptor.Cold)
-                );
+                ).TargetEnemy();
 
             var icetomb = Helper.CreateBlueprintFeature(
                 "WitchHexIceTombFeature",
@@ -184,6 +189,18 @@ namespace DarkCodex
                 );
 
             Helper.AppendAndReplace(ref WitchHexSelection.m_AllFeatures, icetomb.ToRef());
+        }
+    
+        public static void fixBoundlessHealing()
+        {
+            var boundless = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
+            var heal1 = Helper.ToRef<BlueprintAbilityReference>("ed4fbfcdb0f5dcb41b76d27ed00701af"); //WitchHexHealingAbility
+            var heal2 = Helper.ToRef<BlueprintAbilityReference>("3408c351753aa9049af25af31ebef624"); //WitchHexMajorHealingAbility
+
+            var auto = boundless.GetComponent<AutoMetamagic>().Abilities;
+            auto.Add(heal1);
+            auto.Add(heal2);
+            Helper.AppendAndReplace(ref boundless.GetComponent<AddUnlimitedSpell>().m_Abilities, heal1, heal2);
         }
     }
 }

@@ -351,6 +351,8 @@ namespace DarkCodex
             var hunterfeat = Helper.ToRef<BlueprintFeatureReference>("6dddf5ba2291f41498df2df7f8fa2b35"); //HuntersBondFeature
             var huntersab = Helper.ToRef<BlueprintAbilityReference>("cd80ea8a7a07a9d4cb1a54e67a9390a5"); //HuntersBondAbility
 
+            //huntersab.Get().AvailableMetamagic |= Metamagic.Quicken;
+
             var feat = Helper.CreateBlueprintFeature(
                 "SwiftHuntersBond",
                 "Swift Hunters Bond",
@@ -408,9 +410,11 @@ namespace DarkCodex
         public static void patchLimitlessDemonRage()
         {
             var rage = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
+            var rage2 = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("260daa5144194a8ab5117ff568b680f5"); //DemonRageActivateAbility
             var limitless = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
 
             rage.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
+            rage2.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
         }
 
         public static void patchUnstoppable()

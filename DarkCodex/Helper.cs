@@ -455,17 +455,19 @@ namespace DarkCodex
 
         public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
-            foreach (var comp in components)
-                comp.name = $"${comp.GetType().Name}${obj.AssetGuid}";
-
             obj.ComponentsArray = Append(obj.ComponentsArray, components);
+
+            for (int i = 0; i < obj.ComponentsArray.Length; i++)
+                if (obj.ComponentsArray[i].name == null)
+                    obj.ComponentsArray[i].name = $"${obj.ComponentsArray[i].GetType().Name}${obj.AssetGuid}${i}";
+
             return obj;
         }
 
         public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
-            foreach (var comp in components)
-                comp.name = $"${comp.GetType().Name}${obj.AssetGuid}";
+            for (int i = 0; i < components.Length; i++)
+                components[i].name = $"${components[i].GetType().Name}${obj.AssetGuid}${i}";
 
             obj.ComponentsArray = components;
             return obj;
@@ -473,16 +475,16 @@ namespace DarkCodex
 
         public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig original, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
         {
-            replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}";
-
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
             {
                 if (obj.ComponentsArray[i] is TOrig)
                 {
                     obj.ComponentsArray[i] = replacement;
+                    replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}${i}";
                     break;
                 }
             }
+
             return obj;
         }
 
@@ -759,14 +761,14 @@ namespace DarkCodex
             return true;
         }
 
-        public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = null, bool? stayOnDeath = null)
+        public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = null, bool? stayOnDeath = null, bool? isFromSpell = null, bool? harmful = null)
         {
             if (hidden != null)
             {
                 if (hidden.Value)
                     buff.m_Flags |= BlueprintBuff.Flags.HiddenInUi;
                 else
-                    buff.m_Flags &= BlueprintBuff.Flags.HiddenInUi;
+                    buff.m_Flags &= ~BlueprintBuff.Flags.HiddenInUi;
             }
 
             if (stayOnDeath != null)
@@ -774,8 +776,25 @@ namespace DarkCodex
                 if (stayOnDeath.Value)
                     buff.m_Flags |= BlueprintBuff.Flags.StayOnDeath;
                 else
-                    buff.m_Flags &= BlueprintBuff.Flags.StayOnDeath;
+                    buff.m_Flags &= ~BlueprintBuff.Flags.StayOnDeath;
             }
+
+            if (isFromSpell != null)
+            {
+                if (isFromSpell.Value)
+                    buff.m_Flags |= BlueprintBuff.Flags.IsFromSpell;
+                else
+                    buff.m_Flags &= ~BlueprintBuff.Flags.IsFromSpell;
+            }
+
+            if (harmful != null)
+            {
+                if (harmful.Value)
+                    buff.m_Flags |= BlueprintBuff.Flags.Harmful;
+                else
+                    buff.m_Flags &= ~BlueprintBuff.Flags.Harmful;
+            }
+
             return buff;
         }
 
@@ -862,11 +881,19 @@ namespace DarkCodex
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
         }
 
+        public static AddFactOnlyParty CreateAddFactOnlyParty(BlueprintUnitFactReference fact, FeatureParam param = null)
+        {
+            var result = new AddFactOnlyParty();
+            result.Feature = fact;
+            result.Parameter = param;
+            return result;
+        }
+
         public static AutoMetamagic CreateAutoMetamagic(Metamagic metamagic, List<BlueprintAbilityReference> abilities = null, AutoMetamagic.AllowedType type = AutoMetamagic.AllowedType.Any)
         {
             var result = new AutoMetamagic();
             result.m_AllowedAbilities = type;
-            result.Metamagic = Metamagic.CompletelyNormal;
+            result.Metamagic = metamagic;
             result.Abilities = abilities ?? new List<BlueprintAbilityReference>();
             return result;
         }
@@ -1113,6 +1140,12 @@ namespace DarkCodex
             var result = new AbilityExecuteActionOnCast();
             result.Actions = CreateActionList(actions);
             result.Conditions = new ConditionsChecker() { Operation = operation, Conditions = conditions ?? Array.Empty<Condition>() };
+            return result;
+        }
+
+        public static ConditionsChecker CreateConditionsChecker(Operation operation = Operation.And, params Condition[] conditions)
+        {
+            var result = new ConditionsChecker() { Operation = operation, Conditions = conditions ?? Array.Empty<Condition>() };
             return result;
         }
 
@@ -1508,6 +1541,15 @@ namespace DarkCodex
 
             AddAsset(result, guid);
             return result;
+        }
+
+        #endregion
+
+        #region Library
+
+        public static PrefabLink GetPrefabLink(string assetId)
+        {
+            return new PrefabLink() { AssetId = assetId };
         }
 
         #endregion

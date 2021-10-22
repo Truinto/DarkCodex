@@ -173,6 +173,7 @@ namespace DarkCodex
             var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
             var dimensiondoor = Helper.ToRef<BlueprintAbilityReference>("a9b8be9b87865744382f7c64e599aeb2"); //DimensionDoorCasterOnly
+            var flashstep = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
 
             string name = "Blade Rush";
             string description = "Element: universal\nType: form infusion\nLevel: 2\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou use your element’s power to instantly move 30 feet, manifest a kinetic blade, and attack once. You gain a +2 bonus on the attack roll and take a –2 penalty to your AC until the start of your next turn. The movement doesn’t provoke attacks of opportunity, though activating blade rush does.";
@@ -197,19 +198,18 @@ namespace DarkCodex
                 AbilityRange.Close
                 ).SetComponents(
                 Helper.CreateAbilityExecuteActionOnCast(
-                    Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true),
-                    Helper.CreateContextActionApplyBuff(buff, 3f, toCaster: true)
-                    //Helper.CreateContextActionCastSpell(dimensiondoor),
+                    Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true)
+                    //Helper.CreateContextActionApplyBuff(buff, 3f, toCaster: true)
+                    //Helper.CreateContextActionCastSpell(dimensiondoor)
                     //new ContextActionMeleeAttackPoint()
                     //Helper.CreateContextActionMeleeAttack(true)
                     ),
-                demoncharge.GetComponent<AbilityCustomTeleportation>(),
+                //demoncharge.GetComponent<AbilityCustomTeleportation>(),
+                flashstep.GetComponent<AbilityCustomFlashStep>(),
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
             ability.AvailableMetamagic = Metamagic.Quicken;
-
-            //AbilityCustomTeleportation
 
             var rush = Helper.CreateBlueprintFeature(
                 "KineticBladeRush",
@@ -601,6 +601,40 @@ namespace DarkCodex
             quickenbuff.GetComponent<AutoMetamagic>().Once = true;
         }
 
+        public static void createHurricaneQueen()
+        {
+            var windsBuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff
+            var windsFeat = Helper.ToRef<BlueprintFeatureReference>("bb0de2047c448bd46aff120be3b39b7a");  //EnvelopingWinds
+            var windsEffect = Helper.ToRef<BlueprintUnitFactReference>("bbba1600582cf8446bb515a33bd89af8"); //EnvelopingWindsEffectFeature
+            var wildtalent_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+
+            var feat = Helper.CreateBlueprintFeature(
+                "HurricaneQueen", 
+                "Hurricane Queen",
+                "You are one with the hurricane. Your enveloping winds defense wild talent has an additional 25% chance of deflecting ranged attacks, and your total deflection chance can exceed the usual cap of 75%. All wind and weather (including creatures using the whirlwind monster ability) affect you and your attacks only if you wish them to do so; for example, you could shoot arrows directly through a tornado without penalty."
+                ).SetComponents(
+                Helper.CreateAddFacts(windsEffect, windsEffect, windsEffect, windsEffect, windsEffect),
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 18),
+                Helper.CreatePrerequisiteFeature(windsFeat)
+                );
+
+            var ray = new SetAttackerMissChance() { 
+                m_Type = SetAttackerMissChance.Type.RangedTouch,
+                Value = Helper.CreateContextValue(AbilitySharedValue.Damage),
+                Conditions = Helper.CreateConditionsChecker(0, Helper.CreateContextConditionCasterHasFact(feat.ToRef2()))
+            };
+            windsBuff.AddComponents(ray);
+
+            Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feat.ToRef());
+
+            // immune to air-elemental whirlwind
+            // bb57c37bfb5982d4bbed8d0fea75e404:WildShapeElementalAirWhirlwindDebuff
+            // SpecificBuffImmunity(sleet_storm)
+            // ignore miss chances
+            // ignore weather in UnitPartConcealment.Calculate
+        }
+
         #region Helper
 
         /// <summary>
@@ -762,6 +796,20 @@ namespace DarkCodex
     }
 
     #region Patches
+
+    [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.SetMissChance))]
+    public class Patch_EnvelopingWindsCap
+    {
+        //this.MissChance = Math.Min(50, Math.Max(this.MissChance, value));
+        public static bool Prefix(RuleAttackRoll __instance, ref int value)
+        {
+            if (value > 0 && value > __instance.MissChance)
+            {
+                __instance.MissChance = Math.Min(value, 100);
+            }
+            return false;
+        }
+    }
 
     [HarmonyPatch]
     public class Patch_FixPolymorphGather

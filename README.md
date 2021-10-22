@@ -59,22 +59,23 @@ Content
 |Mythic.createLimitlessArcaneReservoir|mythic ability: infinite arcane reservoir|:construction:|
 |Mythic.createLimitlessKi|mythic ability: reduce ki costs by 1|:heavy_check_mark:|
 |Mythic.createLimitlessDomain|mythic ability: use domain powers at will|:heavy_check_mark:|
-|Mythic.createLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:construction:|
+|Mythic.createLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:heavy_check_mark:|
 |Mythic.createLimitlessWarpriest|mythic ability: infinite scared weapon uses|:construction:|
 |Mythic.createResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:heavy_check_mark:|
-|Mythic.createSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:construction:|
+|Mythic.createSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:heavy_check_mark:|
 |Mythic.createKineticMastery|mythic feat: physical Kinetic Blasts gain bonus equal to mythic level, or half with energy Blasts|:heavy_check_mark:|
 |Mythic.createMagicItemAdept|mythic feat: trinket items use character level as caster level|:heavy_check_mark:|
 |Mythic.createExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:heavy_check_mark:|
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:heavy_check_mark:|
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:heavy_check_mark:|
-|Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:construction:|
-|Ranger.createImprovedHuntersBond|combat feat: Improved Hunter's Bond|:construction:|
+|Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:heavy_check_mark:|
+|Ranger.createImprovedHuntersBond|combat feat: Improved Hunter's Bond|:heavy_check_mark:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|
 |Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:construction:|
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|
-|Witch.createIceTomb|Hex: Ice Tomb|:x:|
+|Witch.createIceTomb|Hex: Ice Tomb|:heavy_check_mark:|
 |Witch.createExtraHex|basic feat: Extra Hex|:heavy_check_mark:|
+|Witch.fixBoundlessHealing|boundless healing applies to healing hex|:heavy_check_mark:|
 
 :heavy_check_mark: works, please report bugs you find \
 :construction: not tested, please let me know if this works or not \

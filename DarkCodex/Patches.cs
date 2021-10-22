@@ -10,6 +10,7 @@ using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
 using System;
@@ -185,33 +186,13 @@ namespace DarkCodex
         }
     }
 
-    [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
-    public class Patch_PreferredSpellMetamagic
+    /// <summary>Fixes area effects to stop working, when going into a different area.</summary>
+    [HarmonyPatch(typeof(AddAreaEffect), nameof(AddAreaEffect.OnAreaDidLoad))]
+    public class Patch_FixAreaEffects
     {
-        public static void Postfix(AbilityData __instance, ref IEnumerable<AbilityData> __result)
+        public static void Postfix(AddAreaEffect __instance)
         {
-            if (__instance.Spellbook == null)
-                return;
-
-            var list = new List<AbilityData>(__result);
-
-            try
-            {
-                foreach (var conlist in __instance.Spellbook.m_SpellConversionLists)
-                {
-                    if (!conlist.Key.StartsWith("PreferredSpell#"))
-                        continue;
-
-                    var spell = conlist.Value.Last();
-                    list.AddRange(__instance.Spellbook.GetCustomSpells(__instance.Spellbook.GetSpellLevel(__instance)).Where(w => w.Blueprint == spell));
-                }
-            }
-            catch (Exception e)
-            {
-                Helper.PrintException(e);
-            }
-
-            __result = list;
+            __instance.OnAreaActivated();
         }
     }
 }

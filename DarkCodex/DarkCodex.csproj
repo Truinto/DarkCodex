@@ -38,6 +38,7 @@
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
+    <Compile Include="Components\AddFactOnlyParty.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
     <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />

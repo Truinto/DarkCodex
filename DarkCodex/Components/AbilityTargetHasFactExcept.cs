@@ -32,7 +32,7 @@ namespace DarkCodex.Components
 			if (unit == null)
 				return false;
 
-			if (unit.Descriptor.HasFact(PassIfFact))
+			if (caster.Descriptor.HasFact(PassIfFact))
 				return true;
 
 			foreach (BlueprintUnitFact blueprint in this.CheckedFacts)
