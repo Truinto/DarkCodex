@@ -39,7 +39,7 @@ Content
 |Kineticist.createExtraWildTalentFeat|Kineticist Extra Wild Talent|:heavy_check_mark:|
 |Kineticist.createImpaleInfusion|Infusion: Impale|:heavy_check_mark: only earth|
 |Kineticist.createWhipInfusion|Infusion: Kinetic Whip, expands Kinetic Knight|:heavy_check_mark:|
-|Kineticist.createBladeRushInfusion|Infusion: Blade Rush, expands Kinetic Knight|:construction:|
+|Kineticist.createBladeRushInfusion|Infusion: Blade Rush, expands Kinetic Knight|:heavy_check_mark:|
 |Kineticist.createKineticistBackground|Regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:heavy_check_mark:|
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:heavy_check_mark:|
 |Kineticist.createAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:heavy_check_mark:|
@@ -71,7 +71,7 @@ Content
 |Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:heavy_check_mark:|
 |Ranger.createImprovedHuntersBond|combat feat: Improved Hunter's Bond|:heavy_check_mark:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|
-|Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:construction:|
+|Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:heavy_check_mark:|
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|
 |Witch.createIceTomb|Hex: Ice Tomb|:heavy_check_mark:|
 |Witch.createExtraHex|basic feat: Extra Hex|:heavy_check_mark:|
