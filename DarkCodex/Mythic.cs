@@ -278,20 +278,22 @@ namespace DarkCodex
 
         public static void createLimitlessWarpriest()
         {
-            var warpriest_resource = BlueprintGuid.Parse("cc700ef06c6fec449ab085cbcd74709c"); //SacredWeaponEnchantResource
-            var warpriest_prereq = Helper.ToRef<BlueprintFeatureReference>(""); //
+            var weapon_resource = BlueprintGuid.Parse("cc700ef06c6fec449ab085cbcd74709c"); //SacredWeaponEnchantResource
+            var armor_resource = BlueprintGuid.Parse("04af200173fafb94381b33e8fe3146e7"); //SacredArmorEnchantResource
+            var warpriest_prereq = Helper.ToRef<BlueprintCharacterClassReference>("30b5e47d47a0e37438cc5a80c96cfb99"); //WarpriestClass.
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessWarpriest",
-                "Limitless Sacred Weapon",
-                "You are chosen by your deity.\nBenefit: You no longer have a limited amount of Sacred Weapon rounds per day.",
+                "Limitless Sacred Warpriest",
+                "You are chosen by your deity.\nBenefit: You no longer have a limited amount of Sacred Weapon and Sacred Armor rounds per day.",
                 group: FeatureGroup.MythicAbility,
                 icon: Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3")
                 ).SetComponents(
-                //Helper.CreatePrerequisiteFeature(warpriest_prereq)
+                Helper.CreatePrerequisiteClassLevel(warpriest_prereq, 1)
                 );
 
-            setResourceDecreasing(warpriest_resource, limitless.ToRef2());
+            setResourceDecreasing(weapon_resource, limitless.ToRef2());
+            setResourceDecreasing(armor_resource, limitless.ToRef2());
 
             Helper.AddMythicTalent(limitless);
         }
