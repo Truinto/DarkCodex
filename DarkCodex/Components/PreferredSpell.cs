@@ -4,6 +4,7 @@ using Kingmaker.PubSubSystem;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 namespace DarkCodex.Components
 {
     [AllowedOn(typeof(BlueprintParametrizedFeature), false)]
-    public class PreferredSpell : UnitFactComponentDelegate, IUnitReapplyFeaturesOnLevelUpHandler, ISpellBookCustomSpell, IUnitSubscriber, ISubscriber
+    public class PreferredSpell : UnitFactComponentDelegate, IUnitReapplyFeaturesOnLevelUpHandler, IUnitSubscriber, ISubscriber //ISpellBookCustomSpell
     {
         public override void OnTurnOn()
         {
@@ -30,44 +31,40 @@ namespace DarkCodex.Components
                 if (min > 10)
                     continue;
 
-                var array = new BlueprintAbility[10];
-                for (int i = min; i < array.Length; i++)
-                    array[i] = spell;
+                var variants = spell.GetComponent<AbilityVariants>();
 
-                spellbook.AddSpellConversionList("PreferredSpell#" + spell.name, array);
-
-                if (spellbook.m_CustomSpells == null)
-                    continue;
-
-                List<AbilityData> metamagics = new List<AbilityData>();
-                foreach (var customSL in spellbook.m_CustomSpells)
-                    foreach (var custom in customSL)
-                        if (custom.Blueprint == spell)
-                            metamagics.Add(custom);
+                if (variants == null)
+                    AddSpell(spellbook, min, spell);
+                else
+                    foreach (var variant in variants.Variants)
+                        AddSpell(spellbook, min, variant);
             }
+        }
+
+        public void AddSpell(Spellbook spellbook, int level, BlueprintAbility spell)
+        {
+            var array = new BlueprintAbility[11];
+            for (int i = level; i < array.Length; i++)
+                array[i] = spell;
+
+            spellbook.AddSpellConversionList("PreferredSpell#" + spell.name, array);
         }
 
         public override void OnTurnOff()
         {
             var spell = this.Param.Blueprint as BlueprintAbility;
             foreach (var spellbook in this.Owner.Spellbooks)
-                spellbook.RemoveSpellConversionList("PreferredSpell#" + spell.name);
+            {
+                var variants = spell.GetComponent<AbilityVariants>();
+                if (variants == null)
+                    spellbook.RemoveSpellConversionList("PreferredSpell#" + spell.name);
+                else
+                    foreach (var variant in variants.Variants)
+                        spellbook.RemoveSpellConversionList("PreferredSpell#" + variant.name);
+            }
         }
 
         public void HandleUnitReapplyFeaturesOnLevelUp()
-        {
-            OnTurnOff();
-            OnTurnOn();
-        }
-
-        public void AddSpellHandler(AbilityData ability)
-        {
-            Helper.PrintDebug("PreferredSpell AddSpellHandler");
-            OnTurnOff();
-            OnTurnOn();
-        }
-
-        public void RemoveSpellHandler(AbilityData ability)
         {
             OnTurnOff();
             OnTurnOn();

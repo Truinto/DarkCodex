@@ -1,6 +1,7 @@
 ﻿using DarkCodex.Components;
 using HarmonyLib;
 using Kingmaker;
+using Kingmaker.AreaLogic.Cutscenes;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
@@ -9,9 +10,13 @@ using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Root;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.DialogSystem.Blueprints;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.PubSubSystem;
+using Kingmaker.UI.Common;
+using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -259,6 +264,10 @@ namespace DarkCodex
                 UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal = cnfeat.m_Icon;
             }
 
+            // add confusion descriptor to song of discord
+            var songDiscord = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("2e1646c2449c88a4188e58043455a43a"); //SongOfDiscordBuff
+            songDiscord.GetComponent<SpellDescriptorComponent>().Descriptor |= SpellDescriptor.Confusion;
+
             // disable area effects during cutscenes?
             // AreaEffectView.SpawnFxs()
             //AreaEffectsController.Spawn
@@ -277,7 +286,7 @@ namespace DarkCodex
         }
     }
 
-    public class Control_AreaEffects
+    public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IGlobalSubscriber, ISubscriber //ICutsceneHandler, ICutsceneDialogHandler
     {
         private static readonly List<AreaEffectEntityData> paused = new List<AreaEffectEntityData>();
 
@@ -289,38 +298,61 @@ namespace DarkCodex
                 if (caster == null || !caster.IsPlayerFaction)
                     continue;
 
+                if (effect.Destroyed || effect.DestroyMark)
+                    continue;
+
                 var fx = effect.View.m_SpawnedFx;
                 if (fx == null || !fx.activeSelf)
                     continue;
 
                 fx.SetActive(false);
                 paused.Add(effect);
+                Helper.PrintDebug(" pausing effect " + effect);
             }
         }
 
         public static void Continue()
         {
-            for (int i = paused.Count -1; i >= 0; i--)
+            for (int i = paused.Count - 1; i >= 0; i--)
             {
                 if (!paused[i].Destroyed && !paused[i].DestroyMark)
+                {
                     paused[i].View.m_SpawnedFx?.SetActive(true);
+                    Helper.PrintDebug(" continuing effect " + paused[i]);
+                }
+
                 paused.RemoveAt(i);
             }
         }
-        //
+
+        public void HandleDialogStarted(BlueprintDialog dialog)
+        {
+            Helper.PrintDebug("Dialog started...");
+            
+            if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
+                Stop();
+        }
+
+        public void HandleDialogFinished(BlueprintDialog dialog, bool success)
+        {
+            Helper.PrintDebug("Dialog finished...");
+            Continue();
+        }
     }
 
     #region Patches
 
-    [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
+    [HarmonyPatch]
     public class Patch_PreferredSpellMetamagic
     {
-        public static void Postfix(AbilityData __instance, ref IEnumerable<AbilityData> __result)
+        [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
+        [HarmonyPostfix]
+        public static void Postfix1(AbilityData __instance, ref IEnumerable<AbilityData> __result)
         {
             if (__instance.Spellbook == null)
                 return;
 
-            var list = new List<AbilityData>(__result);
+            var list = __result.ToList();
 
             try
             {
@@ -330,7 +362,9 @@ namespace DarkCodex
                         continue;
 
                     var targetspell = conlist.Value.Last();
-                    var metamagics = __instance.Spellbook.GetCustomSpells(__instance.Spellbook.GetSpellLevel(__instance)).Where(w => w.Blueprint == targetspell);
+                    if (targetspell.HasVariants) // todo: metamagic for variant spells!
+                        continue;
+                    var metamagics = __instance.Spellbook.GetCustomSpells(__instance.SpellLevel).Where(w => w.Blueprint == targetspell); //__instance.Spellbook.GetSpellLevel(__instance)
 
                     foreach (var metamagic in metamagics)
                     {
@@ -338,7 +372,7 @@ namespace DarkCodex
                         {
                             m_ConvertedFrom = __instance,
                             MetamagicData = metamagic.MetamagicData?.Clone(),
-                            DecorationBorderNumber = metamagic.DecorationBorderNumber,
+                            DecorationBorderNumber = metamagic.DecorationBorderNumber, // note: this is ignored, unfortunately
                             DecorationColorNumber = metamagic.DecorationColorNumber
                         });
                     }
@@ -350,6 +384,24 @@ namespace DarkCodex
             }
 
             __result = list;
+        }
+
+        [HarmonyPatch(typeof(MechanicActionBarSlotSpontaneusConvertedSpell), nameof(MechanicActionBarSlotSpontaneusConvertedSpell.GetDecorationSprite))]
+        [HarmonyPostfix]
+        [HarmonyPriority(Priority.HigherThanNormal)]
+        public static void Postfix2(MechanicActionBarSlotSpontaneusConvertedSpell __instance, ref Sprite __result)
+        {
+            if (__instance.Spell?.ConvertedFrom != null)
+                __result = UIUtility.GetDecorationBorderByIndex(__instance.Spell.DecorationBorderNumber);
+        }
+
+        [HarmonyPatch(typeof(MechanicActionBarSlotSpontaneusConvertedSpell), nameof(MechanicActionBarSlotSpontaneusConvertedSpell.GetDecorationColor))]
+        [HarmonyPostfix]
+        [HarmonyPriority(Priority.HigherThanNormal)]
+        public static void Postfix3(MechanicActionBarSlotSpontaneusConvertedSpell __instance, ref Color __result)
+        {
+            if (__instance.Spell?.ConvertedFrom != null)
+                __result = UIUtility.GetDecorationColorByIndex(__instance.Spell.DecorationColorNumber);
         }
     }
 

@@ -319,7 +319,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
                     PatchSafe(typeof(Patch_FixAreaEffects));
-                    PatchSafe(typeof(Patch_PreferredSpellMetamagic)); // TODO: play test again
+                    PatchSafe(typeof(Patch_PreferredSpellMetamagic));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
@@ -334,7 +334,6 @@ namespace DarkCodex
 
                     // Mythic
                     LoadSafe(Mythic.createLimitlessBardicPerformance);
-                    LoadSafe(Mythic.createLimitlessWitchHexes);
                     LoadSafe(Mythic.createLimitlessSmite);
                     LoadSafe(Mythic.createLimitlessBombs);
                     LoadSafe(Mythic.createLimitlessArcanePool);
@@ -383,6 +382,7 @@ namespace DarkCodex
                     LoadSafe(Ranger.createImprovedHuntersBond);
 
                     // Extra Features - keep last
+                    LoadSafe(Mythic.createLimitlessWitchHexes); // keep last
                     LoadSafe(General.createPreferredSpell); // keep last
                     LoadSafe(General.createAbilityFocus); // keep last
                     LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
@@ -393,6 +393,7 @@ namespace DarkCodex
 
                     // Event subscriptions
                     EventBus.Subscribe(new RestoreEndOfCombat());
+                    EventBus.Subscribe(new Control_AreaEffects());
 
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG

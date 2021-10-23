@@ -13,6 +13,9 @@ namespace DarkCodex
         public bool allowAchievements = true;
 
         [JsonProperty]
+        public bool stopAreaEffectsDuringCutscenes = true;
+
+        [JsonProperty]
         public List<string> doNotLoad = new List<string>() { 
             "General.patchBasicFreebieFeats",
         };
