@@ -286,7 +286,7 @@ namespace DarkCodex
         }
     }
 
-    public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IGlobalSubscriber, ISubscriber //ICutsceneHandler, ICutsceneDialogHandler
+    public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IPartyCombatHandler, IGlobalSubscriber, ISubscriber //ICutsceneHandler, ICutsceneDialogHandler
     {
         private static readonly List<AreaEffectEntityData> paused = new List<AreaEffectEntityData>();
 
@@ -337,6 +337,25 @@ namespace DarkCodex
         {
             Helper.PrintDebug("Dialog finished...");
             Continue();
+        }
+
+        public void HandlePartyCombatStateChanged(bool inCombat)
+        {
+            if (!inCombat)
+                return;
+
+            foreach (var unit in Game.Instance.Player.PartyAndPets) // todo: add activatable enabler
+            {
+                foreach (var buff in unit.Buffs)
+                {
+                    var ae = buff.GetComponent<AddAreaEffect>();
+                    if (ae != null && ae.Data.AreaEffectInstance == null)
+                    {
+                        Helper.PrintDebug("Enabled missing area effect for " + ae.AreaEffect.NameSafe());
+                        ae.OnActivate();
+                    }
+                }
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 # Changelog
+- fix for missing area effects
 
 ## [1.0.9]
 - fixed duplicate undead immunity that blocked dirge bard archetype and undead bloodline

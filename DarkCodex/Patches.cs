@@ -185,14 +185,4 @@ namespace DarkCodex
                 __instance.name = "$$empty";
         }
     }
-
-    /// <summary>Fixes area effects to stop working, when going into a different area.</summary>
-    [HarmonyPatch(typeof(AddAreaEffect), nameof(AddAreaEffect.OnAreaDidLoad))]
-    public class Patch_FixAreaEffects
-    {
-        public static void Postfix(AddAreaEffect __instance)
-        {
-            __instance.OnAreaActivated();
-        }
-    }
 }

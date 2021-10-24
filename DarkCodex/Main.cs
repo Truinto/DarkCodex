@@ -318,7 +318,6 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
-                    PatchSafe(typeof(Patch_FixAreaEffects));
                     PatchSafe(typeof(Patch_PreferredSpellMetamagic));
 
                     // General
