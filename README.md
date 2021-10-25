@@ -44,6 +44,7 @@ Content
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:heavy_check_mark:|
 |Kineticist.createAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:heavy_check_mark:|
 |Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:heavy_check_mark:|
+|Kineticist.createHurricaneQueen|Wild Talent: Hurricane Queen|:construction:|
 |Kineticist.patchDarkElementalist|Dark Elementalist QoL, faster animation and use anywhere, but only out of combat|:heavy_check_mark:|
 |Kineticist.patchGatherPower|Kineticist Gather Power can be used manually|:heavy_check_mark:|
 |Kineticist.patchDemonCharge|Demon Charge also gathers power|:heavy_check_mark:|
@@ -69,6 +70,7 @@ Content
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:heavy_check_mark:|
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:heavy_check_mark:|
 |Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:heavy_check_mark:|
+|Mythic.patchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:construction:|
 |Ranger.createImprovedHuntersBond|combat feat: Improved Hunter's Bond|:heavy_check_mark:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|
 |Rogue.createExtraRogueTalent|basic feat: Extra Rogue Talent|:heavy_check_mark:|

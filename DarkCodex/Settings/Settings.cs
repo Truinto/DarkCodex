@@ -8,7 +8,7 @@ namespace DarkCodex
     {
         [JsonProperty]
         public int version = 1;
-        
+
         [JsonProperty]
         public bool allowAchievements = true;
 
@@ -16,7 +16,7 @@ namespace DarkCodex
         public bool stopAreaEffectsDuringCutscenes = true;
 
         [JsonProperty]
-        public List<string> doNotLoad = new List<string>() { 
+        public List<string> doNotLoad = new List<string>() {
             "General.patchBasicFreebieFeats",
         };
 
@@ -25,6 +25,9 @@ namespace DarkCodex
 
         [JsonProperty]
         public bool polymorphKeepModel = false;
+
+        [JsonProperty]
+        public bool debug_1 = false;
 
         public static Config.Manager<Settings> StateManager = new Config.Manager<Settings>(Path.Combine(Main.ModPath, "settings.json"));
     }

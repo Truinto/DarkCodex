@@ -5,6 +5,7 @@ using Kingmaker.Armies;
 using Kingmaker.Armies.TacticalCombat;
 using Kingmaker.Armies.TacticalCombat.Controllers;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.Items.Ecnchantments;
@@ -28,6 +29,8 @@ using Kingmaker.UI.MVVM._VM.Loot;
 using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UI.Tooltip;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Class.Kineticist;
 using Kingmaker.Utility;
@@ -146,6 +149,19 @@ namespace DarkCodex
             }
         }
 
+        [HarmonyPatch(typeof(AbilityData), MethodType.Constructor, new Type[] { typeof(BlueprintAbility), typeof(UnitDescriptor), typeof(Ability), typeof(BlueprintSpellbook) })]
+        public class SpellReach
+        {
+            public static void Prefix(AbilityData __instance, BlueprintAbility blueprint, UnitDescriptor caster)
+            {
+                if (!Settings.StateManager.State.debug_1)
+                    return;
+
+                if (blueprint.Range == AbilityRange.Personal)
+                    __instance.OverrideRange = AbilityRange.Touch;
+            }
+        }
+
         [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
         public class Enchantments
         {
@@ -222,7 +238,7 @@ namespace DarkCodex
                         if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
                             sb.Append(' ');
 
-                        if (name[i].IsNumber() && !name[i-1].IsNumber()) // prefix number blocks with '+'
+                        if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
                             sb.Append('+');
 
                         if (name[i] != '_')         // print char, except '_'

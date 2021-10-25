@@ -3,6 +3,7 @@ using HarmonyLib;
 using Kingmaker;
 using Kingmaker.AreaLogic.Cutscenes;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Area;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
@@ -344,15 +345,26 @@ namespace DarkCodex
             if (!inCombat)
                 return;
 
-            foreach (var unit in Game.Instance.Player.PartyAndPets) // todo: add activatable enabler
+            foreach (var unit in Game.Instance.Player.PartyAndPets)
             {
                 foreach (var buff in unit.Buffs)
                 {
-                    var ae = buff.GetComponent<AddAreaEffect>();
-                    if (ae != null && ae.Data.AreaEffectInstance == null)
+                    var areaeffect = buff.GetComponent<AddAreaEffect>();
+                    if (areaeffect == null)
+                        continue;
+
+                    if (areaeffect.Data.AreaEffectInstance == null)
                     {
-                        Helper.PrintDebug("Enabled missing area effect for " + ae.AreaEffect.NameSafe());
-                        ae.OnActivate();
+                        Helper.PrintDebug("Enabling missing area effect for " + areaeffect.AreaEffect.NameSafe());
+                        areaeffect.OnActivate();
+                        continue;
+                    }
+
+                    if (!AreaService.Instance.CurrentAreaPart.Bounds.MechanicBounds.Contains(areaeffect.Data.AreaEffectInstance.Entity.Position))
+                    {
+                        Helper.PrintDebug("Restarting area effect stuck in wrong area " + areaeffect.AreaEffect.NameSafe());
+                        areaeffect.OnDeactivate();
+                        areaeffect.OnActivate();
                     }
                 }
             }
@@ -383,15 +395,15 @@ namespace DarkCodex
                     var targetspell = conlist.Value.Last();
                     if (targetspell.HasVariants) // todo: metamagic for variant spells!
                         continue;
-                    var metamagics = __instance.Spellbook.GetCustomSpells(__instance.SpellLevel).Where(w => w.Blueprint == targetspell); //__instance.Spellbook.GetSpellLevel(__instance)
 
+                    var metamagics = __instance.Spellbook.GetCustomSpells(__instance.SpellLevel).Where(w => w.Blueprint == targetspell); //__instance.Spellbook.GetSpellLevel(__instance)
                     foreach (var metamagic in metamagics)
                     {
                         list.Add(new AbilityData(targetspell, __instance.Caster)
                         {
                             m_ConvertedFrom = __instance,
                             MetamagicData = metamagic.MetamagicData?.Clone(),
-                            DecorationBorderNumber = metamagic.DecorationBorderNumber, // note: this is ignored, unfortunately
+                            DecorationBorderNumber = metamagic.DecorationBorderNumber,
                             DecorationColorNumber = metamagic.DecorationColorNumber
                         });
                     }

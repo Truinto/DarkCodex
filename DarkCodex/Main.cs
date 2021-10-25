@@ -71,6 +71,7 @@ namespace DarkCodex
             "Kineticist.createKineticistBackground",
             "Kineticist.createMobileGatheringFeat",
             "Kineticist.createAutoMetakinesis",
+            "Kineticist.createHurricaneQueen",
             "Kineticist.patchDarkElementalist",
             "Kineticist.patchGatherPower",
             "Kineticist.patchDemonCharge",
@@ -97,6 +98,7 @@ namespace DarkCodex
             "Mythic.patchKineticOvercharge",
             "Mythic.patchLimitlessDemonRage",
             "Mythic.patchUnstoppable",
+            "Mythic.patchBoundlessHealing",
             "Ranger.createImprovedHuntersBond",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
@@ -294,6 +296,7 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.PolymorphTest1));
                     PatchSafe(typeof(DEBUG.PolymorphTest2));
+                    PatchSafe(typeof(DEBUG.SpellReach));
                     //PatchSafe(typeof(General.DEBUGTEST));
 
                     // Cache
@@ -348,6 +351,7 @@ namespace DarkCodex
                     LoadSafe(Mythic.patchKineticOvercharge);
                     LoadSafe(Mythic.patchLimitlessDemonRage);
                     LoadSafe(Mythic.patchUnstoppable);
+                    LoadSafe(Mythic.patchBoundlessHealing);
 
                     // Kineticist
                     LoadSafe(Kineticist.fixWallInfusion);
@@ -357,6 +361,7 @@ namespace DarkCodex
                     LoadSafe(Kineticist.createWhipInfusion);
                     LoadSafe(Kineticist.createBladeRushInfusion);
                     LoadSafe(Kineticist.createAutoMetakinesis);
+                    LoadSafe(Kineticist.createHurricaneQueen);
                     LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat

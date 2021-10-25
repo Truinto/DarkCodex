@@ -1,5 +1,7 @@
 # Changelog
 - fix for missing area effects
+- added Kineticist.createHurricaneQueen
+- added Mythic.patchBoundlessHealing (Boundless Healing also grants healing spells to spellbooks)
 
 ## [1.0.9]
 - fixed duplicate undead immunity that blocked dirge bard archetype and undead bloodline
