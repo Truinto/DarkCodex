@@ -393,6 +393,9 @@ namespace DarkCodex
                         continue;
 
                     var targetspell = conlist.Value.Last();
+
+                    list.FirstOrDefault(f => f.Blueprint == targetspell)?.MetamagicData?.Clear(); // clear metamagic copied from donor spell
+
                     if (targetspell.HasVariants) // todo: metamagic for variant spells!
                         continue;
 

@@ -99,6 +99,7 @@ namespace DarkCodex
             "Mythic.patchLimitlessDemonRage",
             "Mythic.patchUnstoppable",
             "Mythic.patchBoundlessHealing",
+            "Mythic.patchVarious",
             "Ranger.createImprovedHuntersBond",
             "Rogue.createBleedingAttack",
             "Rogue.createExtraRogueTalent",
@@ -156,6 +157,7 @@ namespace DarkCodex
                 Control_AreaEffects.Continue();
             Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
+            Checkbox(ref Settings.StateManager.State.debug_1, "Debug: Flag1");
 
             GUILayout.Label("");
 
@@ -352,6 +354,7 @@ namespace DarkCodex
                     LoadSafe(Mythic.patchLimitlessDemonRage);
                     LoadSafe(Mythic.patchUnstoppable);
                     LoadSafe(Mythic.patchBoundlessHealing);
+                    LoadSafe(Mythic.patchVarious);
 
                     // Kineticist
                     LoadSafe(Kineticist.fixWallInfusion);

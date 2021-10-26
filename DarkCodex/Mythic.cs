@@ -473,7 +473,6 @@ namespace DarkCodex
 
         public static void createResourcefulCaster()
         {
-            // check if this works with Preferred Spell
             var feature = Helper.CreateBlueprintFeature(
                 "ResourcefulCasterFeature",
                 "Resourceful Caster",
@@ -483,6 +482,12 @@ namespace DarkCodex
             Resource.Cache.FeatureResourcefulCaster.SetReference(feature);
 
             Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
+        }
+
+        public static void patchVarious()
+        {
+            // allow quicken metamagic on demon teleport
+            ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10").AvailableMetamagic |= Metamagic.Quicken; //DemonTeleport
         }
 
         #region Helper

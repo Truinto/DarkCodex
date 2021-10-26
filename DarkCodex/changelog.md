@@ -2,6 +2,7 @@
 - fix for missing area effects
 - added Kineticist.createHurricaneQueen
 - added Mythic.patchBoundlessHealing (Boundless Healing also grants healing spells to spellbooks)
+- added Mythic.patchVarious: allow quicken metamagic on demon teleport spell
 
 ## [1.0.9]
 - fixed duplicate undead immunity that blocked dirge bard archetype and undead bloodline
