@@ -28,6 +28,12 @@ namespace DarkCodex
 
         [JsonProperty]
         public bool debug_1 = false;
+        [JsonProperty]
+        public bool debug_2 = false;
+        [JsonProperty]
+        public bool debug_3 = false;
+        [JsonProperty]
+        public bool debug_4 = false;
 
         public static Config.Manager<Settings> StateManager = new Config.Manager<Settings>(Path.Combine(Main.ModPath, "settings.json"));
     }

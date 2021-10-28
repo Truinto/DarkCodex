@@ -161,6 +161,9 @@ namespace DarkCodex
             Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
             Checkbox(ref Settings.StateManager.State.debug_1, "Debug: Flag1");
+            Checkbox(ref Settings.StateManager.State.debug_2, "Debug: Flag2");
+            Checkbox(ref Settings.StateManager.State.debug_3, "Debug: Flag3");
+            Checkbox(ref Settings.StateManager.State.debug_4, "Debug: Flag4");
 
             GUILayout.Label("");
 
@@ -303,6 +306,7 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.PolymorphTest2));
                     PatchSafe(typeof(DEBUG.SpellReach));
                     //PatchSafe(typeof(General.DEBUGTEST));
+                    PatchSafe(typeof(Patch_FixLoadCrash1));
 
                     // Cache
                     LoadSafe(PropertyMaxAttribute.createPropertyMaxMentalAttribute);

@@ -13,6 +13,8 @@ using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.DialogSystem.Blueprints;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.EntitySystem.Persistence;
+using Kingmaker.EntitySystem.Persistence.Scenes;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.PubSubSystem;
@@ -34,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -343,7 +346,7 @@ namespace DarkCodex
         public void HandleDialogStarted(BlueprintDialog dialog)
         {
             Helper.PrintDebug("Dialog started...");
-            
+
             if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
                 Stop();
         }
@@ -382,6 +385,19 @@ namespace DarkCodex
                     }
                 }
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(AreaDataStash), nameof(AreaDataStash.GetJsonForArea))]
+    public class Patch_FixLoadCrash1
+    {
+        public static void Postfix(ref string __result)
+        {
+            if (!Settings.StateManager.State.debug_2)
+                return;
+
+            Helper.Print(__result);
+            __result = Regex.Replace(__result, @"{""\$id"":""[0-9]+"",""\$type"":""Kingmaker\.View\.MapObjects\.Traps\.Simple\.SimpleTrapObjectData, Assembly-CSharp"",.*?""UniqueId"":.*?},?", "");
         }
     }
 
