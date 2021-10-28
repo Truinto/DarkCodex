@@ -1,11 +1,14 @@
 ﻿using DarkCodex.Components;
+using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Root.Strings.GameLog;
 using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.Items;
 using Kingmaker.Localization;
+using Kingmaker.Modding;
 using Kingmaker.UI.Log.CombatLog_ThreadSystem;
 using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -14,6 +17,7 @@ using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +39,7 @@ namespace DarkCodex
             public static readonly BlueprintBuffReference BuffBleed;
             public static readonly BlueprintUnitPropertyReference PropertySneakAttackDice;
             public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute;
+            public static readonly BlueprintUnitPropertyReference PropertyMythicDispel;
             public static readonly BlueprintFeatureReference FeatureFeralCombat;
             public static readonly BlueprintFeatureReference FeatureResourcefulCaster;
             public static readonly BlueprintFeatureReference FeatureMagicItemAdept;
@@ -47,6 +52,7 @@ namespace DarkCodex
                     BuffBleed = new BlueprintBuffReference();
                     PropertySneakAttackDice = new BlueprintUnitPropertyReference();
                     PropertyMaxMentalAttribute = new BlueprintUnitPropertyReference();
+                    PropertyMythicDispel = new BlueprintUnitPropertyReference();
                     FeatureFeralCombat = new BlueprintFeatureReference();
                     FeatureResourcefulCaster = new BlueprintFeatureReference();
                     FeatureMagicItemAdept = new BlueprintFeatureReference();
@@ -67,13 +73,51 @@ namespace DarkCodex
                 Ability = new List<BlueprintAbility>();
                 Activatable = new List<BlueprintActivatableAbility>();
 
-                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                var keys = ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Keys.ToArray();
+
+                foreach(var key in keys)
                 {
-                    if (bp.Blueprint is BlueprintAbility)
-                        Ability.Add((BlueprintAbility)bp.Blueprint);
-                    else if (bp.Blueprint is BlueprintActivatableAbility)
-                        Activatable.Add((BlueprintActivatableAbility)bp.Blueprint);
+                    var bp = ResourcesLibrary.BlueprintsCache.Load(key);
+
+                    if (bp is BlueprintAbility ability)
+                        Ability.Add(ability);
+                    else if (bp is BlueprintActivatableAbility activatable)
+                        Activatable.Add(activatable);
                 }
+
+#if false
+                BlueprintsCache cache = ResourcesLibrary.BlueprintsCache;
+                var newdic = new Dictionary<BlueprintGuid, BlueprintsCache.BlueprintCacheEntry>();
+                foreach (var bp in cache.m_LoadedBlueprints)
+                {
+                    var newvalue = bp.Value;
+
+                    if (newvalue.Blueprint == null)
+                    {
+                        if (newvalue.Offset != 0U)
+                        {
+                            cache.m_PackFile.Seek(newvalue.Offset, SeekOrigin.Begin);
+                            SimpleBlueprint simpleBlueprint = null;
+                            cache.m_PackSerializer.Blueprint(ref simpleBlueprint);
+
+                            if (simpleBlueprint != null)
+                            {
+                                OwlcatModificationsManager.Instance.OnResourceLoaded(simpleBlueprint, simpleBlueprint.AssetGuid.ToString());
+
+                                if (simpleBlueprint is BlueprintAbility ab)
+                                    Ability.Add(ab);
+                                else if (simpleBlueprint is BlueprintActivatableAbility act)
+                                    Activatable.Add(act);
+
+                                newvalue.Blueprint = simpleBlueprint;
+                                newvalue.Blueprint.OnEnable();
+                            }
+                        }
+                    }
+                    newdic.Add(bp.Key, newvalue);
+                }
+                AccessTools.Field(typeof(BlueprintsCache), nameof(BlueprintsCache.m_LoadedBlueprints)).SetValue(ResourcesLibrary.BlueprintsCache, newdic);
+#endif
             }
 
             public static void Dispose()

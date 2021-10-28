@@ -498,7 +498,9 @@ namespace DarkCodex
 
         public static T RemoveComponents<T>(this T obj, Predicate<BlueprintComponent> match) where T : BlueprintScriptableObject
         {
-            obj.ComponentsArray.RemoveAll(match);
+            var list = obj.ComponentsArray.ToList();
+            list.RemoveAll(match);
+            obj.ComponentsArray = list.ToArray();
             return obj;
         }
 

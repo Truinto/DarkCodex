@@ -24,7 +24,8 @@ namespace DarkCodex.Components
 
         public override void RunAction()
         {
-            if (this.Context.MaybeCaster == null)
+            var unit = this.Context.MaybeCaster;
+            if (unit == null)
                 return;
 
             TurnController currentTurn = null;
@@ -33,7 +34,7 @@ namespace DarkCodex.Components
                 && this.Context.MaybeCaster.IsCurrentUnit())
                 currentTurn = Game.Instance.TurnBasedCombatController.CurrentTurn;
 
-            Helper.PrintDebug($"pre  UndoAction GainTime={GainTime} TimeMoved={currentTurn?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime()}");
+            Helper.PrintDebug($"pre  UndoAction GainTime={GainTime} TimeMoved={currentTurn?.m_RiderMovementStats.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime(unit)}");
 
             var cooldown = this.Context.MaybeCaster.CombatState.Cooldown;
             if (GainTime >= 0f) // gain time
@@ -46,7 +47,7 @@ namespace DarkCodex.Components
                         cooldown.MoveAction = Math.Max(0, cooldown.MoveAction - GainTime);
                         if (ForceMove && currentTurn != null)
                         {
-                            currentTurn.TimeMoved = cooldown.MoveAction;
+                            currentTurn.m_RiderMovementStats.TimeMoved = cooldown.MoveAction;
                             //currentTurn.TrySelectMovementLimit();
                         }
                         break;
@@ -64,7 +65,7 @@ namespace DarkCodex.Components
                         if (ForceMove && currentTurn != null)
                         {
                             //currentTurn.TickMovement()
-                            currentTurn.TimeMoved -= GainTime;
+                            currentTurn.m_RiderMovementStats.TimeMoved -= GainTime;
                             //currentTurn.TrySelectMovementLimit();
                         }
                         cooldown.MoveAction = Math.Min(6f, cooldown.MoveAction - GainTime);
@@ -74,7 +75,7 @@ namespace DarkCodex.Components
                         break;
                 }
 
-            Helper.PrintDebug($"post UndoAction GainTime={GainTime} TimeMoved={currentTurn?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime()}");
+            Helper.PrintDebug($"post UndoAction GainTime={GainTime} TimeMoved={currentTurn?.m_RiderMovementStats?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime(unit)}");
         }
 
         public bool ForceMove = true; // counts as movement

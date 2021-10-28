@@ -78,10 +78,10 @@ namespace DarkCodex
             MethodInfo reference = AccessTools.PropertyGetter(typeof(BlueprintItemWeapon), "Category");
             MethodInfo call = AccessTools.Method(typeof(Patch_FeralCombat), nameof(Call));
 
-            int index = list.FindIndex(f => f.Calls(reference)) + 2; //59
+            int index = list.FindIndex(f => f.Calls(reference)) + 2; //68
             int label = index - 1;
 
-            for (int i = 57; i <= 61; i++)
+            for (int i = 64; i <= 70; i++)
                 Helper.PrintInstruction(list[i], i.ToString());
             Helper.Print("Patching at " + index);
 

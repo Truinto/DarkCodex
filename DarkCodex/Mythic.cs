@@ -503,7 +503,7 @@ namespace DarkCodex
 
         public static void patchWanderingHex()
         {
-            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
+            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
             feat.RemoveComponents(default(AbilityResourceLogic));
         }
 
