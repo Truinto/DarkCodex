@@ -71,6 +71,8 @@ Content
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:heavy_check_mark:|
 |Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:heavy_check_mark:|
 |Mythic.patchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:construction:|
+|Mythic.patchRangingShots|doesn't get weaker when hitting|:construction:|
+|Mythic.patchWanderingHex|can swap hex at will|:construction:|
 |Mythic.patchVarious|allow quicken on Demon Teleport|:heavy_check_mark:|
 |Ranger.createImprovedHuntersBond|combat feat: Improved Hunter's Bond|:heavy_check_mark:|
 |Rogue.createBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:heavy_check_mark:|

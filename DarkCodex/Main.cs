@@ -99,6 +99,8 @@ namespace DarkCodex
             "Mythic.patchLimitlessDemonRage",
             "Mythic.patchUnstoppable",
             "Mythic.patchBoundlessHealing",
+            "Mythic.patchRangingShots",
+            "Mythic.patchWanderingHex",
             "Mythic.patchVarious",
             "Ranger.createImprovedHuntersBond",
             "Rogue.createBleedingAttack",
@@ -106,6 +108,7 @@ namespace DarkCodex
             "Witch.createCackleActivatable",
             "Witch.createIceTomb",
             "Witch.fixBoundlessHealing",
+            "Patch_AlwaysAChance",
         };
 
         /// <summary>Draws the GUI</summary>
@@ -324,6 +327,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
                     PatchSafe(typeof(Patch_PreferredSpellMetamagic));
+                    PatchSafe(typeof(Patch_AlwaysAChance));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
@@ -354,6 +358,8 @@ namespace DarkCodex
                     LoadSafe(Mythic.patchLimitlessDemonRage);
                     LoadSafe(Mythic.patchUnstoppable);
                     LoadSafe(Mythic.patchBoundlessHealing);
+                    LoadSafe(Mythic.patchRangingShots);
+                    LoadSafe(Mythic.patchWanderingHex);
                     LoadSafe(Mythic.patchVarious);
 
                     // Kineticist

@@ -496,6 +496,12 @@ namespace DarkCodex
             return obj;
         }
 
+        public static T RemoveComponents<T>(this T obj, Predicate<BlueprintComponent> match) where T : BlueprintScriptableObject
+        {
+            obj.ComponentsArray.RemoveAll(match);
+            return obj;
+        }
+
         public static List<BlueprintAbilityReference> GetBaseAndVariants(this List<BlueprintAbilityReference> source, Func<BlueprintAbility, bool> predicate = null)
         {
             var result = new List<BlueprintAbilityReference>();
@@ -879,6 +885,14 @@ namespace DarkCodex
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static CombatStateTrigger CreateCombatStateTrigger(GameAction start = null, GameAction end = null)
+        {
+            var result = new CombatStateTrigger();
+            result.CombatStartActions = CreateActionList(start);
+            result.CombatEndActions = CreateActionList(start);
+            return result;
         }
 
         public static AddFactOnlyParty CreateAddFactOnlyParty(BlueprintUnitFactReference fact, FeatureParam param = null)

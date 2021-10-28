@@ -14,6 +14,11 @@ using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.UI.Log.CombatLog_ThreadSystem;
+using Kingmaker.UI.MVVM;
+using Kingmaker.UI.MVVM._VM.CombatLog;
+using Kingmaker.UI.MVVM._VM.InGame;
+using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -35,8 +40,6 @@ namespace DarkCodex
 {
     public class Mythic
     {
-        public static BlueprintFeature _itemAdept;
-
         public static void createLimitlessBardicPerformance()
         {
             var bardic_resource = BlueprintGuid.Parse("e190ba276831b5c4fa28737e5e49e6a6");
@@ -317,14 +320,16 @@ namespace DarkCodex
 
         public static void createMagicItemAdept()
         {
-            _itemAdept = Helper.CreateBlueprintFeature(
+            var itemAdept = Helper.CreateBlueprintFeature(
                 "MagicItemAdept",
                 "Magic Item Adept",
                 "You learned how to pour your own magic into magic items. Benefit: When you are using magic trinkets you use your character level inplace of the items caster level. This does not work with potions, scrolls, or wands.",
                 group: FeatureGroup.MythicFeat
                 );
 
-            Helper.AddMythicFeat(_itemAdept);
+            Resource.Cache.FeatureMagicItemAdept.SetReference(itemAdept);
+
+            Helper.AddMythicFeat(itemAdept);
         }
 
         public static void createExtraMythicFeats()
@@ -435,8 +440,8 @@ namespace DarkCodex
         public static void patchBoundlessHealing()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
-            feat.AddComponents(new AddKnownSpellsAnyClass() 
-            { 
+            feat.AddComponents(new AddKnownSpellsAnyClass()
+            {
                 Spells = new BlueprintAbilityReference[] {
                     Helper.ToRef<BlueprintAbilityReference>("5590652e1c2225c4ca30c4a699ab3649"), //1: CureLightWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("6b90c773a6543dc49b2505858ce33db5"), //2: CureModerateWoundsCast
@@ -453,7 +458,7 @@ namespace DarkCodex
                     Helper.ToRef<BlueprintAbilityReference>("f2115ac1148256b4ba20788f7e966830"), //3: Restoration
                     Helper.ToRef<BlueprintAbilityReference>("fafd77c6bfa85c04ba31fdc1c962c914"), //4: RestorationGreater
                 },
-                Levels = new int[] { 
+                Levels = new int[] {
                     1, //1: CureLightWoundsCast
                     2,
                     3,
@@ -468,7 +473,8 @@ namespace DarkCodex
                     2, //2: RestorationLesser
                     3,
                     4,
-                }});
+                }
+            });
         }
 
         public static void createResourcefulCaster()
@@ -484,10 +490,32 @@ namespace DarkCodex
             Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
         }
 
+        public static void patchRangingShots()
+        {
+            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("2b558167862b05d47b8472d176257f82"); //RangingShots
+            var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e9da1dc30535fc94ab458ee20f8d3c4e"); //RangingShotsBuff
+
+            // keep attack bonus while hitting
+            feat.RemoveComponents(r => r is AddInitiatorAttackWithWeaponTrigger trigger && trigger.OnlyHit);
+            // feat.AddComponents(Helper.CreateCombatStateTrigger(Helper.CreateContextActionRemoveBuff(buff))); already removes after combat
+            feat.m_Description = Helper.CreateString("Every time you miss an enemy with a ranged weapon attack, your aim improves, giving you a stacking +1 bonus on attacks up to the maximum of your mythic rank for the remainder of the combat.");
+        }
+
+        public static void patchWanderingHex()
+        {
+            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
+            feat.RemoveComponents(default(AbilityResourceLogic));
+        }
+
         public static void patchVarious()
         {
             // allow quicken metamagic on demon teleport
-            ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10").AvailableMetamagic |= Metamagic.Quicken; //DemonTeleport
+            ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
+                .AvailableMetamagic |= Metamagic.Quicken;
+
+            // update Always A Chance description
+            ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("d57301613ad6a5140b2fdac40fa368e3") //AlwaysAChance
+                .m_Description = Helper.CreateString("You automatically succeed when you roll a natural 1.");
         }
 
         #region Helper
@@ -534,6 +562,58 @@ namespace DarkCodex
     }
 
     #region Patches
+
+    [HarmonyPatch]
+    public class Patch_AlwaysAChance // TODO: change description
+    {
+        [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.IsSuccessRoll))]
+        [HarmonyPrefix]
+        public static bool Prefix1(int d20, RuleAttackRoll __instance, ref bool __result)
+        {
+            __result = d20 == 20 || (d20 == 1 && __instance.Initiator.State.Features.AlwaysChance) || (d20 > 1 && d20 + __instance.AttackBonus >= __instance.TargetAC);
+            return false;
+        }
+
+        [HarmonyPatch(typeof(RuleCombatManeuver), nameof(RuleCombatManeuver.IsSuccessRoll))]
+        [HarmonyPrefix]
+        public static bool Prefix2(int d20, RuleCombatManeuver __instance, ref bool __result)
+        {
+            __result = d20 == 20 || (d20 == 1 && __instance.Initiator.State.Features.AlwaysChance) || (d20 > 1 && d20 + __instance.InitiatorCMB >= __instance.TargetCMD);
+            return false;
+        }
+
+        [HarmonyPatch(typeof(RuleDispelMagic), nameof(RuleDispelMagic.IsSuccessRoll))]
+        [HarmonyPrefix]
+        public static bool Prefix3(int d20, RuleDispelMagic __instance, ref bool __result)
+        {
+            __result = ((d20 == 20 || d20 == 1) && __instance.Initiator.State.Features.AlwaysChance) || __instance.DC == 0 || __instance.CasterLevelCheckValue(d20) >= __instance.DC;
+            return false;
+        }
+
+        [HarmonyPatch(typeof(RuleSkillCheck), nameof(RuleSkillCheck.IsSuccessRoll))]
+        [HarmonyPrefix]
+        public static bool Prefix4(int d20, int successBonus, RuleSkillCheck __instance, ref bool __result)
+        {
+            __result = ((d20 == 20 || d20 == 1) && __instance.Initiator.State.Features.AlwaysChance) || d20 + __instance.TotalBonus + successBonus >= __instance.DC;
+            return false;
+        }
+
+        [HarmonyPatch(typeof(RuleSavingThrow), nameof(RuleSavingThrow.IsSuccessRoll))]
+        [HarmonyPrefix]
+        public static bool Prefix5(int d20, int successBonus, RuleSavingThrow __instance, ref bool __result)
+        {
+            __result = d20 == 20 || (d20 == 1 && __instance.Initiator.State.Features.AlwaysChance) || (d20 > 1 && d20 + __instance.StatValue + successBonus >= __instance.DifficultyClass);
+            return false;
+        }
+
+        private static bool Check(int d20, int bonus, int DC, bool AlwaysChance, bool CanCrit)
+        {
+            if (CanCrit)
+                return d20 == 20 || AlwaysChance && d20 == 1 || d20 + bonus >= DC;
+            else
+                return (AlwaysChance && (d20 == 20 || d20 == 1)) || d20 + bonus >= DC;
+        }
+    }
 
     [HarmonyPatch]
     public class Patch_ResourcefulCaster
@@ -631,11 +711,27 @@ namespace DarkCodex
             if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
             {
                 // refund spell if all targets resisted
-                // todo make combat entry for this
-                Helper.Print("Refunding spell");
 
                 spell = spell.ConvertedFrom ?? spell;
 
+                Helper.Print("Refunding spell");
+#if DEBUG
+                try // TODO: finish combat log
+                {
+                    Resource.Log.Print($"{__instance.Context.Caster.CharacterName} regained {spell.Name}", "Resourceful Caster");
+                    //LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat].;
+                    var items = RootUIContext.Instance.InGameVM.StaticPartVM.CombatLogVM.Items;
+                    for (int i = items.Count - 1; i >= 0 && i >= items.Count - 11; i--)
+                    {
+                        var text = items[i].Message.Message;
+                        var tooltip = items[i].Message.Tooltip as TooltipTemplateSimple;
+                        Helper.Print($"text={text} header={tooltip?.Header} tooltip={tooltip?.Description}");
+                    }
+                }
+                catch (Exception)
+                {
+                }
+#endif
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
                 {
@@ -655,7 +751,7 @@ namespace DarkCodex
                 }
             }
         }
-        
+
         [HarmonyPatch(typeof(RuleSpellResistanceCheck), nameof(RuleSpellResistanceCheck.OnTrigger))]
         [HarmonyPostfix]
         public static void Postfix4(RuleSpellResistanceCheck __instance) // push SR checks into history
@@ -677,10 +773,10 @@ namespace DarkCodex
     {
         public static void Postfix(AbilityData __instance, AbilityParams __result)
         {
-            if (__instance.Caster == null || Mythic._itemAdept == null) // todo move to resource.cache
+            if (__instance.Caster == null)
                 return;
 
-            if (!__instance.Caster.Unit.Descriptor.HasFact(Mythic._itemAdept))
+            if (!__instance.Caster.Unit.Descriptor.HasFact(Resource.Cache.FeatureMagicItemAdept))
                 return;
 
             __result.CasterLevel = __instance.Caster.Progression.CharacterLevel;

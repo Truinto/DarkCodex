@@ -1,9 +1,13 @@
-﻿using Kingmaker.Blueprints;
+﻿using DarkCodex.Components;
+using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.Blueprints.Root.Strings.GameLog;
 using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.Items;
 using Kingmaker.Localization;
+using Kingmaker.UI.Log.CombatLog_ThreadSystem;
+using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
@@ -33,6 +37,7 @@ namespace DarkCodex
             public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute;
             public static readonly BlueprintFeatureReference FeatureFeralCombat;
             public static readonly BlueprintFeatureReference FeatureResourcefulCaster;
+            public static readonly BlueprintFeatureReference FeatureMagicItemAdept;
 
             static Cache()
             {
@@ -44,6 +49,7 @@ namespace DarkCodex
                     PropertyMaxMentalAttribute = new BlueprintUnitPropertyReference();
                     FeatureFeralCombat = new BlueprintFeatureReference();
                     FeatureResourcefulCaster = new BlueprintFeatureReference();
+                    FeatureMagicItemAdept = new BlueprintFeatureReference();
 
                     WeaponUnarmed = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
                 }
@@ -76,6 +82,21 @@ namespace DarkCodex
                 Activatable = null;
             }
 
+        }
+
+        public class Log
+        {
+            public static void Print(string text, string header, string tooltip = "")
+            {
+                //var log = LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat];
+
+                var color = GameLogStrings.Instance.DefaultColor;
+                var icon = PrefixIcon.RightArrow;
+                var tooltipmessage = new TooltipTemplateCombatLogMessage(header, tooltip);
+
+                var message = new CombatLogMessage(text, color, icon, tooltipmessage, true);
+                LogThreadController.Instance.HitDiceRestrictionLogThread.AddMessage(message);
+            }
         }
 
         public class Strings

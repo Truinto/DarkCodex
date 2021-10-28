@@ -31,7 +31,9 @@
     <Reference Include="Assembly-CSharp_publicized" HintPath="$(WrathManaged)\Assembly-CSharp_publicized.dll" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
     <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
+    <Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
     <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
+    <Reference Include="Owlcat.Runtime.UI" HintPath="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
     <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
     <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
     <Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />

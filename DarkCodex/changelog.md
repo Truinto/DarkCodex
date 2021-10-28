@@ -1,8 +1,11 @@
 # Changelog
 - fix for missing area effects
 - added Kineticist.createHurricaneQueen
-- added Mythic.patchBoundlessHealing (Boundless Healing also grants healing spells to spellbooks)
+- added Mythic.patchBoundlessHealing: Boundless Healing also grants healing spells to spellbooks
 - added Mythic.patchVarious: allow quicken metamagic on demon teleport spell
+- added Patch_AlwaysAChance: feat 'Always A Chance' will critical succeed on a natural 1 and apply to more checks (saving throws, skill checks)
+- added Mythic.patchRangingShots: doesn't get weaker when hitting
+- added Mythic.patchWanderingHex: can swap hex at will, instead of once per day (which wasn't in the description anyway)
 
 ## [1.0.9]
 - fixed duplicate undead immunity that blocked dirge bard archetype and undead bloodline
