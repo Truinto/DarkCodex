@@ -400,6 +400,8 @@ namespace DarkCodex
 
             // DC = 10 + HD + Mythic Rank + Mental Stat
             // works only on demons with HD < player HD
+
+            // auto revive once per year :D
         }
 
         public static void patchKineticOvercharge()
@@ -564,7 +566,7 @@ namespace DarkCodex
     #region Patches
 
     [HarmonyPatch]
-    public class Patch_AlwaysAChance // TODO: change description
+    public class Patch_AlwaysAChance
     {
         [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.IsSuccessRoll))]
         [HarmonyPrefix]

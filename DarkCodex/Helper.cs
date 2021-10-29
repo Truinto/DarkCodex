@@ -828,13 +828,6 @@ namespace DarkCodex
             return result;
         }
 
-        public static AddAreaEffect MakeAddAreaEffect(this BlueprintAbilityAreaEffect area)
-        {
-            var result = new AddAreaEffect();
-            result.m_AreaEffect = area.ToRef();
-            return result;
-        }
-
         /// <summary>Adds a fact, but only fact not already granted through other means.</summary>
         public static AddFeatureIfHasFact MakeAddFactSafe(BlueprintUnitFactReference feature)
         {
@@ -842,6 +835,16 @@ namespace DarkCodex
             result.m_CheckedFact = feature;
             result.m_Feature = feature;
             result.Not = true;
+            return result;
+        }
+
+        public static ContextActionSavingThrow MakeContextActionSavingThrow(SavingThrowType savingthrow, GameAction succeed, GameAction failed)
+        {
+            var result = new ContextActionSavingThrow();
+            result.Type = savingthrow;
+            result.Actions = CreateActionList(new ContextActionConditionalSaved() {
+                Succeed = CreateActionList(succeed),
+                Failed = CreateActionList(failed) });
             return result;
         }
 
@@ -887,6 +890,13 @@ namespace DarkCodex
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static AddAreaEffect CreateAddAreaEffect(this BlueprintAbilityAreaEffect area)
+        {
+            var result = new AddAreaEffect();
+            result.m_AreaEffect = area.ToRef();
+            return result;
         }
 
         public static CombatStateTrigger CreateCombatStateTrigger(GameAction start = null, GameAction end = null)

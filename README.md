@@ -1,8 +1,7 @@
 # DarkCodex
 Mod for Pathfinder: Wrath of the Righteous
 
-:construction: <span style="color:red">**This mod is under development! Some features are untested and work not properly, cause crashes, or corrupt your save.**</span> :construction: \
-I made this public so people can help me with testing. Don't expect a full-fledged mod.
+:construction: <span style="color:red">**This mod is under development! Some features are untested and work not properly, cause crashes, or corrupt your save.**</span> :construction:
 
 Disclaimers
 -----------

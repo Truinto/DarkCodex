@@ -59,6 +59,7 @@ namespace DarkCodex
             "General.patchAngelsLight",
             "General.patchBasicFreebieFeats",
             "General.patchHideBuffs",
+            "General.patchDispelMagic",
             "General.patchVarious",
             "Hexcrafter.fixProgression",
             "Items.patchArrows",
@@ -311,6 +312,7 @@ namespace DarkCodex
                     // Cache
                     LoadSafe(PropertyMaxAttribute.createPropertyMaxMentalAttribute);
                     LoadSafe(PropertyGetterSneakAttack.createPropertyGetterSneakAttack);
+                    LoadSafe(PropertyMythicLevel.createMythicDispelProperty);
                     LoadSafe(ContextActionIncreaseBleed.createBleedBuff);
 
                     // Harmony Patches
@@ -337,6 +339,7 @@ namespace DarkCodex
                     LoadSafe(General.patchAngelsLight);
                     LoadSafe(General.patchBasicFreebieFeats);
                     LoadSafe(General.patchHideBuffs);
+                    LoadSafe(General.patchDispelMagic);
                     LoadSafe(General.patchVarious);
 
                     // Items

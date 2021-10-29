@@ -1,4 +1,8 @@
 # Changelog
+- fixed bleeding attack not counting as bleed for some features
+- added General.patchDispelMagic: fix Destructive Dispel doing nothing, apply bonus from Mythic Spell Penetration to dispel attempts
+
+## [1.1.0]
 - fix for missing area effects
 - added Kineticist.createHurricaneQueen
 - added Mythic.patchBoundlessHealing: Boundless Healing also grants healing spells to spellbooks
@@ -6,6 +10,8 @@
 - added Patch_AlwaysAChance: feat 'Always A Chance' will critical succeed on a natural 1 and apply to more checks (saving throws, skill checks)
 - added Mythic.patchRangingShots: doesn't get weaker when hitting
 - added Mythic.patchWanderingHex: can swap hex at will, instead of once per day (which wasn't in the description anyway)
+- updated for game version 1.1.0i
+- added debugflag 2 that removes trap data from save games (without this my save wouldn't load)
 
 ## [1.0.9]
 - fixed duplicate undead immunity that blocked dirge bard archetype and undead bloodline

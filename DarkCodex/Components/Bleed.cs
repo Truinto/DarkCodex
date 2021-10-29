@@ -1,4 +1,5 @@
 ﻿using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Controllers.Units;
 using Kingmaker.Designers.Mechanics.Buffs;
@@ -163,7 +164,8 @@ namespace DarkCodex.Components
                 "e12fafba433448f8b71208b0162061fb",
                 Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
                 ).SetComponents(
-                new BleedBuff()
+                new BleedBuff(),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed)
                 );
 
             Resource.Cache.BuffBleed.SetReference(buff);

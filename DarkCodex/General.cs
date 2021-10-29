@@ -9,6 +9,7 @@ using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Root;
+using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.DialogSystem.Blueprints;
@@ -29,6 +30,7 @@ using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.View.MapObjects;
@@ -288,14 +290,36 @@ namespace DarkCodex
         {
             //DispellingAttack.1b92146b8a9830d4bb97ab694335fa7c FEATURE
             //DispellingBomb.f80896af0e10d7c4f9454cf1ce50ada4
-            var spellpen = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("51b6b22ff184eef46a675449e837365d"); //SpellPenetrationMythicFeat
+            var destructive = Helper.ToRef<BlueprintUnitFactReference>("d298e64e14398e848a54db5a2619ba42"); //DestructiveDispel
+            var sickened = Helper.ToRef<BlueprintBuffReference>("4e42460798665fd4cb9173ffa7ada323"); //Sickened
+            var stunned = Helper.ToRef<BlueprintBuffReference>("09d39b38bb7c6014394b6daced9bacd3"); //Stunned
 
             var dispel_target = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("143775c49ae6b7446b805d3b2e702298"); //DispelMagicTarget
             var dispel_point = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("9f6daa93291737c40b8a432c374226a7"); //DispelMagicPoint
             var dispel_target_greater = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6d490c80598f1d34bb277735b52d52c1"); //DispelMagicGreaterTarget
             var dispel_point_greater = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b9be852b03568064b8d2275a6cf9e2de"); //DispelMagicGreaterArea
 
-            // todo: continue
+            var contextbonus = new ContextValue() { ValueType = ContextValueType.CasterCustomProperty, m_CustomProperty = Resource.Cache.PropertyMythicDispel };
+            var onsuccess = Helper.CreateActionList(Helper.CreateConditional(Helper.CreateContextConditionCasterHasFact(destructive),
+                ifTrue: Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude,
+                    succeed: Helper.CreateContextActionApplyBuff(sickened, 1),
+                    failed: Helper.CreateContextActionApplyBuff(stunned, 1))
+                ));
+
+            var action = (ContextActionDispelMagic)dispel_target.GetComponent<AbilityEffectRunAction>().Actions.Actions[0];
+            action.ContextBonus = contextbonus;
+            action.OnSuccess = onsuccess;
+
+            action = (ContextActionDispelMagic)dispel_point.GetComponent<AbilityEffectRunAction>().Actions.Actions[0];
+            action.OnSuccess = onsuccess;
+
+            action = (ContextActionDispelMagic)dispel_target_greater.GetComponent<AbilityEffectRunAction>().Actions.Actions[0];
+            action.ContextBonus = contextbonus;
+            action.OnSuccess = onsuccess;
+
+            action = (ContextActionDispelMagic)(dispel_point_greater.GetComponent<AbilityEffectRunAction>().Actions.Actions[0] as Conditional).IfFalse.Actions[0];
+            action.ContextBonus = contextbonus;
+            action.OnSuccess = onsuccess;
         }
 
         public static void createBardStopSong()

@@ -90,7 +90,7 @@ namespace DarkCodex
                 size: 30.Feet(),
                 sfx: sfx,
                 unitRound: cackle.GetComponent<AbilityEffectRunAction>().Actions
-                ).MakeAddAreaEffect();
+                ).CreateAddAreaEffect();
             var cackle_passiv = Helper.CreateBlueprintActivatableAbility(
                 "WitchHexCacklePassive",
                 "Cackle (passive)",
@@ -111,7 +111,7 @@ namespace DarkCodex
                 size: 30.Feet(),
                 sfx: sfx,
                 unitRound: chant.GetComponent<AbilityEffectRunAction>().Actions
-                ).MakeAddAreaEffect();
+                ).CreateAddAreaEffect();
             var chant_passiv = Helper.CreateBlueprintActivatableAbility(
                 "ShamanHexChantPassive",
                 "Chant (passive)",
