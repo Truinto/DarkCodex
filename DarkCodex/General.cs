@@ -29,6 +29,7 @@ using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Class.LevelUp;
+using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
@@ -324,12 +325,26 @@ namespace DarkCodex
 
         public static void createBardStopSong()
         {
-
+            //ContextActionStopActivatables
+            Helper.CreateBlueprintAbility(
+                "StopActivatables",
+                "Stop Activatables",
+                "Immediately stop all disabled activatables. Useful for bardic performance.",
+                null,
+                icon: Helper.CreateSprite("StopSong.png"),
+                AbilityType.Special,
+                UnitCommand.CommandType.Free,
+                AbilityRange.Personal
+                ).TargetSelf().SetComponents(
+                Helper.CreateAbilityExecuteActionOnCast(new ContextActionStopActivatables())
+                );
         }
     }
 
     public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IPartyCombatHandler, IGlobalSubscriber, ISubscriber //ICutsceneHandler, ICutsceneDialogHandler
     {
+        //Game.Instance.IsModeActive(GameModeType.Dialog) || Game.Instance.IsModeActive(GameModeType.Cutscene);
+
         private static readonly List<AreaEffectEntityData> paused = new List<AreaEffectEntityData>();
 
         public static void Stop()
@@ -418,6 +433,9 @@ namespace DarkCodex
         public static void Postfix(ref string __result)
         {
             if (!Settings.StateManager.State.debug_2)
+                return;
+
+            if (__result == null || __result == "")
                 return;
 
             Helper.Print(__result);

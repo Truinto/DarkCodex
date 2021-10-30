@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <GOGFolder>D:\Programme\GOG Galaxy\Games\</GOGFolder>
+    <WrathManaged Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Wrath_Data\Managed</WrathManaged>
+    <WrathManaged Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\KM2 sources\Wrath_Data\Managed</WrathManaged>
+    <ModFolder Condition="Exists('$(GOGFolder)')">$(GOGFolder)Pathfinder Wrath of the Righteous\Mods</ModFolder>
+    <ModFolder Condition="!Exists('$(GOGFolder)')">..\..\..\$non-backup\KM2 sources\Wrath_Data\Managed</ModFolder>
+  </PropertyGroup>
+</Project>

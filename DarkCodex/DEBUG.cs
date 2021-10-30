@@ -217,6 +217,8 @@ namespace DarkCodex
 
             public static void NameAll()
             {
+                Resource.Cache.Ensure();
+
                 StringBuilder sb = new StringBuilder();
                 foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
                 {

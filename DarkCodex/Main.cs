@@ -308,6 +308,7 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.SpellReach));
                     //PatchSafe(typeof(General.DEBUGTEST));
                     PatchSafe(typeof(Patch_FixLoadCrash1));
+                    LoadSafe(General.createBardStopSong);
 
                     // Cache
                     LoadSafe(PropertyMaxAttribute.createPropertyMaxMentalAttribute);

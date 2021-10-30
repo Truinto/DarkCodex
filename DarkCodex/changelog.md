@@ -1,6 +1,9 @@
 # Changelog
+
+## [1.1.1]
 - fixed bleeding attack not counting as bleed for some features
 - added General.patchDispelMagic: fix Destructive Dispel doing nothing, apply bonus from Mythic Spell Penetration to dispel attempts
+- fixed crash with debug flag 2
 
 ## [1.1.0]
 - fix for missing area effects

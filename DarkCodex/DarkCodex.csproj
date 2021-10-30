@@ -42,6 +42,7 @@
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
     <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
+    <Compile Include="Components\ContextActionStopActivatables.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />
     <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
     <Compile Include="Components\KineticistReduceBurnPooled.cs" />
