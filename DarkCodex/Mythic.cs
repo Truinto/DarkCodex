@@ -402,6 +402,8 @@ namespace DarkCodex
             // works only on demons with HD < player HD
 
             // auto revive once per year :D
+
+            // teleport at will
         }
 
         public static void patchKineticOvercharge()
@@ -658,19 +660,14 @@ namespace DarkCodex
         {
             if (!__instance.IsEnded)
                 return;
-
             Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster?.CharacterName}");
-
             if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
                 return;
-
             if (__instance.Context.IsDuplicateSpellApplied)
                 return;
-
             var spell = __instance.Context.Ability;
             if (spell == null)
                 return;
-
             var spellbook = __instance.Context.Ability.Spellbook;
             if (spellbook == null)
                 return;
@@ -716,24 +713,17 @@ namespace DarkCodex
 
                 spell = spell.ConvertedFrom ?? spell;
 
-                Helper.Print("Refunding spell");
-#if DEBUG
-                try // TODO: finish combat log
-                {
-                    Resource.Log.Print($"{__instance.Context.Caster.CharacterName} regained {spell.Name}", "Resourceful Caster");
-                    //LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat].;
-                    var items = RootUIContext.Instance.InGameVM.StaticPartVM.CombatLogVM.Items;
-                    for (int i = items.Count - 1; i >= 0 && i >= items.Count - 11; i--)
-                    {
-                        var text = items[i].Message.Message;
-                        var tooltip = items[i].Message.Tooltip as TooltipTemplateSimple;
-                        Helper.Print($"text={text} header={tooltip?.Header} tooltip={tooltip?.Description}");
-                    }
-                }
-                catch (Exception)
-                {
-                }
-#endif
+                Helper.PrintDebug("Refunding spell");
+                Resource.Log.Print($"{__instance.Context.Caster.CharacterName} regained {spell.Name}");
+                //LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat].;
+                //var items = RootUIContext.Instance.InGameVM.StaticPartVM.CombatLogVM.Items;
+                //for (int i = items.Count - 1; i >= 0 && i >= items.Count - 11; i--)
+                //{
+                //    var text = items[i].Message.Message;
+                //    var tooltip = items[i].Message.Tooltip as TooltipTemplateSimple;
+                //    Helper.Print($"text={text} header={tooltip?.Header} tooltip={tooltip?.Description}");
+                //}
+
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
                 {

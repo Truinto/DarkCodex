@@ -474,13 +474,30 @@ namespace DarkCodex
                     var metamagics = __instance.Spellbook.GetCustomSpells(__instance.SpellLevel).Where(w => w.Blueprint == targetspell); //__instance.Spellbook.GetSpellLevel(__instance)
                     foreach (var metamagic in metamagics)
                     {
-                        list.Add(new AbilityData(targetspell, __instance.Caster)
+                        var variants = targetspell.GetComponent<AbilityVariants>()?.Variants;
+                        if (variants == null)
                         {
-                            m_ConvertedFrom = __instance,
-                            MetamagicData = metamagic.MetamagicData?.Clone(),
-                            DecorationBorderNumber = metamagic.DecorationBorderNumber,
-                            DecorationColorNumber = metamagic.DecorationColorNumber
-                        });
+                            list.Add(new AbilityData(targetspell, __instance.Caster)
+                            {
+                                m_ConvertedFrom = __instance,
+                                MetamagicData = metamagic.MetamagicData?.Clone(),
+                                DecorationBorderNumber = metamagic.DecorationBorderNumber,
+                                DecorationColorNumber = metamagic.DecorationColorNumber
+                            });
+                        }
+                        else
+                        {
+                            foreach (var variant in variants)
+                            {
+                                list.Add(new AbilityData(variant, __instance.Caster)
+                                {
+                                    m_ConvertedFrom = __instance,
+                                    MetamagicData = metamagic.MetamagicData?.Clone(),
+                                    DecorationBorderNumber = metamagic.DecorationBorderNumber,
+                                    DecorationColorNumber = metamagic.DecorationColorNumber
+                                });
+                            }
+                        }
                     }
                 }
             }

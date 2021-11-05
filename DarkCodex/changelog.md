@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.2]
+- fixed issue with freebie feats
+- fixed metamagic variants with preferred spell
+
 ## [1.1.1]
 - fixed bleeding attack not counting as bleed for some features
 - added General.patchDispelMagic: fix Destructive Dispel doing nothing, apply bonus from Mythic Spell Penetration to dispel attempts

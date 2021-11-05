@@ -130,13 +130,13 @@ namespace DarkCodex
 
         public class Log
         {
-            public static void Print(string text, string header, string tooltip = "")
+            public static void Print(string text, string header = null, string tooltip = null)
             {
                 //var log = LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat];
 
                 var color = GameLogStrings.Instance.DefaultColor;
                 var icon = PrefixIcon.RightArrow;
-                var tooltipmessage = new TooltipTemplateCombatLogMessage(header, tooltip);
+                var tooltipmessage = new TooltipTemplateCombatLogMessage(header ?? text, tooltip);
 
                 var message = new CombatLogMessage(text, color, icon, tooltipmessage, true);
                 LogThreadController.Instance.HitDiceRestrictionLogThread.AddMessage(message);
