@@ -28,6 +28,7 @@ namespace DarkCodex
 {
     public class Witch
     {
+        [PatchInfo(Severity.Create, "Extra Hex", "basic feat: Extra Hex", false)]
         public static void createExtraHex()
         {
             var witch_class = Helper.ToRef<BlueprintCharacterClassReference>("1b9873f1e7bfe5449bc84d03e9c8e3cc"); //WitchClass
@@ -62,16 +63,19 @@ namespace DarkCodex
             Helper.AddFeats(witch_extra, shaman_extra);
         }
 
+        [PatchInfo(Severity.Create | Severity.Faulty, "Hex Strike", "", false)]
         public static void createHexStrike()
         {
 
         }
 
+        [PatchInfo(Severity.Create | Severity.Faulty, "Split Hex", "", false)]
         public static void createSplitHex()
         {
             //DublicateSpellComponent
         }
 
+        [PatchInfo(Severity.Create, "Cackle Activatable", "Cackle/Chant can be toggled to use move action passively", false)]
         public static void createCackleActivatable()
         {
             var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("36f2467103d4635459d412fb418276f4");
@@ -128,6 +132,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref chant_feat.GetComponent<AddFacts>().m_Facts, chant_passiv.ToRef());
         }
 
+        [PatchInfo(Severity.Create, "Ice Tomb", "Hex: Ice Tomb", false)]
         public static void createIceTomb()
         {
             var IcyPrison = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("65e8d23aef5e7784dbeb27b1fca40931");
@@ -190,7 +195,8 @@ namespace DarkCodex
 
             Helper.AppendAndReplace(ref WitchHexSelection.m_AllFeatures, icetomb.ToRef());
         }
-    
+
+        [PatchInfo(Severity.Fix, "Boundless Healing Hex", "boundless healing applies to healing hex", false)]
         public static void fixBoundlessHealing()
         {
             var boundless = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing

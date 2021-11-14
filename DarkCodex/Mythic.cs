@@ -40,6 +40,7 @@ namespace DarkCodex
 {
     public class Mythic
     {
+        [PatchInfo(Severity.Create, "Limitless Bardic Performance", "mythic ability: Bardic Performances cost no resources", true)]
         public static void createLimitlessBardicPerformance()
         {
             var bardic_resource = BlueprintGuid.Parse("e190ba276831b5c4fa28737e5e49e6a6");
@@ -59,6 +60,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Witch Hexes", "mythic ability: Hexes ignore their cooldown", true)]
         public static void createLimitlessWitchHexes()
         {
             Resource.Cache.Ensure();
@@ -100,6 +102,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Smite", "mythic ability: infinite Smites (chaotic and evil), requires Abundant Smite", true)]
         public static void createLimitlessSmite()
         {
             var smite_evil = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("7bb9eb2042e67bf489ccd1374423cdec");
@@ -124,6 +127,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Bombs", "mythic ability: infinite alchemist bombs and incenses", true)]
         public static void createLimitlessBombs()
         {
             var bomb_resource = BlueprintGuid.Parse("1633025edc9d53f4691481b48248edd7");
@@ -148,6 +152,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Arcane Pool", "mythic ability: infinite arcane pool, expect spell recall", true)]
         public static void createLimitlessArcanePool()
         {
             var arcane_resource = BlueprintGuid.Parse("effc3e386331f864e9e06d19dc218b37");
@@ -171,6 +176,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Arcane Reservoir", "mythic ability: infinite arcane reservoir", true)]
         public static void createLimitlessArcaneReservoir()
         {
             var arcane_resource = BlueprintGuid.Parse("cac948cbbe79b55459459dd6a8fe44ce");
@@ -193,6 +199,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Ki", "mythic ability: reduce ki costs by 1", true)]
         public static void createLimitlessKi()
         {
             var ki_resource = BlueprintGuid.Parse("9d9c90a9a1f52d04799294bf91c80a82");
@@ -215,6 +222,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Domain", "mythic ability: use domain powers at will", true)]
         public static void createLimitlessDomain()
         {
             var limitless = Helper.CreateBlueprintFeature(
@@ -259,6 +267,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Shaman", "mythic ability: infinite spirit weapon uses (shaman, spirit hunter)", true, Priority: 200)]
         public static void createLimitlessShaman()
         {
             var shaman_resource = BlueprintGuid.Parse("ecf700928d1e3a647a92c095f5de1999"); //ShamanWeaponPoolResourse
@@ -271,14 +280,24 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility,
                 icon: Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3")
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature(shaman_prereq)
+                Helper.CreatePrerequisiteFeature(shaman_prereq, true)
                 );
 
             setResourceDecreasing(shaman_resource, limitless.ToRef2());
 
             Helper.AddMythicTalent(limitless);
+
+            // TableTopTweaks
+            var ttt_feature = Helper.Get<BlueprintFeature>("22731cf358814278b18e6ab4e741e988"); //WarriorSpiritFeature
+            var ttt_ability = Helper.Get<BlueprintAbility>("55929e3504f84f5095dd60ad0fbb1c29"); //WarriorSpiritToggleAbility
+            if (ttt_feature != null && ttt_ability != null)
+            {
+                limitless.AddComponents(Helper.CreatePrerequisiteFeature(ttt_feature.ToRef(), true));
+                ttt_ability.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts?.Add(limitless.ToRef2());
+            }
         }
 
+        [PatchInfo(Severity.Create, "Limitless Warpriest", "mythic ability: infinite scared weapon uses", true)]
         public static void createLimitlessWarpriest()
         {
             var weapon_resource = BlueprintGuid.Parse("cc700ef06c6fec449ab085cbcd74709c"); //SacredWeaponEnchantResource
@@ -301,6 +320,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Kinetic Mastery", "mythic feat: physical Kinetic Blasts gain attack bonus equal to mythic level, or half with energy Blasts", true)]
         public static void createKineticMastery()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
@@ -318,6 +338,7 @@ namespace DarkCodex
             Helper.AddMythicFeat(kinetic_mastery);
         }
 
+        [PatchInfo(Severity.Create, "Magic Item Adept", "mythic feat: trinket items use character level as caster level", true, Requirement: typeof(Patch_MagicItemAdept))]
         public static void createMagicItemAdept()
         {
             var itemAdept = Helper.CreateBlueprintFeature(
@@ -331,7 +352,8 @@ namespace DarkCodex
 
             Helper.AddMythicFeat(itemAdept);
         }
-
+        
+        [PatchInfo(Severity.Create, "Extra Mythic Feats", "mythic feat: can pick mythic abilities as feats and vice versa", true)]
         public static void createExtraMythicFeats()
         {
             var base_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81"); //MythicFeatSelection
@@ -353,6 +375,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref base_selection2.m_AllFeatures, extra_selection2.ToRef());
         }
 
+        [PatchInfo(Severity.Create, "Swift Hunters Bond", "mythic ability: ranger's Hunter's Bond can be used as a swift action", true)]
         public static void createSwiftHuntersBond()
         {
             var hunterfeat = Helper.ToRef<BlueprintFeatureReference>("6dddf5ba2291f41498df2df7f8fa2b35"); //HuntersBondFeature
@@ -405,7 +428,8 @@ namespace DarkCodex
 
             // teleport at will
         }
-
+       
+        [PatchInfo(Severity.Extend, "Kinetic Overcharge", "Kinetic Overcharge works always, not only while gathering power", true)]
         public static void patchKineticOvercharge()
         {
             var overcharge = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("4236ca275c6fa9b4a9945b2645262616");
@@ -418,6 +442,7 @@ namespace DarkCodex
                 );
         }
 
+        [PatchInfo(Severity.Extend, "Limitless Demon Rage", "Limitless Rage also applies to Demon Rage", true)]
         public static void patchLimitlessDemonRage()
         {
             var rage = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
@@ -428,6 +453,7 @@ namespace DarkCodex
             rage2.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
         }
 
+        [PatchInfo(Severity.Extend, "Unstoppable", "Unstoppable works against more conditions like stun, daze, and confusion", true)]
         public static void patchUnstoppable()
         {
             var unstoppable = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("74afc3465db56924c9618a42d84efab8"); //Unstoppable
@@ -441,6 +467,7 @@ namespace DarkCodex
             unstoppable.AddComponents(new BuffSubstitutionOnApply() { m_GainedFact = dominate, m_SubstituteBuff = entangle });
         }
 
+        [PatchInfo(Severity.Extend, "Boundless Healing", "Boundless Healing also grants healing spells to spellbooks", true)]
         public static void patchBoundlessHealing()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
@@ -481,6 +508,7 @@ namespace DarkCodex
             });
         }
 
+        [PatchInfo(Severity.Create, "Resourceful Caster", "mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws", true, Requirement: typeof(Patch_ResourcefulCaster))]
         public static void createResourcefulCaster()
         {
             var feature = Helper.CreateBlueprintFeature(
@@ -494,6 +522,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
         }
 
+        [PatchInfo(Severity.Extend, "Ranging Shots", "doesn't get weaker when hitting", true)]
         public static void patchRangingShots()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("2b558167862b05d47b8472d176257f82"); //RangingShots
@@ -505,12 +534,14 @@ namespace DarkCodex
             feat.m_Description = Helper.CreateString("Every time you miss an enemy with a ranged weapon attack, your aim improves, giving you a stacking +1 bonus on attacks up to the maximum of your mythic rank for the remainder of the combat.");
         }
 
+        [PatchInfo(Severity.Extend, "Wandering Hex", "can swap hex at will", true)]
         public static void patchWanderingHex()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
             feat.RemoveComponents(default(AbilityResourceLogic));
         }
 
+        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, fix description", true)]
         public static void patchVarious()
         {
             // allow quicken metamagic on demon teleport
@@ -519,7 +550,7 @@ namespace DarkCodex
 
             // update Always A Chance description
             ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("d57301613ad6a5140b2fdac40fa368e3") //AlwaysAChance
-                .m_Description = Helper.CreateString("You automatically succeed when you roll a natural 1.");
+                .m_Description = Helper.CreateString("You automatically succeed when you roll a natural 1."); // todo: make own patch!
         }
 
         #region Helper
@@ -567,6 +598,7 @@ namespace DarkCodex
 
     #region Patches
 
+    [PatchInfo(Severity.Harmony, "Patch: Always A Chance", "Always A Chance succeeds on a natural one and applies to most d20 rolls", true)]
     [HarmonyPatch]
     public class Patch_AlwaysAChance
     {
@@ -619,6 +651,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: Resourceful Caster", "patches for Resourceful Caster", true)]
     [HarmonyPatch]
     public class Patch_ResourcefulCaster
     {
@@ -760,6 +793,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: Magic Item Adept", "patches for Magic Item Adept", true)]
     [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetParamsFromItem))]
     public class Patch_MagicItemAdept
     {

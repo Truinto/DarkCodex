@@ -38,6 +38,7 @@ using Kingmaker.View.MapObjects;
 using Owlcat.Runtime.Core.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -220,49 +221,71 @@ namespace DarkCodex
                 Resource.Cache.Ensure();
 
                 StringBuilder sb = new StringBuilder();
-                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                using (StreamWriter sw = new StreamWriter(Path.Combine(Main.ModPath, "IconsExport"), false))
                 {
-                    var enchantment = bp.Blueprint as BlueprintItemEnchantment;
-                    if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "")
-                        continue;
-
-                    string name = enchantment.name;
-                    if (name == null) continue;
-                    name = name.Replace("Enchantment", "");
-                    name = name.Replace("Enchant", "");
-                    name = name.Replace("Plus", "");
-                    if (name.Length < 1) continue;
-                    sb.Clear();
-                    sb.Append(name[0]);
-                    for (int i = 1; i < name.Length; i++)
+                    sw.WriteLine("names");
+                    foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
                     {
-                        // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
-                        if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
-                            sb.Append(' ');
+                        var enchantment = bp.Blueprint as BlueprintItemEnchantment;
+                        if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
+                            continue;
 
-                        if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
-                            sb.Append('+');
+                        string name = enchantment.name;
+                        if (name == null) continue;
+                        name = name.Replace("Enchantment", "");
+                        name = name.Replace("Enchant", "");
+                        name = name.Replace("Plus", "");
+                        if (name.Length < 1) continue;
+                        sb.Clear();
+                        sb.Append(name[0]);
+                        for (int i = 1; i < name.Length; i++)
+                        {
+                            // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
+                            if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
+                                sb.Append(' ');
 
-                        if (name[i] != '_')         // print char, except '_'
-                            sb.Append(name[i]);
-                        else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
-                            sb.Append(' ');
+                            if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
+                                sb.Append('+');
+
+                            if (name[i] != '_')         // print char, except '_'
+                                sb.Append(name[i]);
+                            else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
+                                sb.Append(' ');
+                        }
+
+                        enchantment.m_EnchantName = sb.ToString().CreateString();
+
+                        sw.Write(enchantment.AssetGuid);
+                        sw.Write("\t");
+                        sw.WriteLine(sb);
                     }
 
-                    enchantment.m_EnchantName = sb.ToString().CreateString();
+                    sw.WriteLine("descriptions");
+
+                    foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                    {
+                        try
+                        {
+                            var item = bp.Blueprint as BlueprintItem;
+                            if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty() || item.m_DescriptionText == "")
+                                continue;
+
+                            foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty() || w.m_Description == ""))
+                            {
+                                enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
+
+                                sw.Write(enchantent.AssetGuid);
+                                sw.Write("\t");
+                                sw.WriteLine(enchantent.m_Description.ToString()); // TODO: remove this
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            sw.WriteLine(bp.Blueprint.AssetGuid + "\tcaused crash");
+                        }
+                        // regex to fix linebreaks "\n(?![a-f0-9]{32}\t)", "\\n"
+                    }
                 }
-
-                //foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
-                //{
-                //    var item = bp.Blueprint as BlueprintItem;
-                //    if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty())
-                //        continue;
-
-                //    foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty()))
-                //    {
-                //        enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
-                //    }
-                //}
             }
 
         }

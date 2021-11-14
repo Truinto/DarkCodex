@@ -19,6 +19,9 @@ using System.IO;
 using Newtonsoft.Json;
 using Kingmaker.PubSubSystem;
 using System.Reflection;
+using System.Linq.Expressions;
+using Kingmaker.UI.Common;
+using Kingmaker.UI;
 
 namespace DarkCodex
 {
@@ -112,6 +115,9 @@ namespace DarkCodex
             "Patch_AlwaysAChance",
         };
 
+        internal static List<PatchInfoAttribute> patchInfos = new List<PatchInfoAttribute>();
+
+        private static bool restart;
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
@@ -127,22 +133,58 @@ namespace DarkCodex
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
 
-            GUILayout.Label("");
-
+            GUILayout.Space(5);
             GUILayout.Label("Advanced: Patch Control");
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
-                    + "\nWarning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled."
-                    + "\nSee Github for descriptions of these options.");
-            foreach (string str in loadSaveOptions)
+                    + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
+
+            var style2 = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleLeft };
+            var style3 = new GUIStyle() { fixedHeight = 1, margin = new RectOffset(0, 0, 4, 4) };
+            style3.normal.background = new Texture2D(1, 1);
+            string category = null;
+            bool disableAll = false;
+            foreach (var info in patchInfos)
             {
-                bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
-                if (GUILayout.Button($"{(enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>")} {str}", GUILayout.ExpandWidth(false)))
+                if (info.Class != category)
                 {
+                    GUILayout.Box(GUIContent.none, style3);
+                    GUILayout.Label(info.Class);
+                    category = info.Class;
+                    disableAll = Settings.StateManager.State.doNotLoad.Contains(category + ".*");
+
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", style2, GUILayout.Width(20)))
+                    {
+                        restart = true;
+                        if (!disableAll)
+                            Settings.StateManager.State.doNotLoad.Add(category + ".*");
+                        else
+                            Settings.StateManager.State.doNotLoad.Remove(category + ".*");
+                    }
+                    GUILayout.Space(5);
+                    GUILayout.Label("Disable all", GUILayout.ExpandWidth(false));
+                    GUILayout.EndHorizontal();
+                }
+
+                string str = info.Class + "." + info.Method;
+                bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Space(5);
+                if (GUILayout.Button(disableAll
+                    ? enabled ? "<color=grey><b>✔</b></color>" : "<color=grey><b>✖</b></color>"
+                    : enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", style2, GUILayout.Width(20)))
+                {
+                    restart = true;
                     if (enabled)
                         Settings.StateManager.State.doNotLoad.Add(str);
                     else
                         Settings.StateManager.State.doNotLoad.Remove(str);
                 }
+                GUILayout.Space(5);
+                GUILayout.Label(info.Name, GUILayout.Width(300));
+                GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
             }
 
             GUILayout.Label("");
@@ -171,6 +213,15 @@ namespace DarkCodex
             if (GUILayout.Button("Save settings!"))
                 OnSaveGUI(modEntry);
 
+        }
+
+        private static void OnHideGUI(UnityModManager.ModEntry modEntry)
+        {
+            if (restart)
+            {
+                restart = false;
+                UIUtility.ShowMessageBox("Warning! Patch selection changed. Restart game before saving. If you cannot load your save, re-enable patches.", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
+            }
         }
 
         private static void OnSaveGUI(UnityModManager.ModEntry modEntry)
@@ -263,6 +314,7 @@ namespace DarkCodex
             modEntry.OnToggle = OnToggle;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
+            modEntry.OnHideGUI = OnHideGUI;
 
             try
             {
@@ -324,12 +376,12 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
                     PatchSafe(typeof(Patch_EnvelopingWindsCap));
                     PatchSafe(typeof(Patch_MagicItemAdept));
-                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnNewRoundPatch));
-                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_HandleUnitRunCommand));
-                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_OnTurnOn));
-                    PatchSafe(typeof(Patches_Activatable.ActivatableAbilityUnitCommand_ApplyValidation));
-                    PatchSafe(typeof(Patches_Activatable.ActivatableAbility_TryStart));
-                    PatchSafe(typeof(Patches_Activatable.ActionBar));
+                    PatchSafe(typeof(Patch_ActivatableOnNewRound));
+                    PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
+                    PatchSafe(typeof(Patch_ActivatableOnTurnOn));
+                    PatchSafe(typeof(Patch_ActivatableApplyValidation));
+                    PatchSafe(typeof(Patch_ActivatableTryStart));
+                    PatchSafe(typeof(Patch_ActivatableActionBar));
                     PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
@@ -416,6 +468,7 @@ namespace DarkCodex
                     EventBus.Subscribe(new RestoreEndOfCombat());
                     EventBus.Subscribe(new Control_AreaEffects());
 
+                    patchInfos.Sort(); // sort info list for GUI
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG
                     Helper.PrintDebug("Running in debug.");
@@ -436,6 +489,7 @@ namespace DarkCodex
 
         public static bool LoadSafe(Action action)
         {
+            ProcessInfo(action.Method);
 #if DEBUG
             var watch = Stopwatch.StartNew();
 #endif
@@ -469,6 +523,7 @@ namespace DarkCodex
 
         public static bool LoadSafe(Action<bool> action, bool flag)
         {
+            ProcessInfo(action.Method);
 #if DEBUG
             var watch = Stopwatch.StartNew();
 #endif
@@ -502,22 +557,24 @@ namespace DarkCodex
 
         public static void PatchUnique(Type patch)
         {
+            ProcessInfo(patch);
             if (Helper.IsPatched(patch))
             {
                 Helper.Print("Skipped patching because not unique " + patch.Name);
                 return;
             }
 
-            PatchSafe(patch);
-            patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
+            if (PatchSafe(patch))
+                patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
         }
 
-        public static void PatchSafe(Type patch)
+        public static bool PatchSafe(Type patch)
         {
-            if (CheckSetting(patch.Name))
+            ProcessInfo(patch);
+            if (CheckSetting("Patch." + patch.Name))
             {
                 Helper.Print("Skipped patching " + patch.Name);
-                return;
+                return false;
             }
 
             try
@@ -526,10 +583,12 @@ namespace DarkCodex
                     Helper.Patch(patch, default);
                 else
                     Helper.Patch(patch);
+                return true;
             }
             catch (Exception e)
             {
                 Helper.PrintException(e);
+                return false;
             }
         }
 
@@ -545,6 +604,23 @@ namespace DarkCodex
             }
 
             return false;
+        }
+
+        private static void ProcessInfo(MemberInfo info)
+        {
+            if (info == null)
+                return;
+
+            var attr = Attribute.GetCustomAttribute(info, typeof(PatchInfoAttribute)) as PatchInfoAttribute;
+            if (attr == null)
+            {
+                Helper.PrintDebug(info.Name + " has no PatchInfo");
+                return;
+            }
+
+            attr.Class = info.DeclaringType?.Name ?? "Patch";
+            attr.Method = info.Name;
+            patchInfos.Add(attr);
         }
 
         private static void ExportPlayerData()

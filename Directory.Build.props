@@ -29,6 +29,7 @@
     <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
     <Reference Include="Owlcat.Runtime.UI" HintPath="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
     <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
+    <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
     <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
     <Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />

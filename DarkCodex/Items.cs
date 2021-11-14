@@ -19,6 +19,7 @@ namespace DarkCodex
 {
     public class Items
     {
+        [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false)]
         public static void patchArrows()
         {
             var ColdIronArrowsQuiverItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("a5a537ad28053ad48a7be1c53d7fd7ed");
@@ -31,12 +32,14 @@ namespace DarkCodex
             ColdIronArrowsQuiverItem_20Charges.ComponentsArray = ColdIronArrowsQuiverItem.ComponentsArray;
         }
 
+        [PatchInfo(Severity.Extend, "Terendelev´s Scale", "make the revive scale usable once per day", true)]
         public static void patchTerendelevScale()
         {
             var TerendelevScaleItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("816f244523b5455a85ae06db452d4330");
             TerendelevScaleItem.RestoreChargesOnRest = true;
         }
 
+        [PatchInfo(Severity.Create, "Kinetic Artifact", "new weapon for Kineticists", true)]
         public static void createKineticArtifact()
         {
             var bladetype = Helper.ToRef<BlueprintWeaponTypeReference>("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade

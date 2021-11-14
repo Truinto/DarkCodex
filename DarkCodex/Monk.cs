@@ -25,6 +25,7 @@ namespace DarkCodex
 {
     public class Monk
     {
+        [PatchInfo(Severity.Create, "Feral Combat Training", "basic feat: Feral Combat Training", true, Requirement: typeof(Patch_FeralCombat))]
         public static void createFeralCombatTraining()
         {
             /*
@@ -60,6 +61,7 @@ namespace DarkCodex
 
     #region Patches
 
+    [PatchInfo(Severity.Harmony, "Patch: Feral Combat", "collection of patches for Feral Combat Training", false)]
     [HarmonyPatch]
     public class Patch_FeralCombat
     {

@@ -1578,6 +1578,20 @@ namespace DarkCodex
             return new PrefabLink() { AssetId = assetId };
         }
 
+        public static T Get<T>(string guid) where T : SimpleBlueprint
+        {
+            var sb = ResourcesLibrary.TryGetBlueprint(BlueprintGuid.Parse(guid));
+
+            if (sb is T bp)
+                return bp;
+            else if (sb == null)
+                Print("ERROR: could not resolve " + guid);
+            else
+                Print("ERROR: invalid conversion " + guid);
+
+            return null;
+        }
+
         #endregion
 
         #region ToReference

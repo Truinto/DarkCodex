@@ -1,8 +1,9 @@
 # Changelog
 
 ## [1.1.2]
-- fixed issue with freebie feats
 - fixed metamagic variants with preferred spell
+- improved ingame menu
+- added TableTopTweaks' (TTT from now on) Fighter Advanced Weapon Training for limitless shaman weapon
 
 ## [1.1.1]
 - fixed bleeding attack not counting as bleed for some features

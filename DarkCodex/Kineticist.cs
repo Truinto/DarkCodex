@@ -67,6 +67,7 @@ namespace DarkCodex
             "f8d0f7099e73c95499830ec0a93e2eeb",  //MetakinesisEmpowerCheaperBuff
             "f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
 
+        [PatchInfo(Severity.Create, "Kineticist Background", "regional background: gain +1 Kineticist level for the purpose of feat prerequisites", true)]
         public static void createKineticistBackground()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
@@ -84,6 +85,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
 
+        [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent", false)]
         public static void createExtraWildTalentFeat()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
@@ -108,6 +110,7 @@ namespace DarkCodex
             Helper.AddFeats(extra_wild_talent_selection);
         }
 
+        [PatchInfo(Severity.Create, "Whip Infusion", "infusion: Kinetic Whip, expands Kinetic Knight", false, Requirement: typeof(Patch_KineticistAllowOpportunityAttack))]
         public static void createWhipInfusion()
         {
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
@@ -165,6 +168,7 @@ namespace DarkCodex
             Resource.Cache.BuffKineticWhip.SetReference(buff);
         }
 
+        [PatchInfo(Severity.Create, "Blade Rush Infusion", "infusion: Blade Rush, expands Kinetic Knight", false)]
         public static void createBladeRushInfusion()
         {
             var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
@@ -237,6 +241,7 @@ namespace DarkCodex
             Blasts.Add(ability);
         }
 
+        [PatchInfo(Severity.Create, "Mobile Gathering", "basic feat: Mobile Gathering", false)]
         public static void createMobileGatheringFeat()
         {
             // --- base game stuff ---
@@ -343,6 +348,7 @@ namespace DarkCodex
 
         }
 
+        [PatchInfo(Severity.Create, "Impale Infusion", "infusion: Impale", false)]
         public static void createImpaleInfusion()
         {
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
@@ -466,6 +472,7 @@ namespace DarkCodex
             Helper.AddToAbilityVariants(ice_base, ice_impale_ab);
         }
 
+        [PatchInfo(Severity.Extend, "Gather Power", "Kineticist Gather Power can be used manually", false, Requirement: typeof(Patch_TrueGatherPowerLevel))]
         public static void patchGatherPower()
         {
             var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
@@ -474,6 +481,7 @@ namespace DarkCodex
             gather_original_ab.AddComponents(new RestrictionCanGatherPowerAbility());
         }
 
+        [PatchInfo(Severity.Extend, "Demon Charge", "Demon Charge also gathers power", true)]
         public static void patchDemonCharge()
         {
             var charge = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
@@ -482,7 +490,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref charge.GetComponent<AbilityExecuteActionOnCast>().Actions.Actions, new ContextActionCastSpellOnCaster() { m_Spell = gather });
         }
 
-        /// <summary>QoL Soul Power.</summary>
+        [PatchInfo(Severity.Extend, "Dark Elementalist QoL", "faster animation and use anywhere, but only out of combat", true)]
         public static void patchDarkElementalist()
         {
             var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c"); //DarkElementalistSoulPowerAbility
@@ -494,6 +502,7 @@ namespace DarkCodex
             soulability.AddComponents(new AbilityRequirementOnlyCombat { Not = true });
         }
 
+        [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast", true)]
         public static void patchVarious()
         {
             // allow bowling infusion on sandblasts
@@ -502,13 +511,15 @@ namespace DarkCodex
 
             ExpandSubstance(bowling, sandstorm);
         }
-
+        
+        [PatchInfo(Severity.Fix, "Spell-like Blasts", "makes blasts register as spell like, instead of supernatural", false)]
         public static void fixBlastsAreSpellLike()
         {
             foreach (var blast in Blasts.GetBaseAndVariants())
                 blast.Get().Type = AbilityType.SpellLike;
         }
 
+        [PatchInfo(Severity.Fix, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
         public static void fixWallInfusion()
         {
             int counter = 0;
@@ -535,6 +546,7 @@ namespace DarkCodex
             Helper.Print("Patched Wall Infusions: " + counter);
         }
 
+        [PatchInfo(Severity.Create, "Selective Metakinesis", "gain selective metakinesis at level 7", true)]
         public static void createSelectiveMetakinesis()
         {
             //var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
@@ -578,10 +590,12 @@ namespace DarkCodex
             knight.RemoveFeature(7, feature1);
         }
 
+        [PatchInfo(Severity.Create, "Auto Metakinesis", "activatable to automatically empower and maximize blasts, if you have unused burn", false)]
         public static void createAutoMetakinesis()
         {
             var empower = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("70322f5a2a294e54a9552f77ee85b0a7"); //MetakinesisEmpowerFeature
             var quickenbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"); //MetakinesisQuickenBuff
+            var quickenbuff2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("c4b74e4448b81d04f9df89ed14c38a95"); //MetakinesisQuickenCheaperBuff
 
             var auto = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisAutoAbility",
@@ -598,9 +612,11 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref empower.GetComponent<AddFacts>().m_Facts, auto.ToRef());
 
             // quicken removes itself after use
-            quickenbuff.GetComponent<AutoMetamagic>().Once = true;
+            quickenbuff.GetComponent<AutoMetamagic>().Once = true; 
+            quickenbuff2.GetComponent<AutoMetamagic>().Once = true;
         }
 
+        [PatchInfo(Severity.Create, "Hurricane Queen", "Wild Talent: Hurricane Queen", false, Requirement: typeof(Patch_EnvelopingWindsCap))]
         public static void createHurricaneQueen()
         {
             var windsBuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff
@@ -797,6 +813,7 @@ namespace DarkCodex
 
     #region Patches
 
+    [PatchInfo(Severity.Harmony, "Patch: Enveloping Winds Cap", "removes 50% evasion cap for Hurricane Queen", false)]
     [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.SetMissChance))]
     public class Patch_EnvelopingWindsCap
     {
@@ -811,6 +828,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: Fix Polymorph Gather", "makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade", false)]
     [HarmonyPatch]
     public class Patch_FixPolymorphGather
     {
@@ -897,10 +915,7 @@ namespace DarkCodex
         }
     }
 
-    /// <summary>
-    /// Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost.
-    /// Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.
-    /// </summary>
+    [PatchInfo(Severity.Harmony, "Patch: True Gather Power Level", "Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost.\nPatched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.", false)]
     [HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryApplyGatherPower))]
     public class Patch_TrueGatherPowerLevel
     {
@@ -931,6 +946,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: Kineticist Allow Opportunity Attack", "allows Attack of Opportunities with anything but standard Kinetic Blade; so that Kinetic Whip works; also allows natural attacks to be used, if Whip isn't available", false)]
     [HarmonyPatch]
     public class Patch_KineticistAllowOpportunityAttack
     {

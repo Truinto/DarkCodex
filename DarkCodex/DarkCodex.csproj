@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,6 +78,7 @@
     <Compile Include="Rogue.cs" />
     <Compile Include="Settings\ConfigManager.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Attributes\PatchInfoAttribute.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Witch.cs" />
     <None Include="Settings\Repository.json" />

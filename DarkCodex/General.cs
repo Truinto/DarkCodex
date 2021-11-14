@@ -70,6 +70,7 @@ namespace DarkCodex
             }
         }
 
+        [PatchInfo(Severity.Create, "Ability Focus", "basic feat: Ability Focus, increase DC of one ability by +2", false)]
         public static void createAbilityFocus()
         {
             Resource.Cache.Ensure();
@@ -106,7 +107,8 @@ namespace DarkCodex
 
             Helper.AddFeats(feat);
         }
-
+        
+        [PatchInfo(Severity.Extend, "Empower Angels Light", "'Light of the Angels' give temporary HP equal to character level", true)]
         public static void patchAngelsLight()
         {
             var angelbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e173dc1eedf4e344da226ffbd4d76c60"); // AngelMinorAbilityEffectBuff
@@ -116,6 +118,7 @@ namespace DarkCodex
             angelbuff.AddComponents(Helper.CreateContextRankConfig(ContextRankBaseValueType.CharacterLevel, type: AbilityRankType.Default)); // see FalseLifeBuff
         }
 
+        [PatchInfo(Severity.Extend, "Basic Freebie Feats", "reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/", true)]
         public static void patchBasicFreebieFeats()
         {
             //https://michaeliantorno.com/feat-taxes-in-pathfinder/
@@ -165,6 +168,7 @@ namespace DarkCodex
             //ImprovedSunder.9719015edcbf142409592e2cbaab7fe1
         }
 
+        [PatchInfo(Severity.Create, "Preferred Spell", "basic feat: Preferred Spell, spontaneously cast a specific spell", false, Requirement: typeof(Patch_PreferredSpellMetamagic))]
         public static void createPreferredSpell()
         {
             var specialization = ResourcesLibrary.TryGetBlueprint<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
@@ -190,17 +194,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref wizard.m_AllFeatures, feat.ToRef());
         }
 
-        public static void patchExtendSpells()
-        {
-            string[] guids = new string[] {
-                "2cadf6c6350e4684baa109d067277a45", //ProtectionFromAlignmentCommunal only duration string
-                "93f391b0c5a99e04e83bbfbe3bb6db64", //ProtectionFromEvilCommunal
-                "5bfd4cce1557d5744914f8f6d85959a4", //ProtectionFromGoodCommunal
-                "8b8ccc9763e3cc74bbf5acc9c98557b9", //ProtectionFromLawCommunal
-                "0ec75ec95d9e39d47a23610123ba1bad", //ProtectionFromChaosCommunal
-            };
-        }
-
+        [PatchInfo(Severity.Extend, "Hide Buffs", "unclogs UI by hidding a few buffs", false)]
         public static void patchHideBuffs()
         {
             string[] guids = new string[] {
@@ -222,7 +216,8 @@ namespace DarkCodex
                 }
             }
         }
-
+        
+        [PatchInfo(Severity.Extend, "Various Tweaks", "removed PreciousTreat penalty, extend protection from X to 10 minutes", true)]
         public static void patchVarious()
         {
             // remove penalty on Precious Treat item
@@ -286,7 +281,8 @@ namespace DarkCodex
             var holysymbol = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("e67dc14ff73014547920dc92bc8e1bfc"); //Artifact_HolySymbolOfIomedaeToggleAbility
             holysymbol.DoNotTurnOffOnRest = true;
         }
-
+        
+        [PatchInfo(Severity.Extend, "Dispel Magic", "fix Destructive Dispel, apply bonus", true)]
         public static void patchDispelMagic()
         {
             //DispellingAttack.1b92146b8a9830d4bb97ab694335fa7c FEATURE
@@ -323,6 +319,7 @@ namespace DarkCodex
             action.OnSuccess = onsuccess;
         }
 
+        [PatchInfo(Severity.Create, "Stop Activatable", "adds ability to stop any activatable immediately", false)]
         public static void createBardStopSong()
         {
             //ContextActionStopActivatables
@@ -341,6 +338,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Event, "Event: Area Effects", "mute player area effects while in dialog", false)]
     public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IPartyCombatHandler, IGlobalSubscriber, ISubscriber //ICutsceneHandler, ICutsceneDialogHandler
     {
         //Game.Instance.IsModeActive(GameModeType.Dialog) || Game.Instance.IsModeActive(GameModeType.Cutscene);
@@ -427,6 +425,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: Fix Load Crash", "removes trap data during save load to prevent a specific crash", false)]
     [HarmonyPatch(typeof(AreaDataStash), nameof(AreaDataStash.GetJsonForArea))]
     public class Patch_FixLoadCrash1
     {
@@ -445,6 +444,7 @@ namespace DarkCodex
 
     #region Patches
 
+    [PatchInfo(Severity.Harmony, "Patch: Preferred Spell Metamagic", "necessary patches for Preferred Spell", false)]
     [HarmonyPatch]
     public class Patch_PreferredSpellMetamagic
     {
@@ -528,6 +528,7 @@ namespace DarkCodex
         }
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: Spell Selection Parametrized", "fix spell selection for Preferred Spell", false)]
     [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.ExtractItemsFromSpellbooks))]
     public class Patch_SpellSelectionParametrized
     {
