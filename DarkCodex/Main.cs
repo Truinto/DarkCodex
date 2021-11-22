@@ -118,9 +118,18 @@ namespace DarkCodex
         internal static List<PatchInfoAttribute> patchInfos = new List<PatchInfoAttribute>();
 
         private static bool restart;
+        private static GUIStyle StyleBox;
+        private static GUIStyle StyleLine;
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
+            if (StyleBox == null)
+            {
+                StyleBox = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleCenter };
+                StyleLine = new GUIStyle() { fixedHeight = 1, margin = new RectOffset(0, 0, 4, 4), };
+                StyleLine.normal.background = new Texture2D(1, 1);
+            }
+
             GUILayout.Label("Disclaimer: Remember that playing with mods often makes them mandatory for your save game!");
             GUILayout.Label("Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above."
                 + "\n[*] Option is enabled/disabled immediately, without restart.");
@@ -133,27 +142,24 @@ namespace DarkCodex
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
 
-            GUILayout.Space(5);
+            GUILayout.Space(10);
             GUILayout.Label("Advanced: Patch Control");
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
 
-            var style2 = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleLeft };
-            var style3 = new GUIStyle() { fixedHeight = 1, margin = new RectOffset(0, 0, 4, 4) };
-            style3.normal.background = new Texture2D(1, 1);
             string category = null;
             bool disableAll = false;
             foreach (var info in patchInfos)
             {
                 if (info.Class != category)
                 {
-                    GUILayout.Box(GUIContent.none, style3);
+                    GUILayout.Box(GUIContent.none, StyleLine);
                     GUILayout.Label(info.Class);
                     category = info.Class;
                     disableAll = Settings.StateManager.State.doNotLoad.Contains(category + ".*");
 
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", style2, GUILayout.Width(20)))
+                    if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
                     {
                         restart = true;
                         if (!disableAll)
@@ -173,7 +179,7 @@ namespace DarkCodex
                 GUILayout.Space(5);
                 if (GUILayout.Button(disableAll
                     ? enabled ? "<color=grey><b>✔</b></color>" : "<color=grey><b>✖</b></color>"
-                    : enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", style2, GUILayout.Width(20)))
+                    : enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
                 {
                     restart = true;
                     if (enabled)
@@ -187,7 +193,8 @@ namespace DarkCodex
                 GUILayout.EndHorizontal();
             }
 
-            GUILayout.Label("");
+            GUILayout.Space(10);
+            GUILayout.Label("Debug");
 
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
@@ -255,13 +262,35 @@ namespace DarkCodex
         private static void Checkbox(ref bool value, string label, Action<bool> action = null)
         {
             GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button($"{(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>")} {label}", GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
             {
                 value = !value;
                 action?.Invoke(value);
             }
+            GUILayout.Space(5);
+            GUILayout.Label(label, GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+        }
 
+        private static void FlagBox(string name, string description, string str, bool grey, int spacing = 10)
+        {
+            bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(spacing);
+            if (GUILayout.Button(grey
+                ? enabled ? "<color=grey><b>✔</b></color>" : "<color=grey><b>✖</b></color>"
+                : enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
+            {
+                restart = true;
+                if (enabled)
+                    Settings.StateManager.State.doNotLoad.Add(str);
+                else
+                    Settings.StateManager.State.doNotLoad.Remove(str);
+            }
+            GUILayout.Space(5);
+            GUILayout.Label(name, GUILayout.Width(300));
+            GUILayout.Label(description, GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
         }
 
@@ -336,6 +365,15 @@ namespace DarkCodex
         #endregion
 
         #region Load_Patch
+
+        [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
+        public static class MainMenu_Start
+        {
+            public static void Postfix()
+            {
+                // todo: start up warning
+            }
+        }
 
         [HarmonyPatch(typeof(StartGameLoader), "LoadAllJson")]
         public static class StartGameLoader_LoadAllJson
@@ -463,12 +501,19 @@ namespace DarkCodex
                     LoadSafe(Witch.createCackleActivatable); // keep last
                     LoadSafe(Rogue.createExtraRogueTalent); // keep last
                     LoadSafe(Mythic.createExtraMythicFeats); // keep last
+                    LoadSafe(Mythic.createSwiftHex); // keep last
 
                     // Event subscriptions
                     EventBus.Subscribe(new RestoreEndOfCombat());
                     EventBus.Subscribe(new Control_AreaEffects());
 
                     patchInfos.Sort(); // sort info list for GUI
+                    //if (Settings.StateManager.State.showBootupWarning)
+                    //{
+                    //    UIUtility.ShowMessageBox("Test", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
+                    //    Settings.StateManager.State.showBootupWarning = false;
+                    //    Settings.StateManager.TrySaveConfigurationState();
+                    //}
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG
                     Helper.PrintDebug("Running in debug.");

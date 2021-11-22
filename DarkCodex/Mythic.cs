@@ -3,6 +3,7 @@ using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Controllers;
@@ -393,6 +394,37 @@ namespace DarkCodex
                 );
 
             Helper.AddMythicTalent(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Cursing Gaze", "mythic ability: hexes other than grant can be used as a swift action", true, 295)]
+        public static void createSwiftHex()
+        {
+            var witch_selection = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
+            var shaman_selection = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
+            var grant_hex = BlueprintGuid.Parse("d24c2467804ce0e4497d9978bafec1f9"); //WitchGrandHex
+
+            var abilities = new List<BlueprintAbilityReference>();
+
+            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures))
+            {
+                var hex = sel.Get();
+                if (hex.GetComponent<PrerequisiteFeature>()?.m_Feature.Guid == grant_hex)
+                    continue;
+
+                foreach (var fact in hex.GetComponent<AddFacts>().m_Facts ?? Array.Empty<BlueprintUnitFactReference>())
+                    if (fact.Get() is BlueprintAbility ab)
+                        abilities.Add(ab.ToRef());
+            }
+
+            var feat = Helper.CreateBlueprintFeature(
+                "MythicSwiftHex",
+                "Cursing Gaze",
+                "A mere glimpse is enough to curse your enemies. You may use hexes and major hexes, but not grant hexes, as a swift action."
+                ).SetComponents(
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, abilities),
+                Helper.CreatePrerequisiteFeature(witch_selection.ToRef(), true),
+                Helper.CreatePrerequisiteFeature(shaman_selection.ToRef(), true)
+                );
         }
 
         public static void createDemonLord()

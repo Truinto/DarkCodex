@@ -10,6 +10,9 @@ namespace DarkCodex
         public int version = 1;
 
         [JsonProperty]
+        public bool showBootupWarning = true;
+
+        [JsonProperty]
         public bool allowAchievements = true;
 
         [JsonProperty]

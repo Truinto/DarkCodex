@@ -4,6 +4,7 @@
 - fixed metamagic variants with preferred spell
 - improved ingame menu
 - added TableTopTweaks' (TTT from now on) Fighter Advanced Weapon Training for limitless shaman weapon
+- added Cursing Gaze | mythic ability: hexes other than grant can be used as a swift action
 
 ## [1.1.1]
 - fixed bleeding attack not counting as bleed for some features
