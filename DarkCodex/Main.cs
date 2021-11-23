@@ -49,72 +49,6 @@ namespace DarkCodex
             return true;
         }
 
-        private static string[] loadSaveOptions = new string[] {
-            "General.*",
-            "Hexcrafter.*",
-            "Items.*",
-            "Kineticist.*",
-            "Mythic.*",
-            "Rogue.*",
-            "Witch.*",
-            "General.createAbilityFocus",
-            "General.createPreferredSpell",
-            "General.patchAngelsLight",
-            "General.patchBasicFreebieFeats",
-            "General.patchHideBuffs",
-            "General.patchDispelMagic",
-            "General.patchVarious",
-            "Hexcrafter.fixProgression",
-            "Items.patchArrows",
-            "Items.patchTerendelevScale",
-            "Items.createKineticArtifact",
-            "Kineticist.createExtraWildTalentFeat",
-            "Kineticist.createImpaleInfusion",
-            "Kineticist.createWhipInfusion",
-            "Kineticist.createBladeRushInfusion",
-            "Kineticist.createKineticistBackground",
-            "Kineticist.createMobileGatheringFeat",
-            "Kineticist.createAutoMetakinesis",
-            "Kineticist.createHurricaneQueen",
-            "Kineticist.patchDarkElementalist",
-            "Kineticist.patchGatherPower",
-            "Kineticist.patchDemonCharge",
-            "Kineticist.patchVarious",
-            "Kineticist.fixBlastsAreSpellLike",
-            "Kineticist.fixWallInfusion",
-            "Kineticist.createSelectiveMetakinesis",
-            "Monk.createFeralCombatTraining",
-            "Mythic.createLimitlessBardicPerformance",
-            "Mythic.createLimitlessWitchHexes",
-            "Mythic.createLimitlessSmite",
-            "Mythic.createLimitlessBombs",
-            "Mythic.createLimitlessArcanePool",
-            "Mythic.createLimitlessArcaneReservoir",
-            "Mythic.createLimitlessKi",
-            "Mythic.createLimitlessDomain",
-            "Mythic.createLimitlessShaman",
-            "Mythic.createLimitlessWarpriest",
-            "Mythic.createKineticMastery",
-            "Mythic.createMagicItemAdept",
-            "Mythic.createExtraMythicFeats",
-            "Mythic.createResourcefulCaster",
-            "Mythic.createSwiftHuntersBond",
-            "Mythic.patchKineticOvercharge",
-            "Mythic.patchLimitlessDemonRage",
-            "Mythic.patchUnstoppable",
-            "Mythic.patchBoundlessHealing",
-            "Mythic.patchRangingShots",
-            "Mythic.patchWanderingHex",
-            "Mythic.patchVarious",
-            "Ranger.createImprovedHuntersBond",
-            "Rogue.createBleedingAttack",
-            "Rogue.createExtraRogueTalent",
-            "Witch.createCackleActivatable",
-            "Witch.createIceTomb",
-            "Witch.fixBoundlessHealing",
-            "Patch_AlwaysAChance",
-        };
-
         internal static List<PatchInfoAttribute> patchInfos = new List<PatchInfoAttribute>();
 
         private static bool restart;
@@ -146,6 +80,9 @@ namespace DarkCodex
             GUILayout.Label("Advanced: Patch Control");
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
+            if (GUILayout.Button("Disable all homebrew"))
+                Settings.StateManager.State.doNotLoad =
+                    Settings.StateManager.State.doNotLoad.Union(patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method)).ToList();
 
             string category = null;
             bool disableAll = false;
@@ -188,7 +125,7 @@ namespace DarkCodex
                         Settings.StateManager.State.doNotLoad.Remove(str);
                 }
                 GUILayout.Space(5);
-                GUILayout.Label(info.Name, GUILayout.Width(300));
+                GUILayout.Label(info.Name.Red(info.IsDangerous), GUILayout.Width(300));
                 GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
             }
@@ -208,6 +145,17 @@ namespace DarkCodex
                 Control_AreaEffects.Stop();
             if (GUILayout.Button("Debug: Continue Area Fxs", GUILayout.ExpandWidth(false)))
                 Control_AreaEffects.Continue();
+            if (GUILayout.Button("Debug: Print Content Table", GUILayout.ExpandWidth(false)))
+            {
+                using var sw = new StreamWriter(Path.Combine(Main.ModPath, "content.md"), false);
+                sw.WriteLine("Content");
+                sw.WriteLine("-----------");
+                sw.WriteLine("| Option | Description | HB | Status |");
+                sw.WriteLine("| ------ | ----------- | ------ | ------ |");
+
+                foreach (var info in patchInfos)
+                    sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description}|{info.HomebrewStr}|{info.StatusStr}|");
+            }
             Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
             Checkbox(ref Settings.StateManager.State.debug_1, "Debug: Flag1");
@@ -349,6 +297,7 @@ namespace DarkCodex
             {
                 harmony = new Harmony(modEntry.Info.Id);
                 Helper.Patch(typeof(StartGameLoader_LoadAllJson));
+                Helper.Patch(typeof(MainMenu_Start));
                 //harmony.PatchAll(typeof(Main).Assembly);
                 //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
                 //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
@@ -371,7 +320,12 @@ namespace DarkCodex
         {
             public static void Postfix()
             {
-                // todo: start up warning
+                if (Settings.StateManager.State.showBootupWarning)
+                {
+                    UIUtility.ShowMessageBox("Installed Dark Codex.\nIf you want to disable certain features, do it now. Disabling 'red' features during a playthrough is not possible. Enabling features can be done at any time.", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
+                    Settings.StateManager.State.showBootupWarning = false;
+                    Settings.StateManager.TrySaveConfigurationState();
+                }
             }
         }
 
@@ -508,12 +462,7 @@ namespace DarkCodex
                     EventBus.Subscribe(new Control_AreaEffects());
 
                     patchInfos.Sort(); // sort info list for GUI
-                    //if (Settings.StateManager.State.showBootupWarning)
-                    //{
-                    //    UIUtility.ShowMessageBox("Test", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
-                    //    Settings.StateManager.State.showBootupWarning = false;
-                    //    Settings.StateManager.TrySaveConfigurationState();
-                    //}
+
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG
                     Helper.PrintDebug("Running in debug.");

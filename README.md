@@ -85,6 +85,8 @@ Content
 :heavy_check_mark: works, please report bugs you find \
 :construction: not tested, please let me know if this works or not \
 :x: does not work, avoid taking these feats
+:house: homebrew
+:book: from the books
 
 FAQ
 -----------

@@ -449,6 +449,13 @@ namespace DarkCodex
             return sb[sb.Length - 1] != ' ';
         }
 
+        public static string Red(this string text, bool condition = true)
+        {
+            if (condition)
+                return $"<color=red>{text}</color>";
+            return text;
+        }
+
         #endregion
 
         #region Components

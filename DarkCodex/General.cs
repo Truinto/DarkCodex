@@ -468,9 +468,6 @@ namespace DarkCodex
 
                     list.FirstOrDefault(f => f.Blueprint == targetspell)?.MetamagicData?.Clear(); // clear metamagic copied from donor spell
 
-                    if (targetspell.HasVariants) // todo: metamagic for variant spells!
-                        continue;
-
                     var metamagics = __instance.Spellbook.GetCustomSpells(__instance.SpellLevel).Where(w => w.Blueprint == targetspell); //__instance.Spellbook.GetSpellLevel(__instance)
                     foreach (var metamagic in metamagics)
                     {

@@ -41,7 +41,7 @@ namespace DarkCodex
 {
     public class Mythic
     {
-        [PatchInfo(Severity.Create, "Limitless Bardic Performance", "mythic ability: Bardic Performances cost no resources", true)]
+        [PatchInfo(Severity.Create, "Limitless Bardic Performance / Raging Song", "mythic ability: Bardic Performances cost no resources\nmythic ability: Skald's Raging Song cost no resources", true)]
         public static void createLimitlessBardicPerformance()
         {
             var bardic_resource = BlueprintGuid.Parse("e190ba276831b5c4fa28737e5e49e6a6");
@@ -57,8 +57,23 @@ namespace DarkCodex
                 ); // todo: icon?
 
             setResourceDecreasing(bardic_resource, limitless.ToRef2());
-
             Helper.AddMythicTalent(limitless);
+
+            // same again for skald raging song
+            var ragesong_resource = BlueprintGuid.Parse("4a2302c4ec2cfb042bba67d825babfec"); //RagingSongResource
+            var ragesong_prereq = Helper.ToRef<BlueprintFeatureReference>("334cb75aa673d1d4bb279761c2ef5cf1"); //RagingSong
+
+            var limitless2 = Helper.CreateBlueprintFeature(
+                "LimitlessRagingSong",
+                "Limitless Raging Song",
+                "Your inspire ferocity in your allies.\nBenefit: You no longer have a limited amount of Raging Song rounds per day.",
+                group: FeatureGroup.MythicAbility
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature(ragesong_prereq)
+                );
+
+            setResourceDecreasing(ragesong_resource, limitless2.ToRef2());
+            Helper.AddMythicTalent(limitless2);
         }
 
         [PatchInfo(Severity.Create, "Limitless Witch Hexes", "mythic ability: Hexes ignore their cooldown", true)]

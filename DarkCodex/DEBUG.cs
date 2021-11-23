@@ -221,10 +221,12 @@ namespace DarkCodex
                 Resource.Cache.Ensure();
 
                 StringBuilder sb = new StringBuilder();
-                using (StreamWriter sw = new StreamWriter(Path.Combine(Main.ModPath, "IconsExport"), false))
+#if DEBUG
+                using (StreamWriter sw = new StreamWriter(Path.Combine(Main.ModPath, "enchantment-export.txt"), false)) // todo: remove debug log
                 {
                     sw.WriteLine("names");
-                    foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+#endif
+                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
                     {
                         var enchantment = bp.Blueprint as BlueprintItemEnchantment;
                         if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
@@ -254,14 +256,15 @@ namespace DarkCodex
                         }
 
                         enchantment.m_EnchantName = sb.ToString().CreateString();
-
+#if DEBUG
                         sw.Write(enchantment.AssetGuid);
                         sw.Write("\t");
                         sw.WriteLine(sb);
+#endif
                     }
-
+#if DEBUG
                     sw.WriteLine("descriptions");
-
+#endif
                     foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
                     {
                         try
@@ -273,19 +276,24 @@ namespace DarkCodex
                             foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty() || w.m_Description == ""))
                             {
                                 enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
-
+#if DEBUG
                                 sw.Write(enchantent.AssetGuid);
                                 sw.Write("\t");
-                                sw.WriteLine(enchantent.m_Description.ToString()); // TODO: remove this
+                                sw.WriteLine(enchantent.m_Description.ToString());
+#endif
                             }
                         }
                         catch (Exception)
                         {
+#if DEBUG
                             sw.WriteLine(bp.Blueprint.AssetGuid + "\tcaused crash");
+#endif
                         }
                         // regex to fix linebreaks "\n(?![a-f0-9]{32}\t)", "\\n"
                     }
+#if DEBUG
                 }
+#endif
             }
 
         }
