@@ -423,10 +423,10 @@ namespace DarkCodex
             foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures))
             {
                 var hex = sel.Get();
-                if (hex.GetComponent<PrerequisiteFeature>()?.m_Feature.Guid == grant_hex)
+                if (hex.GetComponent<PrerequisiteFeature>()?.m_Feature?.Guid == grant_hex)
                     continue;
 
-                foreach (var fact in hex.GetComponent<AddFacts>().m_Facts ?? Array.Empty<BlueprintUnitFactReference>())
+                foreach (var fact in hex.GetComponent<AddFacts>()?.m_Facts ?? Array.Empty<BlueprintUnitFactReference>())
                     if (fact.Get() is BlueprintAbility ab)
                         abilities.Add(ab.ToRef());
             }
@@ -440,6 +440,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(witch_selection.ToRef(), true),
                 Helper.CreatePrerequisiteFeature(shaman_selection.ToRef(), true)
                 );
+
+            Helper.AddMythicTalent(feat);
         }
 
         public static void createDemonLord()

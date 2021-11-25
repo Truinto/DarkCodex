@@ -60,9 +60,9 @@ namespace DarkCodex
         None = 0,
         Event = 1,      // for Events only, conflicts near impossible
         Harmony = 2,    // for HarmonyPatches only, conflicts improbable
-        Fix = 3,        // low, no content
-        Extend = 4,     // low, conflicts improbable
-        Create = 5,     // high, permanent requirement for save
+        Fix = 4,        // low, no content
+        Extend = 8,     // low, conflicts improbable
+        Create = 16,    // high, permanent requirement for save
 
         WIP = 256,
         Faulty = 512,

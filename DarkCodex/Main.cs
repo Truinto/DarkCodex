@@ -344,15 +344,17 @@ namespace DarkCodex
                     // Debug
                     LoadSafe(DEBUG.Enchantments.NameAll);
                     PatchSafe(typeof(DEBUG.Enchantments));
+#if DEBUG
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.PolymorphTest1));
                     PatchSafe(typeof(DEBUG.PolymorphTest2));
                     PatchSafe(typeof(DEBUG.SpellReach));
-                    //PatchSafe(typeof(General.DEBUGTEST));
+#endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
                     LoadSafe(General.createBardStopSong);
+                    //PatchSafe(typeof(General.DEBUGTEST));
 
                     // Cache
                     LoadSafe(PropertyMaxAttribute.createPropertyMaxMentalAttribute);
