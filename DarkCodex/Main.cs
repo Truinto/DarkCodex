@@ -145,7 +145,7 @@ namespace DarkCodex
                 Control_AreaEffects.Stop();
             if (GUILayout.Button("Debug: Continue Area Fxs", GUILayout.ExpandWidth(false)))
                 Control_AreaEffects.Continue();
-            if (GUILayout.Button("Debug: Print Content Table", GUILayout.ExpandWidth(false)))
+            if (GUILayout.Button("Debug: Print Content Table", GUILayout.ExpandWidth(false))) // TODO: don't print harmony patches, fix new lines; update WIP markers
             {
                 using var sw = new StreamWriter(Path.Combine(Main.ModPath, "content.md"), false);
                 sw.WriteLine("Content");

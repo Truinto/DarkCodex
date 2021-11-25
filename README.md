@@ -66,6 +66,7 @@ Content
 |Mythic.createKineticMastery|mythic feat: physical Kinetic Blasts gain bonus equal to mythic level, or half with energy Blasts|:heavy_check_mark:|
 |Mythic.createMagicItemAdept|mythic feat: trinket items use character level as caster level|:heavy_check_mark:|
 |Mythic.createExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:heavy_check_mark:|
+|Mythic.createSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|construction|
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:heavy_check_mark:|
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:heavy_check_mark:|
 |Mythic.patchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:heavy_check_mark:|
