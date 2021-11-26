@@ -32,6 +32,7 @@ namespace DarkCodex
         public bool IsWIP => (PatchType & Severity.WIP) > 0;
         public bool IsFaulty => (PatchType & Severity.Faulty) > 0;
         public bool IsDangerous => (PatchType & Severity.Create) > 0;
+        public bool IsHarmony => (PatchType & Severity.Harmony) > 0;
 
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";
         public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : "heavy_check_mark";

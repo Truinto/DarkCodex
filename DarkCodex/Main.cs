@@ -145,7 +145,7 @@ namespace DarkCodex
                 Control_AreaEffects.Stop();
             if (GUILayout.Button("Debug: Continue Area Fxs", GUILayout.ExpandWidth(false)))
                 Control_AreaEffects.Continue();
-            if (GUILayout.Button("Debug: Print Content Table", GUILayout.ExpandWidth(false))) // TODO: don't print harmony patches, fix new lines; update WIP markers
+            if (GUILayout.Button("Debug: Print Content Table", GUILayout.ExpandWidth(false)))
             {
                 using var sw = new StreamWriter(Path.Combine(Main.ModPath, "content.md"), false);
                 sw.WriteLine("Content");
@@ -154,7 +154,8 @@ namespace DarkCodex
                 sw.WriteLine("| ------ | ----------- | ------ | ------ |");
 
                 foreach (var info in patchInfos)
-                    sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description}|{info.HomebrewStr}|{info.StatusStr}|");
+                    if (!info.IsHarmony)
+                        sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
             Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");

@@ -143,7 +143,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
-        [PatchInfo(Severity.Create, "Limitless Bombs", "mythic ability: infinite alchemist bombs and incenses", true)]
+        [PatchInfo(Severity.Create & Severity.WIP, "Limitless Bombs", "mythic ability: infinite alchemist bombs and incenses", true)]
         public static void createLimitlessBombs()
         {
             var bomb_resource = BlueprintGuid.Parse("1633025edc9d53f4691481b48248edd7");
@@ -168,7 +168,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
-        [PatchInfo(Severity.Create, "Limitless Arcane Pool", "mythic ability: infinite arcane pool, expect spell recall", true)]
+        [PatchInfo(Severity.Create & Severity.WIP, "Limitless Arcane Pool", "mythic ability: infinite arcane pool, expect spell recall", true)]
         public static void createLimitlessArcanePool()
         {
             var arcane_resource = BlueprintGuid.Parse("effc3e386331f864e9e06d19dc218b37");
@@ -192,7 +192,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
-        [PatchInfo(Severity.Create, "Limitless Arcane Reservoir", "mythic ability: infinite arcane reservoir", true)]
+        [PatchInfo(Severity.Create & Severity.WIP, "Limitless Arcane Reservoir", "mythic ability: infinite arcane reservoir", true)]
         public static void createLimitlessArcaneReservoir()
         {
             var arcane_resource = BlueprintGuid.Parse("cac948cbbe79b55459459dd6a8fe44ce");
@@ -313,7 +313,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create, "Limitless Warpriest", "mythic ability: infinite scared weapon uses", true)]
+        [PatchInfo(Severity.Create & Severity.WIP, "Limitless Warpriest", "mythic ability: infinite scared weapon uses", true)]
         public static void createLimitlessWarpriest()
         {
             var weapon_resource = BlueprintGuid.Parse("cc700ef06c6fec449ab085cbcd74709c"); //SacredWeaponEnchantResource
@@ -411,7 +411,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(feat);
         }
 
-        [PatchInfo(Severity.Create, "Cursing Gaze", "mythic ability: hexes other than grant can be used as a swift action", true, 295)]
+        [PatchInfo(Severity.Create & Severity.WIP, "Cursing Gaze", "mythic ability: hexes other than grant can be used as a swift action", true, 295)]
         public static void createSwiftHex()
         {
             var witch_selection = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
@@ -571,7 +571,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
         }
 
-        [PatchInfo(Severity.Extend, "Ranging Shots", "doesn't get weaker when hitting", true)]
+        [PatchInfo(Severity.Extend & Severity.WIP, "Ranging Shots", "doesn't get weaker when hitting", true)]
         public static void patchRangingShots()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("2b558167862b05d47b8472d176257f82"); //RangingShots
@@ -583,7 +583,7 @@ namespace DarkCodex
             feat.m_Description = Helper.CreateString("Every time you miss an enemy with a ranged weapon attack, your aim improves, giving you a stacking +1 bonus on attacks up to the maximum of your mythic rank for the remainder of the combat.");
         }
 
-        [PatchInfo(Severity.Extend, "Wandering Hex", "can swap hex at will", true)]
+        [PatchInfo(Severity.Extend & Severity.WIP, "Wandering Hex", "can swap hex at will", true)]
         public static void patchWanderingHex()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility

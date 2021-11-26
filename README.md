@@ -80,13 +80,12 @@ Content
 |Witch.createCackleActivatable|Cackle/Chant can be toggled to use move action passively|:heavy_check_mark:|
 |Witch.createIceTomb|Hex: Ice Tomb|:heavy_check_mark:|
 |Witch.createExtraHex|basic feat: Extra Hex|:heavy_check_mark:|
-|Witch.createSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:construction:|
 |Witch.fixBoundlessHealing|boundless healing applies to healing hex|:heavy_check_mark:|
 
 :heavy_check_mark: works, please report bugs you find \
 :construction: not tested, please let me know if this works or not \
-:x: does not work, avoid taking these feats
-:house: homebrew
+:x: does not work, avoid taking these feats \
+:house: homebrew \
 :book: from the books
 
 FAQ
