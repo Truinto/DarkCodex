@@ -26,6 +26,9 @@ namespace DarkCodex
 {
     public class Resource
     {
+        // clear before use
+        public static StringBuilder sb = new();
+
         public class Cache
         {
             public static List<BlueprintAbility> Ability;

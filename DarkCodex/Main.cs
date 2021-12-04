@@ -28,7 +28,7 @@ namespace DarkCodex
     public class Main
     {
         public static Harmony harmony;
-        public static bool IsInGame { get { return Game.Instance.Player?.Party.Any() ?? false; } }
+        public static bool IsInGame { get { return Game.Instance.Player?.Party?.Any() ?? false; } }
 
         /// <summary>True if mod is enabled. Doesn't do anything right now.</summary>
         public static bool Enabled { get; set; } = true;

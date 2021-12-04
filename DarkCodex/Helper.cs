@@ -51,6 +51,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -340,9 +341,22 @@ namespace DarkCodex
 
         #region Strings
 
-        public static LocalizedString GetString(string guid)
+        public static LocalizedString GetString(string key)
         {
-            return new LocalizedString { Key = "" };
+            return new LocalizedString { Key = key };
+        }
+
+        public static bool IsEmptyKey(this LocalizedString key)
+        {
+            if (key == null)
+                return true;
+            if (key == "")
+                return true;
+
+            if (LocalizationManager.CurrentPack.GetText(key.Key, false) == "")
+                return true;
+
+            return false;
         }
 
         private static SHA1 _SHA = SHA1Managed.Create();
@@ -455,6 +469,9 @@ namespace DarkCodex
                 return $"<color=red>{text}</color>";
             return text;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool StartsWithO(this string source, string value) => source.StartsWith(value, StringComparison.Ordinal);
 
         #endregion
 

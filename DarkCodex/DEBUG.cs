@@ -226,7 +226,7 @@ namespace DarkCodex
                 {
                     sw.WriteLine("names");
 #endif
-                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                    foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
                     {
                         var enchantment = bp.Blueprint as BlueprintItemEnchantment;
                         if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
@@ -294,6 +294,74 @@ namespace DarkCodex
 #if DEBUG
                 }
 #endif
+            }
+
+            public static void Name2()
+            {
+                Resource.Cache.Ensure();
+
+                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                {
+                    if (bp.Blueprint is not BlueprintItem item)
+                        continue;
+
+                    string description;
+                    if (item.m_DescriptionText != null && item.m_DescriptionText.Key != "")
+                        description = LocalizationManager.CurrentPack.GetText(item.m_DescriptionText.Key);
+                    else
+                        description = "";
+
+                    foreach (var enchant in item.CollectEnchantments())
+                    {
+                        if (enchant.m_EnchantName.IsEmptyKey())
+                        {
+                            enchant.m_EnchantName = ConvertName(enchant.name).CreateString(); // todo: use separate file?
+                        }
+
+                        if (description != "" && enchant.m_Description.IsEmptyKey())
+                        {
+                            enchant.m_Description = description.CreateString();
+                        }
+                    }
+                }
+            }
+
+            public static string ConvertName(string name)
+            {
+                if (name == null)
+                    return null;
+
+                name = name.Replace("Enchantment", "");
+                name = name.Replace("Enchant", "");
+                name = name.Replace("Plus", "");
+                if (name.Length < 1)
+                    return null;
+
+                var sb = Resource.sb;
+                sb.Clear();
+                sb.Append(name[0]);
+                for (int i = 1; i < name.Length; i++)
+                {
+                    // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
+                    if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
+                        if (sb.IsNotSpaced())
+                            sb.Append(' ');
+
+                    // prefix number blocks with '+'
+                    if (name[i].IsNumber() && !name[i - 1].IsNumber())
+                    {
+                        if (sb.IsNotSpaced()) 
+                            sb.Append(' ');
+                        sb.Append('+');
+                    }
+
+                    if (name[i] != '_')         // print char, except '_'
+                        sb.Append(name[i]);
+                    else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
+                        sb.Append(' ');
+                }
+
+                return sb.ToString();
             }
 
         }
