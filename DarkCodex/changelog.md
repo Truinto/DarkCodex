@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.3]
+- fixed Bleeding Attack's funny damage resolution by apply it to weapon attacks instead of attack rolls
+
 ## [1.1.2]
 - fixed metamagic variants with preferred spell
 - improved ingame menu

@@ -1,4 +1,5 @@
 ﻿using Kingmaker.EntitySystem.Entities;
+using Kingmaker.Enums.Damage;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
@@ -16,6 +17,11 @@ namespace DarkCodex.Components
         public int Dice;
         public DiceType DiceType;
         public int Bonus;
+
+        public PhysicalDamage GetPhysical()
+        {
+            return new PhysicalDamage(new DiceFormula(Dice, DiceType), Bonus, PhysicalDamageForm.Slashing);
+        }
 
         public DirectDamage GetDirect()
         {

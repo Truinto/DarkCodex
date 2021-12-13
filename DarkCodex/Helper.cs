@@ -998,6 +998,15 @@ namespace DarkCodex
             return result;
         }
 
+        public static AddInitiatorAttackWithWeaponTrigger CreateAddInitiatorAttackWithWeaponTrigger(ActionList Action, bool OnlyHit = true, bool OnlySneakAttack = false)
+        {
+            var result = new AddInitiatorAttackWithWeaponTrigger();
+            result.Action = Action;
+            result.OnlyHit = OnlyHit;
+            result.OnlySneakAttack = OnlySneakAttack;
+            return result;
+        }
+
         public static PrerequisiteFullStatValue CreatePrerequisiteFullStatValue(StatType stat, int value = 0)
         {
             var result = new PrerequisiteFullStatValue();

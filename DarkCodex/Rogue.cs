@@ -38,12 +38,12 @@ namespace DarkCodex
                 ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("75039846c3d85d940aa96c249b97e562").Icon
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(SneakAttack),
-                Helper.CreateAddInitiatorAttackRollTrigger(
+                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
                     Helper.CreateActionList(Helper.CreateConditional(
                         condition: new ContextConditionCasterHasFact { m_Fact = flensing.ToRef2() },
                         ifTrue: new ContextActionIncreaseBleed(true),
                         ifFalse: new ContextActionIncreaseBleed(false))),
-                    SneakAttack: true),
+                    OnlySneakAttack: true),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed),
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.StatBonus, stat: StatType.SneakAttack, customProperty: Resource.Cache.PropertySneakAttackDice)
                 );

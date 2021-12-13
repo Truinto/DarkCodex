@@ -80,6 +80,8 @@ namespace DarkCodex.Components
             if (context == null)
                 return;
 
+            //if (context.SourceAbility.IsSpell) return;
+
             Buff buff = this.Target.Unit.Buffs.GetBuff(Resource.Cache.BuffBleed);
             if (buff == null)
                 buff = this.Target.Unit.Descriptor.AddBuff(Resource.Cache.BuffBleed, context);
@@ -106,7 +108,7 @@ namespace DarkCodex.Components
             else if (this.IsStacking)
                 bleed.Value.Increase(this.Value, this.Context);
 
-            var damage = bleed.Value.GetDirect();
+            var damage = bleed.Value.GetDirect(); // TODO: maybe use physical, if still conflicting with energy attacks
             var ruleDamage = new RuleDealDamage(caster, target, damage);
             this.Context.TriggerRule(ruleDamage);
 
