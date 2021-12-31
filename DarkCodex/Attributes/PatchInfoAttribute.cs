@@ -35,7 +35,7 @@ namespace DarkCodex
         public bool IsHarmony => (PatchType & Severity.Harmony) > 0;
 
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";
-        public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : "heavy_check_mark";
+        public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : ":heavy_check_mark:";
 
         public int CompareTo(object obj)
         {
