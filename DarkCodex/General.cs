@@ -70,7 +70,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create & Severity.Faulty, "Ability Focus", "basic feat: Ability Focus, increase DC of one ability by +2", false)]
+        [PatchInfo(Severity.Create | Severity.Faulty, "Ability Focus", "basic feat: Ability Focus, increase DC of one ability by +2", false)]
         public static void createAbilityFocus()
         {
             Resource.Cache.Ensure();
@@ -194,7 +194,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref wizard.m_AllFeatures, feat.ToRef());
         }
 
-        [PatchInfo(Severity.Extend & Severity.WIP, "Hide Buffs", "unclogs UI by hidding a few buffs", false)]
+        [PatchInfo(Severity.Extend | Severity.WIP, "Hide Buffs", "unclogs UI by hidding a few buffs", false)]
         public static void patchHideBuffs()
         {
             string[] guids = new string[] {
