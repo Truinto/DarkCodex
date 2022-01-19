@@ -4,7 +4,11 @@ using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.Mechanics.EquipmentEnchants;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.Enums;
+using Kingmaker.Enums.Damage;
+using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Class.Kineticist;
@@ -81,8 +85,7 @@ namespace DarkCodex
                 ).SetComponents(
                 new KineticBlastEnhancement(),
                 new AddUnitFactEquipment() { m_Blueprint = fake_blade_damage.ToRef2() },
-                new AddUnitFactEquipment() { m_Blueprint = fake_blade_burn.ToRef2() }
-                );
+                new AddUnitFactEquipment() { m_Blueprint = fake_blade_burn.ToRef2() });
 
             var weapon = new BlueprintItemWeapon();
             weapon.m_Type = bladetype;
@@ -99,6 +102,124 @@ namespace DarkCodex
             weapon.SetComponents(new WeaponKineticBlade() { m_ActivationAbility = fake_blade_burn.ToRef(), m_Blast = fake_blade_damage.ToRef() });
 
             Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
+        }
+    
+        [PatchInfo(Severity.Create | Severity.WIP, "Butchering Axe", "new weapon type Butchering Axe", false)]
+        public static void createButcheringAxe()
+        {
+            var butchering = Helper.CreateBlueprintWeaponEnchantment(
+                "ButcheringAxeEnchantment",
+                "Butchering",
+                "If your Strength is less than 19, you take a –2 penalty on attacks with it, as you’re unable to maneuver its daunting size and weight."
+                ).SetComponents(
+                new ButcheringAxeLogic());
+
+            var tmp = Helper.CreateBlueprintWeaponType(
+                "ButcheringAxeType",
+                "Butchering Axe",
+                "e8059a8eac62cd74f9171d748a5ae428",
+                damage: new DiceFormula(3, DiceType.D6),
+                form: PhysicalDamageForm.Slashing,
+                critMod: DamageCriticalModifierType.X3);
+            tmp.m_Enchantments = butchering.ToRef().ObjToArray();
+            Resource.Cache.WeaponTypeButchering.SetReference(tmp);
+            var butcherType = Resource.Cache.WeaponTypeButchering;
+
+            var standard = Helper.CreateBlueprintItemWeapon(
+                "ButcheringAxeStandard",
+                "",
+                "",
+                butcherType,
+                price: 65);            
+            var plus1 = Helper.CreateBlueprintItemWeapon(
+                 "ButcheringAxePlus1",
+                 "",
+                 "",
+                 butcherType,
+                 price: Resource.WeaponPrice[1]).SetEnchantment("d42fc23b92c640846ac137dc26e000d4"); //Enhancement1
+            var plus2 = Helper.CreateBlueprintItemWeapon(
+                 "ButcheringAxePlus2",
+                 "",
+                 "",
+                 butcherType,
+                 price: Resource.WeaponPrice[2]).SetEnchantment("eb2faccc4c9487d43b3575d7e77ff3f5"); //Enhancement2
+            var plus3 = Helper.CreateBlueprintItemWeapon(
+                 "ButcheringAxePlus3",
+                 "",
+                 "",
+                 butcherType,
+                 price: Resource.WeaponPrice[3]).SetEnchantment("80bb8a737579e35498177e1e3c75899b"); //Enhancement3
+            var plus4 = Helper.CreateBlueprintItemWeapon(
+                 "ButcheringAxePlus4",
+                 "",
+                 "",
+                 butcherType,
+                 price: Resource.WeaponPrice[4]).SetEnchantment("783d7d496da6ac44f9511011fc5f1979"); //Enhancement4
+            var plus5 = Helper.CreateBlueprintItemWeapon(
+                 "ButcheringAxePlus5",
+                 "",
+                 "",
+                 butcherType,
+                 price: Resource.WeaponPrice[5]).SetEnchantment("bdba267e951851449af552aa9f9e3992"); //Enhancement5
+
+            Helper.AddExoticVendorItem(standard.ToReference<BlueprintItemReference>(), 3);
+            Helper.AddExoticVendorItem(plus1.ToReference<BlueprintItemReference>(), 3);
+            Helper.AddExoticVendorItem(plus2.ToReference<BlueprintItemReference>(), 3);
+            Helper.AddExoticVendorItem(plus3.ToReference<BlueprintItemReference>(), 3);
+            Helper.AddExoticVendorItem(plus4.ToReference<BlueprintItemReference>(), 3);
+            Helper.AddExoticVendorItem(plus5.ToReference<BlueprintItemReference>(), 3);
+        }
+
+        [PatchInfo(Severity.Create | Severity.WIP, "Impact Enchantment", "new enchantment Impact", false)]
+        public static void createImpactEnchantment()
+        {
+            var impact = Helper.CreateBlueprintWeaponEnchantment(
+                "ImpactEnchantment",
+                "Impact",
+                "An impact weapon delivers a potent kinetic jolt when it strikes, dealing damage as if the weapon were one size category larger. In addition, any bull rush combat maneuver the wielder attempts while wielding the weapon gains a bonus equal to the weapon’s enhancement bonus.",
+                prefix: "Impactful",
+                enchantValue: 2
+                ).SetComponents(
+                new ModifyWeaponSize { SizeCategoryChange = 1 },
+                new ScalingCMBonus { Type = CombatManeuver.BullRush }
+                ).ToRef();
+
+            var butcherType = Resource.Cache.WeaponTypeButchering;
+            if (butcherType.Get() != null)
+            {
+                var w1 = Helper.CreateBlueprintItemWeapon(
+                     "ButcheringAxePlus1Impact",
+                     "",
+                     "",
+                     butcherType,
+                     price: Resource.WeaponPrice[3]).SetEnchantment("d42fc23b92c640846ac137dc26e000d4", impact); //Enhancement1
+
+                var w2 = Helper.CreateBlueprintItemWeapon(
+                     "ButcheringAxePlus3Impact",
+                     "",
+                     "",
+                     butcherType,
+                     price: Resource.WeaponPrice[5]).SetEnchantment("80bb8a737579e35498177e1e3c75899b", impact); //Enhancement3
+
+                var w3 = Helper.CreateBlueprintItemWeapon(
+                     "ButcheringAxePlus5Impact",
+                     "",
+                     "",
+                     butcherType,
+                     price: Resource.WeaponPrice[7]).SetEnchantment("bdba267e951851449af552aa9f9e3992", impact); //Enhancement5
+
+                var w4 = Helper.CreateBlueprintItemWeapon(
+                     "ButcheringAxePlus5ImpactBaneEvil",
+                     "",
+                     "",
+                     butcherType,
+                     price: Resource.WeaponPrice[8]).SetEnchantment("bdba267e951851449af552aa9f9e3992", impact, "20ba9055c6ae1e44ca270c03feacc53b"); //Enhancement5, BaneOutsiderEvil
+
+                Helper.AddExoticVendorItem(w1.ToReference<BlueprintItemReference>(), 3);
+                Helper.AddExoticVendorItem(w2.ToReference<BlueprintItemReference>(), 2);
+                Helper.AddExoticVendorItem(w3.ToReference<BlueprintItemReference>(), 2);
+                Helper.AddExoticVendorItem(w4.ToReference<BlueprintItemReference>(), 2);
+            }
         }
     }
 }

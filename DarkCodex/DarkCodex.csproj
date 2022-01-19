@@ -42,6 +42,7 @@
     <Compile Include="Components\AddFactOnlyParty.cs" />
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
+    <Compile Include="Components\ButcheringAxeLogic.cs" />
     <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
     <Compile Include="Components\ContextActionStopActivatables.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />
@@ -50,6 +51,7 @@
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\DiceValue.cs" />
+    <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyGetterSneakAttack.cs" />
     <Compile Include="Components\PropertyMaxAttribute.cs" />
@@ -59,7 +61,9 @@
     <Compile Include="Components\ContextActionUndoAction.cs" />
     <Compile Include="Components\ContextConditionAttackRoll.cs" />
     <Compile Include="Components\RestoreEndOfCombat.cs" />
+    <Compile Include="Components\RestrictionKineticWhip.cs" />
     <Compile Include="Components\RuleAttackRoll2.cs" />
+    <Compile Include="Components\ScalingCMBonus.cs" />
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
     <Compile Include="DEBUG.cs" />
     <Compile Include="General.cs" />

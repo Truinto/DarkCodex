@@ -129,7 +129,7 @@ namespace DarkCodex
                 out BlueprintBuff buff,
                 icon: icon
                 ).SetComponents(
-                new RestrictionCanGatherPower()
+                new RestrictionKineticWhip()
                 );
 
             buff.Flags(hidden: true);

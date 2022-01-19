@@ -29,6 +29,20 @@ namespace DarkCodex
         // clear before use
         public static StringBuilder sb = new();
 
+        public static readonly int[] WeaponPrice = new int[] {
+                100,
+                2000,
+                8000,
+                18000,
+                32000,
+                50000,
+                72000,
+                98000,
+                128000,
+                162000,
+                200000,
+            };
+
         public class Cache
         {
             public static List<BlueprintAbility> Ability;
@@ -46,6 +60,7 @@ namespace DarkCodex
             public static readonly BlueprintFeatureReference FeatureFeralCombat;
             public static readonly BlueprintFeatureReference FeatureResourcefulCaster;
             public static readonly BlueprintFeatureReference FeatureMagicItemAdept;
+            public static readonly BlueprintWeaponTypeReference WeaponTypeButchering;
 
             static Cache()
             {
@@ -59,6 +74,7 @@ namespace DarkCodex
                     FeatureFeralCombat = new BlueprintFeatureReference();
                     FeatureResourcefulCaster = new BlueprintFeatureReference();
                     FeatureMagicItemAdept = new BlueprintFeatureReference();
+                    WeaponTypeButchering = new BlueprintWeaponTypeReference();
 
                     WeaponUnarmed = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
                 }
@@ -78,7 +94,7 @@ namespace DarkCodex
 
                 var keys = ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Keys.ToArray();
 
-                foreach(var key in keys)
+                foreach (var key in keys)
                 {
                     var bp = ResourcesLibrary.BlueprintsCache.Load(key);
 

@@ -394,6 +394,8 @@ namespace DarkCodex
                     LoadSafe(Items.patchArrows);
                     LoadSafe(Items.patchTerendelevScale);
                     LoadSafe(Items.createKineticArtifact);
+                    LoadSafe(Items.createButcheringAxe);
+                    LoadSafe(Items.createImpactEnchantment);
 
                     // Mythic
                     LoadSafe(Mythic.createLimitlessBardicPerformance);

@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.4]
+- changed restriction on Kinetic Whip, so it can be used whenever a Kinetic Blade is equipped
+- added Butchering Axe and Impact enchantment
+
 ## [1.1.3]
 - fixed Bleeding Attack's funny damage resolution by apply it to weapon attacks instead of attack rolls
 

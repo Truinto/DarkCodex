@@ -287,6 +287,7 @@ namespace DarkCodex
         {
             //DispellingAttack.1b92146b8a9830d4bb97ab694335fa7c FEATURE
             //DispellingBomb.f80896af0e10d7c4f9454cf1ce50ada4
+            //UnravelingInfusionBuff.cebd08ab72f1baa4eaacdd836207873a
             var destructive = Helper.ToRef<BlueprintUnitFactReference>("d298e64e14398e848a54db5a2619ba42"); //DestructiveDispel
             var sickened = Helper.ToRef<BlueprintBuffReference>("4e42460798665fd4cb9173ffa7ada323"); //Sickened
             var stunned = Helper.ToRef<BlueprintBuffReference>("09d39b38bb7c6014394b6daced9bacd3"); //Stunned

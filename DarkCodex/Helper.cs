@@ -667,6 +667,8 @@ namespace DarkCodex
 
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = (T)_memberwiseClone.Invoke(obj, null);
             result.name = name;
@@ -836,6 +838,12 @@ namespace DarkCodex
             vendor_table.AddComponents(new LootItemsPackFixed() { m_Item = new LootItem() { m_Item = item }, m_Count = amount });
         }
 
+        public static void AddExoticVendorItem(BlueprintItemReference item, int amount = 1)
+        {
+            var vendor_table = ResourcesLibrary.TryGetBlueprint<BlueprintSharedVendorTable>("5f722616e64f41b4f960cd00c0b4896c"); //RE_Chapter3VendorTableExotic
+            vendor_table.AddComponents(new LootItemsPackFixed() { m_Item = new LootItem() { m_Item = item }, m_Count = amount });
+        }
+
         public static ContextCondition[] MakeConditionHasNoBuff(params BlueprintBuff[] buffs)
         {
             if (buffs == null || buffs[0] == null) throw new ArgumentNullException();
@@ -866,9 +874,11 @@ namespace DarkCodex
         {
             var result = new ContextActionSavingThrow();
             result.Type = savingthrow;
-            result.Actions = CreateActionList(new ContextActionConditionalSaved() {
+            result.Actions = CreateActionList(new ContextActionConditionalSaved()
+            {
                 Succeed = CreateActionList(succeed),
-                Failed = CreateActionList(failed) });
+                Failed = CreateActionList(failed)
+            });
             return result;
         }
 
@@ -900,6 +910,42 @@ namespace DarkCodex
             ability.CanTargetSelf = true;
             ability.Animation = animation;
             return ability;
+        }
+
+        #endregion
+
+        #region Blueprint Weapon
+
+        /// <param name="BlueprintWeaponEnchantment">direct type, reference, or string</param>
+        public static BlueprintItemWeapon SetEnchantment(this BlueprintItemWeapon bp, params object[] BlueprintWeaponEnchantment)
+        {
+            var list = new List<BlueprintWeaponEnchantmentReference>();
+
+            foreach (var obj in BlueprintWeaponEnchantment)
+            {
+                if (obj is string guid)
+                    list.Add(guid.ToRef<BlueprintWeaponEnchantmentReference>());
+                else if (obj is BlueprintWeaponEnchantmentReference reference)
+                    list.Add(reference);
+                else if (obj is BlueprintWeaponEnchantment enchantment)
+                    list.Add(enchantment.ToRef());
+                else
+                    throw new ArgumentException("invalid type: " + obj.GetType().AssemblyQualifiedName);
+            }
+
+            bp.m_Enchantments = list.ToArray();
+            return bp;
+        }
+
+        public static void GenerateEnchantedWeapons(this BlueprintWeaponType weaponType, List<BlueprintItemWeapon> list, BlueprintWeaponEnchantment enchantment, bool full, params object[] BlueprintWeaponEnchantment)
+        {
+            var plus1 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("d42fc23b92c640846ac137dc26e000d4");
+            var plus2 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("eb2faccc4c9487d43b3575d7e77ff3f5");
+            var plus3 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b");
+            var plus4 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("783d7d496da6ac44f9511011fc5f1979");
+            var plus5 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("bdba267e951851449af552aa9f9e3992");
+
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -1391,6 +1437,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintBuff();
             result.name = name;
@@ -1409,6 +1457,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintFeature();
             result.IsClassFeature = true;
@@ -1426,6 +1476,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintAbility();
             result.name = name;
@@ -1447,6 +1499,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintFeatureSelection();
             result.IsClassFeature = true;
@@ -1464,6 +1518,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintParametrizedFeature();
             result.IsClassFeature = true;
@@ -1483,6 +1539,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintActivatableAbility();
             result.name = name;
@@ -1536,6 +1594,8 @@ namespace DarkCodex
 
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintAbilityAreaEffect();
             result.name = name;
@@ -1579,6 +1639,8 @@ namespace DarkCodex
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
 
             var result = new BlueprintWeaponEnchantment();
             result.name = name;
@@ -1597,6 +1659,103 @@ namespace DarkCodex
             var guid = GuidManager.i.Get(name);
             var result = new BlueprintUnitProperty();
             result.name = name;
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static BlueprintWeaponType CreateBlueprintWeaponType(string name, string displayName, string cloneFromWeaponType, Feet range = default, DiceFormula damage = default, PhysicalDamageForm form = PhysicalDamageForm.Bludgeoning, int critRange = 20, DamageCriticalModifierType critMod = DamageCriticalModifierType.X2, WeaponFighterGroupFlags? fighterGroup = null, WeaponCategory? category = null, float? weight = null, string guid = null)
+        {
+            // note: take care to not mutate m_VisualParameters!
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
+            var clone = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponType>(cloneFromWeaponType);
+            if (range == default)
+                range = 5.Feet();
+            if (damage == default)
+                damage = new DiceFormula(1, DiceType.D6);
+
+            var result = new BlueprintWeaponType();
+            result.name = name;
+
+            result.m_TypeNameText = displayName.CreateString();
+            result.m_DefaultNameText = result.m_TypeNameText;
+            result.m_DescriptionText = "".CreateString();
+            result.m_MasterworkDescriptionText = "".CreateString();
+            result.m_MagicDescriptionText = "".CreateString();
+
+            result.m_AttackRange = range;
+            result.m_BaseDamage = damage;
+            result.m_DamageType = new DamageTypeDescription();
+            result.m_DamageType.Physical.Form = form;
+            result.m_CriticalRollEdge = critRange;
+            result.m_CriticalModifier = critMod;
+            result.m_FighterGroupFlags = fighterGroup ?? clone.m_FighterGroupFlags;
+            result.Category = category ?? clone.Category;
+            result.m_Weight = weight ?? clone.m_Weight;
+
+            result.m_VisualParameters = clone.m_VisualParameters;
+            result.m_Icon = clone.Icon;
+            result.m_IsTwoHanded = clone.m_IsTwoHanded;
+            result.m_IsLight = clone.m_IsLight;
+            result.m_IsMonk = clone.m_IsMonk;
+            result.m_IsNatural = clone.m_IsNatural;
+            result.m_IsUnarmed = clone.m_IsUnarmed;
+            result.m_OverrideAttackBonusStat = clone.m_OverrideAttackBonusStat;
+            result.m_AttackBonusStatOverride = clone.m_AttackBonusStatOverride;
+            result.m_ShardItem = clone.m_ShardItem;
+
+            result.m_Enchantments = clone.m_Enchantments;
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName, string description, BlueprintWeaponTypeReference weaponType, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, string guid = null, int price = 1000)
+        {
+            if (guid == null)
+                guid = GuidManager.i.Get(name);
+            else
+                GuidManager.i.Reg(guid);
+
+            var result = new BlueprintItemWeapon();
+            result.name = name;
+
+            result.m_DisplayNameText = displayName.CreateString();
+            result.m_DescriptionText = description.CreateString();
+            result.m_Type = weaponType;
+            result.m_Size = Size.Medium;
+            result.m_OverrideDamageDice = damageOverride != null;
+            result.m_DamageDice = damageOverride.GetValueOrDefault();
+            result.m_OverrideDamageType = form != null;
+            result.m_DamageType = form;
+            result.Double = secondWeapon != null;
+            result.m_SecondWeapon = secondWeapon;
+            result.KeepInPolymorph = false;
+            result.m_AlwaysPrimary = primaryNatural;
+            result.m_Cost = price;
+
+            // didn't needs these values so far
+            result.CR = 0;
+            result.m_Ability = null;
+            result.m_ActivatableAbility = null;
+            result.SpendCharges = false;
+            result.Charges = 1;
+            result.RestoreChargesOnRest = result.SpendCharges;
+            result.CasterLevel = 1;
+            result.SpellLevel = 1;
+            result.DC = 11;
+            result.m_Weight = 0;
+            result.m_FlavorText = "".CreateString();
+            result.m_NonIdentifiedNameText = "".CreateString();
+            result.m_NonIdentifiedDescriptionText = "".CreateString();
+            result.m_Icon = null; //can be null
+
+            result.m_Enchantments = Array.Empty<BlueprintWeaponEnchantmentReference>();
+
+            result.OnEnableWithLibrary();
 
             AddAsset(result, guid);
             return result;
@@ -1964,13 +2123,17 @@ namespace DarkCodex
             //if (res is BlueprintUnitFact res1)
             try
             {
-                return ResourcesLibrary.TryGetBlueprint<BlueprintUnitFact>(guid)?.Icon;
+                var bp = ResourcesLibrary.TryGetBlueprint(BlueprintGuid.Parse(guid));
+                if (bp is BlueprintUnitFact fact)
+                    return fact.m_Icon;
+                if (bp is BlueprintWeaponType weapontype)
+                    return weapontype.m_Icon;
             }
             catch (Exception)
             {
-                Helper.Print("Could not import icon from " + guid);
-                return null;
             }
+            Print("Could not import icon from " + guid);
+            return null;
         }
 
         public static Sprite CreateSprite(string filename, int width = 64, int height = 64)
