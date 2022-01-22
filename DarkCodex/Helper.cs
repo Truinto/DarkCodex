@@ -45,6 +45,7 @@ using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.Utility;
+using Kingmaker.View.Equipment;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1755,7 +1756,10 @@ namespace DarkCodex
 
             result.m_Enchantments = Array.Empty<BlueprintWeaponEnchantmentReference>();
 
+            // not sure
             result.OnEnableWithLibrary();
+            result.m_VisualParameters.m_Projectiles = Array.Empty<BlueprintProjectileReference>();
+            result.m_VisualParameters.m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>();
 
             AddAsset(result, guid);
             return result;

@@ -36,6 +36,8 @@ Content
 |Hexcrafter.fixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Items.patchArrows|will pick up non-magical arrows after combat|:book:|:heavy_check_mark:|
 |Items.patchTerendelevScale|make the revive scale usable once per day|:house:|:heavy_check_mark:|
+|Items.createButcheringAxe|new weapon type Butchering Axe|:book:|:heavy_check_mark:|
+|Items.createImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|
 |Items.createKineticArtifact|new weapon for Kineticists|:house:|:heavy_check_mark:|
 |Kineticist.fixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
 |Kineticist.fixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:heavy_check_mark:|

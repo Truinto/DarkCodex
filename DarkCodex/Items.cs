@@ -104,7 +104,7 @@ namespace DarkCodex
             Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
         }
     
-        [PatchInfo(Severity.Create | Severity.WIP, "Butchering Axe", "new weapon type Butchering Axe", false)]
+        [PatchInfo(Severity.Create, "Butchering Axe", "new weapon type Butchering Axe", false)]
         public static void createButcheringAxe()
         {
             var butchering = Helper.CreateBlueprintWeaponEnchantment(
@@ -170,7 +170,7 @@ namespace DarkCodex
             Helper.AddExoticVendorItem(plus5.ToReference<BlueprintItemReference>(), 3);
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Impact Enchantment", "new enchantment Impact", false)]
+        [PatchInfo(Severity.Create, "Impact Enchantment", "new enchantment Impact", false)]
         public static void createImpactEnchantment()
         {
             var impact = Helper.CreateBlueprintWeaponEnchantment(
