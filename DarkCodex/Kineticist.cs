@@ -502,16 +502,26 @@ namespace DarkCodex
             soulability.AddComponents(new AbilityRequirementOnlyCombat { Not = true });
         }
 
-        [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast", true)]
+        [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast, apply PsychokineticistStat setting", true)]
         public static void patchVarious()
         {
             // allow bowling infusion on sandblasts
             var bowling = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("918b2524af5c3f647b5daa4f4e985411"); //BowlingInfusionBuff
             var sandstorm = Helper.ToRef<BlueprintAbilityReference>("b93e1f0540a4fa3478a6b47ae3816f32"); //SandstormBlastBase
-
             ExpandSubstance(bowling, sandstorm);
+
+            // apply PsychokineticistStat setting
+            var pstat = Settings.StateManager.State.PsychokineticistStat;
+            if (pstat != StatType.Wisdom)
+            {
+                var pfeat = Helper.Get<BlueprintFeature>("2fa48527ba627254ba9bf4556330a4d4"); //PsychokineticistBurnFeature
+                pfeat.GetComponent<AddKineticistPart>().MainStat = pstat;
+
+                var presource = Helper.Get<BlueprintAbilityResource>("4b8b95612529a8640bb6e07c580b947b"); //PsychokineticistBurnResource
+                presource.m_MaxAmount.ResourceBonusStat = pstat;
+            }
         }
-        
+
         [PatchInfo(Severity.Fix, "Spell-like Blasts", "makes blasts register as spell like, instead of supernatural", false)]
         public static void fixBlastsAreSpellLike()
         {
@@ -649,6 +659,31 @@ namespace DarkCodex
             // SpecificBuffImmunity(sleet_storm)
             // ignore miss chances
             // ignore weather in UnitPartConcealment.Calculate
+        }
+
+        [PatchInfo(Severity.Create, "Mind Shield", "Wild Talent: half Psychokineticist's penalties", true)]
+        public static void createMindShield()
+        {
+            var buff = Helper.Get<BlueprintBuff>("a9e3e785ea41449499b6b5d3d22a0856");  //PsychokineticistBurnBuff
+            var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459"); 
+            var psychokineticist = Helper.ToRef<BlueprintArchetypeReference>("f2847dd4b12fffd41beaa3d7120d27ad");
+
+            var feature = Helper.CreateBlueprintFeature(
+                "MindShieldFeature",
+                "Mind Shield",
+                "Reduce the penalties of Mind Burn by 1."
+                ).SetComponents(
+                Helper.CreatePrerequisiteArchetypeLevel(psychokineticist));
+            Resource.Cache.FeatureMindShield.SetReference(feature);
+
+            var property = Helper.CreateBlueprintUnitProperty("PsychokineticistMindPropertyGetter")
+                .SetComponents(new PropertyMindShield { Feature = feature });
+
+            var rank = buff.GetComponent<ContextRankConfig>();
+            rank.m_StepLevel = 1;
+            rank.m_CustomProperty = property.ToRef();
+
+            Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feature.ToRef());
         }
 
         #region Helper

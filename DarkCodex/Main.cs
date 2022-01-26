@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Linq.Expressions;
 using Kingmaker.UI.Common;
 using Kingmaker.UI;
+using Kingmaker.EntitySystem.Stats;
 
 namespace DarkCodex
 {
@@ -57,6 +58,8 @@ namespace DarkCodex
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
+            Settings state = Settings.StateManager.State;
+
             if (StyleBox == null)
             {
                 StyleBox = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleCenter };
@@ -69,9 +72,11 @@ namespace DarkCodex
                 + "\n[*] Option is enabled/disabled immediately, without restart.");
 
             if (Patch_AllowAchievements.Patched)
-                Checkbox(ref Settings.StateManager.State.allowAchievements, "[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files");
+                Checkbox(ref state.allowAchievements, "[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files");
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
+
+            //Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
@@ -81,8 +86,8 @@ namespace DarkCodex
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
             if (GUILayout.Button("Disable all homebrew"))
-                Settings.StateManager.State.doNotLoad =
-                    Settings.StateManager.State.doNotLoad.Union(patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method)).ToList();
+                state.doNotLoad =
+                    state.doNotLoad.Union(patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method)).ToList();
 
             string category = null;
             bool disableAll = false;
@@ -93,16 +98,16 @@ namespace DarkCodex
                     GUILayout.Box(GUIContent.none, StyleLine);
                     GUILayout.Label(info.Class);
                     category = info.Class;
-                    disableAll = Settings.StateManager.State.doNotLoad.Contains(category + ".*");
+                    disableAll = state.doNotLoad.Contains(category + ".*");
 
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
                     {
                         restart = true;
                         if (!disableAll)
-                            Settings.StateManager.State.doNotLoad.Add(category + ".*");
+                            state.doNotLoad.Add(category + ".*");
                         else
-                            Settings.StateManager.State.doNotLoad.Remove(category + ".*");
+                            state.doNotLoad.Remove(category + ".*");
                     }
                     GUILayout.Space(5);
                     GUILayout.Label("Disable all", GUILayout.ExpandWidth(false));
@@ -110,7 +115,7 @@ namespace DarkCodex
                 }
 
                 string str = info.Class + "." + info.Method;
-                bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
+                bool enabled = !state.doNotLoad.Contains(str);
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(5);
@@ -120,9 +125,9 @@ namespace DarkCodex
                 {
                     restart = true;
                     if (enabled)
-                        Settings.StateManager.State.doNotLoad.Add(str);
+                        state.doNotLoad.Add(str);
                     else
-                        Settings.StateManager.State.doNotLoad.Remove(str);
+                        state.doNotLoad.Remove(str);
                 }
                 GUILayout.Space(5);
                 GUILayout.Label(info.Name.Red(info.IsDangerous), GUILayout.Width(300));
@@ -157,18 +162,17 @@ namespace DarkCodex
                     if (!info.IsHarmony)
                         sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
-            Checkbox(ref Settings.StateManager.State.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
-            Checkbox(ref Settings.StateManager.State.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
-            Checkbox(ref Settings.StateManager.State.debug_1, "Debug: Flag1");
-            Checkbox(ref Settings.StateManager.State.debug_2, "Debug: Flag2");
-            Checkbox(ref Settings.StateManager.State.debug_3, "Debug: Flag3");
-            Checkbox(ref Settings.StateManager.State.debug_4, "Debug: Flag4");
+            Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
+            Checkbox(ref state.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
+            Checkbox(ref state.debug_1, "Debug: Flag1");
+            Checkbox(ref state.debug_2, "Debug: Flag2");
+            Checkbox(ref state.debug_3, "Debug: Flag3");
+            Checkbox(ref state.debug_4, "Debug: Flag4");
 
             GUILayout.Label("");
 
             if (GUILayout.Button("Save settings!"))
                 OnSaveGUI(modEntry);
-
         }
 
         private static void OnHideGUI(UnityModManager.ModEntry modEntry)
@@ -187,13 +191,12 @@ namespace DarkCodex
                 try
                 {
                     var field = typeof(Settings).GetField(entry.Key);
-
                     if (field.FieldType == typeof(int))
                     {
                         if (int.TryParse(entry.Value, out int num))
                             field.SetValue(Settings.StateManager.State, num);
                     }
-                    else
+                    else if (field.FieldType == typeof(float))
                     {
                         if (float.TryParse(entry.Value, out float num))
                             field.SetValue(Settings.StateManager.State, num);
@@ -219,6 +222,22 @@ namespace DarkCodex
             GUILayout.Space(5);
             GUILayout.Label(label, GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
+        }
+
+        private static void Checkbox<T>(ref T value, string label, Action<T> action = null) where T : Enum
+        {
+            if (!GUILayout.Button(label)) // TODO: state must be saved
+                return;
+            string name = value.ToString();
+            var names = Enum.GetNames(typeof(T));
+            int index = names.IndexOf(name);
+            int newindex = GUILayout.SelectionGrid(index, names, names.Length);
+
+            if (index == newindex)
+                return;
+
+            value = (T)Enum.Parse(typeof(T), names[newindex]);
+            action?.Invoke(value);
         }
 
         private static void FlagBox(string name, string description, string str, bool grey, int spacing = 10)
@@ -417,6 +436,7 @@ namespace DarkCodex
                     LoadSafe(Mythic.patchBoundlessHealing);
                     LoadSafe(Mythic.patchRangingShots);
                     LoadSafe(Mythic.patchWanderingHex);
+                    LoadSafe(Mythic.patchJudgementAura);
                     LoadSafe(Mythic.patchVarious);
 
                     // Kineticist
@@ -428,6 +448,7 @@ namespace DarkCodex
                     LoadSafe(Kineticist.createBladeRushInfusion);
                     LoadSafe(Kineticist.createAutoMetakinesis);
                     LoadSafe(Kineticist.createHurricaneQueen);
+                    LoadSafe(Kineticist.createMindShield);
                     LoadSafe(Kineticist.patchGatherPower);
                     LoadSafe(Kineticist.patchDarkElementalist);
                     LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat

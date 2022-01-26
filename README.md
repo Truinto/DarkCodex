@@ -44,18 +44,20 @@ Content
 |Kineticist.patchDarkElementalist|faster animation and use anywhere, but only out of combat|:house:|:heavy_check_mark:|
 |Kineticist.patchDemonCharge|Demon Charge also gathers power|:house:|:heavy_check_mark:|
 |Kineticist.patchGatherPower|Kineticist Gather Power can be used manually|:book:|:heavy_check_mark:|
-|Kineticist.patchVarious|bowling works with sandstorm blast|:house:|:heavy_check_mark:|
+|Kineticist.patchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting|:house:|:heavy_check_mark:|
 |Kineticist.createAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:book:|:heavy_check_mark:|
 |Kineticist.createBladeRushInfusion|infusion: Blade Rush, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Kineticist.createExtraWildTalentFeat|basic feat: Extra Wild Talent|:book:|:heavy_check_mark:|
 |Kineticist.createHurricaneQueen|Wild Talent: Hurricane Queen|:book:|:construction:|
 |Kineticist.createImpaleInfusion|infusion: Impale|:book:|:heavy_check_mark:|
 |Kineticist.createKineticistBackground|regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:house:|:heavy_check_mark:|
+|Kineticist.createMindShield|Wild Talent: half Psychokineticist's penalties|:house:|:construction:|
 |Kineticist.createMobileGatheringFeat|basic feat: Mobile Gathering|:book:|:heavy_check_mark:|
 |Kineticist.createSelectiveMetakinesis|gain selective metakinesis at level 7|:house:|:heavy_check_mark:|
 |Kineticist.createWhipInfusion|infusion: Kinetic Whip, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Monk.createFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
 |Mythic.patchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:house:|:heavy_check_mark:|
+|Mythic.patchJudgementAura|Everlasting Judgement also applies to Judgement Aura|:house:|:heavy_check_mark:|
 |Mythic.patchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:house:|:heavy_check_mark:|
 |Mythic.patchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:house:|:heavy_check_mark:|
 |Mythic.patchRangingShots|doesn't get weaker when hitting|:house:|:construction:|

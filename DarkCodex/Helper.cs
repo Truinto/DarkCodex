@@ -1783,7 +1783,7 @@ namespace DarkCodex
             else if (sb == null)
                 Print("ERROR: could not resolve " + guid);
             else
-                Print("ERROR: invalid conversion " + guid);
+                Print($"ERROR: invalid conversion {sb.name} : {guid}");
 
             return null;
         }

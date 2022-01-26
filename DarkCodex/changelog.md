@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.5]
+- added createMindShield: Wild Talent, half Psychokineticist's penalties
+- added patchJudgementAura: Everlasting Judgement also applies to Judgement Aura
+- added option to change Psychokineticist's main stat (does not update ingame descriptions)
+
 ## [1.1.4]
 - changed restriction on Kinetic Whip, so it can be used whenever a Kinetic Blade is equipped
 - added Butchering Axe and Impact enchantment

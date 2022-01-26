@@ -60,6 +60,7 @@ namespace DarkCodex
             public static readonly BlueprintFeatureReference FeatureFeralCombat;
             public static readonly BlueprintFeatureReference FeatureResourcefulCaster;
             public static readonly BlueprintFeatureReference FeatureMagicItemAdept;
+            public static readonly BlueprintFeatureReference FeatureMindShield;
             public static readonly BlueprintWeaponTypeReference WeaponTypeButchering;
 
             static Cache()
@@ -74,6 +75,7 @@ namespace DarkCodex
                     FeatureFeralCombat = new BlueprintFeatureReference();
                     FeatureResourcefulCaster = new BlueprintFeatureReference();
                     FeatureMagicItemAdept = new BlueprintFeatureReference();
+                    FeatureMindShield = new BlueprintFeatureReference();
                     WeaponTypeButchering = new BlueprintWeaponTypeReference();
 
                     WeaponUnarmed = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6

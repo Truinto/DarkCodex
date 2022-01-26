@@ -591,6 +591,15 @@ namespace DarkCodex
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
             feat.RemoveComponents(default(AbilityResourceLogic));
         }
+        
+        [PatchInfo(Severity.Extend, "Judgement Aura", "Everlasting Judgement also applies to Judgement Aura", true)]
+        public static void patchJudgementAura()
+        {
+            var ability = Helper.Get<BlueprintAbility>("faa50b5d67eb4745b7b1157629d5c304"); //JudgementAuraAbility
+            var fact = Helper.ToRef<BlueprintUnitFactReference>("4a6dc772c9a7fe742a65820007107f03"); //EverlastingJudgement
+
+            ability.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(fact);
+        }
 
         [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, fix description", true)]
         public static void patchVarious()

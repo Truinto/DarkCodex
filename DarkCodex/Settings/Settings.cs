@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Kingmaker.EntitySystem.Stats;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.IO;
 
@@ -7,7 +9,7 @@ namespace DarkCodex
     public class Settings
     {
         [JsonProperty]
-        public int version = 1;
+        public int version = 2;
 
         [JsonProperty]
         public bool showBootupWarning = true;
@@ -22,6 +24,10 @@ namespace DarkCodex
         public List<string> doNotLoad = new List<string>() {
             "General.patchBasicFreebieFeats",
         };
+
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public StatType PsychokineticistStat = StatType.Wisdom;
 
         [JsonProperty]
         public bool polymorphKeepInventory = false;

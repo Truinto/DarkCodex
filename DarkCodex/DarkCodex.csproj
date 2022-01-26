@@ -51,6 +51,7 @@
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\DiceValue.cs" />
+    <Compile Include="Components\PropertyMindShield.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyGetterSneakAttack.cs" />
