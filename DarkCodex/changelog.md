@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.6]
+- fixed improved hunter's bond not showing up in feat selection
+
 ## [1.1.5]
 - added createMindShield: Wild Talent, half Psychokineticist's penalties
 - added patchJudgementAura: Everlasting Judgement also applies to Judgement Aura

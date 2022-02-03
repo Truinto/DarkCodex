@@ -732,6 +732,8 @@ namespace DarkCodex
             if (_combatfeats3 == null) //ExtraFeatMythicFeat
                 _combatfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
             Helper.AppendAndReplace(ref _combatfeats3.m_AllFeatures, feats.ToRef());
+
+            AddFeats(feats);
         }
 
         private static BlueprintFeatureSelection _mythicfeats;
