@@ -24,11 +24,9 @@ namespace DarkCodex
             var accursed_strike_variants = new List<BlueprintAbility>();
             foreach (var hex in hexes_harmful)
             {
-                var hex_accursed = hex.Clone(hex.name + "_Accursed", guid2: "edcbb0c312504c679d5a2d5af5beecdf");
-                hex_accursed.Range = AbilityRange.Touch;
-                //AddComponent CreateDeliverTouch()
+                Helper.MakeStickySpell(hex.AssetGuidThreadSafe, out var hex_accursed, out _);
 
-                //Helper.CreateTouchSpellCast();
+                accursed_strike_variants.Add(hex_accursed);
             }
 
             //BalefulPolymorph

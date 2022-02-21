@@ -107,7 +107,7 @@ namespace DarkCodex
 
             Helper.AddFeats(feat);
         }
-        
+
         [PatchInfo(Severity.Extend, "Empower Angels Light", "'Light of the Angels' give temporary HP equal to character level", true)]
         public static void patchAngelsLight()
         {
@@ -216,13 +216,13 @@ namespace DarkCodex
                 }
             }
         }
-        
+
         [PatchInfo(Severity.Extend, "Various Tweaks", "removed PreciousTreat penalty, extend protection from X to 10 minutes", true)]
         public static void patchVarious()
         {
             // remove penalty on Precious Treat item
             var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("ee8ee3c5c8f055e48a1ec1bfb92778f1"); //PreciousTreatBuff
-            buff.RemoveComponents(default(AddStatBonus));
+            buff.RemoveComponents<AddStatBonus>();
 
             // extend protection from X to 10 minutes
             var pfa = new string[] {
@@ -281,7 +281,7 @@ namespace DarkCodex
             var holysymbol = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("e67dc14ff73014547920dc92bc8e1bfc"); //Artifact_HolySymbolOfIomedaeToggleAbility
             holysymbol.DoNotTurnOffOnRest = true;
         }
-        
+
         [PatchInfo(Severity.Extend, "Dispel Magic", "fix Destructive Dispel, apply bonus", true)]
         public static void patchDispelMagic()
         {
@@ -339,8 +339,8 @@ namespace DarkCodex
         }
     }
 
-    [PatchInfo(Severity.Event, "Event: Area Effects", "mute player area effects while in dialog", false)]
-    public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IPartyCombatHandler, IGlobalSubscriber, ISubscriber //ICutsceneHandler, ICutsceneDialogHandler
+    [PatchInfo(Severity.Event | Severity.WIP, "Event: Area Effects", "mute player area effects while in dialog", false)]
+    public class Control_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IPartyCombatHandler, ICutsceneHandler, ICutsceneDialogHandler, IGlobalSubscriber, ISubscriber
     {
         //Game.Instance.IsModeActive(GameModeType.Dialog) || Game.Instance.IsModeActive(GameModeType.Cutscene);
 
@@ -400,6 +400,8 @@ namespace DarkCodex
             if (!inCombat)
                 return;
 
+            Continue();
+
             foreach (var unit in Game.Instance.Player.PartyAndPets)
             {
                 foreach (var buff in unit.Buffs)
@@ -424,9 +426,44 @@ namespace DarkCodex
                 }
             }
         }
+
+        public void HandleDialogVisible(bool state)
+        {
+            Helper.PrintDebug("HandleDialogVisible: " + state);
+        }
+
+        public void HandleCutsceneStarted(CutscenePlayerData cutscene, bool queued)
+        {
+            Helper.PrintDebug("Cutscene started...");
+
+            if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
+                Stop();
+        }
+
+        public void HandleCutsceneRestarted(CutscenePlayerData cutscene)
+        {
+            Helper.PrintDebug("Cutscene restarted...");
+
+            if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
+                Stop();
+        }
+
+        public void HandleCutscenePaused(CutscenePlayerData cutscene, CutscenePauseReason reason)
+        {
+        }
+
+        public void HandleCutsceneResumed(CutscenePlayerData cutscene)
+        {
+        }
+
+        public void HandleCutsceneStopped(CutscenePlayerData cutscene)
+        {
+            Helper.PrintDebug("Cutscene stopped...");
+            Continue();
+        }
     }
 
-    [PatchInfo(Severity.Harmony, "Patch: Fix Load Crash", "removes trap data during save load to prevent a specific crash", false)]
+    [PatchInfo(Severity.Harmony, "Patch: Fix Load Crash", "removes trap data during save load to prevent a specific crash; toggle with debug flag 2", false)]
     [HarmonyPatch(typeof(AreaDataStash), nameof(AreaDataStash.GetJsonForArea))]
     public class Patch_FixLoadCrash1
     {
@@ -464,7 +501,7 @@ namespace DarkCodex
                 {
                     if (!conlist.Key.StartsWith("PreferredSpell#"))
                         continue;
-                    
+
                     var targetspell = conlist.Value.Last();
 
                     list.FirstOrDefault(f => f.Blueprint == targetspell)?.MetamagicData?.Clear(); // clear metamagic copied from donor spell

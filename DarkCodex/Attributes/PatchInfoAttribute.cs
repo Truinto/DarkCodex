@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
-    public class PatchInfoAttribute : Attribute, IComparable
+    public class PatchInfoAttribute : Attribute, IComparable<PatchInfoAttribute>, IEquatable<PatchInfoAttribute>
     {
         public PatchInfoAttribute() { }
 
-        public PatchInfoAttribute(Severity PatchType, string Name = null, string Description = null, bool Homebrew = true, int Priority = 400, Type Requirement = null) 
+        public PatchInfoAttribute(Severity PatchType, string Name = null, string Description = null, bool Homebrew = true, int Priority = 400, Type Requirement = null)
         {
             this.PatchType = PatchType;
             this.Name = Name;
@@ -28,30 +28,40 @@ namespace DarkCodex
         public int Priority;    // 400 = normal, 300 = late, 500 = early, 200 = after other mods; currently only informative
         public string Class;
         public string Method;
+        public bool Disabled;
+        public bool DisabledAll;
 
         public bool IsWIP => (PatchType & Severity.WIP) > 0;
         public bool IsFaulty => (PatchType & Severity.Faulty) > 0;
         public bool IsDangerous => (PatchType & Severity.Create) > 0;
         public bool IsHarmony => (PatchType & Severity.Harmony) > 0;
+        public bool IsEvent => (PatchType & Severity.Event) > 0;
 
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";
         public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : ":heavy_check_mark:";
 
-        public int CompareTo(object obj)
+        public int CompareTo(PatchInfoAttribute other)
         {
-            if (this == null && obj == null)
-                return 0;
-            if (this == null)
-                return -1;
-            if (obj is not PatchInfoAttribute other)
-                return 1;
+            // put last: Patch, Event
+            int i = 0;
+            if (this.Class == "Patch")
+                i += 100;
+            if (other.Class == "Patch")
+                i -= 100;
 
-            int i = this.Class.CompareTo(other.Class);
+            // sort by class name, then patch severity, then method name
+            if (i == 0)
+                i = this.Class.CompareTo(other.Class);
             if (i == 0)
                 i = ((int)this.PatchType & 0xFF) - ((int)other.PatchType & 0xFF);
             if (i == 0)
                 i = this.Method.CompareTo(other.Method);
             return i;
+        }
+
+        public bool Equals(PatchInfoAttribute other)
+        {
+            return this.Method == other.Method && this.Class == other.Class;
         }
     }
 

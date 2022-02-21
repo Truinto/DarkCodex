@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.7]
+- added Patch_FixAreaEffectDamage which prevents area effects from running simultaneously OnEnter and OnRound e.g. dealing double damage
+- extended Control_AreaEffects functionality to cutscenes (needs testing)
+- added events to advanced patch manager
+- disabled patches show warnings, if a requirement isn't met
+
 ## [1.1.6]
 - fixed improved hunter's bond not showing up in feat selection
 

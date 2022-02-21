@@ -132,24 +132,6 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.OnActivate))]
-        public class PolymorphTest1
-        {
-            public static void Prefix(Polymorph __instance)
-            {
-                __instance.m_KeepSlots = __instance.m_KeepSlots || Settings.StateManager.State.polymorphKeepInventory;
-            }
-        }
-
-        [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.TryReplaceView))]
-        public class PolymorphTest2
-        {
-            public static bool Prefix(Polymorph __instance)
-            {
-                return !Settings.StateManager.State.polymorphKeepModel;
-            }
-        }
-
         [HarmonyPatch(typeof(AbilityData), MethodType.Constructor, new Type[] { typeof(BlueprintAbility), typeof(UnitDescriptor), typeof(Ability), typeof(BlueprintSpellbook) })]
         public class SpellReach
         {

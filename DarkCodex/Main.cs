@@ -23,6 +23,7 @@ using System.Linq.Expressions;
 using Kingmaker.UI.Common;
 using Kingmaker.UI;
 using Kingmaker.EntitySystem.Stats;
+using System.Runtime.CompilerServices;
 
 namespace DarkCodex
 {
@@ -76,7 +77,7 @@ namespace DarkCodex
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
 
-            //Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
+            Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
@@ -91,6 +92,19 @@ namespace DarkCodex
 
             string category = null;
             bool disableAll = false;
+
+            foreach (var info in patchInfos)
+            {
+                if (info.Class != category)
+                {
+                    category = info.Class;
+                    disableAll = state.doNotLoad.Contains(category + ".*");
+                }
+                info.DisabledAll = disableAll;
+                info.Disabled = state.doNotLoad.Contains(info.Class + "." + info.Method);
+            }
+
+            category = null;
             foreach (var info in patchInfos)
             {
                 if (info.Class != category)
@@ -98,7 +112,7 @@ namespace DarkCodex
                     GUILayout.Box(GUIContent.none, StyleLine);
                     GUILayout.Label(info.Class);
                     category = info.Class;
-                    disableAll = state.doNotLoad.Contains(category + ".*");
+                    disableAll = info.DisabledAll;
 
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
@@ -114,17 +128,13 @@ namespace DarkCodex
                     GUILayout.EndHorizontal();
                 }
 
-                string str = info.Class + "." + info.Method;
-                bool enabled = !state.doNotLoad.Contains(str);
-
                 GUILayout.BeginHorizontal();
                 GUILayout.Space(5);
-                if (GUILayout.Button(disableAll
-                    ? enabled ? "<color=grey><b>✔</b></color>" : "<color=grey><b>✖</b></color>"
-                    : enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
+                if (DrawInfoButton(info))
                 {
+                    string str = info.Class + "." + info.Method;
                     restart = true;
-                    if (enabled)
+                    if (!info.Disabled)
                         state.doNotLoad.Add(str);
                     else
                         state.doNotLoad.Remove(str);
@@ -156,10 +166,10 @@ namespace DarkCodex
                 sw.WriteLine("Content");
                 sw.WriteLine("-----------");
                 sw.WriteLine("| Option | Description | HB | Status |");
-                sw.WriteLine("| ------ | ----------- | ------ | ------ |");
+                sw.WriteLine("|--------|-------------|----|--------|");
 
                 foreach (var info in patchInfos)
-                    if (!info.IsHarmony)
+                    if (!info.IsHarmony && !info.IsEvent)
                         sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
@@ -224,10 +234,20 @@ namespace DarkCodex
             GUILayout.EndHorizontal();
         }
 
+        private static string lastEnum;
         private static void Checkbox<T>(ref T value, string label, Action<T> action = null) where T : Enum
         {
-            if (!GUILayout.Button(label)) // TODO: state must be saved
+            if (GUILayout.Button(label))
+            {
+                if (lastEnum == label)
+                    lastEnum = null;
+                else
+                    lastEnum = label;
+            }
+
+            if (lastEnum != label)
                 return;
+
             string name = value.ToString();
             var names = Enum.GetNames(typeof(T));
             int index = names.IndexOf(name);
@@ -238,28 +258,6 @@ namespace DarkCodex
 
             value = (T)Enum.Parse(typeof(T), names[newindex]);
             action?.Invoke(value);
-        }
-
-        private static void FlagBox(string name, string description, string str, bool grey, int spacing = 10)
-        {
-            bool enabled = !Settings.StateManager.State.doNotLoad.Contains(str);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(spacing);
-            if (GUILayout.Button(grey
-                ? enabled ? "<color=grey><b>✔</b></color>" : "<color=grey><b>✖</b></color>"
-                : enabled ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
-            {
-                restart = true;
-                if (enabled)
-                    Settings.StateManager.State.doNotLoad.Add(str);
-                else
-                    Settings.StateManager.State.doNotLoad.Remove(str);
-            }
-            GUILayout.Space(5);
-            GUILayout.Label(name, GUILayout.Width(300));
-            GUILayout.Label(description, GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
         }
 
         private static void NumberFieldFast(ref float value, string label)
@@ -286,6 +284,29 @@ namespace DarkCodex
             NumberTable[key] = GUILayout.TextField(str, GUILayout.Width(230f));
 
             GUILayout.EndHorizontal();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool DrawInfoButton(PatchInfoAttribute info)
+        {
+            GUIContent text;
+            if (info.DisabledAll)
+            {
+                if (info.Disabled)
+                    text = new("<color=grey><b>✖</b></color>", "Disabled by category.");
+                else
+                    text = new("<color=grey><b>✔</b></color>", "Disabled by category.");
+            }
+            else if (info.Disabled)
+                text = new("<color=red><b>✖</b></color>", "");
+            else if (info.Requirement?.Name is string req
+                    && patchInfos.FirstOrDefault(f => f.Method == req) is PatchInfoAttribute other
+                    && other.Disabled)
+                text = new("<color=yellow><b>⚠️</b></color>", "This patch won't work without " + req);
+            else
+                text = new("<color=green><b>✔</b></color>", "");
+
+            return GUILayout.Button(text, StyleBox, GUILayout.Width(20));
         }
 
         #endregion
@@ -368,8 +389,6 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
-                    PatchSafe(typeof(DEBUG.PolymorphTest1));
-                    PatchSafe(typeof(DEBUG.PolymorphTest2));
                     PatchSafe(typeof(DEBUG.SpellReach));
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
@@ -401,6 +420,8 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
                     PatchSafe(typeof(Patch_PreferredSpellMetamagic));
                     PatchSafe(typeof(Patch_AlwaysAChance));
+                    PatchSafe(typeof(Patch_FixAreaEffectDamage));
+                    PatchSafe(typeof(Patch_Polymorph));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
@@ -484,8 +505,9 @@ namespace DarkCodex
                     LoadSafe(Mythic.createSwiftHex); // keep last
 
                     // Event subscriptions
-                    EventBus.Subscribe(new RestoreEndOfCombat());
-                    EventBus.Subscribe(new Control_AreaEffects());
+                    SubscribeSafe(typeof(RestoreEndOfCombat));
+                    SubscribeSafe(typeof(Control_AreaEffects));
+                    SubscribeSafe(typeof(Patch_FixAreaEffectDamage));
 
                     patchInfos.Sort(); // sort info list for GUI
 
@@ -612,6 +634,26 @@ namespace DarkCodex
             }
         }
 
+        public static void SubscribeSafe(Type type)
+        {
+            ProcessInfo(type);
+            if (CheckSetting("Patch." + type.Name))
+            {
+                Helper.Print("Skipped subscribing to " + type.Name);
+                return;
+            }
+
+            try
+            {
+                Helper.Print("Subscribing to " + type.Name);
+                EventBus.Subscribe(Activator.CreateInstance(type));
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+        }
+
         private static bool CheckSetting(string name)
         {
             foreach (string str in Settings.StateManager.State.doNotLoad)
@@ -640,7 +682,9 @@ namespace DarkCodex
 
             attr.Class = info.DeclaringType?.Name ?? "Patch";
             attr.Method = info.Name;
-            patchInfos.Add(attr);
+
+            if (!patchInfos.Contains(attr))
+                patchInfos.Add(attr);
         }
 
         private static void ExportPlayerData()

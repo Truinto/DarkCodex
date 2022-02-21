@@ -6,13 +6,19 @@ using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Modding;
+using Kingmaker.PubSubSystem;
 using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
+using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -184,6 +190,79 @@ namespace DarkCodex
         {
             if (__instance.name == null)
                 __instance.name = "$$empty";
+        }
+    }
+
+    [PatchInfo(Severity.Harmony | Severity.Event | Severity.WIP, "Patch: Fix Area Effects", "fix some area effects triggering twice")]
+    [HarmonyPatch(typeof(AbilityAreaEffectRunAction))]
+    public class Patch_FixAreaEffectDamage : IPartyCombatHandler, IGlobalSubscriber, ISubscriber
+    {
+        //base.Data.LastUseTime + 1.Rounds().Seconds > Game.Instance.TimeController.GameTime
+        public static Dictionary<UnitEntityData, TimeSpan> times = new();
+
+        [HarmonyPatch(nameof(AbilityAreaEffectRunAction.OnUnitEnter))]
+        [HarmonyPostfix]
+        public static void OnUnitEnter(MechanicsContext context, AreaEffectEntityData areaEffect, UnitEntityData unit, AbilityAreaEffectRunAction __instance)
+        {
+            if (!__instance.UnitEnter.HasActions || !__instance.Round.HasActions)
+                return;
+
+            if (context.SourceAbility?.EffectOnAlly == AbilityEffectOnUnit.Helpful)
+                return;
+
+            times[unit] = Game.Instance.TimeController.GameTime;
+        }
+
+        [HarmonyPatch(nameof(AbilityAreaEffectRunAction.OnRound))]
+        [HarmonyPrefix]
+        public static bool OnRound(MechanicsContext context, AreaEffectEntityData areaEffect, AbilityAreaEffectRunAction __instance)
+        {
+            if (!__instance.Round.HasActions)
+                return false;
+
+            using (ContextData<AreaEffectContextData>.Request().Setup(areaEffect))
+            {
+                var nowminus = Game.Instance.TimeController.GameTime - 1.Rounds().Seconds;
+
+                foreach (UnitEntityData unit in areaEffect.InGameUnitsInside)
+                {
+                    if (times.TryGetValue(unit, out var lastuse) && lastuse > nowminus)
+                    {
+                        Helper.PrintDebug($"skipped OnRound unit={unit.CharacterName} lastuse={lastuse} nowminus={nowminus} area={areaEffect.Blueprint.name}");
+                        continue;
+                    }
+
+                    using (context.GetDataScope(unit))
+                    {
+                        __instance.Round.Run();
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void HandlePartyCombatStateChanged(bool inCombat)
+        {
+            if (!inCombat)
+                times.Clear();
+        }
+    }
+
+    /// <summary>Allows debug flags to keep inventory or model during polymorph.</summary>
+    public class Patch_Polymorph
+    {
+        [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.OnActivate))]
+        [HarmonyPrefix]
+        public static void KeepSlots(Polymorph __instance)
+        {
+            __instance.m_KeepSlots = __instance.m_KeepSlots || Settings.StateManager.State.polymorphKeepInventory;
+        }
+
+        [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.TryReplaceView))]
+        [HarmonyPrefix]
+        public static bool KeepModel(Polymorph __instance)
+        {
+            return !Settings.StateManager.State.polymorphKeepModel;
         }
     }
 }

@@ -54,6 +54,7 @@ using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.Items;
 using Kingmaker.Blueprints.Items.Armors;
+using Kingmaker.PubSubSystem;
 
 namespace DarkCodex
 {
@@ -622,7 +623,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref empower.GetComponent<AddFacts>().m_Facts, auto.ToRef());
 
             // quicken removes itself after use
-            quickenbuff.GetComponent<AutoMetamagic>().Once = true; 
+            quickenbuff.GetComponent<AutoMetamagic>().Once = true;
             quickenbuff2.GetComponent<AutoMetamagic>().Once = true;
         }
 
@@ -636,7 +637,7 @@ namespace DarkCodex
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
 
             var feat = Helper.CreateBlueprintFeature(
-                "HurricaneQueen", 
+                "HurricaneQueen",
                 "Hurricane Queen",
                 "You are one with the hurricane. Your enveloping winds defense wild talent has an additional 25% chance of deflecting ranged attacks, and your total deflection chance can exceed the usual cap of 75%. All wind and weather (including creatures using the whirlwind monster ability) affect you and your attacks only if you wish them to do so; for example, you could shoot arrows directly through a tornado without penalty."
                 ).SetComponents(
@@ -645,7 +646,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(windsFeat)
                 );
 
-            var ray = new SetAttackerMissChance() { 
+            var ray = new SetAttackerMissChance()
+            {
                 m_Type = SetAttackerMissChance.Type.RangedTouch,
                 Value = Helper.CreateContextValue(AbilitySharedValue.Damage),
                 Conditions = Helper.CreateConditionsChecker(0, Helper.CreateContextConditionCasterHasFact(feat.ToRef2()))
@@ -665,7 +667,7 @@ namespace DarkCodex
         public static void createMindShield()
         {
             var buff = Helper.Get<BlueprintBuff>("a9e3e785ea41449499b6b5d3d22a0856");  //PsychokineticistBurnBuff
-            var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459"); 
+            var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
             var psychokineticist = Helper.ToRef<BlueprintArchetypeReference>("f2847dd4b12fffd41beaa3d7120d27ad");
 
             var feature = Helper.CreateBlueprintFeature(

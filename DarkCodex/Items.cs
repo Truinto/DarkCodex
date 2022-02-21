@@ -23,7 +23,7 @@ namespace DarkCodex
 {
     public class Items
     {
-        [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false)]
+        [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false, Requirement: typeof(RestoreEndOfCombat))]
         public static void patchArrows()
         {
             var ColdIronArrowsQuiverItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("a5a537ad28053ad48a7be1c53d7fd7ed");
@@ -33,7 +33,7 @@ namespace DarkCodex
             ColdIronArrowsQuiverItem_20Charges.RestoreChargesOnRest = true;
 
             ColdIronArrowsQuiverItem.AddComponents(new RestoreEndOfCombat());
-            ColdIronArrowsQuiverItem_20Charges.ComponentsArray = ColdIronArrowsQuiverItem.ComponentsArray;
+            ColdIronArrowsQuiverItem_20Charges.Components = ColdIronArrowsQuiverItem.Components;
         }
 
         [PatchInfo(Severity.Extend, "Terendelev´s Scale", "make the revive scale usable once per day", true)]
@@ -62,8 +62,8 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close
                 ).TargetEnemy()
-                .SetComponents(air_damage.ComponentsArray)
-                .RemoveComponents(default(AbilityShowIfCasterHasFact));
+                .SetComponents(air_damage.Components)
+                .RemoveComponents<AbilityShowIfCasterHasFact>();
             fake_blade_damage.Hidden = true;
 
             var fake_blade_burn = Helper.CreateBlueprintAbility(
@@ -75,7 +75,7 @@ namespace DarkCodex
                 UnitCommand.CommandType.Free,
                 AbilityRange.Close
                 ).TargetSelf()
-                .SetComponents(air_burn.ComponentsArray);
+                .SetComponents(air_burn.Components);
             fake_blade_burn.Hidden = true;
 
             var enchant_kinetic = Helper.CreateBlueprintWeaponEnchantment(
@@ -103,7 +103,7 @@ namespace DarkCodex
 
             Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
         }
-    
+
         [PatchInfo(Severity.Create, "Butchering Axe", "new weapon type Butchering Axe", false)]
         public static void createButcheringAxe()
         {
@@ -130,7 +130,7 @@ namespace DarkCodex
                 "",
                 "",
                 butcherType,
-                price: 65);            
+                price: 65);
             var plus1 = Helper.CreateBlueprintItemWeapon(
                  "ButcheringAxePlus1",
                  "",

@@ -62,6 +62,12 @@ using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCas
 
 namespace DarkCodex
 {
+    /* 
+     * Notes:
+     * BlueprintComponent has a field OwnerBlueprint. When components are shared between blueprints, these may cause weird bugs.
+     * 
+     */
+
     public static class Helper
     {
         #region Other
@@ -225,9 +231,10 @@ namespace DarkCodex
         }
 
         /// <summary>Appends objects on array.</summary>
-        public static T[] Append<T>(T[] orig, params T[] objs)
+        public static T[] Append<T>(this T[] orig, params T[] objs)
         {
             if (orig == null) orig = new T[0];
+            if (objs == null) objs = new T[0];
 
             int i, j;
             T[] result = new T[orig.Length + objs.Length];
@@ -242,6 +249,7 @@ namespace DarkCodex
         public static T[] AppendAndReplace<T>(ref T[] orig, params T[] objs)
         {
             if (orig == null) orig = new T[0];
+            if (objs == null) objs = new T[0];
 
             int i, j;
             T[] result = new T[orig.Length + objs.Length];
@@ -480,11 +488,11 @@ namespace DarkCodex
 
         public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
-            obj.ComponentsArray = Append(obj.ComponentsArray, components);
+            obj.Components = Append(obj.Components, components);
 
-            for (int i = 0; i < obj.ComponentsArray.Length; i++)
-                if (obj.ComponentsArray[i].name == null)
-                    obj.ComponentsArray[i].name = $"${obj.ComponentsArray[i].GetType().Name}${obj.AssetGuid}${i}";
+            for (int i = 0; i < obj.Components.Length; i++)
+                if (obj.Components[i].name == null)
+                    obj.Components[i].name = $"${obj.Components[i].GetType().Name}${obj.AssetGuid}${i}";
 
             return obj;
         }
@@ -494,7 +502,7 @@ namespace DarkCodex
             for (int i = 0; i < components.Length; i++)
                 components[i].name = $"${components[i].GetType().Name}${obj.AssetGuid}${i}";
 
-            obj.ComponentsArray = components;
+            obj.Components = components;
             return obj;
         }
 
@@ -502,9 +510,9 @@ namespace DarkCodex
         {
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
             {
-                if (obj.ComponentsArray[i] is TOrig)
+                if (obj.Components[i] is TOrig)
                 {
-                    obj.ComponentsArray[i] = replacement;
+                    obj.Components[i] = replacement;
                     replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}${i}";
                     break;
                 }
@@ -513,19 +521,26 @@ namespace DarkCodex
             return obj;
         }
 
-        public static T RemoveComponents<T, TRemove>(this T obj, TRemove _) where T : BlueprintScriptableObject where TRemove : BlueprintComponent
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static T RemoveComponents<T, TRemove>(T obj) where T : BlueprintScriptableObject where TRemove : BlueprintComponent
         {
             var list = obj.ComponentsArray.ToList();
             list.RemoveAll(r => r is TRemove);
-            obj.ComponentsArray = list.ToArray();
+            obj.Components = list.ToArray();
             return obj;
         }
+        public static BlueprintAbility RemoveComponents<TRemove>(this BlueprintAbility obj) where TRemove : BlueprintComponent
+            => RemoveComponents<BlueprintAbility, TRemove>(obj);
+        public static BlueprintFeature RemoveComponents<TRemove>(this BlueprintFeature obj) where TRemove : BlueprintComponent
+            => RemoveComponents<BlueprintFeature, TRemove>(obj);
+        public static BlueprintBuff RemoveComponents<TRemove>(this BlueprintBuff obj) where TRemove : BlueprintComponent
+            => RemoveComponents<BlueprintBuff, TRemove>(obj);
 
         public static T RemoveComponents<T>(this T obj, Predicate<BlueprintComponent> match) where T : BlueprintScriptableObject
         {
             var list = obj.ComponentsArray.ToList();
             list.RemoveAll(match);
-            obj.ComponentsArray = list.ToArray();
+            obj.Components = list.ToArray();
             return obj;
         }
 
@@ -661,6 +676,14 @@ namespace DarkCodex
         #region Create Advanced
 
         private static MethodInfo _memberwiseClone = AccessTools.Method(typeof(object), "MemberwiseClone");
+        /// <summary>
+        /// This creates a shallow copy. This means BlueprintComponents are shared and morphing can happen.<br/><br/>
+        /// Watch out for these fields:<br/>
+        /// BlueprintAbility: m_Parent
+        /// </summary>
+        /// <param name="guid">guid to use, recommended to always leave empty</param>
+        /// <param name="guid2">guid to merge with, use for dynamic blueprints (unknown list of blueprints), otherwise empty</param>
+        /// <returns></returns>
         public static T Clone<T>(this T obj, string name, string guid = null, string guid2 = null) where T : SimpleBlueprint
         {
             if (guid2 != null)
@@ -674,6 +697,13 @@ namespace DarkCodex
             var result = (T)_memberwiseClone.Invoke(obj, null);
             result.name = name;
             AddAsset(result, guid);
+
+            // prevent some morphing
+            if (result is BlueprintFeature feature)
+            {
+                feature.IsPrerequisiteFor = new();
+            }    
+
             return result;
 
             //var result = Activator.CreateInstance<T>();
@@ -682,6 +712,14 @@ namespace DarkCodex
             //    field.SetValue(result, field.GetValue(obj));
             //return result;
         }
+        
+        public static T Clone<T>(this T obj, BlueprintScriptableObject parent) where T : BlueprintComponent
+        {
+            var result = (T)_memberwiseClone.Invoke(obj, null);
+            obj.OwnerBlueprint = parent;
+            return result;
+        }
+        
         private static ulong ParseGuidLow(string id) => ulong.Parse(id.Substring(id.Length - 16), System.Globalization.NumberStyles.HexNumber);
         private static ulong ParseGuidHigh(string id) => ulong.Parse(id.Substring(0, id.Length - 16), System.Globalization.NumberStyles.HexNumber);
         public static string MergeIds(string guid1, string guid2, string guid3 = null)
@@ -762,7 +800,7 @@ namespace DarkCodex
         private static BlueprintFeatureSelection _slayerfeats1;
         private static BlueprintFeatureSelection _slayerfeats2;
         private static BlueprintFeatureSelection _slayerfeats3;
-        private static BlueprintFeatureSelection _vivsectionistfeats3;
+        private static BlueprintFeatureSelection _vivsectionistfeats;
         public static void AddRogueFeat(BlueprintFeature feat)
         {
             if (_roguefeats == null)
@@ -773,8 +811,8 @@ namespace DarkCodex
                 _slayerfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("43d1b15873e926848be2abf0ea3ad9a8");
             if (_slayerfeats3 == null)
                 _slayerfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("913b9cf25c9536949b43a2651b7ffb66");
-            if (_vivsectionistfeats3 == null)
-                _vivsectionistfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
+            if (_vivsectionistfeats == null)
+                _vivsectionistfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
 
             var reference = feat.ToRef();
 
@@ -782,7 +820,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref _slayerfeats1.m_AllFeatures, reference);
             Helper.AppendAndReplace(ref _slayerfeats2.m_AllFeatures, reference);
             Helper.AppendAndReplace(ref _slayerfeats3.m_AllFeatures, reference);
-            Helper.AppendAndReplace(ref _vivsectionistfeats3.m_AllFeatures, reference);
+            Helper.AppendAndReplace(ref _vivsectionistfeats.m_AllFeatures, reference);
         }
 
         public static bool AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
@@ -885,6 +923,27 @@ namespace DarkCodex
             return result;
         }
 
+        public static void MakeStickySpell(string guid, out BlueprintAbility cast, out BlueprintAbility effect)
+        {
+            const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
+            const string guid_effect = "73749154177c4f8c83231da1c9dc9f6f";
+
+            var spell = Get<BlueprintAbility>(guid);
+            cast = spell.Clone(spell.name + "_Cast", guid2: guid_cast)
+                    .RemoveComponents<AbilityDeliverProjectile>()
+                    .RemoveComponents<AbilityEffectRunAction>();
+            effect = spell.Clone(spell.name + "_Effect", guid2: guid_effect)
+                    .RemoveComponents<AbilityDeliverProjectile>();
+
+            cast.AddComponents(CreateAbilityEffectStickyTouch(effect.ToRef()));
+            cast.Range = AbilityRange.Touch;
+            cast.Animation = CastAnimationStyle.Self;
+
+            effect.AddComponents(CreateAbilityDeliverTouch());
+            effect.Range = AbilityRange.Touch;
+            effect.Animation = CastAnimationStyle.Touch;
+        }
+
         public static BlueprintAbility TargetPoint(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = false)
         {
             ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
@@ -963,6 +1022,20 @@ namespace DarkCodex
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static AbilityEffectStickyTouch CreateAbilityEffectStickyTouch(BlueprintAbilityReference ability)
+        {
+            var result = new AbilityEffectStickyTouch();
+            result.m_TouchDeliveryAbility = ability;
+            return result;
+        }
+
+        public static AbilityDeliverTouch CreateAbilityDeliverTouch()
+        {
+            var result = new AbilityDeliverTouch();
+            result.m_TouchWeapon = Resource.Cache.WeaponTouch;
+            return result;
         }
 
         public static AddAreaEffect CreateAddAreaEffect(this BlueprintAbilityAreaEffect area)
@@ -1495,6 +1568,7 @@ namespace DarkCodex
             result.LocalizedSavingThrow = savingThrow ?? Resource.Strings.Empty;
 
             AddAsset(result, guid);
+            // todo add blueprint to Resource.Cache.Ability
             return result;
         }
 
@@ -1587,6 +1661,7 @@ namespace DarkCodex
             AddAsset(buff, buff.AssetGuid);
 
             result.m_Buff = buff.ToRef();
+            // todo add blueprint to Resource.Cache.Activatable
             return result;
         }
 

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 namespace DarkCodex.Components
 {
     [AllowedOn(typeof(BlueprintItemEquipmentUsable), false)]
-    [TypeId("f6b36505daa4414f93d2e3c94b1254ac")]
     public class RestoreEndOfCombat : BlueprintComponent, IPartyCombatHandler, IGlobalSubscriber, ISubscriber
     {
         public void HandlePartyCombatStateChanged(bool inCombat)

@@ -36,6 +36,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
+//global using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
 
 namespace DarkCodex
 {
@@ -370,7 +372,7 @@ namespace DarkCodex
 
             Helper.AddMythicFeat(itemAdept);
         }
-        
+
         [PatchInfo(Severity.Create, "Extra Mythic Feats", "mythic feat: can pick mythic abilities as feats and vice versa", true)]
         public static void createExtraMythicFeats()
         {
@@ -453,12 +455,12 @@ namespace DarkCodex
             var typedemon = Helper.ToRef<BlueprintUnitFactReference>("dc960a234d365cb4f905bdc5937e623a"); //SubtypeDemon
 
             var ddbuff = dpbuff.Clone("DominateDemonBuff")
-                .RemoveComponents(default(AddFactContextActions));
+                .RemoveComponents<AddFactContextActions>();
 
             var dd = dp.Clone("DominateDemon")
-                .RemoveComponents(default(SpellListComponent))
-                .RemoveComponents(default(CraftInfoComponent))
-                .RemoveComponents(default(AbilityTargetHasNoFactUnless))
+                .RemoveComponents<SpellListComponent>()
+                .RemoveComponents<CraftInfoComponent>()
+                .RemoveComponents<AbilityTargetHasNoFactUnless>()
                 .ReplaceComponent(default(AbilityTargetHasFact), new AbilityTargetHasFact()
                 {
                     m_CheckedFacts = new BlueprintUnitFactReference[] { typedemon } //SubtypeDemon, DemonOfMagicFeature, DemonOfSlaughterFeature, DemonOfStrengthFeature
@@ -479,14 +481,14 @@ namespace DarkCodex
 
             // teleport at will
         }
-       
+
         [PatchInfo(Severity.Extend, "Kinetic Overcharge", "Kinetic Overcharge works always, not only while gathering power", true)]
         public static void patchKineticOvercharge()
         {
             var overcharge = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("4236ca275c6fa9b4a9945b2645262616");
             overcharge.m_Description = Helper.CreateString("You use your mythic powers to fuel kineticist abilities.\nBenefit: Reduce the burn cost of kineticist blasts by one burn point.");
             overcharge.Ranks = 6;
-            overcharge.RemoveComponents(default(AddFacts));
+            overcharge.RemoveComponents<AddFacts>();
             overcharge.AddComponents(
                 new KineticistReduceBurnPooled() { ReduceBurn = Helper.CreateContextValue(AbilityRankType.Default) },
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.FeatureRank, feature: overcharge.ToRef())
@@ -589,9 +591,9 @@ namespace DarkCodex
         public static void patchWanderingHex()
         {
             var feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
-            feat.RemoveComponents(default(AbilityResourceLogic));
+            feat.RemoveComponents<AbilityResourceLogic>();
         }
-        
+
         [PatchInfo(Severity.Extend, "Judgement Aura", "Everlasting Judgement also applies to Judgement Aura", true)]
         public static void patchJudgementAura()
         {
