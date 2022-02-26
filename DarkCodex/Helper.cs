@@ -448,6 +448,18 @@ namespace DarkCodex
                 Print($"Failed export lanaguage file: {e.Message}");
             }
         }
+        
+        public static string TrySubstring(this string str, char c, int start = 0)
+        {
+            try
+            {
+                return str.Substring(start, str.IndexOf(c, start));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
         public static bool IsNumber(this char c)
         {
@@ -476,6 +488,13 @@ namespace DarkCodex
         {
             if (condition)
                 return $"<color=red>{text}</color>";
+            return text;
+        }
+
+        public static string Grey(this string text, bool condition = true)
+        {
+            if (condition)
+                return $"<color=grey>{text}</color>";
             return text;
         }
 

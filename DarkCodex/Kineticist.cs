@@ -548,10 +548,6 @@ namespace DarkCodex
                         //run.UnitEnter = Helper.CreateActionList();
                         counter++;
                     }
-                    //else if (bp.Blueprint.name.StartsWith("DeadlyEarth"))
-                    //{
-                    //    run.UnitEnter = Helper.CreateActionList();
-                    //}
                 }
             }
             Helper.Print("Patched Wall Infusions: " + counter);

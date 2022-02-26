@@ -198,7 +198,7 @@ namespace Config
                         Debug.Log("Updating version...");
                         bool shouldSave = true;
                         if (updateCallback != null) shouldSave = updateCallback(State);
-                        State.GetType().GetProperty("version").SetValue(State, newVersion, null);
+                        typeof(T).GetField("version").SetValue(State, newVersion);
                         if (shouldSave) this.TrySaveConfigurationState();
                     }
                 }

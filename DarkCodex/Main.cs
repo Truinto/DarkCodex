@@ -85,10 +85,12 @@ namespace DarkCodex
             GUILayout.Space(10);
             GUILayout.Label("Advanced: Patch Control");
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
+                    + " Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
             if (GUILayout.Button("Disable all homebrew"))
-                state.doNotLoad =
-                    state.doNotLoad.Union(patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method)).ToList();
+                patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method).ForEach(name => state.SetEnable(false, name));
+            GUILayout.Space(10);
+            Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
 
             string category = null;
             bool disableAll = false;
@@ -98,15 +100,18 @@ namespace DarkCodex
                 if (info.Class != category)
                 {
                     category = info.Class;
-                    disableAll = state.doNotLoad.Contains(category + ".*");
+                    disableAll = state.IsDisenabledCategory(category + ".*");
                 }
                 info.DisabledAll = disableAll;
-                info.Disabled = state.doNotLoad.Contains(info.Class + "." + info.Method);
+                info.Disabled = state.IsDisenabledSingle(info.Class + "." + info.Method);
             }
 
             category = null;
             foreach (var info in patchInfos)
             {
+#if !DEBUG
+                if (info.IsHidden) continue;
+#endif
                 if (info.Class != category)
                 {
                     GUILayout.Box(GUIContent.none, StyleLine);
@@ -118,10 +123,7 @@ namespace DarkCodex
                     if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
                     {
                         restart = true;
-                        if (!disableAll)
-                            state.doNotLoad.Add(category + ".*");
-                        else
-                            state.doNotLoad.Remove(category + ".*");
+                        state.SetEnable(disableAll, category + ".*");
                     }
                     GUILayout.Space(5);
                     GUILayout.Label("Disable all", GUILayout.ExpandWidth(false));
@@ -134,13 +136,10 @@ namespace DarkCodex
                 {
                     string str = info.Class + "." + info.Method;
                     restart = true;
-                    if (!info.Disabled)
-                        state.doNotLoad.Add(str);
-                    else
-                        state.doNotLoad.Remove(str);
+                    state.SetEnable(info.Disabled, str);
                 }
                 GUILayout.Space(5);
-                GUILayout.Label(info.Name.Red(info.IsDangerous), GUILayout.Width(300));
+                GUILayout.Label(info.Name.Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
                 GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
             }
@@ -169,7 +168,7 @@ namespace DarkCodex
                 sw.WriteLine("|--------|-------------|----|--------|");
 
                 foreach (var info in patchInfos)
-                    if (!info.IsHarmony && !info.IsEvent)
+                    if (!info.IsHarmony && !info.IsEvent && !info.IsHidden)
                         sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
@@ -251,7 +250,7 @@ namespace DarkCodex
             string name = value.ToString();
             var names = Enum.GetNames(typeof(T));
             int index = names.IndexOf(name);
-            int newindex = GUILayout.SelectionGrid(index, names, names.Length);
+            int newindex = GUILayout.SelectionGrid(index, names, 10); //GUILayout.SelectionGrid(index, names, names.Length)
 
             if (index == newindex)
                 return;
@@ -301,12 +300,21 @@ namespace DarkCodex
                 text = new("<color=red><b>✖</b></color>", "");
             else if (info.Requirement?.Name is string req
                     && patchInfos.FirstOrDefault(f => f.Method == req) is PatchInfoAttribute other
-                    && other.Disabled)
-                text = new("<color=yellow><b>⚠️</b></color>", "This patch won't work without " + req);
+                    && (other.Disabled || other.DisabledAll))
+                text = new("<color=yellow><b>!</b></color>", "This patch won't work without " + req);
             else
                 text = new("<color=green><b>✔</b></color>", "");
 
             return GUILayout.Button(text, StyleBox, GUILayout.Width(20));
+        }
+
+        private static void DrawToolip()
+        {
+            Vector3 x = Input.mousePosition;
+
+            Rect r = new(x.x - 10, x.y, 150, 20);
+
+            GUI.Box(r, "This patch won't work without {0}");
         }
 
         #endregion
@@ -420,7 +428,8 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
                     PatchSafe(typeof(Patch_PreferredSpellMetamagic));
                     PatchSafe(typeof(Patch_AlwaysAChance));
-                    PatchSafe(typeof(Patch_FixAreaEffectDamage));
+                    PatchSafe(typeof(Patch_FixAreaDoubleDamage));
+                    PatchSafe(typeof(Patch_FixAreaEndOfTurn));
                     PatchSafe(typeof(Patch_Polymorph));
 
                     // General
@@ -507,7 +516,6 @@ namespace DarkCodex
                     // Event subscriptions
                     SubscribeSafe(typeof(RestoreEndOfCombat));
                     SubscribeSafe(typeof(Control_AreaEffects));
-                    SubscribeSafe(typeof(Patch_FixAreaEffectDamage));
 
                     patchInfos.Sort(); // sort info list for GUI
 
@@ -656,16 +664,7 @@ namespace DarkCodex
 
         private static bool CheckSetting(string name)
         {
-            foreach (string str in Settings.StateManager.State.doNotLoad)
-            {
-                if (str == name)
-                    return true;
-
-                if (str.EndsWith(".*", StringComparison.Ordinal) && name.StartsWith(str.Substring(0, str.Length - 1), StringComparison.Ordinal))
-                    return true;
-            }
-
-            return false;
+            return Settings.StateManager.State.IsDisenabled(name);
         }
 
         private static void ProcessInfo(MemberInfo info)

@@ -36,6 +36,7 @@ namespace DarkCodex
         public bool IsDangerous => (PatchType & Severity.Create) > 0;
         public bool IsHarmony => (PatchType & Severity.Harmony) > 0;
         public bool IsEvent => (PatchType & Severity.Event) > 0;
+        public bool IsHidden => (PatchType & Severity.Hidden) > 0;
 
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";
         public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : ":heavy_check_mark:";
@@ -53,7 +54,7 @@ namespace DarkCodex
             if (i == 0)
                 i = this.Class.CompareTo(other.Class);
             if (i == 0)
-                i = ((int)this.PatchType & 0xFF) - ((int)other.PatchType & 0xFF);
+                i = ((int)other.PatchType & 0xFF) - ((int)this.PatchType & 0xFF);
             if (i == 0)
                 i = this.Method.CompareTo(other.Method);
             return i;
@@ -77,5 +78,6 @@ namespace DarkCodex
 
         WIP = 256,
         Faulty = 512,
+        Hidden = 1024,
     }
 }

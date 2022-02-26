@@ -145,6 +145,7 @@ namespace DarkCodex
             }
         }
 
+        [PatchInfo(Severity.Hidden | Severity.WIP, "Display All", "makes enchantments visible for items that don't usually display them", false)]
         [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
         public class Enchantments
         {
@@ -198,6 +199,7 @@ namespace DarkCodex
                 }
             }
 
+            [PatchInfo(Severity.Hidden | Severity.WIP, "Name All", "gives all enchantments a name and description", false)]
             public static void NameAll()
             {
                 Resource.Cache.Ensure();

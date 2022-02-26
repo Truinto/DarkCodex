@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.8]
+- removed Patch_FixAreaEffectDamage
+- added Patch_FixAreaDoubleDamage, which doesn't have overlapping issues
+- added Patch_FixAreaEndOfTurn to deal damage at the end of each unit's turn, instead all at once during the caster's turn
+- added option to disable new features by default
+
 ## [1.1.7]
 - added Patch_FixAreaEffectDamage which prevents area effects from running simultaneously OnEnter and OnRound e.g. dealing double damage
 - extended Control_AreaEffects functionality to cutscenes (needs testing)
