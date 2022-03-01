@@ -398,7 +398,6 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.SpellReach));
-                    LoadSafe(Kineticist.xCombineBlade);
                     PatchSafe(typeof(Kineticist.Patch_ActivatableGroups));
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
