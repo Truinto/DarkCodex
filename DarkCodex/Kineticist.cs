@@ -55,6 +55,8 @@ using Kingmaker.RuleSystem.Rules;
 using Kingmaker.Items;
 using Kingmaker.Blueprints.Items.Armors;
 using Kingmaker.PubSubSystem;
+using Kingmaker.UI.MVVM._VM.ActionBar;
+using Kingmaker.UI.UnitSettings;
 
 namespace DarkCodex
 {
@@ -682,6 +684,139 @@ namespace DarkCodex
             rank.m_CustomProperty = property.ToRef();
 
             Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feature.ToRef());
+        }
+
+        public static void xCombineBlade()
+        {
+            //BlueprintActivatableAbility   KineticBladeFireBlastAbility.41e9a0626aa54824db9293f5de71f23f
+            //BlueprintBuff   KineticBladeFireBlastBuff.aebbdc50df4dc9148b165a4d07a2cf0d
+            //BlueprintAbility   KineticBladeFireBlastBurnAbility.879b666ce3247ed4b8aa379d5946c38e
+
+            // make Activatable hidden
+            var act = Helper.Get<BlueprintActivatableAbility>("41e9a0626aa54824db9293f5de71f23f"); //KineticBladeFireBlastAbility
+            var act2 = Helper.Get<BlueprintActivatableAbility>("dc6f0b906566aca4d8b86729855959cb"); //KineticBladeSandstormBlastAbility
+            //act.AddComponents(new ComponentHide());
+
+            // add new ActivatableGroup, then add hidden Activatables to sublist
+            var group = Helper.CreateBlueprintAbility(
+                "KineticBlade_Group", 
+                "Kinetic Blades", 
+                "",
+                null, 
+                null, 
+                AbilityType.SpellLike, 
+                UnitCommand.CommandType.Free, 
+                AbilityRange.Personal
+                ).SetComponents(
+                new ActivatableGroup { Activatables = new List<BlueprintActivatableAbility> { act, act2 } });
+        }
+
+        [HarmonyPatch]
+        public class Patch_ActivatableGroups
+        {
+            [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.CollectAbilities))]
+            [HarmonyPostfix]
+            public static void RemoveHidden(ActionBarVM __instance)
+            {
+                for (int i = __instance.GroupAbilities.Count - 1; i >= 0; i--)
+                {
+                    var slot = __instance.GroupAbilities[i].MechanicActionBarSlot;
+                    if (slot is MechanicActionBarSlotActivableAbility act && act.ActivatableAbility.Blueprint.GetComponent<ComponentHide>())
+                    {
+                        __instance.GroupAbilities.RemoveAt(i);
+                    }
+                }
+            }
+
+            [HarmonyPatch(typeof(BlueprintAbility), nameof(BlueprintAbility.HasVariants), MethodType.Getter)]
+            [HarmonyPrefix]
+            public static bool HasVariant(BlueprintAbility __instance, ref bool __result)
+            {
+                if (__instance.GetComponent<ActivatableGroup>())
+                {
+                    __result = true;
+                    return false;
+                }
+                return true;
+            }
+
+            [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.SetMechanicSlot))]
+            [HarmonyPostfix]
+            public static void HasVariant(ActionBarSlotVM __instance)
+            {
+                if (__instance?.MechanicActionBarSlot is MechanicActionBarSlotAbility actionbar && actionbar.Ability.Blueprint.GetComponent<ActivatableGroup>())
+                    __instance.HasConvert.Value = true;
+            }
+
+            [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.OnShowConvertRequest))]
+            [HarmonyPriority(Priority.VeryHigh)]
+            [HarmonyPrefix]
+            public static bool OnShowConvert(ActionBarSlotVM __instance)
+            {
+                if (__instance.MechanicActionBarSlot is not MechanicActionBarSlotAbility actionbar)
+                    return true;
+
+                var subs = actionbar.Ability.Blueprint.GetComponent<ActivatableGroup>()?.Activatables;
+                if (subs == null)
+                    return true;
+
+                List<MechanicActionBarSlotActivableAbility> conversions = new();
+                foreach (var activatable in __instance.MechanicActionBarSlot.Unit.ActivatableAbilities)
+                {
+                    if (subs.Any(f => f == activatable.Blueprint))
+                        conversions.Add(new MechanicActionBarSlotActivableAbility
+                        {
+                            ActivatableAbility = activatable,
+                            Unit = __instance.MechanicActionBarSlot.Unit
+                        });
+                }
+
+                Helper.PrintDebug($"OnShowConvert has {conversions.Count} conversions for {actionbar.Ability.Blueprint.Name}");
+
+                __instance.ConvertedVm.Value = new ActionBarConvertedActivableVM(conversions, __instance.CloseConvert);
+                return false;
+
+                // improvements:
+                // - close if pressed again https://github.com/Vek17/WrathMods-TabletopTweaks/blob/c731e644eb239cacca2a5fc8d7ef974e76c78382/TabletopTweaks/NewUI/ActionBarPatches.cs#L65
+                // - ~~don't close after ability clicked~~
+                // - show active border if any are active
+                // - add all kinetic blades
+                // - add all DemonAspect (+ DemonClaws) (+ DemonFirst ac8e25586edaf6348a7cbc35d3aa21f2)
+                // - combine demon summons? (is non activatable)
+            }
+
+            public class ActionBarConvertedActivableVM : ActionBarConvertedVM
+            {
+                public ActionBarConvertedActivableVM(List<MechanicActionBarSlotActivableAbility> list, Action onClose) : base(new(), onClose)
+                {
+                    foreach (var item in list)
+                        this.Slots.Add(new ActionBarSlotVM(item, -1, -1));
+                }
+            }
+
+            /*//[HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
+            //[HarmonyPrefix]
+            public static bool __OverrideConversions(AbilityData __instance, ref IEnumerable<AbilityData> __result) // too complicated
+            {
+                var group = __instance.Blueprint.GetComponent<ActivatableGroup>();
+                if (group == null)
+                    return true;
+                // generate pseudo spell data to redirect click to Activatable
+                return false;
+            }
+
+            //[HarmonyPatch(typeof(UnitFact), nameof(UnitFact.Hidden), MethodType.Getter)]
+            //[HarmonyPostfix]
+            public static void HideHidden(UnitFact __instance, ref bool __result) // remove?
+            {
+                if (__result)
+                    return;
+
+                if (__instance is ActivatableAbility && __instance.Blueprint.GetComponent<ComponentHide>())
+                {
+                    __result = true;
+                }
+            }*/
         }
 
         #region Helper

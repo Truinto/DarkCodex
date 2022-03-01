@@ -39,10 +39,12 @@
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
+    <Compile Include="Components\ActivatableGroup.cs" />
     <Compile Include="Components\AddFactOnlyParty.cs" />
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
     <Compile Include="Components\ButcheringAxeLogic.cs" />
+    <Compile Include="Components\ComponentHide.cs" />
     <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
     <Compile Include="Components\ContextActionStopActivatables.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />

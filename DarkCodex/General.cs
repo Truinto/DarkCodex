@@ -73,8 +73,19 @@ namespace DarkCodex
         [PatchInfo(Severity.Create | Severity.Faulty, "Ability Focus", "basic feat: Ability Focus, increase DC of one ability by +2", false)]
         public static void createAbilityFocus()
         {
-            Resource.Cache.Ensure();
+            var feat = Helper.CreateBlueprintParametrizedFeature(
+                "AbilityFocusCustom",
+                "Ability Focus",
+                "Choose one special attack. Add +2 to the DC for all saving throws against the special attack on which you focus.",
+                blueprints: null
+                ).SetComponents(
+                new AbilityFocusParametrized()
+                );
+            feat.Ranks = 10;
 
+            return;
+
+            Resource.Cache.Ensure();
             var abilities = Resource.Cache.Ability.Where(ability =>
             {
                 if (ability.Type == AbilityType.Spell)
@@ -92,16 +103,7 @@ namespace DarkCodex
 
                 return run.SavingThrowType != SavingThrowType.Unknown;
             }).ToArray();
-
-            var feat = Helper.CreateBlueprintParametrizedFeature(
-                "AbilityFocusCustom",
-                "Ability Focus",
-                "Choose one special attack. Add +2 to the DC for all saving throws against the special attack on which you focus.",
-                blueprints: abilities.ToRef3()
-                ).SetComponents(
-                new AbilityFocusParametrized()
-                );
-            feat.Ranks = 10;
+            feat.BlueprintParameterVariants = abilities.ToRef3();
 
             return;
 
