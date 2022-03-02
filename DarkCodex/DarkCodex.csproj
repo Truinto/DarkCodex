@@ -66,6 +66,7 @@
     <Compile Include="Components\RuleAttackRoll2.cs" />
     <Compile Include="Components\ScalingCMBonus.cs" />
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
+    <Compile Include="Components\UIData.cs" />
     <Compile Include="DEBUG.cs" />
     <Compile Include="General.cs" />
     <Compile Include="GuidManager.cs" />
