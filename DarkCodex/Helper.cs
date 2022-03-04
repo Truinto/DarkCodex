@@ -386,7 +386,7 @@ namespace DarkCodex
                 _sb1.Clear();
             }
 
-            var pack = LocalizationManager.CurrentPack.Strings;
+            var pack = LocalizationManager.CurrentPack;
             if (LocalizationManager.CurrentPack.Locale != _lastLocale)
             {
                 _lastLocale = LocalizationManager.CurrentPack.Locale;
@@ -394,7 +394,7 @@ namespace DarkCodex
                 {
                     _mappedStrings = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
                     foreach (var entry in _mappedStrings)
-                        pack[entry.Key] = entry.Value;
+                        pack.PutString(entry.Key, entry.Value);
                     _mappedStrings = null;
                 }
                 catch (Exception e)
@@ -403,9 +403,9 @@ namespace DarkCodex
                 }
             }
 
-            if (!pack.ContainsKey(key))
+            if (!pack.m_Strings.ContainsKey(key))
             {
-                pack.Add(key, value);
+                pack.PutString(key, value);
                 _saveString(key, value);
             }
 

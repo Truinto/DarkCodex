@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0]
+- updated to game version 1.2
+- added Patch_AbilityGroups that merges similar abilities into foldable categories
+
 ## [1.1.8]
 - removed Patch_FixAreaEffectDamage
 - added Patch_FixAreaDoubleDamage, which doesn't have overlapping issues

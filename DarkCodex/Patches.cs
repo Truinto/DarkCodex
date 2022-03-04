@@ -29,6 +29,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TurnBased.Controllers;
+using Kingmaker.UI.MVVM._VM.ActionBar;
+using Kingmaker.UI.ActionBar;
+using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
+using Newtonsoft.Json;
+using UnityEngine;
+using DarkCodex.Components;
 
 namespace DarkCodex
 {
@@ -256,8 +262,8 @@ namespace DarkCodex
                 times.Clear();
         }
     }
-    
-    [PatchInfo(Severity.Harmony, "Patch: Fix Area Effect Double Damage", "fixes area effects triggering twice when cast")]
+
+    [PatchInfo(Severity.Harmony, "Patch: Fix Area Effect Double Damage", "fixes area effects triggering twice when cast", false)]
     [HarmonyPatch]
     public class Patch_FixAreaDoubleDamage
     {
@@ -270,7 +276,7 @@ namespace DarkCodex
         }
     }
 
-    [PatchInfo(Severity.Harmony | Severity.WIP, "Patch: Area Effect End Of Turn", "in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round")]
+    [PatchInfo(Severity.Harmony | Severity.WIP, "Patch: Area Effect End Of Turn", "in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round", false)]
     [HarmonyPatch]
     public class Patch_FixAreaEndOfTurn
     {
@@ -459,7 +465,7 @@ namespace DarkCodex
         }
     }
 
-    /// <summary>Allows debug flags to keep inventory or model during polymorph.</summary>
+    [PatchInfo(Severity.Harmony, "Patch: Polymorph", "allows debug flags to keep inventory or model during polymorph", false)]
     public class Patch_Polymorph
     {
         [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.OnActivate))]
@@ -475,5 +481,410 @@ namespace DarkCodex
         {
             return !Settings.StateManager.State.polymorphKeepModel;
         }
+    }
+
+    [PatchInfo(Severity.Harmony | Severity.WIP, "Patch: Ability Groups", "merges similar abilities into foldable categories", false)]
+    [HarmonyPatch]
+    public class Patch_AbilityGroups
+    {
+        // improvements:
+        // - fix doesn't show resource count
+        // - fix cannot remove from toolbar
+
+        public static void AddGroup(string title, string description, Sprite icon, params string[] guids)
+        {
+            if (title == null)
+                return;
+
+            var group = Groups.FirstOrDefault(f => f.Title == title);
+            if (group == null)
+                Groups.Add(group = new(title, description ?? "", icon));
+
+            group.Guids.AddRange(guids.Select(s => BlueprintGuid.Parse(s)));
+        }
+
+        #region DefGroup
+        public static List<DefGroup> Groups = new()
+        {
+            new DefGroup(
+                "Kinetic Blades",
+                "Kinetic Blade Category",
+                Helper.StealIcon("41e9a0626aa54824db9293f5de71f23f"),
+                "89acea313b9a9cb4d86bbbca01b90346", //KineticBladeAirBlastAbility
+                "55790f1d270297f4a998292e1573a09e", //KineticBladeBlizzardBlastAbility
+                "98f0da4bf25a34a4caffa6b8a2d33ef6", //KineticBladeBloodBlastAbility
+                "4005fc2cd91860142ba55a369fbbec23", //KineticBladeBlueFlameBlastAbility
+                "371b160cbb2ce9c4a8d6c28e61393f6d", //KineticBladeChargeWaterBlastAbility
+                "37c87f140af6166419fe4c1f1305b2b8", //KineticBladeColdBlastAbility
+                "77d9c04214a9bd84bbc1eefabcd98220", //KineticBladeEarthBlastAbility
+                "b9e9011e24abcab4996e6bd3228bd60b", //KineticBladeElectricBlastAbility
+                "41e9a0626aa54824db9293f5de71f23f", //KineticBladeFireBlastAbility
+                "3f68b8bdd90ccb0428acd38b84934d30", //KineticBladeIceBlastAbility
+                "cf1085900220be5459273282389aa9c2", //KineticBladeMagmaBlastAbility
+                "ea2b3e7e3b8726d4c94ba58118749742", //KineticBladeMetalBlastAbility
+                "5639fadad8b45e2418b356327d072789", //KineticBladeMudBlastAbility
+                "acc31b4666e923b49b3ab85b2304f26c", //KineticBladePlasmaBlastAbility
+                "dc6f0b906566aca4d8b86729855959cb", //KineticBladeSandstormBlastAbility
+                "66028030b96875b4c97066525ff75a27", //KineticBladeSteamBlastAbility
+                "287e0c88af08f3e4ba4aca52566f33a7", //KineticBladeThunderstormBlastAbility
+                "70524e9d61b22e948aee1dfe11dc67c8"),//KineticBladeWaterBlastAbility)
+            new DefGroup(
+                "Demon Aspects",
+                "Demon Aspects and other demon related abilities.",
+                Helper.StealIcon("e24fbd97558f06b45a09c7fbe7170a55"),
+                "0b57876f5dbbc784186b8b1f7d678602", //DemonFirstAscensionAbility, this is the gore attack
+                "7b63a532fe1ad654fa1aa8f5ebf3cefb", //DemonClawsAbility
+                "b17352531cb25d64fbf4078b856383c5", //DemonSummonAbilityTier2
+                "9365979e813d90f4db1579dd36f0a3c9", //DemonSummonAbilityTier3
+                "375089aeb3bcfa4479de8476b1589996", //DemonSummonAbilityTier4
+                "fd1669c290212484894bc276d79bc63f", //DemonSummonAbilityTier5
+                "745734402784ef34894aac64e35d46f0", //DemonSummonAbilityTier6
+                "a693ad7d3783f8a4680ab410d9858525", //DemonSummonAbilityTier7
+                "7a6f84f3df641d64e8f59e8fccf00568", //DemonSummonAbilityTier8
+                "cf6355be6d63541418279a560039a866", //DemonSummonAbilityTier9
+                "54d981871c4241844b7dcfc5d4893025", //DemonSummonAbilityTier10
+                "b968988d6c0e830458fd49efbfb86202", //NocticulaAspectAbility
+                "e24fbd97558f06b45a09c7fbe7170a55", //BabauAspectAbility
+                "3070984d4c8bd4f48877337da6c7535d", //BalorAspectAbility
+                "e642444d21a4dab4ea07cd042e6f9dc0", //BrimorakAspectAbility
+                "49e1df551bc9cdc499930be39a3fc8cf", //ColoxusAspectAbility
+                "55c6e91192b92b8479fa66d6aee33074", //IncubusAspectAbility
+                "37bfe9e5535e54c49b248bd84305ebd5", //KalavakusAspectAbility
+                "868c4957c5671114eaaf8e0b6b55ad3f", //NabasuAspectAbility
+                "e305991cb9461a04a97e4f5b02b8b767", //OmoxAspectAbility
+                "fae00e8f4de9cd54da800d383ede7812", //SchirAspectAbility
+                "0d817aa4f8bc00541a43ea2f822d124b", //ShadowDemonAspectAbility
+                "8a474cae6e2788a498f616d36b56b5d2", //SuccubusAspectAbility
+                "b6dc815e86a12654eb7f78c5f14008df", //VavakiaAspectAbility
+                "600cf1ff1d381d8488faed4e7fbda865", //VrockAspectAbility
+                "df9e7bbc606b0cd4087ee2d08cc2c09b"),//VrolikaiAspectAbility
+            new DefGroup(
+                "Metakinesis",
+                "Metakinesis",
+                Helper.StealIcon("bb4369a9be4406147ad4f1a1f05adccf"),
+                "2dc9630110d0434ba7df785777b67be7", //MetakinesisAutoAbility
+                "c93c0217b3e0b4441a4f789dfb95fc8b", //MetakinesisEmpowerAbility
+                "b65ad9782f697f245baeb90cd5670546", //MetakinesisEmpowerCheaperAbility
+                "bb4369a9be4406147ad4f1a1f05adccf", //MetakinesisMaximizedAbility
+                "5c9f2b38404f118479a44234777e1ea8", //MetakinesisMaximizedCheaperAbility
+                "990dd3388df6a8d4cad1429380e71853", //MetakinesisQuickenAbility
+                "53c7b6accfa1e8e4eba7004b17f61ac1", //MetakinesisQuickenCheaperAbility
+                "031d823e0b804b3c868bd031e539cac3"),//MetakinesisSelectiveAbility
+            new DefGroup(
+                "Infusions",
+                "Infusions",
+                Helper.StealIcon("88c37d8a7d808a844ba0116dd37e4059"),
+                "6d35b4f39de9eb446b2d0a65b931246b", //BleedingInfusionAbility
+                "88c37d8a7d808a844ba0116dd37e4059", //BowlingInfusionAbility
+                "96b3fc11991f2664080c7c5e41417f48", //BurningInfusionAbility
+                "fb426ea002abbbc4198b1cd6b99f1be8", //ChillingInfusionAbility
+                "abf5c26910fda5949abbc285c60416f9", //DazzlingInfusionAbility
+                "091b297f43ac5be43af31979c00ade57", //EntanglingInfusionAbility
+                "323be9d573657374da4e3f1456a2366c", //FlashInfusionAbility
+                "d0007fed20710ae4a96cebd2ba99f08b", //FoxfireInfusionAbility
+                "2816fad233e15a54c86729cee6e8969d", //GrapplingInfusionAbility
+                "e2e3ce12bdfc9d14a9ca4d51696dc8db", //GutWrenchingInfusionAbility
+                "b2d91bac690b74140b4fa3eec443edee", //MagneticInfusionAbility
+                "06e3ac0ec6341744eb87f1f70a11576b", //PureFlameInfusionAbility
+                "bc5665a318bc4eb46a0537455509851a", //PushingInfusionAbility
+                "097c209e378144045ab97f4d54876959", //RareMetalInfusionAbility
+                "db3ccc72faeac0343891ba71bb692a42", //SynapticInfusionAbility
+                "59303d0eb693cd2438fc89f91e29ab19", //UnravelingInfusionAbility
+                "30c81aff8e5293d418759d10f193f347"),//VampiricInfusionAbility
+            new DefGroup(
+                "Metamagic Rods",
+                "Metamagic Rods",
+                Helper.StealIcon("485ffd3bd7877fb4d81409b120a41076"),
+                "ccffef1193d04ad1a9430a8009365e81", //MetamagicRodGreaterBolsterToggleAbility
+                "cc266cfb106a5a3449b383a25ab364f0", //MetamagicRodGreaterEmpowerToggleAbility
+                "c137a17a798334c4280e1eb811a14a70", //MetamagicRodGreaterExtendToggleAbility
+                "78b5971c7a0b7f94db5b4d22c2224189", //MetamagicRodGreaterMaximizeToggleAbility
+                "5016f110e5c742768afa08224d6cde56", //MetamagicRodGreaterPersistentToggleAbility
+                "fca35196b3b23c346a7d1b1ce20c6f1c", //MetamagicRodGreaterQuickenToggleAbility
+                "cc116b4dbb96375429107ed2d88943a1", //MetamagicRodGreaterReachToggleAbility
+                "f0d798f5139440a8b2e72fe445678d29", //MetamagicRodGreaterSelectiveToggleAbility
+                "056b9f1aa5c54a7996ca8c4a00a88f88", //MetamagicRodLesserBolsterToggleAbility
+                "ed10ddd385a528944bccbdc4254f8392", //MetamagicRodLesserEmpowerToggleAbility
+                "605e64c0b4586a34494fc3471525a2e5", //MetamagicRodLesserExtendToggleAbility
+                "868673cd023f96945a2ee61355740a96", //MetamagicRodLesserKineticToggleAbility
+                "485ffd3bd7877fb4d81409b120a41076", //MetamagicRodLesserMaximizeToggleAbility
+                "5a87350fcc6b46328a2b345f23bbda44", //MetamagicRodLesserPersistentToggleAbility
+                "b8b79d4c37981194fa91771fc5376c5e", //MetamagicRodLesserQuickenToggleAbility
+                "7dc276169f3edd54093bf63cec5701ff", //MetamagicRodLesserReachToggleAbility
+                "66e68fd0b661413790e3000ede141f16", //MetamagicRodLesserSelectiveToggleAbility
+                "afb2e1f96933c22469168222f7dab8fb", //MetamagicRodMasterpieceToggleAbility
+                "6cc31148ae2d48359c02712308cb4167", //MetamagicRodNormalBolsterToggleAbility
+                "077ec9f9394b8b347ba2b9ec45c74739", //MetamagicRodNormalEmpowerToggleAbility
+                "69de70b88ca056440b44acb029a76cd7", //MetamagicRodNormalExtendToggleAbility
+                "3b5184a55f98f264f8b39bddd3fe0e88", //MetamagicRodNormalMaximizeToggleAbility
+                "9ae2e56b24404144bd911378fe541597", //MetamagicRodNormalPersistentToggleAbility
+                "1f390e6f38d3d5247aacb25ab3a2a6d2", //MetamagicRodNormalQuickenToggleAbility
+                "f0b05e39b82c3be408009e26be40bc91", //MetamagicRodNormalReachToggleAbility
+                "04f768c59bb947e3948ce2e7e72feecb"),//MetamagicRodNormalSelectiveToggleAbility
+        };
+        #endregion
+
+        [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.SetMechanicSlot))]
+        [HarmonyPostfix]
+        public static void ShowButton(ActionBarSlotVM __instance)
+        {
+            // makes the unfold button visible
+            if (__instance?.MechanicActionBarSlot is MechanicActionBarSlotGroup)
+                __instance.HasConvert.Value = true;
+        }
+
+        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.CollectAbilities))]
+        [HarmonyPostfix]
+        public static void GroupAbilities(UnitEntityData unit, ActionBarVM __instance)
+        {
+            var all = new Dictionary<int, List<MechanicActionBarSlot>>();
+
+            for (int i = __instance.GroupAbilities.Count - 1; i >= 0; i--)
+            {
+                BlueprintGuid guid;
+                var slot = __instance.GroupAbilities[i].MechanicActionBarSlot;
+                if (slot is MechanicActionBarSlotActivableAbility act)
+                    guid = act.ActivatableAbility.Blueprint.AssetGuid;
+                else if (slot is MechanicActionBarSlotAbility ab)
+                    guid = ab.Ability.Blueprint.AssetGuid;
+                else
+                    continue;
+
+                int index = Groups.FindIndex(f => f.Guids.Contains(guid));
+                if (index < 0)
+                    continue;
+
+                if (!all.TryGetValue(index, out var list))
+                    all.Add(index, list = new());
+
+                list.Add(slot);
+                __instance.GroupAbilities.RemoveAt(i);
+            }
+
+            foreach (var list in all)
+            {
+                // add new toolbar group
+                __instance.GroupAbilities.Add(new ActionBarSlotVM(new MechanicActionBarSlotGroup(unit, list.Key, list.Value)));
+
+                // update existing toolbar slots
+                foreach (var slot in __instance.Slots)
+                {
+                    if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group && group.Index == list.Key)
+                        group.Slots = list.Value;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.OnShowConvertRequest))]
+        [HarmonyPriority(Priority.VeryHigh)]
+        [HarmonyPrefix]
+        public static bool OnShowConvert(ActionBarSlotVM __instance)
+        {
+            if (__instance.MechanicActionBarSlot is not MechanicActionBarSlotGroup group)
+                return true;
+
+            if (__instance.ConvertedVm.Value != null && !__instance.ConvertedVm.Value.IsDisposed)
+            {
+                __instance.CloseConvert();
+                return false;
+            }
+
+            __instance.ConvertedVm.Value = new ActionBarConvertedActivableVM(group.Slots, __instance.CloseConvert); // if null is used, it won't close; possible useful for nesting
+            return false;
+        }
+
+        [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.OnMainClick))]
+        [HarmonyPostfix]
+        public static void OnClick(ActionBarSlotVM __instance)
+        {
+            if (__instance.MechanicActionBarSlot is MechanicActionBarSlotGroup)
+                __instance.OnShowConvertRequest();
+        }
+
+        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.OnUnitChanged))]
+        [HarmonyPrefix]
+        public static void KeepOpen1(ActionBarVM __instance, out int __state)
+        {
+            __state = -1;
+
+            foreach (var slot in __instance.Slots)
+            {
+                if (slot.ConvertedVm?.Value != null && slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group)
+                {
+                    __state = group.Index;
+                    break;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.OnUnitChanged))]
+        [HarmonyPostfix]
+        public static void KeepOpen2(ActionBarVM __instance, int __state)
+        {
+            if (__state < 0)
+                return;
+
+            foreach (var slot in __instance.Slots)
+            {
+                if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group && group.Index == __state)
+                {
+                    Helper.PrintDebug("reopend OnShowConvertRequest after refresh");
+                    slot.OnShowConvertRequest();
+                    break;
+                }
+            }
+        }
+
+        //[HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.ClearSlot))]
+        //[HarmonyPrefix]
+        public static void Debug1(ActionBarSlotVM viewModel, ActionBarVM __instance)
+        {
+            Helper.Print($"clearing slot index={viewModel?.Index} unit-select={__instance.SelectedUnitValue?.CharacterName} unit-bar={viewModel?.MechanicActionBarSlot?.Unit?.CharacterName} mechanic={viewModel?.MechanicActionBarSlot?.GetType()?.Name}");
+        }
+
+        public class MechanicActionBarSlotGroup : MechanicActionBarSlot
+        {
+            public int Index;
+            [JsonProperty]
+            public List<MechanicActionBarSlot> Slots;
+
+            [JsonConstructor]
+            public MechanicActionBarSlotGroup(List<MechanicActionBarSlot> slots)
+            {
+                this.Slots = slots;
+
+                // find and set Index
+                var guid = BlueprintGuid.Empty;
+                var slot = this.Slots.FirstOrDefault();
+                if (slot is MechanicActionBarSlotActivableAbility act)
+                    guid = act.ActivatableAbility.Blueprint.AssetGuid;
+                else if (slot is MechanicActionBarSlotAbility ab)
+                    guid = ab.Ability.Blueprint.AssetGuid;
+                if (guid != BlueprintGuid.Empty)
+                {
+                    this.Index = Groups.FindIndex(f => f.Guids.Contains(guid));
+                }
+            }
+
+            public MechanicActionBarSlotGroup(UnitEntityData unit, int index, List<MechanicActionBarSlot> slots)
+            {
+                this.Unit = unit;
+                this.Index = index;
+                this.Slots = slots;
+            }
+
+            public override bool CanUseIfTurnBasedInternal() => true;
+            public override object GetContentData() => this;
+            public override Color GetDecorationColor() => default; //new Color(0f, 0f, 0f, 0f);
+            public override Sprite GetDecorationSprite() => null;
+            public override string GetTitle() => Groups.ElementAtOrDefault(this.Index)?.Title;
+            public override string GetDescription() => Groups.ElementAtOrDefault(this.Index)?.Description;
+            public override Sprite GetIcon() => Groups.ElementAtOrDefault(this.Index)?.Icon;
+            public override int GetResource()
+            {
+                int count = 0;
+                foreach (var slot in Slots)
+                    if (slot.IsActive())
+                        count++;
+                if (count == 0)
+                    return -1;
+                return count;
+            }
+            public override bool IsCasting() => false;
+
+            public override string KeyName => GetTitle();
+            public override bool IsActive() => Slots.Any(a => a.IsActive()); // active border
+            public override bool IsDisabled(int resourceCount) => false;
+            public override bool IsPossibleActive(int? resource = null) => true;
+            public override void UpdateSlotInternal(ActionBarSlot slot)
+            {
+                if (slot.ActiveMark != null && IsActive())
+                {
+                    slot.ActiveMark.color = slot.RunningColor;
+                    slot.ActiveMark.gameObject.SetActive(true);
+                }
+            }
+            public override bool IsBad() => Index < 0; // use this to remove invalid entries
+
+            public override TooltipBaseTemplate GetTooltipTemplate()
+            {
+                string title = "";
+                string description = "";
+                Sprite icon = null;
+
+                var info = Groups.ElementAtOrDefault(this.Index);
+                if (info != null)
+                {
+                    title = info.Title;
+                    description = info.Description;
+                    icon = info.Icon;
+                }
+
+                return new TooltipTemplateDataProvider(new UIData(title, description, icon));
+            }
+
+        }
+
+        public class DefGroup
+        {
+            public HashSet<BlueprintGuid> Guids;
+            public string Title;
+            public string Description;
+            public Sprite Icon;
+
+            public DefGroup(string title, string description, Sprite icon, params string[] guids)
+            {
+                this.Title = title;
+                this.Description = description;
+                this.Icon = icon;
+                this.Guids = guids.Select(s => BlueprintGuid.Parse(s)).ToHashSet();
+            }
+        }
+
+        public class ActionBarConvertedActivableVM : ActionBarConvertedVM
+        {
+            public ActionBarConvertedActivableVM(List<MechanicActionBarSlot> list, Action onClose) : base(new(), onClose)
+            {
+                foreach (var item in list)
+                    this.Slots.Add(new ActionBarSlotVM(item));
+            }
+        }
+    }
+
+    public class Patch_Prebuilds
+    {
+        /* goal: export player build into file; import file to apply as auto-level-up
+         * milestones:
+         * - find entry into LevelPlan
+         * - save persistance
+         * - multiclass support / auto choose class
+         * - pet companion support
+         * - mythic class support
+         * 
+         * findings:
+         * - prebuild is defined by AddClassLevels, for players mostly on BlueprintFeature
+         * - player class's are named "Prebuild{class}FeatureList"
+         * - story companion's are named "{name}PregenFeatureList"
+         * 
+         */
+
+        //LevelUpController.ApplyPlanAsFarAsPossible
+        //if (this.HasNextLevelPlan)
+        //{
+        //    this.ApplyLevelUpPlan(true);
+        //    this.Commit();
+        //}
+
+        //UnitProgressionData.GetNextLevelPlan
+        //UnitProgressionData.m_LevelPlans
+        // - is saved in json (PostLoad); not entry
+        // - can be copied from other units (CopyFrom); probably irrelevant
+        // - can be imported (AddLevelPlan)
+
+        //UnitProgressionData.AddLevelPlan
+        // - CreateImportedCompanion
+        // -- ActionCreateImportedCompanion.RunAction
+        // --- PlayerDungeonState.ImportedCompanions:Levels
+        // - AddClassLevels.LevelUp
     }
 }

@@ -398,7 +398,6 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.SpellReach));
-                    PatchSafe(typeof(Kineticist.Patch_ActivatableGroups));
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
                     LoadSafe(General.createBardStopSong);
@@ -432,6 +431,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_FixAreaDoubleDamage));
                     PatchSafe(typeof(Patch_FixAreaEndOfTurn));
                     PatchSafe(typeof(Patch_Polymorph));
+                    PatchSafe(typeof(Patch_AbilityGroups));
 
                     // General
                     LoadSafe(General.patchAngelsLight);
