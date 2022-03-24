@@ -1193,6 +1193,32 @@ namespace DarkCodex
 
     }
 
+    [PatchInfo(Severity.Harmony, "Patch: AOE Attack Rolls", "allows Impale Infusion and other AOE attacks to roll once for all", false)]
+    public class Patch_AOEAttackRolls
+    {
+        public IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        {
+            var line = instr.ToList();
+            var original = AccessTools.PropertyGetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.D20));
+
+            for (int i = 0; i < line.Count; i++)
+            {
+                if (line[i].Calls(original))
+                {
+                    line[i] = CodeInstruction.Call(typeof(Patch_AOEAttackRolls), nameof(SetD20));
+                }
+            }
+
+            return line;
+        }
+
+        public static void SetD20(RuleAttackRoll instance, RuleRollD20 d20)
+        {
+            if (instance.D20 == null)
+                instance.D20 = d20;
+        }
+    }
+
     //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]
     //public class Patch_KineticistWhipReach
     //{

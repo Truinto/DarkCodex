@@ -15,6 +15,8 @@
 - improved loading time significantly
 - extended ability groups, now accessible via file "DefGroups.json"
 
+- Patch_ResourcefulCaster
+
 ## [1.2.0]
 - updated to game version 1.2
 - added Patch_AbilityGroups that merges similar abilities into foldable categories

@@ -12,6 +12,7 @@ using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.GameModes;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Abilities;
@@ -631,7 +632,7 @@ namespace DarkCodex
             var feature = Helper.CreateBlueprintFeature(
                 "ResourcefulCasterFeature",
                 "Resourceful Caster",
-                "You can repurpose magic energy of failed spell. You don't expend a spell slot, if you fail to cast a spell due to arcane spell failure or concentration checks. Furthermore you regain your spell slot, whenever all targets of your spells resist due to spell resistance or succeed on their saving throws."
+                "You can repurpose magic energy of failed spells. You don't expend a spell slot, if you fail to cast a spell due to arcane spell failure or concentration checks. Furthermore you regain your spell slot, whenever all targets of your spells resist due to spell resistance or succeed on their saving throws."
                 );
 
             Resource.Cache.FeatureResourcefulCaster.SetReference(feature);
@@ -790,6 +791,11 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_ResourcefulCaster
     {
+        public static bool IsAllowed(UnitEntityData unit) // TODO: #37 check if cutscene suppression would help
+        {
+            return unit != null && unit.IsPlayerFaction && !Game.Instance.IsModeActive(GameModeType.Dialog) && !Game.Instance.IsModeActive(GameModeType.Cutscene);
+        }
+
         [HarmonyPatch(typeof(RuleCastSpell), nameof(RuleCastSpell.ShouldSpendResource), MethodType.Getter)]
         [HarmonyPostfix]
         public static void Postfix1(RuleCastSpell __instance, ref bool __result) // arcane spell failure
@@ -829,7 +835,7 @@ namespace DarkCodex
             if (!__instance.IsEnded)
                 return;
             Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster?.CharacterName}");
-            if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
+            if (__instance.Context.MaybeCaster == null || !__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
                 return;
             if (__instance.Context.IsDuplicateSpellApplied)
                 return;
@@ -838,6 +844,8 @@ namespace DarkCodex
                 return;
             var spellbook = __instance.Context.Ability.Spellbook;
             if (spellbook == null)
+                return;
+            if (__instance.Context.RulebookContext == null)
                 return;
 
             bool hasSaves = false;
@@ -878,19 +886,10 @@ namespace DarkCodex
             if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
             {
                 // refund spell if all targets resisted
-
                 spell = spell.ConvertedFrom ?? spell;
 
                 Helper.PrintDebug("Refunding spell");
                 Resource.Log.Print($"{__instance.Context.Caster.CharacterName} regained {spell.Name}");
-                //LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat].;
-                //var items = RootUIContext.Instance.InGameVM.StaticPartVM.CombatLogVM.Items;
-                //for (int i = items.Count - 1; i >= 0 && i >= items.Count - 11; i--)
-                //{
-                //    var text = items[i].Message.Message;
-                //    var tooltip = items[i].Message.Tooltip as TooltipTemplateSimple;
-                //    Helper.Print($"text={text} header={tooltip?.Header} tooltip={tooltip?.Description}");
-                //}
 
                 int level = spellbook.GetSpellLevel(spell);
                 if (spellbook.Blueprint.Spontaneous)
@@ -918,13 +917,19 @@ namespace DarkCodex
         {
             try
             {
-                __instance.Context?.SourceAbilityContext?.RulebookContext?.m_AllEvents.Add(__instance);
+                __instance.Context?.SourceAbilityContext?.RulebookContext?.m_AllEvents?.Add(__instance);
                 Helper.PrintDebug("added SR check to stack");
             }
             catch (Exception e)
             {
                 Helper.Print("Patch_ResourcefulCaster4 " + e);
             }
+        }
+
+        public static Exception Finalizer(Exception __exception)
+        {
+            Helper.PrintException(__exception);
+            return null;
         }
     }
 

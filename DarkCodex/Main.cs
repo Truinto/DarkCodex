@@ -440,6 +440,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_TrueGatherPowerLevel));
                     PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
                     PatchSafe(typeof(Patch_EnvelopingWindsCap));
+                    PatchSafe(typeof(Patch_AOEAttackRolls));
                     PatchSafe(typeof(Patch_MagicItemAdept));
                     PatchSafe(typeof(Patch_ActivatableOnNewRound));
                     PatchSafe(typeof(Patch_ActivatableActionBar));

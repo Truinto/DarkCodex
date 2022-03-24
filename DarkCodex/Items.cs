@@ -43,7 +43,7 @@ namespace DarkCodex
             TerendelevScaleItem.RestoreChargesOnRest = true;
         }
 
-        [PatchInfo(Severity.Create, "Kinetic Artifact", "new weapon for Kineticists", true)]
+        [PatchInfo(Severity.Create | Severity.Faulty, "Kinetic Artifact", "new weapon for Kineticists", true)] // TODO: #36 cannot interact with companions
         public static void CreateKineticArtifact()
         {
             var bladetype = Helper.ToRef<BlueprintWeaponTypeReference>("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade

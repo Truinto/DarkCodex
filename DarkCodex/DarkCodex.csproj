@@ -34,6 +34,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BlueprintLoader.cs" />
     <Compile Include="Classes\AbilityRegister.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
