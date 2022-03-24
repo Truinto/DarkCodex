@@ -54,12 +54,22 @@ using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.Items;
 using Kingmaker.Blueprints.Items.Armors;
+using JetBrains.Annotations;
+using Kingmaker.Blueprints.Classes.Prerequisites;
+
+namespace X
+{
+
+}
 
 namespace DarkCodex
 {
     public class Kineticist
     {
-        public static AbilityRegister Blasts = new AbilityRegister(
+
+        public static KineticistTree Tree = new();
+
+        public static AbilityRegister Blasts = new(
             "c4b74e4448b81d04f9df89ed14c38a95",  //MetakinesisQuickenCheaperBuff
             "f690edc756b748e43bba232e0eabd004",  //MetakinesisQuickenBuff
             "b8f43f0040155c74abd1bc794dbec320",  //MetakinesisMaximizedCheaperBuff
@@ -67,8 +77,11 @@ namespace DarkCodex
             "f8d0f7099e73c95499830ec0a93e2eeb",  //MetakinesisEmpowerCheaperBuff
             "f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
 
+        public static List<BlueprintFeature> Infusions;
+        public static List<BlueprintFeature> WildTalents;
+
         [PatchInfo(Severity.Create, "Kineticist Background", "regional background: gain +1 Kineticist level for the purpose of feat prerequisites", true)]
-        public static void createKineticistBackground()
+        public static void CreateKineticistBackground()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             //var dragon_class = Helper.ToRef<BlueprintCharacterClassReference>("01a754e7c1b7c5946ba895a5ff0faffc");
@@ -86,7 +99,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent", false)]
-        public static void createExtraWildTalentFeat()
+        public static void CreateExtraWildTalentFeat()
         {
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
@@ -111,7 +124,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Whip Infusion", "infusion: Kinetic Whip, expands Kinetic Knight", false, Requirement: typeof(Patch_KineticistAllowOpportunityAttack))]
-        public static void createWhipInfusion()
+        public static void CreateWhipInfusion()
         {
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
@@ -169,7 +182,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Blade Rush Infusion", "infusion: Blade Rush, expands Kinetic Knight", false)]
-        public static void createBladeRushInfusion()
+        public static void CreateBladeRushInfusion()
         {
             var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
@@ -242,7 +255,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Mobile Gathering", "basic feat: Mobile Gathering", false)]
-        public static void createMobileGatheringFeat()
+        public static void CreateMobileGatheringFeat()
         {
             // --- base game stuff ---
             var buff1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e6b8b31e1f8c524458dc62e8a763cfb1");   //GatherPowerBuffI
@@ -348,13 +361,101 @@ namespace DarkCodex
 
         }
 
+        [PatchInfo(Severity.Create | Severity.WIP, "Expanded Element", "basic feat: select extra elements", true, Priority: 300)]
+        public static void CreateExpandedElement()
+        {
+            var t = Kineticist.Tree;
+
+            // make sure progression always grants blast feature (basic only)
+            t.Earth.Progession.AddComponents(Helper.CreateAddFeatureIfHasFact(t.Earth.BlastFeature.ToRef2()));
+            t.Fire.Progession.AddComponents(Helper.CreateAddFeatureIfHasFact(t.Fire.BlastFeature.ToRef2()));
+
+            // add missing composite cases
+            var list = new List<GameAction>();
+            foreach (var element in t.GetAll(composites: true))
+            {
+                if (element.Parent2 != null)
+                {
+                    list.Add(Helper.CreateConditional(
+                        new Condition[]
+                        {
+                            Helper.CreateContextConditionHasFact(element.BlastFeature.ToRef2(), true),
+                            Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature.ToRef2()),
+                            Helper.CreateContextConditionHasFact(element.Parent2.BlastFeature.ToRef2())
+                        },
+                        ifTrue: Helper.CreateContextActionAddFeature(element.BlastFeature.ToRef()).ObjToArray()));
+                }
+            }
+            t.CompositeBuff.GetComponent<AddFactContextActions>().Activated.Actions = list.ToArray();
+
+            // move CompositeBlastBuff to BlastFeature
+            foreach (var element in t.GetAll(basic: true))
+                element.BlastFeature.AddComponents(Helper.CreateAddFacts(t.CompositeBuff.ToRef2()));
+
+            // create new simplified selection
+            t.ExpandedElement = Helper.CreateBlueprintFeatureSelection(
+                "ExpandedElementSelection",
+                "",
+                "A kineticist learns to use another element or expands her understanding of her own element. She can choose any element, including her primary element. She gains one of that element's simple blast wild talents that she does not already possess, if any. She also gains all composite blast wild talents whose prerequisites she meets. She doesn't gain the defensive wild talent of the expanded element unless she later selects it with the expanded defense utility wild talent."
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(t.Class.ToRef(), 7));
+            t.ExpandedElement.m_DisplayName = t.FocusSecond.m_DisplayName;
+            t.ExpandedElement.m_AllFeatures = new BlueprintFeatureReference[] {
+                t.Air.BlastFeature.ToRef(),
+                t.Electric.BlastFeature.ToRef(),
+                t.Earth.BlastFeature.ToRef(),
+                t.Composite_Metal.BlastFeature.ToRef(),
+                t.Fire.BlastFeature.ToRef(),
+                t.Composite_BlueFlame.BlastFeature.ToRef(),
+                t.Water.BlastFeature.ToRef(),
+                t.Cold.BlastFeature.ToRef()
+            };
+
+            // make sure metal and blueflame cannot be taken early
+            t.Composite_Metal.Progession.AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession.ToRef()));
+            t.Composite_BlueFlame.Progession.AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession.ToRef()));
+
+            // change prerequisites of wild talents, check for blasts instead of elemental focus since Expanded Element doesn't grant focus
+            foreach (var talent in WildTalents)
+            {
+                var fromlist = talent.GetComponent<PrerequisiteFeaturesFromList>()?.m_Features;
+                if (fromlist != null)
+                    for (int i = 0; i < fromlist.Length; i++)
+                        swap(ref fromlist[i]);
+
+                foreach (var preq in talent.GetComponents<PrerequisiteFeature>())
+                    swap(ref preq.m_Feature);
+
+                void swap(ref BlueprintFeatureReference original)
+                {
+                    var guid = original.Guid;
+                    var focus = t.GetFocus(f => f.Second.AssetGuid == guid);
+                    if (focus != null)
+                    {
+                        original = focus.Element1.BlastFeature.ToRef();
+                        return;
+                    }
+
+                    focus = t.GetFocus(f => f.Third.AssetGuid == guid);
+                    if (focus != null && focus.Element2 != null)
+                    {
+                        original = focus.Element2.BlastFeature.ToRef();
+                        return;
+                    }
+                }
+            }
+
+            // add to feats
+            Helper.AddFeats(t.ExpandedElement.ToRef());
+        }
+
         [PatchInfo(Severity.Create, "Impale Infusion", "infusion: Impale", false)]
-        public static void createImpaleInfusion()
+        public static void CreateImpaleInfusion()
         {
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var weapon = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8");
-            var icon = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("2aad85320d0751340a0786de073ee3d5").Icon; //TorrentInfusionFeature
+            var icon = Helper.StealIcon("2aad85320d0751340a0786de073ee3d5"); //TorrentInfusionFeature
 
             var earth_base = Helper.ToRef<BlueprintAbilityReference>("e53f34fb268a7964caf1566afb82dadd");   //EarthBlastBase
             var earth_blast = Helper.ToRef<BlueprintFeatureReference>("7f5f82c1108b961459c9884a0fa0f5c4");    //EarthBlastFeature
@@ -367,7 +468,7 @@ namespace DarkCodex
 
 
             // impale feat
-            BlueprintFeature impale_feat = Helper.CreateBlueprintFeature(
+            var impale_feat = Helper.CreateBlueprintFeature(
                 "InfusionImpaleFeature",
                 "Impale",
                 "Element: earth\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: earth, metal, ice\n"
@@ -381,7 +482,6 @@ namespace DarkCodex
                 );
 
             // earth ability
-            var step1 = Step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
             var earth_impale_ab = Helper.CreateBlueprintAbility(
                 "ImpaleEarthBlastAbility",
                 impale_feat.m_DisplayName,
@@ -394,22 +494,19 @@ namespace DarkCodex
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
-                step1,
+                Step1_run_damage(out var actions, p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false),
                 Step2_rank_dice(twice: false),
                 Step3_rank_bonus(half_bonus: false),
-                step4_dc(),
-                Step5_burn(step1.Actions.Actions, infusion: 2, blast: 0),
+                Step4_dc(),
+                Step5_burn(actions, infusion: 2, blast: 0),
                 Step6_feat(impale_feat),
                 Step7_projectile(Resource.Projectile.Kinetic_EarthBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
-            var attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
-            attack.IfTrue = step1.Actions;
-            step1.Actions = Helper.CreateActionList(attack);
+            actions.InjectCondition(new ContextConditionAttackRoll(weapon));
 
             // metal ability
-            step1 = Step1_run_damage(p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false);
             var metal_impale_ab = Helper.CreateBlueprintAbility(
                 "ImpaleMetalBlastAbility",
                 impale_feat.m_DisplayName,
@@ -422,22 +519,19 @@ namespace DarkCodex
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
-                step1,
+                Step1_run_damage(out actions, p: PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, isAOE: true, half: false),
                 Step2_rank_dice(twice: true),
                 Step3_rank_bonus(half_bonus: false),
-                step4_dc(),
-                Step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
+                Step4_dc(),
+                Step5_burn(actions, infusion: 2, blast: 2),
                 Step6_feat(impale_feat),
                 Step7_projectile(Resource.Projectile.Kinetic_MetalBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
-            attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
-            attack.IfTrue = step1.Actions;
-            step1.Actions = Helper.CreateActionList(attack);
+            actions.InjectCondition(new ContextConditionAttackRoll(weapon));
 
             // ice ability
-            step1 = Step1_run_damage(p: PhysicalDamageForm.Piercing, e: DamageEnergyType.Cold, isAOE: true, half: false);
             var ice_impale_ab = Helper.CreateBlueprintAbility(
                 "ImpaleIceBlastAbility",
                 impale_feat.m_DisplayName,
@@ -450,20 +544,18 @@ namespace DarkCodex
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
-                step1,
-                Step2_rank_dice(twice: true),
+                Step1_run_damage(out actions, p: PhysicalDamageForm.Piercing, e: DamageEnergyType.Cold, isAOE: true, half: false),
+                Step2_rank_dice(twice: false),
                 Step3_rank_bonus(half_bonus: false),
-                step4_dc(),
-                Step5_burn(step1.Actions.Actions, infusion: 2, blast: 2),
+                Step4_dc(),
+                Step5_burn(actions, infusion: 2, blast: 2),
                 Step6_feat(impale_feat),
                 Step7_projectile(Resource.Projectile.Kinetic_IceBlastLine00, true, AbilityProjectileType.Line, 30, 5),
                 Step8_spell_description(SpellDescriptor.Cold),
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
-            attack = Helper.CreateConditional(new ContextConditionAttackRoll(weapon));
-            attack.IfTrue = step1.Actions;
-            step1.Actions = Helper.CreateActionList(attack);
+            actions.InjectCondition(new ContextConditionAttackRoll(weapon));
 
             // add to feats and append variants
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, impale_feat.ToRef());
@@ -472,8 +564,66 @@ namespace DarkCodex
             Helper.AddToAbilityVariants(ice_base, ice_impale_ab);
         }
 
+        [PatchInfo(Severity.Create, "Chain Infusion", "infusion: Chain", false)]
+        public static void CreateChainInfusion()
+        {
+            // idea: make thunderstorm full electric and add this infusion
+            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+            var icon = Helper.StealIcon("645558d63604747428d55f0dd3a4cb58"); //ChainLightning
+
+            var electric_base = Helper.ToRef<BlueprintAbilityReference>("45eb571be891c4c4581b6fcddda72bcd");   //ElectricBlastBase
+            var electric_blast = Helper.ToRef<BlueprintFeatureReference>("c2c28b6f6f000314eb35fff49bb99920");    //ElectricBlastFeature
+
+            // chain feat
+            var chain_feat = Helper.CreateBlueprintFeature(
+                "InfusionChainFeature",
+                "Chain",
+                "Element: air\nType: form infusion\nLevel: 4\nBurn: 3\nAssociated Blasts: electric\n"
+                + "Your electric blast leaps from target to target. When you hit a target with your infused blast, you can attempt a ranged touch attack against an additional target that is within 30 feet of the first. Each additional attack originates from the previous target, which could alter cover and other conditions. Each additional target takes 1d6 fewer points of damage than the last, and you can’t chain the blast back to a previous target. You can continue chaining your blasts until it misses or it's reduced to a single damage die.",
+                null,
+                icon,
+                FeatureGroup.KineticBlastInfusion
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeaturesFromList(true, electric_blast),
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 8)
+                );
+
+            // electric ability
+            var electric_chain_ab = Helper.CreateBlueprintAbility(
+                "ChainElectricBlastAbility",
+                chain_feat.m_DisplayName,
+                chain_feat.m_Description,
+                null,
+                icon,
+                AbilityType.SpellLike,
+                UnitCommand.CommandType.Standard,
+                AbilityRange.Close,
+                duration: null,
+                savingThrow: null
+                ).SetComponents(
+                Step1_run_damage(out var actions, e: DamageEnergyType.Electricity, isAOE: false, half: false), //p: PhysicalDamageForm.Bludgeoning
+                Step2_rank_dice(twice: false),
+                Step3_rank_bonus(half_bonus: true),
+                Step4_dc(),
+                Step5_burn(actions, infusion: 3, blast: 0),
+                Step6_feat(chain_feat),
+                //Step7_projectile(Resource.Projectile.LightningBolt00, false, AbilityProjectileType.Simple, 0, 0),
+                Step7b_chain_projectile(Resource.Projectile.LightningBolt00, Resource.Cache.WeaponBlastEnergy, 0.5f),
+                Step8_spell_description(SpellDescriptor.Electricity),
+                Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Electric),
+                Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Electric)
+                ).TargetEnemy(CastAnimationStyle.Kineticist);
+            electric_chain_ab.SpellResistance = true;
+
+            Helper.AppendAndReplace(ref actions.Actions, new ContextActionChangeRankValue(AbilityRankChangeType.Add, AbilityRankType.DamageDice, -1));
+
+            Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, chain_feat.ToRef());
+            Helper.AddToAbilityVariants(electric_base, electric_chain_ab);
+        }
+
         [PatchInfo(Severity.Extend, "Gather Power", "Kineticist Gather Power can be used manually", false, Requirement: typeof(Patch_TrueGatherPowerLevel))]
-        public static void patchGatherPower()
+        public static void PatchGatherPower()
         {
             var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
             gather_original_ab.Hidden = false;
@@ -482,7 +632,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Extend, "Demon Charge", "Demon Charge also gathers power", true)]
-        public static void patchDemonCharge()
+        public static void PatchDemonCharge()
         {
             var charge = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
             var gather = Helper.ToRef<BlueprintAbilityReference>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
@@ -491,7 +641,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Extend, "Dark Elementalist QoL", "faster animation and use anywhere, but only out of combat", true)]
-        public static void patchDarkElementalist()
+        public static void PatchDarkElementalist()
         {
             var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c"); //DarkElementalistSoulPowerAbility
             soulability.ActionType = UnitCommand.CommandType.Free;
@@ -503,7 +653,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast, apply PsychokineticistStat setting", true)]
-        public static void patchVarious()
+        public static void PatchVarious()
         {
             // allow bowling infusion on sandblasts
             var bowling = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("918b2524af5c3f647b5daa4f4e985411"); //BowlingInfusionBuff
@@ -523,14 +673,14 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Fix, "Spell-like Blasts", "makes blasts register as spell like, instead of supernatural", false)]
-        public static void fixBlastsAreSpellLike()
+        public static void FixBlastsAreSpellLike()
         {
             foreach (var blast in Blasts.GetBaseAndVariants())
                 blast.Get().Type = AbilityType.SpellLike;
         }
 
         [PatchInfo(Severity.Fix, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
-        public static void fixWallInfusion()
+        public static void FixWallInfusion()
         {
             int counter = 0;
             foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
@@ -553,7 +703,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Selective Metakinesis", "gain selective metakinesis at level 7", true)]
-        public static void createSelectiveMetakinesis()
+        public static void CreateSelectiveMetakinesis()
         {
             //var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
             //var empower2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"); //MetakinesisEmpowerCheaperBuff
@@ -597,7 +747,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Auto Metakinesis", "activatable to automatically empower and maximize blasts, if you have unused burn", false)]
-        public static void createAutoMetakinesis()
+        public static void CreateAutoMetakinesis()
         {
             var empower = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("70322f5a2a294e54a9552f77ee85b0a7"); //MetakinesisEmpowerFeature
             var quickenbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"); //MetakinesisQuickenBuff
@@ -623,7 +773,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create | Severity.WIP, "Hurricane Queen", "Wild Talent: Hurricane Queen", false, Requirement: typeof(Patch_EnvelopingWindsCap))]
-        public static void createHurricaneQueen()
+        public static void CreateHurricaneQueen()
         {
             var windsBuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff
             var windsFeat = Helper.ToRef<BlueprintFeatureReference>("bb0de2047c448bd46aff120be3b39b7a");  //EnvelopingWinds
@@ -659,7 +809,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Mind Shield", "Wild Talent: half Psychokineticist's penalties", true)]
-        public static void createMindShield()
+        public static void CreateMindShield()
         {
             var buff = Helper.Get<BlueprintBuff>("a9e3e785ea41449499b6b5d3d22a0856");  //PsychokineticistBurnBuff
             var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
@@ -687,18 +837,18 @@ namespace DarkCodex
 
         /// <summary>
         /// 1) make BlueprintAbility
-        /// 2) set m_Parent to XBlastBase
-        /// 3) set SpellResistance
-        /// 4) make components with helpers (step1 to 9)
+        /// 2) set SpellResistance
+        /// 3) make components with helpers (step1 to 9)
+        /// 4) set m_Parent to XBlastBase with Helper.AddToAbilityVariants
         /// Logic for dealing damage. Will make a composite blast, if both p and e are set. How much damage is dealt is defined in step 2.
         /// </summary>
-        public static AbilityEffectRunAction Step1_run_damage(PhysicalDamageForm p = 0, DamageEnergyType e = (DamageEnergyType)255, SavingThrowType save = SavingThrowType.Unknown, bool isAOE = false, bool half = false)
+        public static AbilityEffectRunAction Step1_run_damage(out ActionList actions, PhysicalDamageForm p = 0, DamageEnergyType e = (DamageEnergyType)255, SavingThrowType save = SavingThrowType.Unknown, bool isAOE = false, bool half = false)
         {
             ContextDiceValue dice = Helper.CreateContextDiceValue(DiceType.D6, AbilityRankType.DamageDice, AbilityRankType.DamageBonus);
 
-            List<ContextAction> list = new List<ContextAction>(2);
+            List<ContextAction> list = new(2);
 
-            bool isComposite = e != 0 && e != (DamageEnergyType)255;
+            bool isComposite = p != 0 && e != (DamageEnergyType)255;
 
             if (p != 0)
                 list.Add(Helper.CreateContextActionDealDamage(p, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, writeShare: isComposite));
@@ -706,7 +856,7 @@ namespace DarkCodex
                 list.Add(Helper.CreateContextActionDealDamage(e, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, readShare: isComposite));
 
             var runaction = Helper.CreateAbilityEffectRunAction(save, list.ToArray());
-
+            actions = runaction.Actions;
             return runaction;
         }
 
@@ -745,32 +895,31 @@ namespace DarkCodex
         /// <summary>
         /// Simply makes the DC dex based.
         /// </summary>
-        public static ContextCalculateAbilityParamsBasedOnClass step4_dc()
+        public static ContextCalculateAbilityParamsBasedOnClass Step4_dc()
         {
             var dc = new ContextCalculateAbilityParamsBasedOnClass();
             dc.StatType = StatType.Dexterity;
-            dc.m_CharacterClass = "42a455d9ec1ad924d889272429eb8391".ToRef<BlueprintCharacterClassReference>(); //KineticistClass
+            dc.m_CharacterClass = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
             return dc;
         }
 
         /// <summary>
         /// Creates damage tooltip from the run-action. Defines burn cost. Blast cost is 0, except for composite blasts which is 2. Talent is not used.
         /// </summary>
-        public static AbilityKineticist Step5_burn(GameAction[] actions, int infusion = 0, int blast = 0, int talent = 0)
+        public static AbilityKineticist Step5_burn(ActionList actions, int infusion = 0, int blast = 0, int talent = 0)
         {
             var comp = new AbilityKineticist();
             comp.InfusionBurnCost = infusion;
             comp.BlastBurnCost = blast;
             comp.WildTalentBurnCost = talent;
 
-            if (actions == null)
+            if (actions?.Actions == null)
                 return comp;
 
-            for (int i = 0; i < actions.Length; i++)
+            for (int i = 0; i < actions.Actions.Length; i++)
             {
-                var action = actions[i] as ContextActionDealDamage;
-                if (action == null) continue;
-
+                if (actions.Actions[i] is not ContextActionDealDamage action)
+                    continue;
                 comp.CachedDamageInfo.Add(new AbilityKineticist.DamageInfo() { Value = action.Value, Type = action.DamageType, Half = action.Half });
             }
             return comp;
@@ -800,6 +949,20 @@ namespace DarkCodex
                 length.Feet(),
                 width.Feet());
             return projectile;
+        }
+
+        /// <summary>
+        /// Alternative projectile. Requires attack roll, if weapon is not null.
+        /// </summary>
+        public static AbilityDeliverChainAttack Step7b_chain_projectile(string projectile_guid, [CanBeNull] BlueprintItemWeaponReference weapon, float delay = 0f)
+        {
+            var result = new AbilityDeliverChainAttack();
+            result.TargetsCount = Helper.CreateContextValue(AbilityRankType.DamageDice);
+            result.TargetType = TargetType.Enemy;
+            result.Weapon = weapon;
+            result.Projectile = projectile_guid.ToRef<BlueprintProjectileReference>();
+            result.DelayBetweenChain = delay;
+            return result;
         }
 
         /// <summary>
@@ -872,8 +1035,9 @@ namespace DarkCodex
                 return false;
             }
             UnitBody body = __instance.Owner.Body;
-            ItemEntityWeapon weapon = body.PrimaryHand.MaybeItem as ItemEntityWeapon;
-            if (weapon != null && !weapon.IsMonkUnarmedStrike && !(weapon != null && weapon.Blueprint.Category == WeaponCategory.KineticBlast))
+            if (body.PrimaryHand.MaybeItem is ItemEntityWeapon weapon
+                && !weapon.IsMonkUnarmedStrike
+                && (weapon == null || weapon.Blueprint.Category != WeaponCategory.KineticBlast))
             {
                 __result = false;
                 return false;
@@ -987,16 +1151,14 @@ namespace DarkCodex
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
         {
             List<CodeInstruction> list = instr.ToList();
-            MethodInfo original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
-            MethodInfo replacement = AccessTools.Method(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
+            var original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
 
             for (int i = 0; i < list.Count; i++)
             {
-                var mi = list[i].operand as MethodInfo;
-                if (mi != null && mi == original)
+                if (list[i].Calls(original))
                 {
-                    Helper.PrintDebug("KineticistAoO at " + i);
-                    list[i].operand = replacement;
+                    Helper.PrintDebug("Patched at " + i);
+                    list[i] = CodeInstruction.Call(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
                 }
             }
 

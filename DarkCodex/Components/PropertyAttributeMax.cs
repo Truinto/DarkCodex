@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace DarkCodex.Components
 {
-    public class PropertyMaxAttribute : PropertyValueGetter
+    public class PropertyAttributeMax : PropertyValueGetter
     {
-        public static void createPropertyMaxMentalAttribute()
+        public static void CreatePropertyMaxMentalAttribute()
         {
             var prop = Helper.CreateBlueprintUnitProperty(
                 "MaxMentalAttributePropertyGetter"
-                ).SetComponents(new PropertyMaxAttribute() { PhysicalStat = false, MentalStat = true });
+                ).SetComponents(new PropertyAttributeMax() { PhysicalStat = false, MentalStat = true });
 
             Resource.Cache.PropertyMaxMentalAttribute.SetReference(prop);
         }

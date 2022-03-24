@@ -13,7 +13,7 @@ namespace DarkCodex.Components
 {
     public class PropertyMythicLevel : PropertyValueGetter
     {
-        public static void createMythicDispelProperty()
+        public static void CreateMythicDispelProperty()
         {
             var prop = Helper.CreateBlueprintUnitProperty(
                 "MythicDispelPropertyGetter"

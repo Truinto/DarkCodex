@@ -2,6 +2,8 @@
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Items;
+using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Root.Strings.GameLog;
@@ -16,9 +18,12 @@ using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,11 +52,15 @@ namespace DarkCodex
         {
             public static List<BlueprintAbility> Ability;
             public static List<BlueprintActivatableAbility> Activatable;
+            public static List<BlueprintItem> Item;
+            public static List<BlueprintItemEnchantment> Enchantment;
 
             // Base
             public static readonly BlueprintItemWeaponReference WeaponUnarmed;
             public static readonly BlueprintItemWeaponReference WeaponTouch;
             public static readonly BlueprintItemWeaponReference WeaponRay;
+            public static readonly BlueprintItemWeaponReference WeaponBlastPhysical;
+            public static readonly BlueprintItemWeaponReference WeaponBlastEnergy;
 
             // Mods
             public static readonly BlueprintBuffReference BuffKineticWhip;
@@ -83,6 +92,8 @@ namespace DarkCodex
                     WeaponUnarmed = Helper.ToRef<BlueprintItemWeaponReference>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
                     WeaponTouch = Helper.ToRef<BlueprintItemWeaponReference>("bb337517547de1a4189518d404ec49d4"); //TouchItem
                     WeaponRay = Helper.ToRef<BlueprintItemWeaponReference>("f6ef95b1f7bb52b408a5b345a330ffe8"); //RayItem
+                    WeaponBlastPhysical = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8"); //KineticBlastPhysicalWeapon
+                    WeaponBlastEnergy = Helper.ToRef<BlueprintItemWeaponReference>("4d3265a5b9302ee4cab9c07adddb253f"); //KineticBlastEnergyWeapon
                 }
                 catch (Exception e)
                 {
@@ -91,6 +102,103 @@ namespace DarkCodex
             }
 
             public static void Ensure()
+            {
+                if (Ability != null)
+                    return;
+
+                Ability = new();
+                Activatable = new();
+                Item = new();
+                Enchantment = new();
+
+                var __instance = ResourcesLibrary.BlueprintsCache;
+
+                const int typeLength = 16;
+                var deserializer = __instance.m_PackSerializer;
+                var reader = deserializer.m_Primitive.m_Reader;
+                var stream = reader.BaseStream;
+                var typeCache = ((GuidClassBinder)Json.Serializer.Binder).m_GuidToTypeCache;
+                byte[] typeGuid = new byte[typeLength];
+
+                int total = 0;
+                int count = 0;
+                Stopwatch timer = new();
+                timer.Start();
+
+                lock (__instance.m_Lock)
+                {
+                    foreach (var (guid, bpCache) in __instance.m_LoadedBlueprints.ToArray())
+                    {
+                        total++;
+
+                        switch (bpCache.Blueprint)
+                        {
+                            case null:
+                                break;
+                            case BlueprintAbility bp:
+                                Ability.Add(bp);
+                                continue;
+                            case BlueprintActivatableAbility bp:
+                                Activatable.Add(bp);
+                                continue;
+                            case BlueprintItem bp:
+                                Item.Add(bp);
+                                continue;
+                            case BlueprintItemEnchantment bp:
+                                Enchantment.Add(bp);
+                                continue;
+                        }
+
+                        uint offset = bpCache.Offset;
+
+                        stream.Seek(offset, SeekOrigin.Begin);
+                        reader.Read(typeGuid, 0, typeLength);
+
+                        var typeGuidString = new Guid(typeGuid).ToString("N");
+                        if (typeCache.TryGetValue(typeGuidString, out var type))
+                        {
+                            if (type == typeof(BlueprintAbility))
+                                load(Ability);
+                            else if (type == typeof(BlueprintActivatableAbility))
+                                load(Activatable);
+                            else if (typeof(BlueprintItem).IsAssignableFrom(type))
+                                load(Item);
+                            else if (typeof(BlueprintItemEnchantment).IsAssignableFrom(type))
+                                load(Enchantment);
+
+                            void load<T>(List<T> list) where T : SimpleBlueprint
+                            {
+                                stream.Seek(offset, SeekOrigin.Begin);
+                                SimpleBlueprint sbp = null;
+                                deserializer.Blueprint(ref sbp);
+                                if (sbp == null)
+                                {
+                                    Helper.PrintDebug("spb is null " + type.Name);
+                                    return;
+                                }
+
+                                OwlcatModificationsManager.Instance.OnResourceLoaded(sbp, guid.ToString(), out object obj);
+                                var blueprint = (obj as T) ?? sbp as T;
+                                if (blueprint == null)
+                                {
+                                    Helper.PrintDebug("blueprint is null " + type.Name);
+                                    return;
+                                }
+
+                                count++;
+                                __instance.m_LoadedBlueprints[guid] = new() { Offset = offset, Blueprint = blueprint };
+                                list.Add(blueprint);
+                            }
+                        }
+                        //else Helper.PrintDebug("unkown type: " + typeGuidString);
+                    }
+                }
+
+                timer.Stop();
+                Helper.Print($"Loaded {count} out of {total} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
+            }
+
+            public static void EnsureSlow()
             {
                 if (Ability != null)
                     return;
@@ -109,48 +217,16 @@ namespace DarkCodex
                     else if (bp is BlueprintActivatableAbility activatable)
                         Activatable.Add(activatable);
                 }
-
-#if false
-                BlueprintsCache cache = ResourcesLibrary.BlueprintsCache;
-                var newdic = new Dictionary<BlueprintGuid, BlueprintsCache.BlueprintCacheEntry>();
-                foreach (var bp in cache.m_LoadedBlueprints)
-                {
-                    var newvalue = bp.Value;
-
-                    if (newvalue.Blueprint == null)
-                    {
-                        if (newvalue.Offset != 0U)
-                        {
-                            cache.m_PackFile.Seek(newvalue.Offset, SeekOrigin.Begin);
-                            SimpleBlueprint simpleBlueprint = null;
-                            cache.m_PackSerializer.Blueprint(ref simpleBlueprint);
-
-                            if (simpleBlueprint != null)
-                            {
-                                OwlcatModificationsManager.Instance.OnResourceLoaded(simpleBlueprint, simpleBlueprint.AssetGuid.ToString());
-
-                                if (simpleBlueprint is BlueprintAbility ab)
-                                    Ability.Add(ab);
-                                else if (simpleBlueprint is BlueprintActivatableAbility act)
-                                    Activatable.Add(act);
-
-                                newvalue.Blueprint = simpleBlueprint;
-                                newvalue.Blueprint.OnEnable();
-                            }
-                        }
-                    }
-                    newdic.Add(bp.Key, newvalue);
-                }
-                AccessTools.Field(typeof(BlueprintsCache), nameof(BlueprintsCache.m_LoadedBlueprints)).SetValue(ResourcesLibrary.BlueprintsCache, newdic);
-#endif
             }
 
-            public static void Dispose()
-            {
-                Ability = null;
-                Activatable = null;
-            }
-
+            //public static void Dispose()
+            //{
+            //    foreach (var field in typeof(Cache).GetFields(BindingFlags.Public | BindingFlags.Static))
+            //    {
+            //        if (!field.FieldType.IsValueType)
+            //            field.SetValue(null, null);
+            //    }
+            //}
         }
 
         public class Log
@@ -170,40 +246,40 @@ namespace DarkCodex
 
         public class Strings
         {
-            public static LocalizedString Empty = new LocalizedString { Key = "" };
+            public static LocalizedString Empty = new() { Key = "" };
 
 
-            public static LocalizedString RoundPerLevel = new LocalizedString { Key = "6250ccf0-1ed0-460f-8ce7-094c2da7e198" };
-            public static LocalizedString RoundPerLevelRepeatSave = new LocalizedString { Key = "d7cb2411-bd6e-4b59-a72d-43ea018de978" };
-            public static LocalizedString RoundPerLevelPlus1 = new LocalizedString { Key = "fb690795-9d4e-423b-a81f-44f6e43a17b5" };
-            public static LocalizedString MinutesPerLevel = new LocalizedString { Key = "00b2e4c2-aafe-487b-b890-d57473373da7" };
-            public static LocalizedString TenMinutesPerLevel = new LocalizedString { Key = "9178f928-579f-43d0-bd80-e67e478c7bfc" };
-            public static LocalizedString HoursPerLevel = new LocalizedString { Key = "cca23e25-a5b6-4138-b2bf-0b6387738a22" };
+            public static LocalizedString RoundPerLevel = new() { Key = "6250ccf0-1ed0-460f-8ce7-094c2da7e198" };
+            public static LocalizedString RoundPerLevelRepeatSave = new() { Key = "d7cb2411-bd6e-4b59-a72d-43ea018de978" };
+            public static LocalizedString RoundPerLevelPlus1 = new() { Key = "fb690795-9d4e-423b-a81f-44f6e43a17b5" };
+            public static LocalizedString MinutesPerLevel = new() { Key = "00b2e4c2-aafe-487b-b890-d57473373da7" };
+            public static LocalizedString TenMinutesPerLevel = new() { Key = "9178f928-579f-43d0-bd80-e67e478c7bfc" };
+            public static LocalizedString HoursPerLevel = new() { Key = "cca23e25-a5b6-4138-b2bf-0b6387738a22" };
 
-            public static LocalizedString OneRound = new LocalizedString { Key = "62761fbe-42ce-4474-ae10-14f9024f4c57" };
-            public static LocalizedString ThreeRounds = new LocalizedString { Key = "c106ea15-f587-44ce-9472-fa7cd4c11dab" };
-            public static LocalizedString OneMinute = new LocalizedString { Key = "70e2c2f0-b2c6-423a-b6ec-c05084530366" };
-            public static LocalizedString TenMinutes = new LocalizedString { Key = "96bcc776-c41d-4467-99f7-d5848641ca11" };
-            public static LocalizedString OneHour = new LocalizedString { Key = "9e29a1ac-9b6c-42e1-aa32-08b51962127f" };
-            public static LocalizedString OneDay = new LocalizedString { Key = "b2581d37-9b43-4473-a755-f675929feaa2" };
-            public static LocalizedString Permanent = new LocalizedString { Key = "0b5bb39b-9e2e-4841-9f1c-5c20c306553b" };
-            public static LocalizedString Instantaneous = new LocalizedString { Key = "3d7fbfb9-10e8-4509-bab6-a8e4d3dbc3c8" };
+            public static LocalizedString OneRound = new() { Key = "62761fbe-42ce-4474-ae10-14f9024f4c57" };
+            public static LocalizedString ThreeRounds = new() { Key = "c106ea15-f587-44ce-9472-fa7cd4c11dab" };
+            public static LocalizedString OneMinute = new() { Key = "70e2c2f0-b2c6-423a-b6ec-c05084530366" };
+            public static LocalizedString TenMinutes = new() { Key = "96bcc776-c41d-4467-99f7-d5848641ca11" };
+            public static LocalizedString OneHour = new() { Key = "9e29a1ac-9b6c-42e1-aa32-08b51962127f" };
+            public static LocalizedString OneDay = new() { Key = "b2581d37-9b43-4473-a755-f675929feaa2" };
+            public static LocalizedString Permanent = new() { Key = "0b5bb39b-9e2e-4841-9f1c-5c20c306553b" };
+            public static LocalizedString Instantaneous = new() { Key = "3d7fbfb9-10e8-4509-bab6-a8e4d3dbc3c8" };
 
 
-            public static LocalizedString FortitudeHalf = new LocalizedString { Key = "fc1ffd3d-d343-4dfe-8441-118b33c8026a" };
-            public static LocalizedString FortitudePartial = new LocalizedString { Key = "af1a01bb-3924-4663-94e8-79e080287aaa" };
-            public static LocalizedString FortitudeNegates = new LocalizedString { Key = "c8ec9dfb-37ba-485d-8c08-c45a6bfc88f3" };
-            public static LocalizedString FortitudeNegatesRound = new LocalizedString { Key = "23355cb5-0024-4da1-a542-0ef4a672ed8e" };
+            public static LocalizedString FortitudeHalf = new() { Key = "fc1ffd3d-d343-4dfe-8441-118b33c8026a" };
+            public static LocalizedString FortitudePartial = new() { Key = "af1a01bb-3924-4663-94e8-79e080287aaa" };
+            public static LocalizedString FortitudeNegates = new() { Key = "c8ec9dfb-37ba-485d-8c08-c45a6bfc88f3" };
+            public static LocalizedString FortitudeNegatesRound = new() { Key = "23355cb5-0024-4da1-a542-0ef4a672ed8e" };
 
-            public static LocalizedString WillHalf = new LocalizedString { Key = "d47299a3-2f17-4e60-8199-65545e148a89" };
-            public static LocalizedString WillPartial = new LocalizedString { Key = "03e30000-0921-4296-a8b4-9566a9777a5d" };
-            public static LocalizedString WillNegates = new LocalizedString { Key = "7ac9f1bb-ab14-4d64-8543-4c97a64a71bd" };
-            public static LocalizedString WillPartialRound = new LocalizedString { Key = "1035efbd-2846-480a-ae8a-4593fe3c63d8" };
-            public static LocalizedString WillNegatesRound = new LocalizedString { Key = "50f1639f-a789-4939-bab6-557375828c4d" };
+            public static LocalizedString WillHalf = new() { Key = "d47299a3-2f17-4e60-8199-65545e148a89" };
+            public static LocalizedString WillPartial = new() { Key = "03e30000-0921-4296-a8b4-9566a9777a5d" };
+            public static LocalizedString WillNegates = new() { Key = "7ac9f1bb-ab14-4d64-8543-4c97a64a71bd" };
+            public static LocalizedString WillPartialRound = new() { Key = "1035efbd-2846-480a-ae8a-4593fe3c63d8" };
+            public static LocalizedString WillNegatesRound = new() { Key = "50f1639f-a789-4939-bab6-557375828c4d" };
 
-            public static LocalizedString ReflexHalf = new LocalizedString { Key = "dccd7029-0a51-4e5b-9cb2-7a2969b61516" };
-            public static LocalizedString ReflexPartial = new LocalizedString { Key = "d58f2d26-2317-4023-921a-76d0c1590bcf" };
-            public static LocalizedString ReflexNegates = new LocalizedString { Key = "c649bb57-1a11-4d76-ae8c-8caa59feb39b" };
+            public static LocalizedString ReflexHalf = new() { Key = "dccd7029-0a51-4e5b-9cb2-7a2969b61516" };
+            public static LocalizedString ReflexPartial = new() { Key = "d58f2d26-2317-4023-921a-76d0c1590bcf" };
+            public static LocalizedString ReflexNegates = new() { Key = "c649bb57-1a11-4d76-ae8c-8caa59feb39b" };
         }
 
         public class Projectile
@@ -500,6 +576,9 @@ namespace DarkCodex
         {
             public const string PreStart_Earth = "69a83b56c1265464f8626a2ab414364a";
             public const string Start_Earth = "852b687aad7863e438c61339dd35d85d";
+
+            public const string PreStart_Electric = "a0b5b95a9a139944c965c593a0a77ff7";
+            public const string Start_Electric = "4daa50efa21f9564fb3c5cd35d022cbf";
         }
     }
 }

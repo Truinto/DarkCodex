@@ -14,7 +14,7 @@ namespace DarkCodex
 {
     public class GuidManager
     {
-        public static GuidManager i = new GuidManager();
+        public static GuidManager i = new();
 
 #if DEBUG
         public bool allow_guid_generation = true;
@@ -23,8 +23,8 @@ namespace DarkCodex
 #endif
 
         public string filepath = Path.Combine(Main.ModPath, "blueprints.txt");
-        public Dictionary<string, string> guid_list = new Dictionary<string, string>();
-        public List<string> register = new List<string>();
+        public Dictionary<string, string> guid_list = new();
+        public List<string> register = new();
 
         private bool loaded = false;
         public void TryLoad()
@@ -52,7 +52,7 @@ namespace DarkCodex
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter(filepath, append: true))
+                using (StreamWriter writer = new(filepath, append: true))
                 {
                     writer.WriteLine(key + '\t' + guid);
                 }
@@ -67,7 +67,7 @@ namespace DarkCodex
             if (!allow_guid_generation) return;
             TryLoad();
 
-            using (StreamWriter writer = new StreamWriter(filepath, append: false))
+            using (StreamWriter writer = new(filepath, append: false))
             {
                 foreach (KeyValuePair<string, string> pair in guid_list)
                 {

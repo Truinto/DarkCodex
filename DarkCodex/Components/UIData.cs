@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace DarkCodex.Components
 {
+    //UIDataProvider
     public class UIData : IUIDataProvider
     {
         public UIData()

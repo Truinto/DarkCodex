@@ -27,7 +27,7 @@
     <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
     <Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
     <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
-    <Reference Include="Owlcat.Runtime.UI" HintPath="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
+    <Reference Include="Owlcat.Runtime.UI_publicized" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_publicized.dll" />
     <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
     <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
     <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />

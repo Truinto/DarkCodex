@@ -35,6 +35,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Classes\AbilityRegister.cs" />
+    <Compile Include="Classes\KineticistTree.cs" />
+    <Compile Include="Components\AbilityAtWill.cs" />
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
@@ -43,19 +45,24 @@
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
     <Compile Include="Components\ButcheringAxeLogic.cs" />
+    <Compile Include="Components\AbilityDeliverChainAttack.cs" />
+    <Compile Include="Components\ContextActionChangeRankValue.cs" />
     <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
     <Compile Include="Components\ContextActionStopActivatables.cs" />
+    <Compile Include="Components\ContextConditionHasFactRank.cs" />
+    <Compile Include="Components\ContextConditionMoreHitDice.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />
     <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
     <Compile Include="Components\KineticistReduceBurnPooled.cs" />
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\DiceValue.cs" />
+    <Compile Include="Components\LevelUpAddSelectionHasFact.cs" />
     <Compile Include="Components\PropertyMindShield.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyGetterSneakAttack.cs" />
-    <Compile Include="Components\PropertyMaxAttribute.cs" />
+    <Compile Include="Components\PropertyAttributeMax.cs" />
     <Compile Include="Components\PropertyMythicLevel.cs" />
     <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
     <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
@@ -68,6 +75,7 @@
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
     <Compile Include="Components\UIData.cs" />
     <Compile Include="DEBUG.cs" />
+    <Compile Include="Patches\Event_AreaEffects.cs" />
     <Compile Include="General.cs" />
     <Compile Include="GuidManager.cs" />
     <Compile Include="Helper.cs" />
@@ -77,7 +85,25 @@
     <Compile Include="Kineticist.cs" />
     <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
-    <Compile Include="Patches.cs" />
+    <Compile Include="Patches\Patch_AbilityAtWill.cs" />
+    <Compile Include="Patches\Patch_ActivatableHandleUnitRunCommand.cs" />
+    <Compile Include="Patches\Patch_ActivatableOnNewRound.cs" />
+    <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
+    <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
+    <Compile Include="Patches\Patch_Prebuilds.cs" />
+    <Compile Include="Patches\Patch_AllowAchievements.cs" />
+    <Compile Include="Patches\Patch_AbilityGroups.cs" />
+    <Compile Include="Patches\Patch_ActivatableAbilityGroup.cs" />
+    <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
+    <Compile Include="Patches\Patch_DebugReport.cs" />
+    <Compile Include="Patches\Patch_EnduringSpells.cs" />
+    <Compile Include="Patches\Patch_FixAreaDoubleDamage.cs" />
+    <Compile Include="Patches\Patch_FixAreaEndOfTurn.cs" />
+    <Compile Include="Patches\Patch_Polymorph.cs" />
+    <Compile Include="Patches\Patch_FixLoadCrash1.cs" />
+    <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
+    <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
+    <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ranger.cs" />
     <Compile Include="Resources.cs" />
@@ -86,7 +112,13 @@
     <Compile Include="Main.cs" />
     <Compile Include="Attributes\PatchInfoAttribute.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Patches\Unused_Patch_CopyGuids.cs" />
+    <Compile Include="Patches\Unused_Patch_FixAreaEffectDamage.cs" />
+    <Compile Include="Unlock.cs" />
     <Compile Include="Witch.cs" />
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="Settings\Repository.json" />
     <None Include="..\README.md" />
     <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
@@ -97,7 +129,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"F:\Github\KingmakerFumi\versioncontrol\bin\Release\netcoreapp3.1\versioncontrol.exe" "$(ProjectDir)changelog.md" "$(ProjectDir)Properties\AssemblyInfo.cs" "$(ProjectDir)info.json" "$(ProjectDir)Settings\Repository.json"</PreBuildEvent>
+    <PreBuildEvent>"E:\Github\KingmakerFumi\versioncontrol\bin\Release\netcoreapp3.1\versioncontrol.exe" "$(ProjectDir)changelog.md" "$(ProjectDir)Properties\AssemblyInfo.cs" "$(ProjectDir)info.json" "$(ProjectDir)Settings\Repository.json"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>xcopy /i /e /y /f "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"</PostBuildEvent>

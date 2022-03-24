@@ -22,6 +22,9 @@ namespace DarkCodex
         public bool stopAreaEffectsDuringCutscenes = true;
 
         [JsonProperty]
+        public bool reallyFreeCost = false;
+
+        [JsonProperty]
         public bool newFeatureDefaultOn = true;
 
         [JsonProperty]
@@ -96,7 +99,7 @@ namespace DarkCodex
             return !newFeatureDefaultOn && !whitelist.Contains(name);
         }
 
-        public static Config.Manager<Settings> StateManager = new Config.Manager<Settings>(Path.Combine(Main.ModPath, "settings.json"), OnUpdate);
+        public static Config.Manager<Settings> StateManager = new(Path.Combine(Main.ModPath, "settings.json"), OnUpdate);
 
         private static bool OnUpdate(Settings settings)
         {
@@ -105,6 +108,31 @@ namespace DarkCodex
                 settings.showBootupWarning = true;
                 settings.blacklist = settings.doNotLoad;
                 settings.doNotLoad = null;
+            }
+
+            if (settings.version < 4 && settings.whitelist != null && settings.blacklist != null)
+            {
+                var hash = new HashSet<string>();
+                foreach (string str in settings.whitelist)
+                    hash.Add(toUpper(str));
+                settings.whitelist = hash;
+
+                hash = new HashSet<string>();
+                foreach (string str in settings.blacklist)
+                    hash.Add(toUpper(str));
+                settings.blacklist = hash;
+
+                string toUpper(string text)
+                {
+                    if (text[0].IsLowercase())
+                    {
+                        Resource.sb.Clear();
+                        Resource.sb.Append(text);
+                        Resource.sb[0] -= (char)0x20;
+                        return Resource.sb.ToString();
+                    }
+                    return text;
+                }
             }
 
             return true;

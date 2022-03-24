@@ -13,8 +13,8 @@ namespace DarkCodex
 {
     public class Hexcrafter
     {
-        [PatchInfo(Severity.Create, "Accursed Strike", "hexcrafter arcana: Accursed Strike", false)]
-        public static void createAccursedStrike() // todo: finish accursed strike
+        [PatchInfo(Severity.Create | Severity.Faulty, "Accursed Strike", "hexcrafter arcana: Accursed Strike", false)]
+        public static void CreateAccursedStrike() // todo finish accursed strike
         {
             var hexes = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
 
@@ -100,7 +100,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Fix, "Fix Hexcrafter", "allows hex selection with any arcana, add missing spell recall at level 11", false)]
-        public static void fixProgression()
+        public static void FixProgression()
         {
             var HexcrafterArchetype = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("79ccf7a306a5d5547bebd97299f6fc89");
             var MagusArcanaSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e9dc4dfc73eaaf94aae27e0ed6cc9ada");

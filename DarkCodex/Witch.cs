@@ -29,7 +29,7 @@ namespace DarkCodex
     public class Witch
     {
         [PatchInfo(Severity.Create, "Extra Hex", "basic feat: Extra Hex", false)]
-        public static void createExtraHex()
+        public static void CreateExtraHex()
         {
             var witch_class = Helper.ToRef<BlueprintCharacterClassReference>("1b9873f1e7bfe5449bc84d03e9c8e3cc"); //WitchClass
             var hexcrafter_class = Helper.ToRef<BlueprintArchetypeReference>("79ccf7a306a5d5547bebd97299f6fc89"); //HexcrafterArchetype
@@ -64,19 +64,19 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create | Severity.Faulty, "Hex Strike", "", false)]
-        public static void createHexStrike()
+        public static void CreateHexStrike()
         {
 
         }
 
         [PatchInfo(Severity.Create | Severity.Faulty, "Split Hex", "", false)]
-        public static void createSplitHex()
+        public static void CreateSplitHex()
         {
             //DublicateSpellComponent
         }
 
-        [PatchInfo(Severity.Create, "Cackle Activatable", "Cackle/Chant can be toggled to use move action passively", false)]
-        public static void createCackleActivatable()
+        [PatchInfo(Severity.Create, "Cackle Activatable", "Cackle/Chant can be toggled to use move action passively", Requirement: typeof(Patch_ActivatableOnNewRound))]
+        public static void CreateCackleActivatable()
         {
             var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("36f2467103d4635459d412fb418276f4");
             var cackle = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("4bd01292a9bc4304f861a6a07f03b855");
@@ -86,6 +86,7 @@ namespace DarkCodex
 
             var consume_move = new ActivatableAbilityUnitCommand { Type = CommandType.Move };
 
+            var runCackle = cackle.GetComponent<AbilityEffectRunAction>().Actions;
             var cackle_addarea = Helper.CreateBlueprintAbilityAreaEffect(
                 "CacklePassiveArea",
                 shape: AreaEffectShape.Cylinder,
@@ -93,7 +94,8 @@ namespace DarkCodex
                 applyEnemy: true,
                 size: 30.Feet(),
                 sfx: sfx,
-                unitRound: cackle.GetComponent<AbilityEffectRunAction>().Actions
+                unitEnter: null,
+                unitRound: runCackle
                 ).CreateAddAreaEffect();
             var cackle_passiv = Helper.CreateBlueprintActivatableAbility(
                 "WitchHexCacklePassive",
@@ -101,12 +103,16 @@ namespace DarkCodex
                 cackle.m_Description, 
                 out BlueprintBuff cackle_buff,
                 icon: cackle.Icon,
-                commandType: CommandType.Move,
+                //activationType: AbilityActivationType.WithUnitCommand,
+                //commandType: CommandType.Move,
                 deactivateWhenStunned: true,
-                deactivateWhenDead: true
-                ).SetComponents(consume_move);
+                deactivateWhenDead: true,
+                deactivateImmediately: false
+                ).SetComponents(
+                consume_move);
             cackle_buff.SetComponents(cackle_addarea);
 
+            var runChant = chant.GetComponent<AbilityEffectRunAction>().Actions;
             var chant_addarea = Helper.CreateBlueprintAbilityAreaEffect(
                 "ChantPassiveArea",
                 shape: AreaEffectShape.Cylinder,
@@ -114,7 +120,8 @@ namespace DarkCodex
                 applyEnemy: true,
                 size: 30.Feet(),
                 sfx: sfx,
-                unitRound: chant.GetComponent<AbilityEffectRunAction>().Actions
+                unitEnter: null,
+                unitRound: runChant
                 ).CreateAddAreaEffect();
             var chant_passiv = Helper.CreateBlueprintActivatableAbility(
                 "ShamanHexChantPassive",
@@ -122,10 +129,13 @@ namespace DarkCodex
                 chant.m_Description,
                 out BlueprintBuff chant_buff,
                 icon: chant.Icon,
-                commandType: CommandType.Move,
+                //activationType: AbilityActivationType.WithUnitCommand,
+                //commandType: CommandType.Move,
                 deactivateWhenStunned: true,
-                deactivateWhenDead: true
-                ).SetComponents(consume_move);
+                deactivateWhenDead: true,
+                deactivateImmediately: false
+                ).SetComponents(
+                consume_move);
             chant_buff.SetComponents(chant_addarea);
 
             Helper.AppendAndReplace(ref cackle_feat.GetComponent<AddFacts>().m_Facts, cackle_passiv.ToRef());
@@ -133,14 +143,13 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Ice Tomb", "Hex: Ice Tomb", false)]
-        public static void createIceTomb()
+        public static void CreateIceTomb()
         {
             var IcyPrison = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("65e8d23aef5e7784dbeb27b1fca40931");
             var WitchMajorHex = Helper.ToRef<BlueprintFeatureReference>("8ac781b33e380c84aa578f1b006dd6c5");
             var Staggered = Helper.ToRef<BlueprintBuffReference>("df3950af5a783bd4d91ab73eb8fa0fd3");
             var IcyPrisonParalyzedBuff = Helper.ToRef<BlueprintBuffReference>("6f0e450771cc7d446aea798e1fef1c7a");
             var WitchHexSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
-
 
             var icetomb_cooldown = Helper.CreateBlueprintBuff("WitchHexIceTombCooldownBuff", "", "").Flags(hidden: true);
 
@@ -178,7 +187,7 @@ namespace DarkCodex
                 ).SetComponents(
                 runaction,
                 Helper.CreateAbilityTargetHasFact(true, icetomb_cooldown.ToRef2()),
-                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Hex | SpellDescriptor.Cold)
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Hex | SpellDescriptor.Cold | SpellDescriptor.Paralysis)
                 ).TargetEnemy();
 
             var icetomb = Helper.CreateBlueprintFeature(
@@ -197,7 +206,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Fix, "Boundless Healing Hex", "boundless healing applies to healing hex", false)]
-        public static void fixBoundlessHealing()
+        public static void FixBoundlessHealing()
         {
             var boundless = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
             var heal1 = Helper.ToRef<BlueprintAbilityReference>("ed4fbfcdb0f5dcb41b76d27ed00701af"); //WitchHexHealingAbility

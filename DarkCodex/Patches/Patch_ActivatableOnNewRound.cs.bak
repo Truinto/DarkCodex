@@ -1,0 +1,153 @@
+﻿using DarkCodex.Components;
+using HarmonyLib;
+using Kingmaker;
+using Kingmaker.Blueprints;
+using Kingmaker.Controllers.Units;
+using Kingmaker.EntitySystem.Entities;
+using Kingmaker.PubSubSystem;
+using Kingmaker.TurnBasedMode.Controllers;
+using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Commands;
+using Kingmaker.UnitLogic.Commands.Base;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using TurnBased.Controllers;
+
+namespace DarkCodex
+{
+    [PatchInfo(Severity.Harmony, "Patch: Activatable OnNewRound", "uses up move action when triggered; deactivates activatable if no action left", false)]
+    [HarmonyPatch]
+    public static class Patch_ActivatableOnNewRound
+    {
+        [HarmonyPatch(typeof(UnitActivatableAbilitiesController), nameof(UnitActivatableAbilitiesController.TickOnUnit))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> TranspilerTickOnUnit(IEnumerable<CodeInstruction> instr)
+        {
+            var lines = instr.ToList();
+
+            var original = AccessTools.Method(typeof(UnitActivatableAbilitiesController), nameof(UnitActivatableAbilitiesController.CanTickNewRound));
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (lines[i].Calls(original))
+                {
+                    lines[i] = CodeInstruction.Call(typeof(Patch_ActivatableOnNewRound), nameof(CanTickNewRound));
+
+                    for (int j = i - 1; j > 0; j--) // insert new argument copied from somewhere else
+                    {
+                        if (lines[j].opcode == OpCodes.Ldfld)
+                        {
+                            lines.Insert(i, lines[j].Clone());
+                            lines.Insert(i, lines[--j].Clone());
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            return lines;
+        }
+        public static bool CanTickNewRound(UnitActivatableAbilitiesController instance, UnitEntityData unit, ActivatableAbility ability)
+        {
+            return ability.Blueprint.GetComponent<ActivatableAbilityUnitCommandMove>()?.CanTickNewRound(instance, unit)
+                ?? instance.CanTickNewRound(unit);
+        }
+
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.OnNewRound))]
+        [HarmonyPostfix]
+        public static void OnNewRound(ActivatableAbility __instance)
+        {
+            if (__instance.IsOn)
+                __instance.Blueprint.GetComponent<ActivatableAbilityUnitCommandMove>()?.SpendMoveAction(__instance);
+        }
+
+        //[HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.TryStart))]
+        //[HarmonyPriority(300)]
+        //[HarmonyPrefix]
+        public static bool TryStart(ActivatableAbility __instance)
+        {
+            var aaucm = __instance.Blueprint.GetComponent<ActivatableAbilityUnitCommandMove>();
+            if (aaucm != null)
+                return aaucm.CanTurnOn(__instance);
+            return true;
+        }
+
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.ReadyToStart), MethodType.Setter)]
+        [HarmonyPostfix]
+        public static void OnStartStop(ActivatableAbility __instance)
+        {
+            var aaucm = __instance.Blueprint.GetComponent<ActivatableAbilityUnitCommandMove>();
+            if (aaucm != null)
+                __instance.TimeToNextRound = aaucm.StartTimerAt;
+        }
+
+        [HarmonyPatch(typeof(CombatAction), nameof(CombatAction.CanDeactivateCurrentAbility), MethodType.Getter)]
+        [HarmonyPostfix]
+        public static void AllowPredictionOverride(CombatAction __instance, ref bool __result)
+        {
+            if (__result)
+                return;
+            if (__instance.CurrentAbility is not ActivatableAbility activatable)
+                return;
+            if (activatable.GetComponent<ActivatableAbilityUnitCommandMove>())
+                __result = true;
+        }
+
+        [HarmonyPatch(typeof(TurnController), nameof(TurnController.CalculatePredictionForAbility))]
+        [HarmonyPostfix]
+        public static void PreviewPrediction(object abilityObject, TurnController __instance)
+        {
+            //ClearPrediciton(__instance);
+
+            if (abilityObject is ActivatableAbility activatable && !activatable.IsOn && activatable.Blueprint.GetComponent<ActivatableAbilityUnitCommandMove>())
+            {
+                var states = __instance.GetActionsStates(__instance.SelectedUnit);
+                if (states.Move.CanUse) // if move action already taken, use standard action
+                {
+                    states.Move.SetPrediction(CombatAction.UsageType.UseAbility, CombatAction.ActivityType.Ability, CombatAction.ActivityState.WillBeUsed, activatable);
+                    EventBus.RaiseEvent<IActionsPredictionHandler>(h => h.PredictionChanged(), true);
+                }
+                else if (states.Standard.CanUse)
+                {
+                    states.Standard.SetPrediction(CombatAction.UsageType.UseAbility, CombatAction.ActivityType.Ability, CombatAction.ActivityState.WillBeUsed, activatable);
+                    EventBus.RaiseEvent<IActionsPredictionHandler>(h => h.PredictionChanged(), true);
+                }
+            }
+
+            //RecalcPrediction(__instance);
+            //EventBus.RaiseEvent<IActionsPredictionHandler>(h => h.PredictionChanged(), true);
+        }
+
+        [HarmonyPatch(typeof(TurnController), nameof(TurnController.CalculatePredictionForActivatableAbilities))]
+        public static void RecalcPrediction(TurnController __instance)
+        {
+            foreach (var activatable in __instance.SelectedUnit.ActivatableAbilities.RawFacts)
+            {
+                if (!activatable.IsOn || !activatable.Blueprint.GetComponent<ActivatableAbilityUnitCommandMove>())
+                    continue;
+
+                var states = __instance.GetActionsStates(__instance.SelectedUnit);
+                if (states.Move.CanUse) // if move action already taken, use standard action
+                {
+                    states.Move.SetPrediction(CombatAction.UsageType.UseAbility, CombatAction.ActivityType.Ability, CombatAction.ActivityState.WillBeUsed, activatable);
+                }
+                else if (states.Standard.CanUse)
+                {
+                    states.Standard.SetPrediction(CombatAction.UsageType.UseAbility, CombatAction.ActivityType.Ability, CombatAction.ActivityState.WillBeUsed, activatable);
+                }
+            }
+        }
+
+        public static void ClearPrediciton(TurnController __instance)
+        {
+            var states = __instance.GetActionsStates(__instance.SelectedUnit);
+            if ((states.Move.PredictedAbility as ActivatableAbility)?.Blueprint?.GetComponent<ActivatableAbilityUnitCommandMove>())
+                states.Move.ClearPredictions();
+            if ((states.Standard.PredictedAbility as ActivatableAbility)?.Blueprint?.GetComponent<ActivatableAbilityUnitCommandMove>())
+                states.Standard.ClearPredictions();
+        }
+    }
+}

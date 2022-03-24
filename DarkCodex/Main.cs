@@ -24,6 +24,7 @@ using Kingmaker.UI.Common;
 using Kingmaker.UI;
 using Kingmaker.EntitySystem.Stats;
 using System.Runtime.CompilerServices;
+using Kingmaker.UnitLogic;
 
 namespace DarkCodex
 {
@@ -51,7 +52,7 @@ namespace DarkCodex
             return true;
         }
 
-        internal static List<PatchInfoAttribute> patchInfos = new List<PatchInfoAttribute>();
+        internal static List<PatchInfoAttribute> patchInfos = new();
 
         private static bool restart;
         private static GUIStyle StyleBox;
@@ -78,16 +79,36 @@ namespace DarkCodex
                 GUILayout.Label("Allow achievements - managed by other mod");
 
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
+            Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
+
+#if DEBUG
+            if (Main.IsInGame)
+            {
+                GUILayout.Space(10);
+                GUILayout.Label("Advanced: Prebuild");
+
+                if (GUILayout.Button("<color=yellow>Refresh list</color>", GUILayout.ExpandWidth(false)))
+                    Patch_Prebuilds.Clear();
+
+                foreach (var unit in Game.Instance.Player.PartyAndPets)
+                {
+                    if (!Patch_Prebuilds.HasPlan(unit))
+                        GUILayout.Label("No plan for: " + unit.CharacterName);
+                    else if (GUILayout.Button("Load plan for: " + unit.CharacterName, GUILayout.ExpandWidth(false)))
+                        Patch_Prebuilds.SetPlan(unit);
+                }
+            }
+#endif
 
             GUILayout.Space(10);
             GUILayout.Label("Advanced: Patch Control");
             GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
                     + " Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
-            if (GUILayout.Button("Disable all homebrew"))
+            if (GUILayout.Button("Disable all homebrew", GUILayout.ExpandWidth(false)))
                 patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method).ForEach(name => state.SetEnable(false, name));
             GUILayout.Space(10);
             Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
@@ -149,6 +170,8 @@ namespace DarkCodex
 
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
+            if (GUILayout.Button("Debug: Export LevelPlanData", GUILayout.ExpandWidth(false)))
+                ExportLevelPlanData();
             //if (GUILayout.Button("Debug: Date minus 1", GUILayout.ExpandWidth(false)))
             //    DEBUG.Date.SetDate();
             //if (GUILayout.Button("Debug: Open Shared Stash", GUILayout.ExpandWidth(false)))
@@ -156,9 +179,9 @@ namespace DarkCodex
             //if (GUILayout.Button("Debug: Export Icons", GUILayout.ExpandWidth(false)))
             //    DEBUG.ExportAllIconTextures();
             if (GUILayout.Button("Debug: Pause Area Fxs", GUILayout.ExpandWidth(false)))
-                Control_AreaEffects.Stop();
+                Event_AreaEffects.Stop();
             if (GUILayout.Button("Debug: Continue Area Fxs", GUILayout.ExpandWidth(false)))
-                Control_AreaEffects.Continue();
+                Event_AreaEffects.Continue(force: true);
             if (GUILayout.Button("Debug: Print Content Table", GUILayout.ExpandWidth(false)))
             {
                 using var sw = new StreamWriter(Path.Combine(Main.ModPath, "content.md"), false);
@@ -168,7 +191,7 @@ namespace DarkCodex
                 sw.WriteLine("|--------|-------------|----|--------|");
 
                 foreach (var info in patchInfos)
-                    if (!info.IsHarmony && !info.IsEvent && !info.IsHidden)
+                    if (!info.IsEvent && !info.IsHidden)
                         sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
@@ -270,7 +293,7 @@ namespace DarkCodex
             GUILayout.EndHorizontal();
         }
 
-        private static Dictionary<string, string> NumberTable = new Dictionary<string, string>();
+        private static Dictionary<string, string> NumberTable = new();
         private static void NumberField(string key, string label)
         {
             NumberTable.TryGetValue(key, out string str);
@@ -398,16 +421,17 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.SpellReach));
+                    PatchSafe(typeof(Patch_Prebuilds));
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
-                    LoadSafe(General.createBardStopSong);
+                    LoadSafe(General.CreateBardStopSong);
                     //PatchSafe(typeof(General.DEBUGTEST));
 
                     // Cache
-                    LoadSafe(PropertyMaxAttribute.createPropertyMaxMentalAttribute);
-                    LoadSafe(PropertyGetterSneakAttack.createPropertyGetterSneakAttack);
-                    LoadSafe(PropertyMythicLevel.createMythicDispelProperty);
-                    LoadSafe(ContextActionIncreaseBleed.createBleedBuff);
+                    LoadSafe(PropertyAttributeMax.CreatePropertyMaxMentalAttribute);
+                    LoadSafe(PropertyGetterSneakAttack.CreatePropertyGetterSneakAttack);
+                    LoadSafe(PropertyMythicLevel.CreateMythicDispelProperty);
+                    LoadSafe(ContextActionIncreaseBleed.CreateBleedBuff);
 
                     // Harmony Patches
                     PatchUnique(typeof(Patch_AllowAchievements));
@@ -418,11 +442,10 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_EnvelopingWindsCap));
                     PatchSafe(typeof(Patch_MagicItemAdept));
                     PatchSafe(typeof(Patch_ActivatableOnNewRound));
+                    PatchSafe(typeof(Patch_ActivatableActionBar));
                     PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
                     PatchSafe(typeof(Patch_ActivatableOnTurnOn));
-                    PatchSafe(typeof(Patch_ActivatableApplyValidation));
                     PatchSafe(typeof(Patch_ActivatableTryStart));
-                    PatchSafe(typeof(Patch_ActivatableActionBar));
                     PatchSafe(typeof(Patch_ResourcefulCaster));
                     PatchSafe(typeof(Patch_FeralCombat));
                     PatchSafe(typeof(Patch_SpellSelectionParametrized));
@@ -432,91 +455,100 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_FixAreaEndOfTurn));
                     PatchSafe(typeof(Patch_Polymorph));
                     PatchSafe(typeof(Patch_AbilityGroups));
+                    PatchSafe(typeof(Patch_EnduringSpells));
+                    PatchSafe(typeof(Patch_UnlockClassLevels));
+                    PatchSafe(typeof(Patch_AbilityAtWill));
 
                     // General
-                    LoadSafe(General.patchAngelsLight);
-                    LoadSafe(General.patchBasicFreebieFeats);
-                    LoadSafe(General.patchHideBuffs);
-                    LoadSafe(General.patchDispelMagic);
-                    LoadSafe(General.patchVarious);
+                    LoadSafe(General.PatchAngelsLight);
+                    LoadSafe(General.PatchBasicFreebieFeats);
+                    LoadSafe(General.PatchHideBuffs);
+                    LoadSafe(General.PatchVarious);
 
                     // Items
-                    LoadSafe(Items.patchArrows);
-                    LoadSafe(Items.patchTerendelevScale);
-                    LoadSafe(Items.createKineticArtifact);
-                    LoadSafe(Items.createButcheringAxe);
-                    LoadSafe(Items.createImpactEnchantment);
+                    LoadSafe(Items.PatchArrows);
+                    LoadSafe(Items.PatchTerendelevScale);
+                    LoadSafe(Items.CreateKineticArtifact);
+                    LoadSafe(Items.CreateButcheringAxe);
+                    LoadSafe(Items.CreateImpactEnchantment);
 
                     // Mythic
-                    LoadSafe(Mythic.createLimitlessBardicPerformance);
-                    LoadSafe(Mythic.createLimitlessSmite);
-                    LoadSafe(Mythic.createLimitlessBombs);
-                    LoadSafe(Mythic.createLimitlessArcanePool);
-                    LoadSafe(Mythic.createLimitlessArcaneReservoir);
-                    LoadSafe(Mythic.createLimitlessKi);
-                    LoadSafe(Mythic.createLimitlessDomain);
-                    LoadSafe(Mythic.createLimitlessShaman);
-                    LoadSafe(Mythic.createLimitlessWarpriest);
-                    LoadSafe(Mythic.createKineticMastery);
-                    LoadSafe(Mythic.createMagicItemAdept);
-                    LoadSafe(Mythic.createResourcefulCaster);
-                    LoadSafe(Mythic.createSwiftHuntersBond);
-                    LoadSafe(Mythic.patchKineticOvercharge);
-                    LoadSafe(Mythic.patchLimitlessDemonRage);
-                    LoadSafe(Mythic.patchUnstoppable);
-                    LoadSafe(Mythic.patchBoundlessHealing);
-                    LoadSafe(Mythic.patchRangingShots);
-                    LoadSafe(Mythic.patchWanderingHex);
-                    LoadSafe(Mythic.patchJudgementAura);
-                    LoadSafe(Mythic.patchVarious);
+                    LoadSafe(Mythic.CreateLimitlessBardicPerformance);
+                    LoadSafe(Mythic.CreateLimitlessSmite);
+                    LoadSafe(Mythic.CreateLimitlessBombs);
+                    LoadSafe(Mythic.CreateLimitlessArcanePool);
+                    LoadSafe(Mythic.CreateLimitlessArcaneReservoir);
+                    LoadSafe(Mythic.CreateLimitlessKi);
+                    LoadSafe(Mythic.CreateLimitlessDomain);
+                    LoadSafe(Mythic.CreateLimitlessShaman);
+                    LoadSafe(Mythic.CreateLimitlessWarpriest);
+                    LoadSafe(Mythic.CreateKineticMastery);
+                    LoadSafe(Mythic.CreateMagicItemAdept);
+                    LoadSafe(Mythic.CreateResourcefulCaster);
+                    LoadSafe(Mythic.CreateSwiftHuntersBond);
+                    LoadSafe(Mythic.CreateDemonMastery);
+                    LoadSafe(Mythic.CreateDemonLord);
+                    LoadSafe(Mythic.PatchKineticOvercharge);
+                    LoadSafe(Mythic.PatchLimitlessDemonRage);
+                    LoadSafe(Mythic.PatchUnstoppable);
+                    LoadSafe(Mythic.PatchBoundlessHealing);
+                    LoadSafe(Mythic.PatchRangingShots);
+                    LoadSafe(Mythic.PatchWanderingHex);
+                    LoadSafe(Mythic.PatchJudgementAura);
+                    LoadSafe(Mythic.PatchVarious);
 
                     // Kineticist
-                    LoadSafe(Kineticist.fixWallInfusion);
-                    LoadSafe(Kineticist.createKineticistBackground);
-                    LoadSafe(Kineticist.createMobileGatheringFeat);
-                    LoadSafe(Kineticist.createImpaleInfusion);
-                    LoadSafe(Kineticist.createWhipInfusion);
-                    LoadSafe(Kineticist.createBladeRushInfusion);
-                    LoadSafe(Kineticist.createAutoMetakinesis);
-                    LoadSafe(Kineticist.createHurricaneQueen);
-                    LoadSafe(Kineticist.createMindShield);
-                    LoadSafe(Kineticist.patchGatherPower);
-                    LoadSafe(Kineticist.patchDarkElementalist);
-                    LoadSafe(Kineticist.patchDemonCharge); // after createMobileGatheringFeat
-                    LoadSafe(Kineticist.patchVarious);
-                    LoadSafe(Kineticist.fixBlastsAreSpellLike);
-                    LoadSafe(Kineticist.createSelectiveMetakinesis); // keep late
+                    LoadSafe(Kineticist.FixWallInfusion);
+                    LoadSafe(Kineticist.CreateKineticistBackground);
+                    LoadSafe(Kineticist.CreateMobileGatheringFeat);
+                    LoadSafe(Kineticist.CreateImpaleInfusion);
+                    LoadSafe(Kineticist.CreateChainInfusion);
+                    LoadSafe(Kineticist.CreateWhipInfusion);
+                    LoadSafe(Kineticist.CreateBladeRushInfusion);
+                    LoadSafe(Kineticist.CreateAutoMetakinesis);
+                    LoadSafe(Kineticist.CreateHurricaneQueen);
+                    LoadSafe(Kineticist.CreateMindShield);
+                    LoadSafe(Kineticist.PatchGatherPower);
+                    LoadSafe(Kineticist.PatchDarkElementalist);
+                    LoadSafe(Kineticist.PatchDemonCharge); // after createMobileGatheringFeat
+                    LoadSafe(Kineticist.CreateExpandedElement);
+                    LoadSafe(Kineticist.PatchVarious);
+                    LoadSafe(Kineticist.FixBlastsAreSpellLike);
+                    LoadSafe(Kineticist.CreateSelectiveMetakinesis); // keep late
 
                     // Monk
-                    LoadSafe(Monk.createFeralCombatTraining);
+                    LoadSafe(Monk.CreateFeralCombatTraining);
 
                     // Witch
-                    LoadSafe(Witch.createIceTomb);
-                    LoadSafe(Witch.fixBoundlessHealing);
+                    LoadSafe(Witch.CreateIceTomb);
+                    LoadSafe(Witch.FixBoundlessHealing);
 
                     // Hexcrafter
-                    LoadSafe(Hexcrafter.fixProgression);
+                    LoadSafe(Hexcrafter.FixProgression);
 
                     // Rogue
-                    LoadSafe(Rogue.createBleedingAttack);
+                    LoadSafe(Rogue.CreateBleedingAttack);
 
                     // Ranger
-                    LoadSafe(Ranger.createImprovedHuntersBond);
+                    LoadSafe(Ranger.CreateImprovedHuntersBond);
+
+                    // Unlocks
+                    LoadSafe(Unlock.UnlockKineticist); // keep late
 
                     // Extra Features - keep last
-                    LoadSafe(Mythic.createLimitlessWitchHexes); // keep last
-                    LoadSafe(General.createPreferredSpell); // keep last
-                    LoadSafe(General.createAbilityFocus); // keep last
-                    LoadSafe(Kineticist.createExtraWildTalentFeat); // keep last
-                    LoadSafe(Witch.createExtraHex); // keep last
-                    LoadSafe(Witch.createCackleActivatable); // keep last
-                    LoadSafe(Rogue.createExtraRogueTalent); // keep last
-                    LoadSafe(Mythic.createExtraMythicFeats); // keep last
-                    LoadSafe(Mythic.createSwiftHex); // keep last
+                    LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
+                    LoadSafe(General.CreatePreferredSpell); // keep last
+                    LoadSafe(General.CreateAbilityFocus); // keep last
+                    LoadSafe(Kineticist.CreateExtraWildTalentFeat); // keep last
+                    LoadSafe(Witch.CreateExtraHex); // keep last
+                    LoadSafe(Witch.CreateCackleActivatable); // keep last
+                    LoadSafe(Rogue.CreateExtraRogueTalent); // keep last
+                    LoadSafe(Mythic.CreateExtraMythicFeats); // keep last
+                    LoadSafe(Mythic.CreateSwiftHex); // keep last
 
                     // Event subscriptions
                     SubscribeSafe(typeof(RestoreEndOfCombat));
-                    SubscribeSafe(typeof(Control_AreaEffects));
+                    SubscribeSafe(typeof(Event_AreaEffects));
 
                     patchInfos.Sort(); // sort info list for GUI
 
@@ -673,8 +705,7 @@ namespace DarkCodex
             if (info == null)
                 return;
 
-            var attr = Attribute.GetCustomAttribute(info, typeof(PatchInfoAttribute)) as PatchInfoAttribute;
-            if (attr == null)
+            if (Attribute.GetCustomAttribute(info, typeof(PatchInfoAttribute)) is not PatchInfoAttribute attr)
             {
                 Helper.PrintDebug(info.Name + " has no PatchInfo");
                 return;
@@ -698,12 +729,34 @@ namespace DarkCodex
                     TypeNameHandling = TypeNameHandling.All,
                 });
 
-                using (StreamWriter sw = new StreamWriter(Path.Combine(ModPath, "player.json")))
+                using (StreamWriter sw = new(Path.Combine(ModPath, "player.json")))
                 using (JsonWriter writer = new JsonTextWriter(sw))
                 {
                     serializer.Serialize(writer, Game.Instance.Player.Party);
                 }
 
+                Helper.Print("Exported player data.");
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+        }
+
+        private static void ExportLevelPlanData()
+        {
+            try
+            {
+                Patch_Prebuilds.GetTestPlan();
+
+                var list = new List<List<LevelPlanData>>();
+
+                foreach (var unit in Game.Instance.Player.PartyAndPets)
+                {
+                    list.Add(unit.Progression.m_LevelPlans);
+                }
+
+                Helper.Serialize(list, path: "partylevelplan.json");
                 Helper.Print("Exported player data.");
             }
             catch (Exception e)

@@ -50,7 +50,7 @@ namespace DarkCodex.Components
                 return;
             }
 
-            AbilityData abilityData = new AbilityData(this.Spell, caster.Descriptor);
+            AbilityData abilityData = new(this.Spell, caster.Descriptor);
 			Rulebook.Trigger(new RuleCastSpell(abilityData, caster));
 			//Helper.PrintDebug("ContextActionCastSpellOnCaster casted spell");
 		}

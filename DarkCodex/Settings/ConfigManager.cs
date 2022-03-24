@@ -23,9 +23,9 @@ namespace Config
         {
             T result;
 
-            using (StreamReader streamReader = new StreamReader(path))
+            using (StreamReader streamReader = new(path))
             {
-                using (JsonTextReader jsonReader = new JsonTextReader(streamReader))
+                using (JsonTextReader jsonReader = new(streamReader))
                 {
                     result = this.Serializer.Deserialize<T>(jsonReader);
 
@@ -39,9 +39,9 @@ namespace Config
         }
         public void Serialize<T>(T value, string path)
         {
-            using (StreamWriter streamReader = new StreamWriter(path))
+            using (StreamWriter streamReader = new(path))
             {
-                using (JsonTextWriter jsonReader = new JsonTextWriter(streamReader))
+                using (JsonTextWriter jsonReader = new(streamReader))
                 {
                     this.Serializer.Serialize(jsonReader, value);
 
@@ -225,7 +225,7 @@ namespace Config
             get
             {
                 string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new UriBuilder(codeBase);
+                UriBuilder uri = new(codeBase);
                 string path = Uri.UnescapeDataString(uri.Path);
                 return Path.GetDirectoryName(path);
             }

@@ -18,7 +18,7 @@ namespace DarkCodex.Components
             return value;
         }
 
-        public static void createPropertyGetterSneakAttack()
+        public static void CreatePropertyGetterSneakAttack()
         {
             var prop = Helper.CreateBlueprintUnitProperty(
                 "SneakAttackPropertyGetter"

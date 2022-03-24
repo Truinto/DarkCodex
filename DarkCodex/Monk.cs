@@ -26,7 +26,7 @@ namespace DarkCodex
     public class Monk
     {
         [PatchInfo(Severity.Create, "Feral Combat Training", "basic feat: Feral Combat Training", true, Requirement: typeof(Patch_FeralCombat))]
-        public static void createFeralCombatTraining()
+        public static void CreateFeralCombatTraining()
         {
             /*
              Feral Combat Training (Combat)
@@ -78,18 +78,16 @@ namespace DarkCodex
         {
             List<CodeInstruction> list = instr.ToList();
             MethodInfo reference = AccessTools.PropertyGetter(typeof(BlueprintItemWeapon), "Category");
-            MethodInfo call = AccessTools.Method(typeof(Patch_FeralCombat), nameof(Call));
 
             int index = list.FindIndex(f => f.Calls(reference)) + 2; //68
             int label = index - 1;
 
-            for (int i = 64; i <= 70; i++)
-                Helper.PrintInstruction(list[i], i.ToString());
+            //for (int i = 64; i <= 70; i++) Helper.PrintInstruction(list[i], i.ToString());
             Helper.Print("Patching at " + index);
 
             list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
             list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_1));
-            list.Insert(index++, new CodeInstruction(OpCodes.Call, call));
+            list.Insert(index++, CodeInstruction.Call(typeof(Patch_FeralCombat), nameof(Call)));
             list.Insert(index++, new CodeInstruction(OpCodes.Brtrue_S, list[label].operand)); //label=11
 
             return list;

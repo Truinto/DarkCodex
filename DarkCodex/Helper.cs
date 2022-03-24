@@ -46,6 +46,7 @@ using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.Utility;
 using Kingmaker.View.Equipment;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -111,8 +112,7 @@ namespace DarkCodex
         public static void Patch(Type patch, bool _)
         {
             Print("ManualPatch " + patch.Name);
-            var manual = patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) as ManualPatchAttribute;
-            if (manual == null)
+            if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) is not ManualPatchAttribute manual)
                 throw new ArgumentException("Type must have ManualPatchAttribute");
 
             var prefix = patch.GetMethod("Prefix");
@@ -137,8 +137,7 @@ namespace DarkCodex
         public static void Unpatch(Type patch, HarmonyPatchType patchType)
         {
             Print("Unpatch " + patch);
-            var attr = patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) as HarmonyPatch;
-            if (attr == null)
+            if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
                 return;
 
             MethodBase orignal = attr.info.GetOriginalMethod();
@@ -148,8 +147,7 @@ namespace DarkCodex
         /// <summary>Only works with HarmonyPatch.</summary>
         public static bool IsPatched(Type patch)
         {
-            var attr = patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) as HarmonyPatch;
-            if (attr == null)
+            if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
                 throw new ArgumentException("Type must have HarmonyPatch attribute");
 
             MethodBase orignal = attr.info.GetOriginalMethod();
@@ -198,26 +196,6 @@ namespace DarkCodex
         #endregion
 
         #region Arrays
-        public static T Create<T>(Action<T> action = null) where T : ScriptableObject
-        {
-            var result = ScriptableObject.CreateInstance<T>();
-            action?.Invoke(result);
-            return result;
-        }
-
-        public static T Instantiate<T>(T obj, Action<T> action = null) where T : ScriptableObject
-        {
-            var result = ScriptableObject.Instantiate<T>(obj);
-            action?.Invoke(result);
-            return result;
-        }
-
-        public static T CreateCopy<T>(T original, Action<T> action = null) where T : UnityEngine.Object
-        {
-            var clone = UnityEngine.Object.Instantiate(original);
-            action?.Invoke(clone);
-            return clone;
-        }
 
         public static T[] ObjToArray<T>(this T obj)
         {
@@ -245,8 +223,15 @@ namespace DarkCodex
             return result;
         }
 
+        public static List<T> Append<T>(this List<T> orig, List<T> objs)
+        {
+            var result = new List<T>(orig);
+            result.AddRange(objs);
+            return result;
+        }
+
         /// <summary>Appends objects on array and overwrites the original.</summary>
-        public static T[] AppendAndReplace<T>(ref T[] orig, params T[] objs)
+        public static void AppendAndReplace<T>(ref T[] orig, params T[] objs)
         {
             if (orig == null) orig = new T[0];
             if (objs == null) objs = new T[0];
@@ -258,10 +243,9 @@ namespace DarkCodex
             for (j = 0; i < result.Length; i++)
                 result[i] = objs[j++];
             orig = result;
-            return result;
         }
 
-        public static T[] AppendAndReplace<T>(ref T[] orig, List<T> objs)
+        public static void AppendAndReplace<T>(ref T[] orig, List<T> objs)
         {
             if (orig == null) orig = new T[0];
 
@@ -272,7 +256,42 @@ namespace DarkCodex
             foreach (var obj in objs)
                 result[i++] = obj;
             orig = result;
-            return result;
+        }
+
+        public static void InsertAt<T>(ref T[] orig, T obj, int index = -1)
+        {
+            if (orig == null) orig = new T[0];
+            if (index < 0 || index > orig.Length) index = orig.Length;
+
+            T[] result = new T[orig.Length + 1];
+            for (int i = 0, j = 0; i < result.Length; i++)
+            {
+                if (i == index)
+                    result[i] = obj;
+                else
+                    result[i] = orig[j++];
+            }
+            orig = result;
+        }
+
+        public static void RemoveAt<T>(ref T[] orig, int index)
+        {
+            if (orig == null) orig = new T[0];
+            if (index < 0 || index >= orig.Length) return;
+
+            T[] result = new T[orig.Length - 1];
+            for (int i = 0, j = 0; i < result.Length; i++)
+            {
+                if (i != index)
+                    result[i] = orig[j++];
+            }
+            orig = result;
+        }
+
+        public static void Deconstruct<K, V>(this KeyValuePair<K, V> pair, out K key, out V val)
+        {
+            key = pair.Key;
+            val = pair.Value;
         }
 
         #endregion
@@ -280,7 +299,7 @@ namespace DarkCodex
         #region Log
 
         private static bool _sb2_flag;
-        private static StringBuilder _sb2 = new StringBuilder();
+        private static StringBuilder _sb2 = new();
 
         /// <summary>Only prints message, if compiled on DEBUG.</summary>
         [System.Diagnostics.Conditional("DEBUG")]
@@ -292,6 +311,11 @@ namespace DarkCodex
         internal static void Print(string msg)
         {
             Main.logger?.Log(msg);
+        }
+
+        internal static void PrintError(string msg)
+        {
+            Main.logger?.Log("[Exception/Error] " + msg);
         }
 
         internal static void PrintException(Exception ex)
@@ -348,6 +372,92 @@ namespace DarkCodex
 
         #endregion
 
+        #region JsonSerializer
+
+        private static JsonSerializerSettings _jsetting = new()
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            ObjectCreationHandling = ObjectCreationHandling.Replace,
+            DefaultValueHandling = DefaultValueHandling.Include,
+            TypeNameHandling = TypeNameHandling.Auto,
+            MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+            PreserveReferencesHandling = PreserveReferencesHandling.None
+        };
+
+        public static string Serialize(object value, bool indent = true, string path = null, bool append = false)
+        {
+            _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
+            string result = JsonConvert.SerializeObject(value, _jsetting);
+
+            if (path != null)
+            {
+                using var sw = new StreamWriter(Path.Combine(Main.ModPath, path), append);
+                sw.WriteLine(result);
+                sw.Close();
+            }
+
+            return result;
+        }
+
+        public static string Serialize<T>(T value, bool indent = true, string path = null, bool append = false)
+        {
+            _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
+            string result = JsonConvert.SerializeObject(value, typeof(T), _jsetting);
+
+            if (path != null)
+            {
+                using var sw = new StreamWriter(Path.Combine(Main.ModPath, path), append);
+                sw.WriteLine(result);
+                sw.Close();
+            }
+
+            return result;
+        }
+
+        public static object Deserialize(string path = null, string value = null)
+        {
+            if (path != null)
+            {
+                using var sr = new StreamReader(Path.Combine(Main.ModPath, path));
+                value = sr.ReadToEnd();
+                sr.Close();
+            }
+
+            if (value != null)
+                return JsonConvert.DeserializeObject(value);
+            return null;
+        }
+
+        public static T Deserialize<T>(string path = null, string value = null)
+        {
+            if (path != null)
+            {
+                using var sr = new StreamReader(Path.Combine(Main.ModPath, path));
+                value = sr.ReadToEnd();
+                sr.Close();
+            }
+
+            if (value != null)
+                return JsonConvert.DeserializeObject<T>(value);
+            return default;
+        }
+
+        public static void PrintFile(string path, string content, bool append = true)
+        {
+            try
+            {
+                using var sw = new StreamWriter(Path.Combine(Main.ModPath, path), append);
+                sw.WriteLine(content);
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+        }
+
+        #endregion
+
         #region Strings
 
         public static LocalizedString GetString(string key)
@@ -369,7 +479,7 @@ namespace DarkCodex
         }
 
         private static SHA1 _SHA = SHA1Managed.Create();
-        private static StringBuilder _sb1 = new StringBuilder();
+        private static StringBuilder _sb1 = new();
         private static Locale _lastLocale = Locale.enGB;
         private static Dictionary<string, string> _mappedStrings;
         public static LocalizedString CreateString(this string value, string key = null)
@@ -430,7 +540,7 @@ namespace DarkCodex
 
             try
             {
-                oldmap = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, "enGB.json"));
+                oldmap = Helper.Deserialize<Dictionary<string, string>>(path: Path.Combine(Main.ModPath, "enGB.json"));
 
                 foreach (var entry in _mappedStrings)
                     if (!oldmap.ContainsKey(entry.Key))
@@ -440,7 +550,7 @@ namespace DarkCodex
 
             try
             {
-                new JsonManager().Serialize(oldmap ?? _mappedStrings, Path.Combine(Main.ModPath, "enGB.json"));
+                Helper.Serialize(oldmap ?? _mappedStrings, path: Path.Combine(Main.ModPath, "enGB.json"));
                 _mappedStrings = null;
             }
             catch (Exception e)
@@ -448,7 +558,7 @@ namespace DarkCodex
                 Print($"Failed export lanaguage file: {e.Message}");
             }
         }
-        
+
         public static string TrySubstring(this string str, char c, int start = 0)
         {
             try
@@ -617,29 +727,6 @@ namespace DarkCodex
                 AppendAndReplace(ref obj.RemoveFeatures, CreateLevelEntry(level, feature));
         }
 
-        public static void AddFeature(this BlueprintProgression obj, int level, BlueprintFeatureBase feature, string pairWithGuid = null)
-        {
-            var levelentry = obj.LevelEntries.FirstOrDefault(f => f.Level == level);
-            if (levelentry != null)
-                levelentry.m_Features.Add(feature.ToRef());
-            else
-                AppendAndReplace(ref obj.LevelEntries, CreateLevelEntry(level, feature));
-
-            if (pairWithGuid != null)
-            {
-                var pairGuid = BlueprintGuid.Parse(pairWithGuid);
-                foreach (var ui in obj.UIGroups)
-                {
-                    if (ui.m_Features.Any(a => a.deserializedGuid == pairGuid))
-                    {
-                        ui.m_Features.Add(feature.ToRef());
-                        break;
-                    }
-                }
-            }
-
-        }
-
         #endregion
 
         #region Context Values
@@ -721,7 +808,7 @@ namespace DarkCodex
             if (result is BlueprintFeature feature)
             {
                 feature.IsPrerequisiteFor = new();
-            }    
+            }
 
             return result;
 
@@ -731,14 +818,21 @@ namespace DarkCodex
             //    field.SetValue(result, field.GetValue(obj));
             //return result;
         }
-        
+
         public static T Clone<T>(this T obj, BlueprintScriptableObject parent) where T : BlueprintComponent
         {
             var result = (T)_memberwiseClone.Invoke(obj, null);
             obj.OwnerBlueprint = parent;
             return result;
         }
-        
+
+        public static T Clone<T>(this T obj, Action<T> action = null) where T : class
+        {
+            var result = (T)_memberwiseClone.Invoke(obj, null);
+            action?.Invoke(result);
+            return result;
+        }
+
         private static ulong ParseGuidLow(string id) => ulong.Parse(id.Substring(id.Length - 16), System.Globalization.NumberStyles.HexNumber);
         private static ulong ParseGuidHigh(string id) => ulong.Parse(id.Substring(0, id.Length - 16), System.Globalization.NumberStyles.HexNumber);
         public static string MergeIds(string guid1, string guid2, string guid3 = null)
@@ -920,16 +1014,6 @@ namespace DarkCodex
             return result;
         }
 
-        /// <summary>Adds a fact, but only fact not already granted through other means.</summary>
-        public static AddFeatureIfHasFact MakeAddFactSafe(BlueprintUnitFactReference feature)
-        {
-            var result = new AddFeatureIfHasFact();
-            result.m_CheckedFact = feature;
-            result.m_Feature = feature;
-            result.Not = true;
-            return result;
-        }
-
         public static ContextActionSavingThrow MakeContextActionSavingThrow(SavingThrowType savingthrow, GameAction succeed, GameAction failed)
         {
             var result = new ContextActionSavingThrow();
@@ -993,6 +1077,29 @@ namespace DarkCodex
             return ability;
         }
 
+        /// <summary>Puts a new Conditional infront of existing ActionList.</summary>
+        public static ActionList InjectCondition(this ActionList actionList, Condition condition, bool ifTrue = true)
+        {
+            if (ifTrue)
+                actionList.Actions = new GameAction[] { CreateConditional(condition.ObjToArray(), ifTrue: actionList.Actions) };
+            else
+                actionList.Actions = new GameAction[] { CreateConditional(condition.ObjToArray(), ifFalse: actionList.Actions) };
+
+            return actionList;
+        }
+
+        public static Conditional AddCondition(this Conditional conditional, Condition condition)
+        {
+            InsertAt(ref conditional.ConditionsChecker.Conditions, condition);
+            return conditional;
+        }
+
+        public static ActionList InsertAt(this ActionList actionList, GameAction gameAction, int index = -1)
+        {
+            InsertAt(ref actionList.Actions, gameAction, index);
+            return actionList;
+        }
+
         #endregion
 
         #region Blueprint Weapon
@@ -1027,6 +1134,80 @@ namespace DarkCodex
             var plus5 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("bdba267e951851449af552aa9f9e3992");
 
             throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Blueprint Progression
+
+        /// <summary>Merges LevelEntries or appends new ones.</summary>
+        public static void AddEntries(this BlueprintProgression progression, List<LevelEntry> entries)
+        {
+            for (int i = entries.Count - 1; i > 0; i--)
+            {
+                if (progression.LevelEntries.TryFind(f => f.Level == entries[i].Level, out var entry))
+                {
+                    entry.m_Features.AddRange(entries[i].m_Features);
+                    entries.RemoveAt(i);
+                }
+            }
+
+            if (entries.Count > 0)
+            {
+                Helper.AppendAndReplace(ref progression.LevelEntries, entries);
+            }
+        }
+        public static void AddEntries(this BlueprintProgression progression, params LevelEntry[] entries) => AddEntries(progression, entries.ToList());
+
+        public static void AddFeature(this BlueprintProgression progression, int level, BlueprintFeature feature, string pairWithGuid = null)
+        {
+            var levelentry = progression.LevelEntries.FirstOrDefault(f => f.Level == level);
+            if (levelentry != null)
+                levelentry.m_Features.Add(feature.ToReference<BlueprintFeatureBaseReference>());
+            else
+                AppendAndReplace(ref progression.LevelEntries, CreateLevelEntry(level, feature));
+
+            if (pairWithGuid != null)
+            {
+                var pairGuid = BlueprintGuid.Parse(pairWithGuid);
+                foreach (var ui in progression.UIGroups)
+                {
+                    if (ui.m_Features.Any(a => a.deserializedGuid == pairGuid))
+                    {
+                        ui.m_Features.Add(feature.ToReference<BlueprintFeatureBaseReference>());
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        public static void ClearEntries(this BlueprintProgression progression, int level)
+        {
+            if (level < 0)
+                progression.LevelEntries = Array.Empty<LevelEntry>();
+            else
+            {
+                for (int i = progression.LevelEntries.Length - 1; i >= 0; i--)
+                {
+                    if (progression.LevelEntries[i].Level == level)
+                    {
+                        RemoveAt(ref progression.LevelEntries, i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Blueprint Selection
+
+        public static BlueprintFeatureSelection Add(this BlueprintFeatureSelection selection, params BlueprintFeatureReference[] features)
+        {
+            Helper.AppendAndReplace(ref selection.m_AllFeatures, features);
+
+            return selection;
         }
 
         #endregion
@@ -1114,6 +1295,32 @@ namespace DarkCodex
             result.IgnoreStatBonus = false;
             result.AutoCritThreat = false;
             result.AutoCritConfirmation = false;
+            return result;
+        }
+
+        public static ContextActionAddFeature CreateContextActionAddFeature(BlueprintFeatureReference permanent)
+        {
+            var result = new ContextActionAddFeature();
+            result.m_PermanentFeature = permanent;
+            return result;
+        }
+
+        /// <summary>Adds a fact, but only fact not already granted through other means.</summary>
+        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(BlueprintUnitFactReference feature)
+        {
+            var result = new AddFeatureIfHasFact();
+            result.m_CheckedFact = feature;
+            result.m_Feature = feature;
+            result.Not = true;
+            return result;
+        }
+
+        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(BlueprintUnitFactReference checkedFact, BlueprintUnitFactReference feature, bool not = false)
+        {
+            var result = new AddFeatureIfHasFact();
+            result.m_CheckedFact = checkedFact;
+            result.m_Feature = feature;
+            result.Not = not;
             return result;
         }
 
@@ -1323,7 +1530,10 @@ namespace DarkCodex
             if (actions == null || actions[0] == null) throw new ArgumentNullException();
             var result = new AbilityEffectRunAction();
             result.SavingThrowType = save;
-            result.Actions = new ActionList() { Actions = actions };
+            if (save == SavingThrowType.Unknown)
+                result.Actions = CreateActionList(actions);
+            else
+                result.Actions = CreateActionList(CreateContextActionConditionalSaved(failed: actions));
             return result;
         }
 
@@ -1364,10 +1574,19 @@ namespace DarkCodex
             return hasBuff;
         }
 
-        public static ContextConditionHasFact CreateContextConditionHasFact(BlueprintUnitFactReference fact)
+        public static ContextConditionHasFact CreateContextConditionHasFact(BlueprintUnitFactReference fact, bool not = false)
         {
             var result = new ContextConditionHasFact();
             result.m_Fact = fact;
+            result.Not = not;
+            return result;
+        }
+
+        public static ContextConditionHasFactRank CreateContextConditionHasFactRank(BlueprintUnitFactReference fact, ContextValue rank)
+        {
+            var result = new ContextConditionHasFactRank();
+            result.Fact = fact;
+            result.RankValue = rank;
             return result;
         }
 
@@ -1403,6 +1622,14 @@ namespace DarkCodex
         }
 
         public static ContextActionConditionalSaved CreateContextActionConditionalSaved(GameAction succeed = null, GameAction failed = null)
+        {
+            var result = new ContextActionConditionalSaved();
+            result.Succeed = CreateActionList(succeed);
+            result.Failed = CreateActionList(failed);
+            return result;
+        }
+
+        public static ContextActionConditionalSaved CreateContextActionConditionalSaved(GameAction[] succeed = null, GameAction[] failed = null)
         {
             var result = new ContextActionConditionalSaved();
             result.Succeed = CreateActionList(succeed);
@@ -1467,6 +1694,13 @@ namespace DarkCodex
             return result;
         }
 
+        public static PrerequisiteMythicLevel CreatePrerequisiteMythicLevel(int level)
+        {
+            var result = new PrerequisiteMythicLevel();
+            result.Level = level;
+            return result;
+        }
+
         public static ClassLevelsForPrerequisites CreateClassLevelsForPrerequisites(BlueprintCharacterClassReference target_class, int bonus = 0, BlueprintCharacterClassReference source_class = null, double multiplier = 0d)
         {
             var result = new ClassLevelsForPrerequisites();
@@ -1525,6 +1759,14 @@ namespace DarkCodex
         {
             var result = new AddFacts();
             result.m_Facts = facts;
+            return result;
+        }
+
+        public static LevelUpAddSelectionHasFact CreateLevelUpAddSelectionHasFact(BlueprintUnitFact[] facts, IFeatureSelection selection)
+        {
+            var result = new LevelUpAddSelectionHasFact();
+            result.Facts = facts;
+            result.Selection = selection; // takes BlueprintFeatureSelection or BlueprintParametrizedFeature
             return result;
         }
 
@@ -1709,7 +1951,7 @@ namespace DarkCodex
 
             if (buffWhileInside != null)
             {
-                AbilityAreaEffectBuff areabuff = new AbilityAreaEffectBuff(); // applies buff while inside
+                AbilityAreaEffectBuff areabuff = new(); // applies buff while inside
                 areabuff.Condition = new ConditionsChecker();
                 areabuff.CheckConditionEveryRound = false;
                 areabuff.m_Buff = buffWhileInside;
@@ -1719,7 +1961,7 @@ namespace DarkCodex
 
             if (unitEnter != null || unitExit != null || unitMove != null || unitRound != null)
             {
-                AbilityAreaEffectRunAction runaction = new AbilityAreaEffectRunAction(); // runs actions that persist even when leaving
+                AbilityAreaEffectRunAction runaction = new(); // runs actions that persist even when leaving
                 runaction.UnitEnter = unitEnter ?? new ActionList();
                 runaction.UnitExit = unitExit ?? new ActionList();
                 runaction.UnitMove = unitMove ?? new ActionList();
@@ -1882,6 +2124,49 @@ namespace DarkCodex
                 Print($"ERROR: invalid conversion {sb.name} : {guid}");
 
             return null;
+        }
+
+        #endregion
+
+        #region GameActions
+
+        // recursively search for GameActions
+        public static List<T> Get<T>(this BlueprintAbility ability, Action<T> func = null, Func<T, bool> match = null) where T : GameAction
+        {
+            var list = ability.GetComponent<AbilityEffectRunAction>()?.Actions?.Actions.Get<T>();
+
+            if (match != null)
+                for (int i = list.Count - 1; i > 0; i--)
+                    if (match.Invoke(list[i]))
+                        list.RemoveAt(i);
+
+            if (func != null)
+                list.ForEach(func);
+
+            return list;
+        }
+        public static List<T> Get<T>(this GameAction[] thisActions) where T : GameAction
+        {
+            var list = new List<T>();
+            thisActions.Get<T>(ref list);
+            return list;
+        }
+        public static void Get<T>(this GameAction[] thisActions, ref List<T> list) where T : GameAction
+        {
+            if (thisActions == null)
+                return;
+
+            foreach (var action in thisActions)
+            {
+                if (action is T x)
+                    list.Add(x);
+
+                foreach (var field in action.GetType().GetFields())
+                {
+                    if (field.FieldType == typeof(ActionList))
+                        ((ActionList)field.GetValue(thisActions))?.Actions.Get<T>(ref list);
+                }
+            }
         }
 
         #endregion

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace DarkCodex.Components
 {
     [AllowedOn(typeof(BlueprintItemEquipmentUsable), false)]
+    [PatchInfo(Severity.Event, "Event: Restore End Of Combat", "enables logic used by patchArrows")]
     public class RestoreEndOfCombat : BlueprintComponent, IPartyCombatHandler, IGlobalSubscriber, ISubscriber
     {
         public void HandlePartyCombatStateChanged(bool inCombat)

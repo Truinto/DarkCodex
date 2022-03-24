@@ -204,15 +204,14 @@ namespace DarkCodex
             {
                 Resource.Cache.Ensure();
 
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
 #if DEBUG
-                using (StreamWriter sw = new StreamWriter(Path.Combine(Main.ModPath, "enchantment-export.txt"), false)) // todo: remove debug log
+                using (StreamWriter sw = new(Path.Combine(Main.ModPath, "enchantment-export.txt"), false)) // todo: remove debug log
                 {
                     sw.WriteLine("names");
 #endif
-                    foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                    foreach (var enchantment in Resource.Cache.Enchantment)
                     {
-                        var enchantment = bp.Blueprint as BlueprintItemEnchantment;
                         if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
                             continue;
 
@@ -249,11 +248,10 @@ namespace DarkCodex
 #if DEBUG
                     sw.WriteLine("descriptions");
 #endif
-                    foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
+                    foreach (var item in Resource.Cache.Item)
                     {
                         try
                         {
-                            var item = bp.Blueprint as BlueprintItem;
                             if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty() || item.m_DescriptionText == "")
                                 continue;
 
@@ -270,7 +268,7 @@ namespace DarkCodex
                         catch (Exception)
                         {
 #if DEBUG
-                            sw.WriteLine(bp.Blueprint.AssetGuid + "\tcaused crash");
+                            sw.WriteLine(item.AssetGuid + "\tcaused crash");
 #endif
                         }
                         // regex to fix linebreaks "\n(?![a-f0-9]{32}\t)", "\\n"

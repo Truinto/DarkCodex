@@ -24,7 +24,7 @@ namespace DarkCodex
     public class Items
     {
         [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false, Requirement: typeof(RestoreEndOfCombat))]
-        public static void patchArrows()
+        public static void PatchArrows()
         {
             var ColdIronArrowsQuiverItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("a5a537ad28053ad48a7be1c53d7fd7ed");
             var ColdIronArrowsQuiverItem_20Charges = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("464ecede228b0f745a578f69a968226d");
@@ -37,14 +37,14 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Extend, "Terendelev´s Scale", "make the revive scale usable once per day", true)]
-        public static void patchTerendelevScale()
+        public static void PatchTerendelevScale()
         {
             var TerendelevScaleItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("816f244523b5455a85ae06db452d4330");
             TerendelevScaleItem.RestoreChargesOnRest = true;
         }
 
         [PatchInfo(Severity.Create, "Kinetic Artifact", "new weapon for Kineticists", true)]
-        public static void createKineticArtifact()
+        public static void CreateKineticArtifact()
         {
             var bladetype = Helper.ToRef<BlueprintWeaponTypeReference>("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
             var staff = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("e33fd75689190094f897a57a227fa272"); //BurnedAshwoodItem
@@ -105,7 +105,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Butchering Axe", "new weapon type Butchering Axe", false)]
-        public static void createButcheringAxe()
+        public static void CreateButcheringAxe()
         {
             var butchering = Helper.CreateBlueprintWeaponEnchantment(
                 "ButcheringAxeEnchantment",
@@ -171,7 +171,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Impact Enchantment", "new enchantment Impact", false)]
-        public static void createImpactEnchantment()
+        public static void CreateImpactEnchantment()
         {
             var impact = Helper.CreateBlueprintWeaponEnchantment(
                 "ImpactEnchantment",

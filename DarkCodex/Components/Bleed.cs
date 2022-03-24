@@ -157,7 +157,7 @@ namespace DarkCodex.Components
             };
         }
 
-        internal static void createBleedBuff()
+        internal static void CreateBleedBuff()
         {
             var buff = Helper.CreateBlueprintBuff(
                 "BleedVariableBuff",

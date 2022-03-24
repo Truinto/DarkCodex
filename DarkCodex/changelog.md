@@ -1,4 +1,19 @@
 # Changelog
+- removed patchDispelMagic as Destructive Dispel has been fixed in 1.2 update
+- added more patch comments
+- added Chain Infusion
+- added Enduring Spells to spell-like abilities and items again
+- added option to reduce limitless cost to 0
+- added Expanded Element which adds feat to select new elements
+- added Patch_UnlockClassLevels which enables all classes to level up to 40 (albeit no features beyond 20)
+- added Unlock Kineticist which adds features up to level 40
+- added Demon Mastery
+- fixed ice impale dealing twice as much damage
+- fixed issues with Patch_FixAreaDoubleDamage that had no UnitEnter actions
+- fixed cackle/chant not showing up in prediction bar
+- fixed area effects being invisible after cutscenes
+- improved loading time significantly
+- extended ability groups, now accessible via file "DefGroups.json"
 
 ## [1.2.0]
 - updated to game version 1.2
