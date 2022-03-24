@@ -803,6 +803,9 @@ namespace DarkCodex
             if (__result == false)
                 return;
 
+            if (!IsAllowed(__instance.Initiator))
+                return;
+
             if (!__instance.IsSpellFailed && !__instance.IsArcaneSpellFailed)
                 return;
 
@@ -814,6 +817,9 @@ namespace DarkCodex
         [HarmonyPrefix]
         public static bool Prefix2(UnitUseAbility __instance, ref bool __result) // concentration failed
         {
+            if (!IsAllowed(__instance.Executor))
+                return true;
+
             if (__instance.ConcentrationCheckFailed)
             {
                 __instance.SpawnInterruptFx();
@@ -834,6 +840,10 @@ namespace DarkCodex
         {
             if (!__instance.IsEnded)
                 return;
+
+            if (!IsAllowed(__instance.Context?.MaybeCaster))
+                return;
+
             Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster?.CharacterName}");
             if (__instance.Context.MaybeCaster == null || !__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
                 return;
@@ -915,6 +925,9 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix4(RuleSpellResistanceCheck __instance) // push SR checks into history
         {
+            if (!IsAllowed(__instance.Context?.MaybeCaster))
+                return;
+
             try
             {
                 __instance.Context?.SourceAbilityContext?.RulebookContext?.m_AllEvents?.Add(__instance);
