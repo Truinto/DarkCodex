@@ -1,0 +1,12 @@
+{
+    "Id": "BlueprintLoader",
+    "DisplayName": "BlueprintLoader",
+    "Author": "Fumihiko",
+    "Version": "0.1.0",
+    "ManagerVersion": "0.23.0",
+    "Requirements": [],
+    "AssemblyName": "BlueprintLoader.dll",
+    "HomePage": "https://github.com/Truinto/DarkCodex/releases",
+    "Repository": "https://raw.githubusercontent.com/Truinto/DarkCodex/master/BlueprintLoader/Settings/Repository.json",
+    "EntryMethod": "BlueprintLoader.Main.Load"
+}

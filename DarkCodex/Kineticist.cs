@@ -56,11 +56,7 @@ using Kingmaker.Items;
 using Kingmaker.Blueprints.Items.Armors;
 using JetBrains.Annotations;
 using Kingmaker.Blueprints.Classes.Prerequisites;
-
-namespace X
-{
-
-}
+using Kingmaker.Blueprints.JsonSystem;
 
 namespace DarkCodex
 {
@@ -77,8 +73,8 @@ namespace DarkCodex
             "f8d0f7099e73c95499830ec0a93e2eeb",  //MetakinesisEmpowerCheaperBuff
             "f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
 
-        public static List<BlueprintFeature> Infusions;
-        public static List<BlueprintFeature> WildTalents;
+        public static List<BlueprintFeature> Infusions = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea").m_AllFeatures.Select(s => s.Get()).ToList(); // todo make dynamic
+        public static List<BlueprintFeature> WildTalents = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459").m_AllFeatures.Select(s => s.Get()).ToList();
 
         [PatchInfo(Severity.Create, "Kineticist Background", "regional background: gain +1 Kineticist level for the purpose of feat prerequisites", true)]
         public static void CreateKineticistBackground()
@@ -415,6 +411,9 @@ namespace DarkCodex
             t.Composite_Metal.Progession.AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession.ToRef()));
             t.Composite_BlueFlame.Progession.AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession.ToRef()));
 
+            // add to feats
+            Helper.AddFeats(t.ExpandedElement.ToRef());
+
             // change prerequisites of wild talents, check for blasts instead of elemental focus since Expanded Element doesn't grant focus
             foreach (var talent in WildTalents)
             {
@@ -444,9 +443,6 @@ namespace DarkCodex
                     }
                 }
             }
-
-            // add to feats
-            Helper.AddFeats(t.ExpandedElement.ToRef());
         }
 
         [PatchInfo(Severity.Create, "Impale Infusion", "infusion: Impale", false)]
@@ -683,21 +679,19 @@ namespace DarkCodex
         public static void FixWallInfusion()
         {
             int counter = 0;
-            foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
-            {
-                if (bp.Blueprint is BlueprintAbilityAreaEffect)
-                {
-                    var run = (bp.Blueprint as BlueprintAbilityAreaEffect).GetComponent<AbilityAreaEffectRunAction>();
-                    if (run == null)
-                        continue;
 
-                    if (bp.Blueprint.name.StartsWith("Wall"))
-                    {
-                        run.Round = run.UnitEnter;
-                        //run.UnitEnter = Helper.CreateActionList();
-                        counter++;
-                    }
-                }
+            foreach (var ab in Resource.Cache.Ability.Where(w => w.name.StartsWith("Wall")))
+            {
+                var abRun = ab.GetComponent<AbilityEffectRunAction>();
+                if (abRun == null || abRun.Actions.Actions[0] is not ContextActionSpawnAreaEffect area)
+                    continue;
+
+                var areaRun = area.AreaEffect.GetComponent<AbilityAreaEffectRunAction>();
+                if (areaRun == null)
+                    continue;
+
+                areaRun.Round = areaRun.UnitEnter;
+                counter++;
             }
             Helper.Print("Patched Wall Infusions: " + counter);
         }
@@ -1194,19 +1188,21 @@ namespace DarkCodex
     }
 
     [PatchInfo(Severity.Harmony, "Patch: AOE Attack Rolls", "allows Impale Infusion and other AOE attacks to roll once for all", false)]
+    [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
     public class Patch_AOEAttackRolls
     {
-        public IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
         {
             var line = instr.ToList();
-            var original = AccessTools.PropertyGetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.D20));
+            var original1 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.D20));
+            var original2 = AccessTools.PropertyGetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.CriticalConfirmationD20));
 
             for (int i = 0; i < line.Count; i++)
             {
-                if (line[i].Calls(original))
-                {
-                    line[i] = CodeInstruction.Call(typeof(Patch_AOEAttackRolls), nameof(SetD20));
-                }
+                if (line[i].Calls(original1))
+                    line[i].ReplaceCall(typeof(Patch_AOEAttackRolls), nameof(SetD20));
+                else if(line[i].Calls(original2))
+                    line[i].ReplaceCall(typeof(Patch_AOEAttackRolls), nameof(SetD20Crit));
             }
 
             return line;
@@ -1216,6 +1212,12 @@ namespace DarkCodex
         {
             if (instance.D20 == null)
                 instance.D20 = d20;
+        }
+
+        public static void SetD20Crit(RuleAttackRoll instance, RuleRollD20 d20)
+        {
+            if (instance.D20 == null)
+                instance.CriticalConfirmationD20 = d20;
         }
     }
 

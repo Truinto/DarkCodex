@@ -28,5 +28,18 @@ namespace DarkCodex
             }
             return true;
         }
+
+        [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.GetAvailableForCastSpellCount))]
+        [HarmonyPriority(410)]
+        [HarmonyPrefix]
+        public static bool GetAvailableForCastSpellCount(AbilityData spell, ref int __result)
+        {
+            if (spell.Blueprint.GetComponent<AbilityAtWill>())
+            {
+                __result = -1;
+                return false;
+            }
+            return true;
+        }
     }
 }

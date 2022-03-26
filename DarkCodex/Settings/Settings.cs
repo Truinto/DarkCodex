@@ -10,7 +10,7 @@ namespace DarkCodex
     public class Settings
     {
         [JsonProperty]
-        public int version = 3;
+        public int version = 4;
 
         [JsonProperty]
         public bool showBootupWarning = true;

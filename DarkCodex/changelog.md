@@ -1,4 +1,6 @@
 # Changelog
+
+## [1.2.1]
 - removed patchDispelMagic as Destructive Dispel has been fixed in 1.2 update
 - added more patch comments
 - added Chain Infusion
@@ -12,10 +14,10 @@
 - fixed issues with Patch_FixAreaDoubleDamage that had no UnitEnter actions
 - fixed cackle/chant not showing up in prediction bar
 - fixed area effects being invisible after cutscenes
+- fixed loading issue
+- fixed Resourceful Caster causing all spell being broken after some cutscenes
 - improved loading time significantly
 - extended ability groups, now accessible via file "DefGroups.json"
-
-- Patch_ResourcefulCaster
 
 ## [1.2.0]
 - updated to game version 1.2

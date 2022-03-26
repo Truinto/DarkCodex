@@ -106,7 +106,7 @@ namespace DarkCodex
 
         #endregion
 
-        #region Patching
+        #region Patching/Harmony
 
         /// <summary>Needs ManualPatch attribute.</summary>
         public static void Patch(Type patch, bool _)
@@ -191,6 +191,13 @@ namespace DarkCodex
             }
 
             return null;
+        }
+
+        public static void ReplaceCall(this CodeInstruction code, Type type, string name, Type[] parameters = null, Type[] generics = null)
+        {
+            var repl = CodeInstruction.Call(type, name, parameters, generics);
+            code.opcode = repl.opcode;
+            code.operand = repl.operand;
         }
 
         #endregion
@@ -1833,7 +1840,7 @@ namespace DarkCodex
             return result;
         }
 
-        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0)
+        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.OnlyNew)
         {
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -1847,6 +1854,7 @@ namespace DarkCodex
             result.m_Description = description.CreateString();
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.m_Icon = icon;
+            result.Mode = mode;
 
             AddAsset(result, guid);
             return result;

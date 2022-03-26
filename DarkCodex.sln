@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueprintLoader", "BlueprintLoader\BlueprintLoader.csproj", "{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{1B87B8EA-001B-4FE4-9993-77C33BFFBA87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B87B8EA-001B-4FE4-9993-77C33BFFBA87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B87B8EA-001B-4FE4-9993-77C33BFFBA87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -101,7 +101,7 @@ namespace DarkCodex
             weapon.AddAsset(GuidManager.i.Get(weapon.name));
             weapon.SetComponents(new WeaponKineticBlade() { m_ActivationAbility = fake_blade_burn.ToRef(), m_Blast = fake_blade_damage.ToRef() });
 
-            Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
+            //Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
         }
 
         [PatchInfo(Severity.Create, "Butchering Axe", "new weapon type Butchering Axe", false)]

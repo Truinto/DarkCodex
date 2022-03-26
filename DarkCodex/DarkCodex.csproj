@@ -12,12 +12,12 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -25,16 +25,16 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BlueprintLoader.cs" />
     <Compile Include="Classes\AbilityRegister.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
@@ -91,6 +91,7 @@
     <Compile Include="Patches\Patch_ActivatableOnNewRound.cs" />
     <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
+    <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
     <Compile Include="Patches\Patch_Prebuilds.cs" />
     <Compile Include="Patches\Patch_AllowAchievements.cs" />
     <Compile Include="Patches\Patch_AbilityGroups.cs" />
@@ -129,9 +130,6 @@
     <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>"E:\Github\KingmakerFumi\versioncontrol\bin\Release\netcoreapp3.1\versioncontrol.exe" "$(ProjectDir)changelog.md" "$(ProjectDir)Properties\AssemblyInfo.cs" "$(ProjectDir)info.json" "$(ProjectDir)Settings\Repository.json"</PreBuildEvent>
-  </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>xcopy /i /e /y /f "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"</PostBuildEvent>
   </PropertyGroup>

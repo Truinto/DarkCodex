@@ -1,16 +1,22 @@
 ﻿using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.Blueprints.JsonSystem.BinaryFormat;
+using Kingmaker.Blueprints.JsonSystem.Converters;
+using Kingmaker.BundlesLoading;
 using Kingmaker.Modding;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace DarkCodex
 {
@@ -19,7 +25,13 @@ namespace DarkCodex
     {
         public static readonly BlueprintLoader Instance = new();
 
-        public Dictionary<Type, IList> ListByType;
+        /// <summary>Do not modify Dictionary or any of its values. Use 'ResourcesLibrary.BlueprintsCache.AddCachedBlueprint' to add new blueprints.</summary>
+        public readonly Dictionary<Type, IList> ListByType;
+        public float Progress;
+        private Thread LoadingThread;
+        private object Lock;
+        public bool WasStarted { get; private set; }
+        public bool IsFinished { get; private set; }
 
         public BlueprintLoader()
         {
@@ -31,26 +43,54 @@ namespace DarkCodex
                     ListByType[type] = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
         }
 
-        public void Load()
+        public void Start()
+        {
+            if (this.WasStarted || ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Count <= 0)
+                return;
+
+            this.WasStarted = true;
+            LoadingThread = new Thread(Load);
+            LoadingThread.Start();
+        }
+
+        private void Load()
         {
             var __instance = ResourcesLibrary.BlueprintsCache;
-            var deserializer = __instance.m_PackSerializer;
-            var reader = deserializer.m_Primitive.m_Reader;
-            var stream = reader.BaseStream;
+            int total = __instance.m_LoadedBlueprints.Count;
+            int count = 0;
 
-            lock (__instance.m_Lock)
+#if false
+            var stream = new FileStream(BundlesLoadService.BundlesPath("blueprints-pack.bbp"), FileMode.Open, FileAccess.Read);
+            var deserializer = new ReflectionBasedSerializer(new PrimitiveSerializer(new BinaryReader(stream), UnityObjectConverter.AssetList));
+#else
+            var deserializer = __instance.m_PackSerializer;
+            var stream = deserializer.m_Primitive.m_Reader.BaseStream;
+#endif
+
+            var watch = Stopwatch.StartNew();
+            foreach (var (guid, bpCache) in __instance.m_LoadedBlueprints.ToArray())
             {
-                foreach (var (guid, bpCache) in __instance.m_LoadedBlueprints.ToArray())
+                lock (__instance.m_Lock)
                 {
-                    // add if already loaded
+                    // add if already loaded, but not in our cache
                     if (bpCache.Blueprint != null)
                     {
-                        ListByType[bpCache.Blueprint.GetType()].Add(bpCache.Blueprint);
+                        lock (Lock)
+                        {
+                            var list = ListByType[bpCache.Blueprint.GetType()];
+                            foreach (var bp in list)
+                                if (bp == bpCache.Blueprint)
+                                    continue;
+                            list.Add(bpCache.Blueprint);
+                        }
+                        count++;
                         continue;
                     }
 
                     // try load
                     uint offset = bpCache.Offset;
+                    if (offset == 0)
+                        continue;
                     stream.Seek(offset, SeekOrigin.Begin);
                     SimpleBlueprint sbp = null;
                     deserializer.Blueprint(ref sbp);
@@ -62,12 +102,21 @@ namespace DarkCodex
                     if (blueprint == null)
                         continue;
 
+                    blueprint.OnEnable();
                     __instance.m_LoadedBlueprints[guid] = new() { Offset = offset, Blueprint = blueprint };
 
                     // add if could load
-                    ListByType[blueprint.GetType()].Add(blueprint);
+                    lock (Lock)
+                    {
+                        ListByType[blueprint.GetType()].Add(blueprint);
+                    }
+                    this.Progress = (float)++count / total;
                 }
             }
+            this.Progress = 1f;
+            this.IsFinished = true;
+            watch.Stop();
+            Helper.Print($"loaded {count} of {total} blueprints in {watch.ElapsedMilliseconds} milliseconds");
         }
 
         public List<T> Get<T>(bool includeDerived = true) where T : SimpleBlueprint
@@ -115,14 +164,22 @@ namespace DarkCodex
             return result;
         }
 
+        public void AddBlueprint(SimpleBlueprint bp)
+        {
+            ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(bp.AssetGuid, bp);
+        }
+
         [HarmonyPatch(typeof(BlueprintsCache), nameof(BlueprintsCache.AddCachedBlueprint))]
         [HarmonyPostfix]
         public static void Postfix(SimpleBlueprint bp)
         {
-            var type = bp.GetType();
-            if (Instance.ListByType.TryGetValue(type, out var list))
+            lock (Instance.Lock)
             {
-                list.Add(bp);
+                var type = bp.GetType();
+                if (Instance.ListByType.TryGetValue(type, out var list))
+                {
+                    list.Add(bp);
+                }
             }
         }
 

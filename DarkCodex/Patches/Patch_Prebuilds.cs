@@ -28,50 +28,6 @@ using System.Linq;
 
 namespace DarkCodex
 {
-    /*public class Resolver : DefaultContractResolver
-    {
-        protected override string ResolvePropertyName(string propertyName)
-        {
-            return base.ResolvePropertyName(propertyName);
-        }
-
-        protected override string ResolveDictionaryKey(string dictionaryKey)
-        {
-            return base.ResolveDictionaryKey(dictionaryKey);
-        }
-
-        protected override JsonContract CreateContract(Type objectType)
-        {
-            var result = base.CreateContract(objectType);
-            //result.Converter.
-            return result;
-        }
-    }
-
-    public class Converter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(ILevelUpAction).IsAssignableFrom(objectType);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            ILevelUpAction action = (ILevelUpAction)value;
-            writer.WriteStartObject();
-            writer.WritePropertyName("$type");
-            writer.WriteValue(value.GetType().AssemblyQualifiedName);
-            //writer.WritePropertyName("m_Data");
-            serializer.Serialize(writer, action);
-            writer.WriteEndObject();
-        }
-    }*/
-
     [PatchInfo(Severity.Hidden | Severity.WIP, "Patch: Prebuild export/import", "export/import predefined build information", false)]
     [HarmonyPatch]
     public class Patch_Prebuilds
@@ -141,7 +97,10 @@ namespace DarkCodex
 
                 list = Helper.Deserialize<List<LevelPlanData>>(value: data);// path: Path.Combine("builds", unit.CharacterName + ".json"));
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+            {
+                Helper.PrintException(ex);
+            }
             if (list == null || list.Count == 0)
                 return;
 

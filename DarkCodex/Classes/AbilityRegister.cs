@@ -27,7 +27,7 @@ namespace DarkCodex
         public AbilityRegister(params string[] guids)
         {
             if (guids == null || guids.Length == 0)
-                new ArgumentException("Must supply at least on guid");
+                new ArgumentException("Must supply at least one guid");
 
             this.Components = new List<BlueprintComponent>();
             foreach (var guid in guids)

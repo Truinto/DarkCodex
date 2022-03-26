@@ -278,36 +278,6 @@ namespace DarkCodex
 #endif
             }
 
-            public static void Name2()
-            {
-                Resource.Cache.Ensure();
-
-                foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)
-                {
-                    if (bp.Blueprint is not BlueprintItem item)
-                        continue;
-
-                    string description;
-                    if (item.m_DescriptionText != null && item.m_DescriptionText.Key != "")
-                        description = LocalizationManager.CurrentPack.GetText(item.m_DescriptionText.Key);
-                    else
-                        description = "";
-
-                    foreach (var enchant in item.CollectEnchantments())
-                    {
-                        if (enchant.m_EnchantName.IsEmptyKey())
-                        {
-                            enchant.m_EnchantName = ConvertName(enchant.name).CreateString(); // todo: use separate file?
-                        }
-
-                        if (description != "" && enchant.m_Description.IsEmptyKey())
-                        {
-                            enchant.m_Description = description.CreateString();
-                        }
-                    }
-                }
-            }
-
             public static string ConvertName(string name)
             {
                 if (name == null)

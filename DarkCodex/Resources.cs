@@ -150,6 +150,8 @@ namespace DarkCodex
                         }
 
                         uint offset = bpCache.Offset;
+                        if (offset == 0)
+                            continue;
 
                         stream.Seek(offset, SeekOrigin.Begin);
                         reader.Read(typeGuid, 0, typeLength);
@@ -185,9 +187,10 @@ namespace DarkCodex
                                     return;
                                 }
 
-                                count++;
+                                blueprint.OnEnable();
                                 __instance.m_LoadedBlueprints[guid] = new() { Offset = offset, Blueprint = blueprint };
                                 list.Add(blueprint);
+                                count++;
                             }
                         }
                         //else Helper.PrintDebug("unkown type: " + typeGuidString);

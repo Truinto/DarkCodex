@@ -84,6 +84,9 @@ namespace DarkCodex
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
 
+            if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
+                Patch_AbilityGroups.Reload();
+
 #if DEBUG
             if (Main.IsInGame)
             {
@@ -664,7 +667,7 @@ namespace DarkCodex
             try
             {
                 if (patch.GetCustomAttributes(false).Any(a => a is ManualPatchAttribute))
-                    Helper.Patch(patch, default);
+                    Helper.Patch(patch, false);
                 else
                     Helper.Patch(patch);
                 return true;

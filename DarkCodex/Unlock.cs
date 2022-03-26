@@ -26,7 +26,7 @@ namespace DarkCodex
             if (t.ExpandedElement != null)
             {
                 t.FocusSecond.m_AllFeatures = t.ExpandedElement.m_AllFeatures;
-                t.FocusThird.m_AllElements = t.ExpandedElement.m_AllElements;
+                t.FocusThird.m_AllFeatures = t.ExpandedElement.m_AllFeatures;
             }
 
             // repeat progression
