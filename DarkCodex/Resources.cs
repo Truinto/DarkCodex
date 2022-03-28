@@ -101,7 +101,7 @@ namespace DarkCodex
                 }
             }
 
-            public static void Ensure()
+            public static void EnsureFast()
             {
                 if (Ability != null)
                     return;
@@ -201,7 +201,7 @@ namespace DarkCodex
                 Helper.Print($"Loaded {count} out of {total} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
             }
 
-            public static void EnsureSlow()
+            public static void Ensure()
             {
                 if (Ability != null)
                     return;

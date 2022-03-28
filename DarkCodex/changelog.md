@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.1]
+## [1.2.1.1]
 - removed patchDispelMagic as Destructive Dispel has been fixed in 1.2 update
 - added more patch comments
 - added Chain Infusion
