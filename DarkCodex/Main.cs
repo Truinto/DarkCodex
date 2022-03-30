@@ -84,6 +84,8 @@ namespace DarkCodex
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
 
+            if (GUILayout.Button(Patch_AbilityGroups.Locked ? "Unlock ability groups" : "Lock ability groups", GUILayout.ExpandWidth(false)))
+                Patch_AbilityGroups.Locked = !Patch_AbilityGroups.Locked;
             if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.Reload();
 
@@ -197,6 +199,8 @@ namespace DarkCodex
                     if (!info.IsEvent && !info.IsHidden)
                         sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
+            if (GUILayout.Button("Debug: Generate bin files (will lag)", GUILayout.ExpandWidth(false)))
+                Resource.Cache.SaveBaseGame();
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref state.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
             Checkbox(ref state.debug_1, "Debug: Flag1");
@@ -373,6 +377,7 @@ namespace DarkCodex
                 harmony = new Harmony(modEntry.Info.Id);
                 Helper.Patch(typeof(StartGameLoader_LoadAllJson));
                 Helper.Patch(typeof(MainMenu_Start));
+                Helper.Patch(typeof(Patch_LoadBlueprints));
                 //harmony.PatchAll(typeof(Main).Assembly);
                 //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
                 //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
@@ -462,11 +467,13 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_EnduringSpells));
                     PatchSafe(typeof(Patch_UnlockClassLevels));
                     PatchSafe(typeof(Patch_AbilityAtWill));
+                    PatchSafe(typeof(Patch_DarkElementalistBurn));
 
                     // General
                     LoadSafe(General.PatchAngelsLight);
                     LoadSafe(General.PatchBasicFreebieFeats);
                     LoadSafe(General.PatchHideBuffs);
+                    LoadSafe(General.PatchDismissAnything);
                     LoadSafe(General.PatchVarious);
 
                     // Items
@@ -537,6 +544,7 @@ namespace DarkCodex
                     LoadSafe(Ranger.CreateImprovedHuntersBond);
 
                     // Unlocks
+                    LoadSafe(Unlock.UnlockAnimalCompanion);
                     LoadSafe(Unlock.UnlockKineticist); // keep late
 
                     // Extra Features - keep last
@@ -717,6 +725,7 @@ namespace DarkCodex
 
             attr.Class = info.DeclaringType?.Name ?? "Patch";
             attr.Method = info.Name;
+            attr.Hash = (attr.Class + "." + attr.Method).GetHashCode();
 
             if (!patchInfos.Contains(attr))
                 patchInfos.Add(attr);

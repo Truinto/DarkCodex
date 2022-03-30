@@ -97,7 +97,7 @@ namespace DarkCodex
 
                 list = Helper.Deserialize<List<LevelPlanData>>(value: data);// path: Path.Combine("builds", unit.CharacterName + ".json"));
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Helper.PrintException(ex);
             }
@@ -117,13 +117,19 @@ namespace DarkCodex
             Helper.Serialize(list, path: Path.Combine("builds", "testdata.json"));
         }
 
+        [HarmonyPatch(typeof(LevelUpController), MethodType.Constructor, typeof(UnitEntityData), typeof(bool), typeof(LevelUpState.CharBuildMode))]
+        [HarmonyPrefix]
+        public static void Debug1(UnitEntityData unit, bool autoCommit, LevelUpState.CharBuildMode mode, LevelUpController __instance)
+        {
+            Helper.PrintDebug($"LevelUpController Constructor: unit={unit.CharacterName} auto={autoCommit} mode={mode}");
+        }
+
         [HarmonyPatch(typeof(LevelUpController), nameof(LevelUpController.ApplyLevelUpPlan))]
         [HarmonyPrefix]
         public static void IgnoreSettings(ref bool ignoreSettings)
         {
             ignoreSettings = true;
         }
-
 
         [HarmonyPatch(typeof(LevelUpController), nameof(LevelUpController.ApplyLevelUpActions))]
         [HarmonyPrefix]

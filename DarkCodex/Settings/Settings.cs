@@ -28,19 +28,10 @@ namespace DarkCodex
         public bool newFeatureDefaultOn = true;
 
         [JsonProperty]
-        [Obsolete]
-        private HashSet<string> doNotLoad = null;
+        private HashSet<string> blacklist = new();
 
         [JsonProperty]
-        private HashSet<string> blacklist = new()
-        {
-            "General.patchBasicFreebieFeats",
-        };
-
-        [JsonProperty]
-        private HashSet<string> whitelist = new()
-        {
-        };
+        private HashSet<string> whitelist = new();
 
         [JsonProperty]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -76,13 +67,6 @@ namespace DarkCodex
             }
         }
 
-        public bool IsDisenabledSingle(string name)
-        {
-            if (blacklist.Contains(name))
-                return true;
-            return !newFeatureDefaultOn && !whitelist.Contains(name);
-        }
-
         public bool IsDisenabledCategory(string name)
         {
             if (blacklist.Contains(name))
@@ -90,28 +74,46 @@ namespace DarkCodex
             return false;
         }
 
+        public bool IsDisenabledSingle(string name)
+        {
+            if (blacklist.Contains(name))
+                return true;
+
+            if (whitelist.Contains(name))
+                return false;
+
+            int hash = name.GetHashCode();
+            if (Main.patchInfos.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+                return true;
+
+            return !newFeatureDefaultOn;
+        }
+
         public bool IsDisenabled(string name)
         {
-            string all = name.TrySubstring('.') + ".*";
-
-            if (blacklist.Contains(name) || blacklist.Contains(all))
+            if (blacklist.Contains(name))
                 return true;
-            return !newFeatureDefaultOn && !whitelist.Contains(name);
+
+            if (blacklist.Contains(name.TrySubstring('.') + ".*"))
+                return true;
+
+            if (whitelist.Contains(name))
+                return false;
+
+            int hash = name.GetHashCode();
+            if (Main.patchInfos.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+                return true;
+
+            return !newFeatureDefaultOn;
         }
 
         public static Config.Manager<Settings> StateManager = new(Path.Combine(Main.ModPath, "settings.json"), OnUpdate);
 
         private static bool OnUpdate(Settings settings)
         {
-            if (settings.version < 3 && settings.doNotLoad != null)
-            {
-                settings.showBootupWarning = true;
-                settings.blacklist = settings.doNotLoad;
-                settings.doNotLoad = null;
-            }
-
             if (settings.version < 4 && settings.whitelist != null && settings.blacklist != null)
             {
+                settings.showBootupWarning = true;
                 var hash = new HashSet<string>();
                 foreach (string str in settings.whitelist)
                     hash.Add(toUpper(str));

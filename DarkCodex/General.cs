@@ -15,6 +15,7 @@ using Kingmaker.Enums;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
@@ -106,7 +107,7 @@ namespace DarkCodex
             angelbuff.AddComponents(Helper.CreateContextRankConfig(ContextRankBaseValueType.CharacterLevel, type: AbilityRankType.Default)); // see FalseLifeBuff
         }
 
-        [PatchInfo(Severity.Extend, "Basic Freebie Feats", "reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/", true)]
+        [PatchInfo(Severity.Extend | Severity.DefaultOff, "Basic Freebie Feats", "reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/", true)]
         public static void PatchBasicFreebieFeats()
         {
             //https://michaeliantorno.com/feat-taxes-in-pathfinder/
@@ -203,6 +204,13 @@ namespace DarkCodex
                     Helper.Print(" error: couldn't load " + guid);
                 }
             }
+        }
+
+        [PatchInfo(Severity.Extend | Severity.DefaultOff, "Dismiss Anything", "dismiss any spell regardless of who the caster is", true)]
+        public static void PatchDismissAnything()
+        {
+            Helper.Get<BlueprintAbility>("97a23111df7547fd8f6417f9ba9b9775").RemoveComponents<AbilityTargetIsAreaEffectFromCaster>();
+            Helper.Get<BlueprintAbility>("feba4322f7614276a69efece6d5093c3").RemoveComponents<AbilityTargetIsAreaEffectFromCaster>();
         }
 
         [PatchInfo(Severity.Extend, "Various Tweaks", "removed PreciousTreat penalty, extend protection from X to 10 minutes", true)]

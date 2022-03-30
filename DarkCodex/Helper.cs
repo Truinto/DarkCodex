@@ -22,10 +22,12 @@ using Kingmaker.Enums;
 using Kingmaker.Enums.Damage;
 using Kingmaker.Localization;
 using Kingmaker.Localization.Shared;
+using Kingmaker.PubSubSystem;
 using Kingmaker.ResourceLinks;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
+using Kingmaker.UI;
 using Kingmaker.UI.Log;
 using Kingmaker.UI.Log.CombatLog_ThreadSystem;
 using Kingmaker.UnitLogic;
@@ -57,6 +59,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
@@ -295,6 +298,32 @@ namespace DarkCodex
             orig = result;
         }
 
+        public static void RemoveGet<T>(this List<T> list, List<T> result, Func<T, bool> predicate)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (predicate(list[i]))
+                {
+                    result.Add(list[i]);
+                    list.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public static void RemoveGet<T1, T2>(this List<T1> list, List<T2> result, Func<T1, bool> predicate, Func<T1, T2> select)
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (predicate(list[i]))
+                {
+                    result.Add(select(list[i]));
+                    list.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
         public static void Deconstruct<K, V>(this KeyValuePair<K, V> pair, out K key, out V val)
         {
             key = pair.Key;
@@ -377,6 +406,44 @@ namespace DarkCodex
             _sb2.Append(msg);
         }
 
+        public static void ShowMessageBox(string messageText, Action onYes = null, int waitTime = 0, string yesLabel = null, string noLabel = null)
+        {
+            EventBus.RaiseEvent<IMessageModalUIHandler>(w =>
+            {
+                w.HandleOpen(messageText: messageText,
+                    modalType: onYes == null ? MessageModalBase.ModalType.Message : MessageModalBase.ModalType.Dialog,
+                    onClose: onYes == null ? null : a => { if (a == MessageModalBase.ButtonType.Yes) try { onYes(); } catch { } },
+                    onLinkInvoke: null,
+                    yesLabel: yesLabel,
+                    noLabel: noLabel,
+                    onTextResult: null,
+                    inputText: null,
+                    inputPlaceholder: null,
+                    waitTime: waitTime,
+                    maxInputTextLength: uint.MaxValue,
+                    items: null);
+            }, true);
+        }
+
+        public static void ShowInputBox(string messageText, Action<string> onOK = null, Action onCancel = null, int waitTime = 0, string yesLabel = null, string noLabel = null)
+        {
+            EventBus.RaiseEvent<IMessageModalUIHandler>(w =>
+            {
+                w.HandleOpen(messageText: messageText,
+                    modalType: MessageModalBase.ModalType.TextField,
+                    onClose: onCancel == null ? null : a => { if (a == MessageModalBase.ButtonType.No) try { onCancel(); } catch { } },
+                    onLinkInvoke: null,
+                    yesLabel: yesLabel,
+                    noLabel: noLabel,
+                    onTextResult: onOK,
+                    inputText: null,
+                    inputPlaceholder: null,
+                    waitTime: waitTime,
+                    maxInputTextLength: uint.MaxValue,
+                    items: null);
+            }, true);
+        }
+
         #endregion
 
         #region JsonSerializer
@@ -399,7 +466,9 @@ namespace DarkCodex
 
             if (path != null)
             {
-                using var sw = new StreamWriter(Path.Combine(Main.ModPath, path), append);
+                path = Path.Combine(Main.ModPath, path);
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                using var sw = new StreamWriter(path, append);
                 sw.WriteLine(result);
                 sw.Close();
             }
@@ -414,7 +483,9 @@ namespace DarkCodex
 
             if (path != null)
             {
-                using var sw = new StreamWriter(Path.Combine(Main.ModPath, path), append);
+                path = Path.Combine(Main.ModPath, path);
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                using var sw = new StreamWriter(path, append);
                 sw.WriteLine(result);
                 sw.Close();
             }
@@ -454,12 +525,41 @@ namespace DarkCodex
         {
             try
             {
-                using var sw = new StreamWriter(Path.Combine(Main.ModPath, path), append);
+                path = Path.Combine(Main.ModPath, path);
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                using var sw = new StreamWriter(path, append);
                 sw.WriteLine(content);
             }
             catch (Exception e)
             {
                 Helper.PrintException(e);
+            }
+        }
+
+        public static void PrintBytes(string path, byte[] data)
+        {
+            try
+            {
+                path = Path.Combine(Main.ModPath, path);
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                File.WriteAllBytes(path, data);
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+        }
+
+        public static byte[] ReadBytes(string path)
+        {
+            try
+            {
+                return File.ReadAllBytes(Path.Combine(Main.ModPath, path));
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+                return new byte[0];
             }
         }
 

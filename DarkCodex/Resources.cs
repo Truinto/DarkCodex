@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -50,66 +51,37 @@ namespace DarkCodex
 
         public class Cache
         {
-            public static List<BlueprintAbility> Ability;
-            public static List<BlueprintActivatableAbility> Activatable;
-            public static List<BlueprintItem> Item;
-            public static List<BlueprintItemEnchantment> Enchantment;
+            public static bool IsLoaded;
+            public static List<BlueprintAbility> Ability = new();
+            public static List<BlueprintActivatableAbility> Activatable = new();
+            public static List<BlueprintItem> Item = new();
+            public static List<BlueprintItemEnchantment> Enchantment = new();
 
             // Base
-            public static readonly BlueprintItemWeaponReference WeaponUnarmed;
-            public static readonly BlueprintItemWeaponReference WeaponTouch;
-            public static readonly BlueprintItemWeaponReference WeaponRay;
-            public static readonly BlueprintItemWeaponReference WeaponBlastPhysical;
-            public static readonly BlueprintItemWeaponReference WeaponBlastEnergy;
+            public static readonly BlueprintItemWeaponReference WeaponUnarmed = Helper.ToRef<BlueprintItemWeaponReference>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
+            public static readonly BlueprintItemWeaponReference WeaponTouch = Helper.ToRef<BlueprintItemWeaponReference>("bb337517547de1a4189518d404ec49d4"); //TouchItem
+            public static readonly BlueprintItemWeaponReference WeaponRay = Helper.ToRef<BlueprintItemWeaponReference>("f6ef95b1f7bb52b408a5b345a330ffe8"); //RayItem
+            public static readonly BlueprintItemWeaponReference WeaponBlastPhysical = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8"); //KineticBlastPhysicalWeapon
+            public static readonly BlueprintItemWeaponReference WeaponBlastEnergy = Helper.ToRef<BlueprintItemWeaponReference>("4d3265a5b9302ee4cab9c07adddb253f"); //KineticBlastEnergyWeapon
 
             // Mods
-            public static readonly BlueprintBuffReference BuffKineticWhip;
-            public static readonly BlueprintBuffReference BuffBleed;
-            public static readonly BlueprintUnitPropertyReference PropertySneakAttackDice;
-            public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute;
-            public static readonly BlueprintUnitPropertyReference PropertyMythicDispel;
-            public static readonly BlueprintFeatureReference FeatureFeralCombat;
-            public static readonly BlueprintFeatureReference FeatureResourcefulCaster;
-            public static readonly BlueprintFeatureReference FeatureMagicItemAdept;
-            public static readonly BlueprintFeatureReference FeatureMindShield;
-            public static readonly BlueprintWeaponTypeReference WeaponTypeButchering;
-
-            static Cache()
-            {
-                try
-                {
-                    BuffKineticWhip = new BlueprintBuffReference();
-                    BuffBleed = new BlueprintBuffReference();
-                    PropertySneakAttackDice = new BlueprintUnitPropertyReference();
-                    PropertyMaxMentalAttribute = new BlueprintUnitPropertyReference();
-                    PropertyMythicDispel = new BlueprintUnitPropertyReference();
-                    FeatureFeralCombat = new BlueprintFeatureReference();
-                    FeatureResourcefulCaster = new BlueprintFeatureReference();
-                    FeatureMagicItemAdept = new BlueprintFeatureReference();
-                    FeatureMindShield = new BlueprintFeatureReference();
-                    WeaponTypeButchering = new BlueprintWeaponTypeReference();
-
-                    WeaponUnarmed = Helper.ToRef<BlueprintItemWeaponReference>("f60c5a820b69fb243a4cce5d1d07d06e"); //Unarmed1d6
-                    WeaponTouch = Helper.ToRef<BlueprintItemWeaponReference>("bb337517547de1a4189518d404ec49d4"); //TouchItem
-                    WeaponRay = Helper.ToRef<BlueprintItemWeaponReference>("f6ef95b1f7bb52b408a5b345a330ffe8"); //RayItem
-                    WeaponBlastPhysical = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8"); //KineticBlastPhysicalWeapon
-                    WeaponBlastEnergy = Helper.ToRef<BlueprintItemWeaponReference>("4d3265a5b9302ee4cab9c07adddb253f"); //KineticBlastEnergyWeapon
-                }
-                catch (Exception e)
-                {
-                    Helper.Print("Cache crashed! " + e.ToString());
-                }
-            }
+            public static readonly BlueprintBuffReference BuffKineticWhip = new();
+            public static readonly BlueprintBuffReference BuffBleed = new();
+            public static readonly BlueprintUnitPropertyReference PropertySneakAttackDice = new();
+            public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute = new();
+            public static readonly BlueprintUnitPropertyReference PropertyMythicDispel = new();
+            public static readonly BlueprintFeatureReference FeatureFeralCombat = new();
+            public static readonly BlueprintFeatureReference FeatureResourcefulCaster = new();
+            public static readonly BlueprintFeatureReference FeatureMagicItemAdept = new();
+            public static readonly BlueprintFeatureReference FeatureMindShield = new();
+            public static readonly BlueprintWeaponTypeReference WeaponTypeButchering = new();
 
             public static void EnsureFast()
             {
-                if (Ability != null)
+                if (IsLoaded)
                     return;
-
-                Ability = new();
-                Activatable = new();
-                Item = new();
-                Enchantment = new();
+                IsLoaded = true;
+                Clear();
 
                 var __instance = ResourcesLibrary.BlueprintsCache;
 
@@ -131,22 +103,10 @@ namespace DarkCodex
                     {
                         total++;
 
-                        switch (bpCache.Blueprint)
+                        if (bpCache.Blueprint != null)
                         {
-                            case null:
-                                break;
-                            case BlueprintAbility bp:
-                                Ability.Add(bp);
-                                continue;
-                            case BlueprintActivatableAbility bp:
-                                Activatable.Add(bp);
-                                continue;
-                            case BlueprintItem bp:
-                                Item.Add(bp);
-                                continue;
-                            case BlueprintItemEnchantment bp:
-                                Enchantment.Add(bp);
-                                continue;
+                            Add(bpCache.Blueprint);
+                            continue;
                         }
 
                         uint offset = bpCache.Offset;
@@ -201,25 +161,186 @@ namespace DarkCodex
                 Helper.Print($"Loaded {count} out of {total} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
             }
 
-            public static void Ensure()
+            public static void EnsureMod()
             {
-                if (Ability != null)
+                if (IsLoaded)
                     return;
+                IsLoaded = true;
+                Clear();
 
-                Ability = new List<BlueprintAbility>();
-                Activatable = new List<BlueprintActivatableAbility>();
+                var __instance = ResourcesLibrary.BlueprintsCache;
+
+                const int typeLength = 16;
+                var deserializer = __instance.m_PackSerializer;
+                var stream = deserializer.m_Primitive.m_Reader.BaseStream;
+                var typeCache = ((GuidClassBinder)Json.Serializer.Binder).m_GuidToTypeCache;
+                byte[] typeGuid = new byte[typeLength];
+
+                int count = 0;
+                KeyValuePair<BlueprintGuid, BlueprintsCache.BlueprintCacheEntry>[] assets;
+                Stopwatch timer = Stopwatch.StartNew();
+
+                lock (__instance.m_Lock)
+                {
+                    assets = __instance.m_LoadedBlueprints.ToArray();
+                }
+
+                foreach (var (guid, bpCache) in assets)
+                {
+                    if (bpCache.Blueprint != null)
+                    {
+                        Add(bpCache.Blueprint);
+                        continue;
+                    }
+
+                    uint offset = bpCache.Offset;
+                    if (offset == 0)
+                        continue;
+
+                    stream.Seek(offset, SeekOrigin.Begin);
+                    deserializer.m_Primitive.m_Reader.Read(typeGuid, 0, typeLength);
+
+                    var typeGuidString = new Guid(typeGuid).ToString("N");
+                    if (typeCache.TryGetValue(typeGuidString, out var type))
+                    {
+                        if (type == typeof(BlueprintAbility))
+                            load(Ability);
+                        else if (type == typeof(BlueprintActivatableAbility))
+                            load(Activatable);
+                        else if (typeof(BlueprintItem).IsAssignableFrom(type))
+                            load(Item);
+                        else if (typeof(BlueprintItemEnchantment).IsAssignableFrom(type))
+                            load(Enchantment);
+
+                        void load<T>(List<T> list)
+                        {
+                            count++;
+                            if (__instance.Load(guid) is T bp)
+                                list.Add(bp);
+                            else
+                                Helper.PrintError("unable to load " + guid);
+                        }
+                    }
+                    //else Helper.PrintDebug("unkown type: " + typeGuidString);
+                }
+
+                timer.Stop();
+                Helper.Print($"Loaded {count} out of {assets.Length} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
+            }
+
+            public static void EnsureSlow()
+            {
+                if (IsLoaded)
+                    return;
+                IsLoaded = true;
+                Clear();
 
                 var keys = ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Keys.ToArray();
-
                 foreach (var key in keys)
-                {
-                    var bp = ResourcesLibrary.BlueprintsCache.Load(key);
+                    Add(ResourcesLibrary.BlueprintsCache.Load(key));
+            }
 
-                    if (bp is BlueprintAbility ability)
-                        Ability.Add(ability);
-                    else if (bp is BlueprintActivatableAbility activatable)
-                        Activatable.Add(activatable);
+            public static void Ensure() // TODO use EnsurePre
+            {
+                if (IsLoaded)
+                    return;
+                IsLoaded = true;
+                // note: do not clear; these lists have modded blueprints included
+
+                Stopwatch timer = Stopwatch.StartNew();
+                Load(Ability, Path.Combine(Main.ModPath, "resources", "Ability.bin"));
+                Load(Activatable, Path.Combine(Main.ModPath, "resources", "Activatable.bin"));
+                Load(Item, Path.Combine(Main.ModPath, "resources", "Item.bin"));
+                Load(Enchantment, Path.Combine(Main.ModPath, "resources", "Enchantment.bin"));
+
+                timer.Stop();
+                Helper.Print($"Loaded blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void Add(SimpleBlueprint bp)
+            {
+                if (bp is BlueprintAbility ability)
+                    Ability.Add(ability);
+                else if (bp is BlueprintActivatableAbility activatable)
+                    Activatable.Add(activatable);
+                else if (bp is BlueprintItem item)
+                    Item.Add(item);
+                else if (bp is BlueprintItemEnchantment enchantment)
+                    Enchantment.Add(enchantment);
+            }
+
+            public static void Clear()
+            {
+                Ability.Clear();
+                Activatable.Clear();
+                Item.Clear();
+                Enchantment.Clear();
+            }
+
+            public static void SaveBaseGame()
+            {
+                // clear all cache, then populate with only base game blueprints
+                var bpcache = ResourcesLibrary.BlueprintsCache;
+                Clear();
+                foreach (var (guid, load) in bpcache.m_LoadedBlueprints.ToArray())
+                {
+                    if (load.Offset != 0)
+                        Add(load.Blueprint ?? bpcache.Load(guid));
                 }
+
+                // save blueprints guids to binary files
+                Save(Ability, Path.Combine(Main.ModPath, "resources", "Ability.bin"));
+                Save(Activatable, Path.Combine(Main.ModPath, "resources", "Activatable.bin"));
+                Save(Item, Path.Combine(Main.ModPath, "resources", "Item.bin"));
+                Save(Enchantment, Path.Combine(Main.ModPath, "resources", "Enchantment.bin"));
+            }
+
+            public static void Save<T>(List<T> list, string path) where T : SimpleBlueprint
+            {
+                try
+                {
+                    if (File.Exists(path))
+                        File.Delete(path);
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+
+                    using var writer = new BinaryWriter(new FileStream(path, FileMode.CreateNew, FileAccess.Write));
+                    foreach (var bp in list)
+                        writer.Write(bp.AssetGuid.ToByteArray());
+                }
+                catch (Exception e)
+                {
+                    Helper.PrintException(e);
+                }
+            }
+
+            public static void Load<T>(List<T> list, string path) where T : SimpleBlueprint
+            {
+                var bpcache = ResourcesLibrary.BlueprintsCache;
+                var buffer = new byte[16];
+
+                try
+                {
+                    using var reader = new FileStream(path, FileMode.Open, FileAccess.Read);
+                    while (reader.Read(buffer, 0, 16) == 16)
+                    {
+                        if (bpcache.Load(new BlueprintGuid(buffer)) is T bp)
+                        {
+                            if (!list.Contains(bp))
+                                list.Add(bp);
+                            else
+                                Helper.PrintDebug("duplicate blueprint: " + bp.AssetGuid);
+                        }
+                        else
+                            Helper.Print($"wrong guid in {path}");
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Helper.PrintException(e);
+                }
+                // Helper.Print($"loaded {list.Count} {typeof(T).Name}");
             }
 
             //public static void Dispose()

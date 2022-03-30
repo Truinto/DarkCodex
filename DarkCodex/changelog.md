@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.2]
+- added logic to organize ability groups via drag&drop
+- added Dark Elementalist soul power to burn boni
+- added option to dismiss any spell regardless of who casted it (default off)
+- fixed Limitless Arcane Pool not applying to Eldritch Scion
+- fixed Enduring Spells not able to apply to enchantment spells (like Magic Weapon)
+- rewrote blueprint loading, which should fix previous issues with it and still be quite fast
+
 ## [1.2.1.1]
 - removed patchDispelMagic as Destructive Dispel has been fixed in 1.2 update
 - added more patch comments
@@ -16,7 +24,7 @@
 - fixed area effects being invisible after cutscenes
 - fixed loading issue
 - fixed Resourceful Caster causing all spell being broken after some cutscenes
-- improved loading time significantly
+- ~~improved loading time significantly~~ reverted to fix a bug
 - extended ability groups, now accessible via file "DefGroups.json"
 
 ## [1.2.0]

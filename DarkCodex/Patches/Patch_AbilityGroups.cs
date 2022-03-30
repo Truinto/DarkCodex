@@ -16,6 +16,7 @@ using DarkCodex.Components;
 using UniRx;
 using System.IO;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.Blueprints.Facts;
 
 namespace DarkCodex
 {
@@ -23,9 +24,10 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_AbilityGroups
     {
+        public static bool Locked = true;
 
-        public static List<DefGroup> Groups;
-        
+        public static HashSet<DefGroup> Groups;
+
         static Patch_AbilityGroups()
         {
             Reload();
@@ -55,7 +57,7 @@ namespace DarkCodex
                 //CollectFromResource("1633025edc9d53f4691481b48248edd7", "Alchemist Bombs", "", null);
                 //Helper.Serialize(Groups, path: Path.Combine(Main.ModPath, "DefGroups.json"));
 
-                Groups = Helper.Deserialize<List<DefGroup>>(path: Path.Combine(Main.ModPath, "DefGroups.json"));
+                Groups = Helper.Deserialize<HashSet<DefGroup>>(path: Path.Combine(Main.ModPath, "DefGroups.json"));
             }
             catch (Exception e1)
             {
@@ -63,7 +65,7 @@ namespace DarkCodex
                 try
                 {
                     Helper.PrintFile("DefGroups.json", DefaultDef);
-                    Groups = Helper.Deserialize<List<DefGroup>>(value: DefaultDef);
+                    Groups = Helper.Deserialize<HashSet<DefGroup>>(value: DefaultDef);
                 }
                 catch (Exception e2)
                 {
@@ -94,11 +96,44 @@ namespace DarkCodex
                 Groups.Add(group = new(title, description ?? "", icon));
 
             group.Guids.AddRange(guids.Select(s => BlueprintGuid.Parse(s)));
+            Save();
+        }
+
+        public static void RemoveGroup(string title)
+        {
+            Groups.RemoveWhere(w => w.Title == title);
+            Save();
+        }
+
+        public static void Save()
+        {
+            try
+            {
+                Helper.Serialize(Groups, path: Path.Combine(Main.ModPath, "DefGroups.json"));
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+            }
+        }
+
+        public static BlueprintUnitFact GetBlueprint(MechanicActionBarSlot slot)
+        {
+            if (slot is MechanicActionBarSlotActivableAbility act)
+                return act.ActivatableAbility.Blueprint;
+            else if (slot is MechanicActionBarSlotAbility ab)
+                return ab.Ability.Blueprint;
+            return null;
+        }
+
+        public static BlueprintGuid GetGuid(MechanicActionBarSlot slot)
+        {
+            return GetBlueprint(slot)?.AssetGuid ?? BlueprintGuid.Empty;
         }
 
         [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.SetMechanicSlot))]
         [HarmonyPostfix]
-        public static void ShowButton(ActionBarSlotVM __instance)
+        private static void ShowButton(ActionBarSlotVM __instance)
         {
             // makes the unfold button visible
             if (__instance?.MechanicActionBarSlot is MechanicActionBarSlotGroup)
@@ -107,42 +142,37 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.CollectAbilities))]
         [HarmonyPostfix]
-        public static void GroupAbilities(UnitEntityData unit, ActionBarVM __instance)
+        private static void CollectAbilities(UnitEntityData unit, ActionBarVM __instance)
         {
-            var all = new Dictionary<int, List<MechanicActionBarSlot>>();
-
-            for (int i = __instance.GroupAbilities.Count - 1; i >= 0; i--)
+            foreach (var group in Groups)
             {
-                BlueprintGuid guid;
-                var slot = __instance.GroupAbilities[i].MechanicActionBarSlot;
-                if (slot is MechanicActionBarSlotActivableAbility act)
-                    guid = act.ActivatableAbility.Blueprint.AssetGuid;
-                else if (slot is MechanicActionBarSlotAbility ab)
-                    guid = ab.Ability.Blueprint.AssetGuid;
-                else
-                    continue;
+                int hash = group.GetHashCode();
+                var list = new List<MechanicActionBarSlot>();
 
-                int index = Groups.FindIndex(f => f.Guids.Contains(guid));
-                if (index < 0)
-                    continue;
+                // find all abilities that match group and extract them
+                for (int i = __instance.GroupAbilities.Count - 1; i >= 0; i--)
+                {
+                    var slot = __instance.GroupAbilities[i].MechanicActionBarSlot;
+                    BlueprintGuid guid = GetGuid(slot);
+                    if (guid == BlueprintGuid.Empty)
+                        continue;
 
-                if (!all.TryGetValue(index, out var list))
-                    all.Add(index, list = new());
+                    if (group.Guids.Contains(guid))
+                    {
+                        list.Add(slot);
+                        __instance.GroupAbilities.RemoveAt(i);
+                    }
+                }
 
-                list.Add(slot);
-                __instance.GroupAbilities.RemoveAt(i);
-            }
-
-            foreach (var list in all)
-            {
-                // add new toolbar group
-                __instance.GroupAbilities.Add(new ActionBarSlotVM(new MechanicActionBarSlotGroup(unit, list.Key, list.Value)));
+                // add group to actionbar
+                if (list.Count > 0 || !Locked)
+                    __instance.GroupAbilities.Add(new ActionBarSlotVM(new MechanicActionBarSlotGroup(unit, hash, list)));
 
                 // update existing toolbar slots
                 foreach (var slot in __instance.Slots)
                 {
-                    if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group && group.Index == list.Key)
-                        group.Slots = list.Value;
+                    if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic && mechanic.GetHashCode() == hash)
+                        mechanic.Slots = list;
                 }
             }
         }
@@ -150,7 +180,7 @@ namespace DarkCodex
         [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.OnShowConvertRequest))]
         [HarmonyPriority(Priority.VeryHigh)]
         [HarmonyPrefix]
-        public static bool OnShowConvert(ActionBarSlotVM __instance)
+        private static bool OnShowConvert(ActionBarSlotVM __instance)
         {
             if (__instance.MechanicActionBarSlot is not MechanicActionBarSlotGroup group)
                 return true;
@@ -167,7 +197,7 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.OnMainClick))]
         [HarmonyPostfix]
-        public static void OnClick(ActionBarSlotVM __instance)
+        private static void OnClick(ActionBarSlotVM __instance)
         {
             if (__instance.MechanicActionBarSlot is MechanicActionBarSlotGroup)
                 __instance.OnShowConvertRequest();
@@ -175,7 +205,7 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.OnUnitChanged))]
         [HarmonyPrefix]
-        public static void KeepOpen1(ActionBarVM __instance, out int __state)
+        private static void KeepOpen1(ActionBarVM __instance, out int __state)
         {
             __state = -1;
 
@@ -183,7 +213,7 @@ namespace DarkCodex
             {
                 if (slot.ConvertedVm?.Value != null && slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group)
                 {
-                    __state = group.Index;
+                    __state = group.GetHashCode();
                     break;
                 }
             }
@@ -191,14 +221,14 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.OnUnitChanged))]
         [HarmonyPostfix]
-        public static void KeepOpen2(ActionBarVM __instance, int __state)
+        private static void KeepOpen2(ActionBarVM __instance, int __state)
         {
             if (__state < 0)
                 return;
 
             foreach (var slot in __instance.Slots)
             {
-                if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group && group.Index == __state)
+                if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup group && group.GetHashCode() == __state)
                 {
                     Helper.PrintDebug("reopend OnShowConvertRequest after refresh");
                     slot.OnShowConvertRequest();
@@ -207,9 +237,68 @@ namespace DarkCodex
             }
         }
 
+        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.MoveSlot))]
+        [HarmonyPostfix]
+        private static void DragAndDrop(ActionBarSlotVM sourceSlotVM, ActionBarSlotVM targetSlotVM)
+        {
+            if (Locked)
+                return;
+
+            if (targetSlotVM.Index == -1)
+            {
+                if (targetSlotVM.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // add to group
+                {
+                    mechanic.AddToGroup(sourceSlotVM.MechanicActionBarSlot);
+                }
+                else
+                {
+                    var source = GetBlueprint(sourceSlotVM.MechanicActionBarSlot);
+                    var target = GetBlueprint(targetSlotVM.MechanicActionBarSlot);
+
+                    if (source != null && target != null)
+                    {
+                        Helper.ShowInputBox("Create new group: ", onOK: a => AddGroup(a, "", null, source.AssetGuid.ToString(), target.AssetGuid.ToString()));
+                    }
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.ClearSlot))]
+        private static void DragClear(ActionBarSlotVM viewModel, ActionBarVM __instance)
+        {
+            if (Locked)
+                return;
+
+            if (__instance.SelectedUnitValue == null
+                || __instance.SelectedUnitValue != viewModel.MechanicActionBarSlot?.Unit)
+                return;
+
+            if (viewModel.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic3)
+            {
+                Helper.ShowMessageBox("Remove group?", onYes: () => RemoveGroup(mechanic3.GetTitle()));
+                return;
+            }
+
+            // find parent and remove from that group
+            foreach (var slot in __instance.GroupAbilities)
+            {
+                if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic)
+                {
+                    var mechanic2 = mechanic.Slots.FirstOrDefault(a => ReferenceEquals(a, viewModel.MechanicActionBarSlot));
+                    if (mechanic2 != null)
+                    {
+                        mechanic.RemoveFromGroup(mechanic2);
+                        break;
+                    }
+                }
+            }
+        }
+
         public class MechanicActionBarSlotGroup : MechanicActionBarSlot
         {
-            public int Index;
+            //public int Index;
+            [JsonProperty]
+            private int hash;
             [JsonProperty]
             public List<MechanicActionBarSlot> Slots;
 
@@ -218,36 +307,79 @@ namespace DarkCodex
             {
                 this.Slots = slots;
 
+                if (this.hash != 0)
+                    return;
+
                 // find and set Index
-                var guid = BlueprintGuid.Empty;
                 var slot = this.Slots.FirstOrDefault();
-                if (slot is MechanicActionBarSlotActivableAbility act)
-                    guid = act.ActivatableAbility.Blueprint.AssetGuid;
-                else if (slot is MechanicActionBarSlotAbility ab)
-                    guid = ab.Ability.Blueprint.AssetGuid;
+                var guid = GetGuid(slot);
                 if (guid != BlueprintGuid.Empty)
-                    this.Index = Groups.FindIndex(f => f.Guids.Contains(guid));
-                else
-                    this.Index = -1;
+                    this.hash = Groups.FindOrDefault(f => f.Guids.Contains(guid))?.GetHashCode() ?? 0;
             }
 
-            public MechanicActionBarSlotGroup(UnitEntityData unit, int index, List<MechanicActionBarSlot> slots)
+            public MechanicActionBarSlotGroup(UnitEntityData unit, int hash, List<MechanicActionBarSlot> slots)
             {
                 this.Unit = unit;
-                this.Index = index;
-                this.Slots = slots;
+                this.hash = hash;
+                this.Slots = slots ?? new();
             }
+
+            public void AddToGroup(MechanicActionBarSlot mechanic)
+            {
+                if (mechanic == null)
+                    return;
+                var guid = GetGuid(mechanic);
+                if (guid != BlueprintGuid.Empty && CanAddGroup(guid))
+                {
+                    Slots.Add(mechanic);
+                    Group?.Guids?.Add(guid);
+                    Save();
+                }
+            }
+
+            public void RemoveFromGroup(MechanicActionBarSlot mechanic)
+            {
+                if (mechanic == null)
+                    return;
+                var guid = GetGuid(mechanic);
+                if (guid != BlueprintGuid.Empty)
+                {
+                    Slots.Remove(mechanic);
+                    Group?.Guids?.Remove(guid);
+                    Save();
+                }
+            }
+
+            public bool CanAddGroup(BlueprintGuid guid)
+            {
+                return Group?.Guids?.Contains(guid) == false;
+            }
+
+            public override int GetHashCode()
+            {
+                return hash;
+            }
+
+            public DefGroup Group => Groups.FindOrDefault(w => w.GetHashCode() == this.hash);
 
             public override bool CanUseIfTurnBasedInternal() => true;
             public override object GetContentData() => this;
             public override Color GetDecorationColor() => default; //new Color(0f, 0f, 0f, 0f);
             public override Sprite GetDecorationSprite() => null;
-            public override string GetTitle() => Groups.ElementAtOrDefault(this.Index)?.Title;
-            public override string GetDescription() => Groups.ElementAtOrDefault(this.Index)?.Description;
+            public override string GetTitle()
+            {
+                return Group?.Title;
+            }
+
+            public override string GetDescription()
+            {
+                return Group?.Description;
+            }
+
             public override Sprite GetIcon()
             {
-                return Groups.ElementAtOrDefault(this.Index)?.GetIcon() 
-                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon() 
+                return Group?.GetIcon()
+                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon()
                     ?? Slots.FirstOrDefault()?.GetIcon();
             }
 
@@ -278,7 +410,7 @@ namespace DarkCodex
                     slot.ActiveMark.gameObject.SetActive(true);
                 }
             }
-            public override bool IsBad() => Index < 0; // use this to remove invalid entries
+            public override bool IsBad() => hash <= 0; // use this to remove invalid entries
 
             public override TooltipBaseTemplate GetTooltipTemplate()
             {
@@ -286,17 +418,16 @@ namespace DarkCodex
                 string description = "";
                 Sprite icon = null;
 
-                var info = Groups.ElementAtOrDefault(this.Index);
-                if (info != null)
+                var group = Group;
+                if (group != null)
                 {
-                    title = info.Title;
-                    description = info.Description;
-                    icon = info.GetIcon();
+                    title = group.Title;
+                    description = group.Description;
+                    icon = group.GetIcon();
                 }
 
                 return new TooltipTemplateDataProvider(new UIData(title, description, icon));
             }
-
         }
 
         public class ActionBarConvertedActivableVM : ActionBarConvertedVM
@@ -308,7 +439,7 @@ namespace DarkCodex
             }
         }
 
-        public class DefGroup
+        public class DefGroup : IEquatable<DefGroup>, IEquatable<string>
         {
             [JsonProperty]
             public string Title;
@@ -320,6 +451,16 @@ namespace DarkCodex
             public HashSet<BlueprintGuid> Guids;
 
             private Sprite m_Icon;
+            private int hash;
+
+            public DefGroup(string title, string description, string icon, params string[] guids)
+            {
+                this.Title = title;
+                this.Description = description;
+                this.Icon = icon;
+                this.Guids = guids.Select(s => BlueprintGuid.Parse(s)).ToHashSet();
+                this.hash = title.GetHashCode();
+            }
 
             public Sprite GetIcon()
             {
@@ -328,12 +469,18 @@ namespace DarkCodex
                 return m_Icon;
             }
 
-            public DefGroup(string title, string description, string icon, params string[] guids)
+            public override int GetHashCode()
             {
-                this.Title = title;
-                this.Description = description;
-                this.Icon = icon;
-                this.Guids = guids.Select(s => BlueprintGuid.Parse(s)).ToHashSet();
+                return hash;
+            }
+
+            public bool Equals(DefGroup other)
+            {
+                return this.Title == other.Title;
+            }
+            public bool Equals(string other)
+            {
+                return this.Title == other;
             }
         }
 

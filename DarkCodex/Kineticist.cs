@@ -32,17 +32,12 @@ using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.ResourceLinks;
 using Kingmaker.Blueprints.Facts;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
-using Kingmaker.Blueprints.Items.Weapons;
 using Newtonsoft.Json;
 using System.IO;
 using Kingmaker;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using System.Reflection;
-using Kingmaker.UnitLogic;
-using Kingmaker.EntitySystem.Entities;
-using Kingmaker.Items.Slots;
-using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using UnityEngine;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
@@ -50,10 +45,7 @@ using Kingmaker.Localization;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.Blueprints.Root;
-using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
 using Kingmaker.RuleSystem.Rules;
-using Kingmaker.Items;
-using Kingmaker.Blueprints.Items.Armors;
 using JetBrains.Annotations;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.JsonSystem;
@@ -1000,227 +992,6 @@ namespace DarkCodex
         #endregion
     }
 
-    #region Patches
-
-    [PatchInfo(Severity.Harmony, "Patch: Enveloping Winds Cap", "removes 50% evasion cap for Hurricane Queen", false)]
-    [HarmonyPatch(typeof(MissChance), nameof(MissChance.ClampMissChance))]
-    public class Patch_EnvelopingWindsCap
-    {
-        //this.MissChance = Math.Min(50, Math.Max(this.MissChance, value));
-        public static bool Prefix(int missChance, ref int __result)
-        {
-            __result = Math.Min(100, missChance);
-            return false;
-        }
-    }
-
-    [PatchInfo(Severity.Harmony, "Patch: Fix Polymorph Gather", "makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade", false)]
-    [HarmonyPatch]
-    public class Patch_FixPolymorphGather
-    {
-        [HarmonyPatch(typeof(RestrictionCanGatherPower), nameof(RestrictionCanGatherPower.IsAvailable))]
-        [HarmonyPrefix]
-        public static bool Prefix1(RestrictionCanGatherPower __instance, ref bool __result)
-        {
-            UnitPartKineticist unitPartKineticist = __instance.Owner.Get<UnitPartKineticist>();
-            if (!unitPartKineticist)
-            {
-                __result = false;
-                return false;
-            }
-            UnitBody body = __instance.Owner.Body;
-            if (body.PrimaryHand.MaybeItem is ItemEntityWeapon weapon
-                && !weapon.IsMonkUnarmedStrike
-                && (weapon == null || weapon.Blueprint.Category != WeaponCategory.KineticBlast))
-            {
-                __result = false;
-                return false;
-            }
-            ItemEntity weapon2 = body.SecondaryHand.MaybeItem;
-            if (weapon2 != null)
-            {
-                ArmorProficiencyGroup? armorProficiencyGroup = body.SecondaryHand.MaybeShield?.Blueprint.Type.ProficiencyGroup;
-                if (armorProficiencyGroup != null)
-                {
-                    if (!(armorProficiencyGroup.GetValueOrDefault() == ArmorProficiencyGroup.TowerShield & armorProficiencyGroup != null))
-                    {
-                        __result = unitPartKineticist.CanGatherPowerWithShield;
-                        return false;
-                    }
-                }
-                __result = false;
-                return false;
-            }
-            __result = true;
-            return false;
-        }
-
-        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[0])]
-        [HarmonyPrefix]
-        public static bool Prefix2(RestrictionCanUseKineticBlade __instance, ref bool __result)
-        {
-            var unit = __instance.Owner;
-            var body = unit.Body;
-            if (body.IsPolymorphed && !body.IsPolymorphKeepSlots || !body.HandsAreEnabled)
-            {
-                __result = false;
-                return false;
-            }
-            UnitPartKineticist unitPartKineticist = unit.Get<UnitPartKineticist>();
-            if (!unitPartKineticist)
-            {
-                __result = false;
-                return false;
-            }
-            ItemEntityWeapon maybeWeapon = body.PrimaryHand.MaybeWeapon;
-            BlueprintItemWeapon blueprintItemWeapon = maybeWeapon?.Blueprint;
-            bool flag = blueprintItemWeapon.GetComponent<WeaponKineticBlade>() != null;
-            if (body.PrimaryHand.MaybeItem != null && !flag)
-            {
-                __result = false;
-                return false;
-            }
-            AddKineticistBlade addKineticistBlade = __instance.Fact.Blueprint.Buff.GetComponent<AddKineticistBlade>().Or(null);
-            BlueprintItemWeapon blueprintItemWeapon2 = addKineticistBlade?.Blade;
-            if (blueprintItemWeapon2 == null)
-            {
-                __result = false;
-                return false;
-            }
-            if (blueprintItemWeapon != blueprintItemWeapon2 || !unitPartKineticist.IsBladeActivated)
-            {
-                WeaponKineticBlade weaponKineticBlade = blueprintItemWeapon2.GetComponent<WeaponKineticBlade>().Or(null);
-                KineticistAbilityBurnCost? kineticistAbilityBurnCost = null;
-                if (((AbilityKineticist.CalculateAbilityBurnCost(weaponKineticBlade?.GetActivationAbility(unit)) != null) ? kineticistAbilityBurnCost.GetValueOrDefault().Total : 0) > unitPartKineticist.LeftBurnThisRound)
-                {
-                    __result = false;
-                    return false;
-                }
-            }
-            __result = true;
-            return false;
-        }
-    }
-
-    [PatchInfo(Severity.Harmony, "Patch: True Gather Power Level", "Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost.\nPatched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.", false)]
-    [HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryApplyGatherPower))]
-    public class Patch_TrueGatherPowerLevel
-    {
-        public static BlueprintBuff buff1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e6b8b31e1f8c524458dc62e8a763cfb1");
-        public static BlueprintBuff buff2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("3a2bfdc8bf74c5c4aafb97591f6e4282");
-        public static BlueprintBuff buff3 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("82eb0c274eddd8849bb89a8e6dbc65f8");
-
-        public static bool Prefix(UnitPartKineticist kineticist, BlueprintAbility abilityBlueprint, ref KineticistAbilityBurnCost cost)
-        {
-            if (kineticist == null || abilityBlueprint.GetComponent<AbilityKineticist>() == null || kineticist.GatherPowerAbility == null)
-                return false;
-
-            int buffRank = kineticist.TargetGatherPowerRank; // get the target power rank
-
-            // check if stronger buff exists and if so apply it instead
-            if (buffRank < 1 && kineticist.Owner.Buffs.GetBuff(buff1) != null)
-                buffRank = 1;
-            else if (buffRank < 2 && kineticist.Owner.Buffs.GetBuff(buff2) != null)
-                buffRank = 2;
-            else if (buffRank < 3 && kineticist.Owner.Buffs.GetBuff(buff3) != null)
-                buffRank = 3;
-
-            int value = KineticistUtils.CalculateGatherPowerBonus(kineticist.GatherPowerBaseValue, buffRank); // add increase from Supercharge
-
-            cost.IncreaseGatherPower(value); // apply value
-
-            return false;
-        }
-    }
-
-    [PatchInfo(Severity.Harmony, "Patch: Kineticist Allow Opportunity Attack", "allows Attack of Opportunities with anything but standard Kinetic Blade; so that Kinetic Whip works; also allows natural attacks to be used, if Whip isn't available", false)]
-    [HarmonyPatch]
-    public class Patch_KineticistAllowOpportunityAttack
-    {
-        private static BlueprintGuid blade_p = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
-        private static BlueprintGuid blade_e = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0"); //KineticBlastEnergyBlade
-
-        [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
-        [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
-        {
-            List<CodeInstruction> list = instr.ToList();
-            var original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].Calls(original))
-                {
-                    Helper.PrintDebug("Patched at " + i);
-                    list[i] = CodeInstruction.Call(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
-                }
-            }
-
-            return list;
-        }
-        public static void NullReplacement(UnitState state, UnitCondition condition, Buff sourceBuff, UnitConditionExceptions exceptions)
-        {
-        }
-
-        [HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
-        [HarmonyPrefix]
-        public static bool Prefix2(UnitEntityData unit, WeaponSlot hand, ref bool __result)
-        {
-            if (!hand.HasWeapon)
-                __result = false;
-
-            else if (!hand.Weapon.Blueprint.IsMelee && !unit.State.Features.SnapShot)
-                __result = false;
-
-            else if (hand.Weapon.Blueprint.IsUnarmed && !unit.Descriptor.State.Features.ImprovedUnarmedStrike)
-                __result = false;
-
-            else if ((hand.Weapon.Blueprint.Type.AssetGuid == blade_p || hand.Weapon.Blueprint.Type.AssetGuid == blade_e)
-                     && unit.Buffs.GetBuff(Resource.Cache.BuffKineticWhip) == null)
-                __result = false;
-
-            else
-                __result = true;
-
-            return false;
-        }
-
-    }
-
-    [PatchInfo(Severity.Harmony, "Patch: AOE Attack Rolls", "allows Impale Infusion and other AOE attacks to roll once for all", false)]
-    [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
-    public class Patch_AOEAttackRolls
-    {
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
-        {
-            var line = instr.ToList();
-            var original1 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.D20));
-            var original2 = AccessTools.PropertyGetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.CriticalConfirmationD20));
-
-            for (int i = 0; i < line.Count; i++)
-            {
-                if (line[i].Calls(original1))
-                    line[i].ReplaceCall(typeof(Patch_AOEAttackRolls), nameof(SetD20));
-                else if(line[i].Calls(original2))
-                    line[i].ReplaceCall(typeof(Patch_AOEAttackRolls), nameof(SetD20Crit));
-            }
-
-            return line;
-        }
-
-        public static void SetD20(RuleAttackRoll instance, RuleRollD20 d20)
-        {
-            if (instance.D20 == null)
-                instance.D20 = d20;
-        }
-
-        public static void SetD20Crit(RuleAttackRoll instance, RuleRollD20 d20)
-        {
-            if (instance.D20 == null)
-                instance.CriticalConfirmationD20 = d20;
-        }
-    }
-
     //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]
     //public class Patch_KineticistWhipReach
     //{
@@ -1233,7 +1004,4 @@ namespace DarkCodex
     //        cmd.ApproachRadius += 5f * 0.3048f;
     //    }
     //}
-
-    #endregion
-
 }

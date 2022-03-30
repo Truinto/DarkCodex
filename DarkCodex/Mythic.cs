@@ -6,29 +6,23 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
-using Kingmaker.Controllers;
 using Kingmaker.Craft;
 using Kingmaker.Designers.Mechanics.Facts;
-using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.GameModes;
 using Kingmaker.RuleSystem;
-using Kingmaker.RuleSystem.Rules;
-using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UI.Log.CombatLog_ThreadSystem;
 using Kingmaker.UI.MVVM;
 using Kingmaker.UI.MVVM._VM.CombatLog;
 using Kingmaker.UI.MVVM._VM.InGame;
 using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
-using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
-using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics.Components;
@@ -179,6 +173,7 @@ namespace DarkCodex
         public static void CreateLimitlessArcanePool()
         {
             var arcane_resource = BlueprintGuid.Parse("effc3e386331f864e9e06d19dc218b37");
+            var arcane_resourceEldritch = BlueprintGuid.Parse("17b6158d363e4844fa073483eb2655f8");
             var abundant_arcane = Helper.ToRef<BlueprintFeatureReference>("8acebba92ada26043873cae5b92cef7b"); //AbundantArcanePool
 
             var limitless = Helper.CreateBlueprintFeature(
@@ -192,6 +187,7 @@ namespace DarkCodex
                 );
 
             SetResourceDecreasing(arcane_resource, limitless.ToRef2(), true);
+            SetResourceDecreasing(arcane_resourceEldritch, limitless.ToRef2(), true);
 
             Helper.AddMythicTalent(limitless);
         }
@@ -668,16 +664,12 @@ namespace DarkCodex
             ability.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(fact);
         }
 
-        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, fix description", true)]
+        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport", true)]
         public static void PatchVarious()
         {
             // allow quicken metamagic on demon teleport
             ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
                 .AvailableMetamagic |= Metamagic.Quicken;
-
-            // update Always A Chance description
-            ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("d57301613ad6a5140b2fdac40fa368e3") //AlwaysAChance
-                .m_Description = Helper.CreateString("You automatically succeed when you roll a natural 1."); // todo: make own patch!
         }
 
         #region Helper
@@ -721,232 +713,5 @@ namespace DarkCodex
         }
 
         #endregion
-
     }
-
-    #region Patches
-
-    [PatchInfo(Severity.Harmony, "Patch: Always A Chance", "Always A Chance succeeds on a natural one and applies to most d20 rolls", true)]
-    [HarmonyPatch]
-    public class Patch_AlwaysAChance
-    {
-        // OvertipViewPartCombatText.OnCombatMessage
-        // UICombatTexts.GetTbmCombatText
-
-        [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.IsSuccessRoll))]
-        [HarmonyPostfix]
-        public static void Postfix(int d20, RuleAttackRoll __instance, ref bool __result)
-        {
-            __result = __result || (d20 == 1 && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
-        }
-
-        [HarmonyPatch(typeof(RuleCombatManeuver), nameof(RuleCombatManeuver.IsSuccessRoll))]
-        [HarmonyPostfix]
-        public static void Postfix2(int d20, RuleCombatManeuver __instance, ref bool __result)
-        {
-            __result = __result || d20 == 20 || (d20 == 1 && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
-        }
-
-        [HarmonyPatch(typeof(RuleDispelMagic), nameof(RuleDispelMagic.IsSuccessRoll))]
-        [HarmonyPostfix]
-        public static void Postfix3(int d20, RuleDispelMagic __instance, ref bool __result)
-        {
-            __result = __result || d20 == 20 || (d20 == 1 && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
-        }
-
-        [HarmonyPatch(typeof(RuleSkillCheck), nameof(RuleSkillCheck.IsSuccessRoll))]
-        [HarmonyPostfix]
-        public static void Postfix4(int d20, RuleSkillCheck __instance, ref bool __result)
-        {
-            __result = __result || d20 == 20 || (d20 == 1 && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
-        }
-
-        [HarmonyPatch(typeof(RuleSavingThrow), nameof(RuleSavingThrow.IsSuccessRoll))]
-        [HarmonyPostfix]
-        public static void Postfix5(int d20, RuleSavingThrow __instance, ref bool __result)
-        {
-            __result = __result || (d20 == 1 && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
-        }
-    }
-
-    [PatchInfo(Severity.Harmony, "Patch: Resourceful Caster", "patches for Resourceful Caster", true)]
-    [HarmonyPatch]
-    public class Patch_ResourcefulCaster
-    {
-
-        [HarmonyPatch(typeof(RuleCastSpell), nameof(RuleCastSpell.ShouldSpendResource), MethodType.Getter)]
-        [HarmonyPostfix]
-        public static void Postfix1(RuleCastSpell __instance, ref bool __result) // arcane spell failure
-        {
-            try
-            {
-                if (__result == false)
-                    return;
-
-                if (__instance.Initiator == null)
-                    return;
-
-                if (!__instance.IsSpellFailed && !__instance.IsArcaneSpellFailed)
-                    return;
-
-                if (__instance.Initiator.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
-                    __result = false;
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.FailIfConcentrationCheckFailed))]
-        [HarmonyPrefix]
-        public static bool Prefix2(UnitUseAbility __instance, ref bool __result) // concentration failed
-        {
-            try
-            {
-                if (__instance.Executor == null
-                    || !__instance.Executor.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
-                    return true;
-
-                if (__instance.ConcentrationCheckFailed)
-                {
-                    __instance.SpawnInterruptFx();
-                    __instance.ForceFinish(UnitCommand.ResultType.Fail);
-                    if (__instance.AiAction != null)
-                        __instance.Executor.CombatState.AIData.UseAction(__instance.AiAction, __instance);
-                }
-                __result = __instance.ConcentrationCheckFailed;
-                return false;
-            }
-            catch (Exception)
-            {
-                return true;
-            }
-        }
-
-        public static List<UnitEntityData> unitsSpellNotResisted = new();
-        [HarmonyPatch(typeof(AbilityExecutionProcess), nameof(AbilityExecutionProcess.Tick))]
-        [HarmonyPostfix]
-        public static void Postfix3(AbilityExecutionProcess __instance) // all targets resisted
-        {
-            try
-            {
-                if (!__instance.IsEnded)
-                    return;
-
-                if (__instance.Context?.MaybeCaster == null)
-                    return;
-
-                Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster.CharacterName}");
-                if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
-                    return;
-                if (__instance.Context.IsDuplicateSpellApplied)
-                    return;
-                var spell = __instance.Context.Ability;
-                if (spell == null)
-                    return;
-                var spellbook = spell.Spellbook;
-                if (spellbook == null)
-                    return;
-                if (__instance.Context.RulebookContext == null)
-                    return;
-
-                bool hasSaves = false;
-                bool allSavesPassed = true;
-                unitsSpellNotResisted.Clear();
-                foreach (var rule in __instance.Context.RulebookContext.AllEvents)
-                {
-                    if (rule is RuleSpellResistanceCheck resistance)
-                    {
-                        Helper.PrintDebug($" -SR {resistance.Target}");
-                        hasSaves = true;
-                        if (!resistance.IsSpellResisted)
-                        {
-                            unitsSpellNotResisted.Add(resistance.Target);
-                        }
-                    }
-
-                    else if (rule is RuleSavingThrow save)
-                    {
-                        Helper.PrintDebug($" -{save.Type} Save {save.Initiator}");
-                        hasSaves = true;
-                        if (save.IsPassed)
-                        {
-                            unitsSpellNotResisted.Remove(save.Initiator);
-                        }
-                        else
-                        {
-                            allSavesPassed = false;
-#if !DEBUG
-                        break;
-#endif
-                        }
-                    }
-
-                    //else Helper.PrintDebug(" -" + rule.GetType().FullName);
-                }
-
-                if (hasSaves && allSavesPassed && unitsSpellNotResisted.Count == 0)
-                {
-                    // refund spell if all targets resisted
-                    spell = spell.ConvertedFrom ?? spell;
-
-                    Helper.PrintDebug("Refunding spell");
-                    Resource.Log.Print($"{__instance.Context.Caster.CharacterName} regained {spell.Name}");
-
-                    int level = spellbook.GetSpellLevel(spell);
-                    if (spellbook.Blueprint.Spontaneous)
-                    {
-                        if (level > 0)
-                            spellbook.m_SpontaneousSlots[level]++;
-                    }
-                    else
-                    {
-                        foreach (var slot in spellbook.m_MemorizedSpells[level])
-                        {
-                            if (!slot.Available && slot.Spell == spell)
-                            {
-                                slot.Available = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        [HarmonyPatch(typeof(RuleSpellResistanceCheck), nameof(RuleSpellResistanceCheck.OnTrigger))]
-        [HarmonyPostfix]
-        public static void Postfix4(RuleSpellResistanceCheck __instance) // push SR checks into history
-        {
-            try
-            {
-                __instance.Context?.SourceAbilityContext?.RulebookContext?.m_AllEvents?.Add(__instance);
-                Helper.PrintDebug("added SR check to stack");
-            }
-            catch (Exception)
-            {
-            }
-        }
-    }
-
-    [PatchInfo(Severity.Harmony, "Patch: Magic Item Adept", "patches for Magic Item Adept", true)]
-    [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetParamsFromItem))]
-    public class Patch_MagicItemAdept
-    {
-        public static void Postfix(AbilityData __instance, AbilityParams __result)
-        {
-            if (__instance.Caster == null)
-                return;
-
-            if (!__instance.Caster.Unit.Descriptor.HasFact(Resource.Cache.FeatureMagicItemAdept))
-                return;
-
-            __result.CasterLevel = __instance.Caster.Progression.CharacterLevel;
-        }
-    }
-
-    #endregion
 }

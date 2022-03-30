@@ -28,6 +28,7 @@ namespace DarkCodex
         public int Priority;    // 400 = normal, 300 = late, 500 = early, 200 = after other mods; currently only informative
         public string Class;
         public string Method;
+        public int Hash;
         public bool Disabled;
         public bool DisabledAll;
 
@@ -37,6 +38,7 @@ namespace DarkCodex
         public bool IsHarmony => (PatchType & Severity.Harmony) > 0;
         public bool IsEvent => (PatchType & Severity.Event) > 0;
         public bool IsHidden => (PatchType & Severity.Hidden) > 0;
+        public bool IsDefaultOff => (PatchType & Severity.DefaultOff) > 0;
 
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";
         public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : ":heavy_check_mark:";
@@ -79,5 +81,6 @@ namespace DarkCodex
         WIP = 256,
         Faulty = 512,
         Hidden = 1024,
+        DefaultOff = 2048,
     }
 }

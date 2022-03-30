@@ -92,6 +92,7 @@
     <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
+    <Compile Include="Patches\Patch_LoadBlueprints.cs" />
     <Compile Include="Patches\Patch_Prebuilds.cs" />
     <Compile Include="Patches\Patch_AllowAchievements.cs" />
     <Compile Include="Patches\Patch_AbilityGroups.cs" />
@@ -106,6 +107,15 @@
     <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
     <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
     <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
+    <Compile Include="Patches\Patch_AlwaysAChance.cs" />
+    <Compile Include="Patches\Patch_MagicItemAdept.cs" />
+    <Compile Include="Patches\Patch_ResourcefulCaster.cs" />
+    <Compile Include="Patches\Patch_FeralCombat.cs" />
+    <Compile Include="Patches\Patch_AOEAttackRolls.cs" />
+    <Compile Include="Patches\Patch_EnvelopingWindsCap.cs" />
+    <Compile Include="Patches\Patch_FixPolymorphGather.cs" />
+    <Compile Include="Patches\Patch_KineticistAllowOpportunityAttack.cs" />
+    <Compile Include="Patches\Patch_TrueGatherPowerLevel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ranger.cs" />
     <Compile Include="Resources.cs" />
