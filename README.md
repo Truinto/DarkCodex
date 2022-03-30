@@ -30,6 +30,7 @@ Content
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
 |General.PatchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:house:|:heavy_check_mark:|
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
+|General.PatchDismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|
 |General.PatchHideBuffs|unclogs UI by hidding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
 |Hexcrafter.FixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
@@ -81,11 +82,12 @@ Content
 |Mythic.PatchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:house:|:heavy_check_mark:|
 |Mythic.PatchRangingShots|doesn't get weaker when hitting|:house:|:construction:|
 |Mythic.PatchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:house:|:heavy_check_mark:|
-|Mythic.PatchVarious|allow quicken on Demon Teleport, fix description|:house:|:heavy_check_mark:|
+|Mythic.PatchVarious|allow quicken on Demon Teleport|:house:|:heavy_check_mark:|
 |Mythic.PatchWanderingHex|can swap hex at will|:house:|:construction:|
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
+|Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
 |Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:construction:|
 |Witch.CreateCackleActivatable|Cackle/Chant can be toggled to use move action passively|:house:|:heavy_check_mark:|
 |Witch.CreateExtraHex|basic feat: Extra Hex|:book:|:heavy_check_mark:|
@@ -101,8 +103,9 @@ Content
 |Patch.Patch_AllowAchievements|clears the 'has used mods before' flag and also pretends that no mods are active|:book:|:heavy_check_mark:|
 |Patch.Patch_AlwaysAChance|Always A Chance succeeds on a natural one and applies to most d20 rolls|:house:|:heavy_check_mark:|
 |Patch.Patch_AOEAttackRolls|allows Impale Infusion and other AOE attacks to roll once for all|:book:|:heavy_check_mark:|
+|Patch.Patch_DarkElementalistBurn|for Wild Talents your current amount of burn includes the number of successful Soul Power uses|:house:|:heavy_check_mark:|
 |Patch.Patch_DebugReport|fixes error log crashes due to unnamed components|:book:|:heavy_check_mark:|
-|Patch.Patch_EnduringSpells|allows Enduring Spell to apply to spells from any source|:book:|:heavy_check_mark:|
+|Patch.Patch_EnduringSpells|allows Enduring Spell to apply to spells from any source; fix for Magic Weapon|:book:|:heavy_check_mark:|
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
 |Patch.Patch_FeralCombat|collection of patches for Feral Combat Training|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaDoubleDamage|fixes area effects triggering twice when cast|:book:|:heavy_check_mark:|
