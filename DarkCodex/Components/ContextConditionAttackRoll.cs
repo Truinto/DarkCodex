@@ -46,7 +46,7 @@ namespace DarkCodex.Components
                 //Helper.PrintDebug("successive attack roll");
                 var attack2 = new RuleAttackRoll(this.Context.MaybeCaster, this.Target.Unit, weapon, 0);
                 attack2.DoNotProvokeAttacksOfOpportunity = true;
-                attack2.D20 = this.AbilityContext.AttackRoll.D20;
+                attack2.D20 = this.AbilityContext.AttackRoll?.D20;
                 //attack2.CriticalConfirmationD20 = this.AbilityContext.AttackRoll.CriticalConfirmationD20;
                 this.Context.TriggerRule(attack2);
 

@@ -1,7 +1,10 @@
 # Changelog
 
+## [1.2.3]
+- fixed Arcane Weapon buff not getting replaced on cast
+- fixed ability group not showing up
+
 ## [1.2.2]
-- added logic to organize ability groups via drag&drop
 - added Dark Elementalist soul power to burn boni
 - added option to dismiss any spell regardless of who casted it (default off)
 - fixed Limitless Arcane Pool not applying to Eldritch Scion

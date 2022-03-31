@@ -101,26 +101,25 @@ namespace DarkCodex
                         Helper.PrintDebug($" -SR {resistance.Target}");
                         hasSaves = true;
                         if (!resistance.IsSpellResisted)
-                        {
                             unitsSpellNotResisted.Add(resistance.Target);
-                        }
                     }
 
-                    else if (rule is RuleSavingThrow save)
+                    else if (rule is RuleSavingThrow save) // this works if Context.TriggerRule is used
                     {
                         Helper.PrintDebug($" -{save.Type} Save {save.Initiator}");
                         hasSaves = true;
                         if (save.IsPassed)
-                        {
                             unitsSpellNotResisted.Remove(save.Initiator);
-                        }
                         else
                         {
                             allSavesPassed = false;
-#if !DEBUG
-                        break;
-#endif
+                            break;
                         }
+                    }
+
+                    else if (rule is RuleDispelMagic dispel) // TODO: add dispel checks
+                    {
+
                     }
 
                     //else Helper.PrintDebug(" -" + rule.GetType().FullName);

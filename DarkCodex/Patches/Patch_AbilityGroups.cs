@@ -17,6 +17,7 @@ using UniRx;
 using System.IO;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.Blueprints.Facts;
+using Kingmaker.EntitySystem;
 
 namespace DarkCodex
 {
@@ -64,8 +65,8 @@ namespace DarkCodex
                 Helper.PrintException(e1);
                 try
                 {
-                    Helper.PrintFile("DefGroups.json", DefaultDef);
                     Groups = Helper.Deserialize<HashSet<DefGroup>>(value: DefaultDef);
+                    Save();
                 }
                 catch (Exception e2)
                 {
@@ -91,7 +92,7 @@ namespace DarkCodex
             if (title == null)
                 return;
 
-            var group = Groups.FirstOrDefault(f => f.Title == title);
+            var group = Groups.FindOrDefault(f => f.Title == title);
             if (group == null)
                 Groups.Add(group = new(title, description ?? "", icon));
 
@@ -174,6 +175,8 @@ namespace DarkCodex
                     if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic && mechanic.GetHashCode() == hash)
                         mechanic.Slots = list;
                 }
+
+                Helper.PrintDebug($"CollectAbilities Hash={hash} Title={group.Title} LCount={list.Count}");
             }
         }
 
@@ -223,7 +226,7 @@ namespace DarkCodex
         [HarmonyPostfix]
         private static void KeepOpen2(ActionBarVM __instance, int __state)
         {
-            if (__state < 0)
+            if (__state <= 0)
                 return;
 
             foreach (var slot in __instance.Slots)
@@ -241,12 +244,15 @@ namespace DarkCodex
         [HarmonyPostfix]
         private static void DragAndDrop(ActionBarSlotVM sourceSlotVM, ActionBarSlotVM targetSlotVM)
         {
+            Helper.PrintDebug($"MoveSlot: source slot={sourceSlotVM.MechanicActionBarSlot.GetType().Name} at {sourceSlotVM.Index} target slot={sourceSlotVM.MechanicActionBarSlot.GetType().Name} at {targetSlotVM.Index}");
+            // TODO: this isn't triggered inside the ability tab!
+
             if (Locked)
                 return;
-
-            if (targetSlotVM.Index == -1)
+                        
+            if (targetSlotVM.Index == -1 && sourceSlotVM.Index == -1) // if both are in the abilities tab
             {
-                if (targetSlotVM.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // add to group
+                if (targetSlotVM.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // if the target is a group, try add source
                 {
                     mechanic.AddToGroup(sourceSlotVM.MechanicActionBarSlot);
                 }
@@ -255,7 +261,7 @@ namespace DarkCodex
                     var source = GetBlueprint(sourceSlotVM.MechanicActionBarSlot);
                     var target = GetBlueprint(targetSlotVM.MechanicActionBarSlot);
 
-                    if (source != null && target != null)
+                    if (source != null && target != null) // if both are abilities make a new group; prompts to get title
                     {
                         Helper.ShowInputBox("Create new group: ", onOK: a => AddGroup(a, "", null, source.AssetGuid.ToString(), target.AssetGuid.ToString()));
                     }
@@ -266,6 +272,8 @@ namespace DarkCodex
         [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.ClearSlot))]
         private static void DragClear(ActionBarSlotVM viewModel, ActionBarVM __instance)
         {
+            Helper.PrintDebug($"ClearSlot: slot={viewModel.MechanicActionBarSlot.GetType().Name} at {viewModel.Index}");
+
             if (Locked)
                 return;
 
@@ -273,13 +281,13 @@ namespace DarkCodex
                 || __instance.SelectedUnitValue != viewModel.MechanicActionBarSlot?.Unit)
                 return;
 
-            if (viewModel.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic3)
+            if (viewModel.Index == -1 && viewModel.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic3)
             {
                 Helper.ShowMessageBox("Remove group?", onYes: () => RemoveGroup(mechanic3.GetTitle()));
                 return;
             }
 
-            // find parent and remove from that group
+            // find parent and remove from that group // perhaps should check for index == -1
             foreach (var slot in __instance.GroupAbilities)
             {
                 if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic)
@@ -296,15 +304,16 @@ namespace DarkCodex
 
         public class MechanicActionBarSlotGroup : MechanicActionBarSlot
         {
-            //public int Index;
             [JsonProperty]
             private int hash;
             [JsonProperty]
             public List<MechanicActionBarSlot> Slots;
 
             [JsonConstructor]
-            public MechanicActionBarSlotGroup(List<MechanicActionBarSlot> slots)
+            public MechanicActionBarSlotGroup(EntityRef<UnitEntityData> m_UnitRef, int hash, List<MechanicActionBarSlot> slots)
             {
+                this.m_UnitRef = m_UnitRef;
+                this.hash = hash;
                 this.Slots = slots;
 
                 if (this.hash != 0)
@@ -332,7 +341,7 @@ namespace DarkCodex
                 if (guid != BlueprintGuid.Empty && CanAddGroup(guid))
                 {
                     Slots.Add(mechanic);
-                    Group?.Guids?.Add(guid);
+                    Group.Guids?.Add(guid);
                     Save();
                 }
             }
@@ -345,14 +354,14 @@ namespace DarkCodex
                 if (guid != BlueprintGuid.Empty)
                 {
                     Slots.Remove(mechanic);
-                    Group?.Guids?.Remove(guid);
+                    Group.Guids?.Remove(guid);
                     Save();
                 }
             }
 
             public bool CanAddGroup(BlueprintGuid guid)
             {
-                return Group?.Guids?.Contains(guid) == false;
+                return Group.Guids?.Contains(guid) == false;
             }
 
             public override int GetHashCode()
@@ -360,7 +369,7 @@ namespace DarkCodex
                 return hash;
             }
 
-            public DefGroup Group => Groups.FindOrDefault(w => w.GetHashCode() == this.hash);
+            public DefGroup Group => Groups.FindOrDefault(w => w.GetHashCode() == this.hash) ?? new();
 
             public override bool CanUseIfTurnBasedInternal() => true;
             public override object GetContentData() => this;
@@ -368,18 +377,18 @@ namespace DarkCodex
             public override Sprite GetDecorationSprite() => null;
             public override string GetTitle()
             {
-                return Group?.Title;
+                return Group.Title;
             }
 
             public override string GetDescription()
             {
-                return Group?.Description;
+                return Group.Description;
             }
 
             public override Sprite GetIcon()
             {
-                return Group?.GetIcon()
-                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon()
+                return Group.GetIcon()
+                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon()   // TODO: icon is only changed when selected unit is changed; make update
                     ?? Slots.FirstOrDefault()?.GetIcon();
             }
 
@@ -410,7 +419,7 @@ namespace DarkCodex
                     slot.ActiveMark.gameObject.SetActive(true);
                 }
             }
-            public override bool IsBad() => hash <= 0; // use this to remove invalid entries
+            public override bool IsBad() => hash == 0 || Group.Title == null; // use this to remove invalid entries
 
             public override TooltipBaseTemplate GetTooltipTemplate()
             {
@@ -421,7 +430,7 @@ namespace DarkCodex
                 var group = Group;
                 if (group != null)
                 {
-                    title = group.Title;
+                    title = group.Title ?? "MISSING TITLE";
                     description = group.Description;
                     icon = group.GetIcon();
                 }
@@ -439,33 +448,48 @@ namespace DarkCodex
             }
         }
 
-        public class DefGroup : IEquatable<DefGroup>, IEquatable<string>
+        public class DefGroup : IEquatable<DefGroup>, IEquatable<string>, IEqualityComparer<DefGroup>
         {
             [JsonProperty]
             public string Title;
             [JsonProperty]
             public string Description;
             [JsonProperty]
-            public string Icon;
-            [JsonProperty]
             public HashSet<BlueprintGuid> Guids;
 
+            [JsonProperty]
+            private string icon;
             private Sprite m_Icon;
             private int hash;
+
+            [JsonConstructor]
+            public DefGroup(string title, string description, string icon, HashSet<BlueprintGuid> guids)
+            {
+                this.Title = title;
+                this.Description = description;
+                this.Guids = guids ?? new();
+                this.icon = icon;
+                this.hash = title.GetHashCode();
+            }
 
             public DefGroup(string title, string description, string icon, params string[] guids)
             {
                 this.Title = title;
                 this.Description = description;
-                this.Icon = icon;
                 this.Guids = guids.Select(s => BlueprintGuid.Parse(s)).ToHashSet();
+                this.icon = icon;
                 this.hash = title.GetHashCode();
+            }
+
+            public DefGroup()
+            {
+                this.Guids = new();
             }
 
             public Sprite GetIcon()
             {
-                if (m_Icon == null && this.Icon != null)
-                    m_Icon = Helper.StealIcon(this.Icon);
+                if (m_Icon == null && this.icon != null)
+                    m_Icon = Helper.StealIcon(this.icon);
                 return m_Icon;
             }
 
@@ -476,11 +500,21 @@ namespace DarkCodex
 
             public bool Equals(DefGroup other)
             {
-                return this.Title == other.Title;
+                return this.hash == other.hash;
             }
             public bool Equals(string other)
             {
                 return this.Title == other;
+            }
+
+            public bool Equals(DefGroup x, DefGroup y)
+            {
+                return x.hash == y.hash;
+            }
+
+            public int GetHashCode(DefGroup obj)
+            {
+                throw new NotImplementedException();
             }
         }
 

@@ -11,6 +11,7 @@ using Kingmaker.UnitLogic;
 using Kingmaker.Blueprints;
 using Kingmaker;
 using Kingmaker.Controllers;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 
 namespace DarkCodex
 {
@@ -18,6 +19,19 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_EnduringSpells
     {
+        [HarmonyPatch(typeof(EnduringSpells), nameof(EnduringSpells.HandleBuffDidAdded))]
+        [HarmonyPrepare]
+        public static void Prepare()
+        {
+            var buff = Helper.Get<BlueprintBuff>("3c2fe8e0374d28d4185355121f4c4544"); //EnduringBladeBuff
+            if (buff != null)
+                buff.Stacking = StackingType.Replace;
+
+            buff = Helper.Get<BlueprintBuff>("538212c81e75481f9191ff77c2519110"); //EnduringBladeMountBuff
+            if (buff != null)
+                buff.Stacking = StackingType.Replace;
+        }
+
         [HarmonyPatch(typeof(EnduringSpells), nameof(EnduringSpells.HandleBuffDidAdded))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)

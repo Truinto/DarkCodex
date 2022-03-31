@@ -83,9 +83,10 @@ namespace DarkCodex
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
-
+#if DEBUG
             if (GUILayout.Button(Patch_AbilityGroups.Locked ? "Unlock ability groups" : "Lock ability groups", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.Locked = !Patch_AbilityGroups.Locked;
+#endif
             if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.Reload();
 
