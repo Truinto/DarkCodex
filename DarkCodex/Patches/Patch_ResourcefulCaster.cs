@@ -69,11 +69,11 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix3(AbilityExecutionProcess __instance) // all targets resisted
         {
+            if (!__instance.IsEnded)
+                return;
+
             try
             {
-                if (!__instance.IsEnded)
-                    return;
-
                 if (__instance.Context?.MaybeCaster == null)
                     return;
 
@@ -93,12 +93,11 @@ namespace DarkCodex
 
                 bool hasSaves = false;
                 bool allSavesPassed = true;
-                unitsSpellNotResisted.Clear();
                 foreach (var rule in __instance.Context.RulebookContext.AllEvents)
                 {
                     if (rule is RuleSpellResistanceCheck resistance)
                     {
-                        Helper.PrintDebug($" -SR {resistance.Target}");
+                        Helper.PrintDebug($" -SR {resistance.Target} {resistance.IsSpellResisted}");
                         hasSaves = true;
                         if (!resistance.IsSpellResisted)
                             unitsSpellNotResisted.Add(resistance.Target);
@@ -106,7 +105,7 @@ namespace DarkCodex
 
                     else if (rule is RuleSavingThrow save) // this works if Context.TriggerRule is used
                     {
-                        Helper.PrintDebug($" -{save.Type} Save {save.Initiator}");
+                        Helper.PrintDebug($" -{save.Type} Save {save.Initiator} {save.IsPassed}");
                         hasSaves = true;
                         if (save.IsPassed)
                             unitsSpellNotResisted.Remove(save.Initiator);
@@ -117,9 +116,15 @@ namespace DarkCodex
                         }
                     }
 
-                    else if (rule is RuleDispelMagic dispel) // TODO: add dispel checks
+                    else if (rule is RuleDispelMagic dispel)
                     {
-
+                        Helper.PrintDebug($" -Dispel {dispel.Buff?.Blueprint?.name} {dispel.AreaEffect?.Blueprint?.name} {dispel.Success}");
+                        hasSaves = true;
+                        if (dispel.Success)
+                        {
+                            allSavesPassed = false;
+                            break;
+                        }    
                     }
 
                     //else Helper.PrintDebug(" -" + rule.GetType().FullName);
@@ -154,6 +159,10 @@ namespace DarkCodex
             }
             catch (Exception)
             {
+            }
+            finally
+            {
+                unitsSpellNotResisted.Clear();
             }
         }
 

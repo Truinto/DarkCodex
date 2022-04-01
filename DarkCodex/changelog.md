@@ -1,4 +1,6 @@
 # Changelog
+- added dispel effects to Resourceful Caster conditions
+- added thunderstorm chain variant
 
 ## [1.2.3]
 - fixed Arcane Weapon buff not getting replaced on cast
