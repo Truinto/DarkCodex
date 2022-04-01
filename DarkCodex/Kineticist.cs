@@ -603,11 +603,41 @@ namespace DarkCodex
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Electric)
                 ).TargetEnemy(CastAnimationStyle.Kineticist);
             electric_chain_ab.SpellResistance = true;
-
             Helper.AppendAndReplace(ref actions.Actions, new ContextActionChangeRankValue(AbilityRankChangeType.Add, AbilityRankType.DamageDice, -1));
+
+            // thunderstorm ability
+            var thunderstorm_chain_ab = Helper.CreateBlueprintAbility(
+                "ChainThunderstormBlastAbility",
+                chain_feat.m_DisplayName,
+                chain_feat.m_Description,
+                null,
+                icon,
+                AbilityType.SpellLike,
+                UnitCommand.CommandType.Standard,
+                AbilityRange.Close,
+                duration: null,
+                savingThrow: null
+                ).SetComponents(
+                Step1_run_damage(out actions, p: PhysicalDamageForm.Bludgeoning, e: DamageEnergyType.Electricity, isAOE: false, half: false), //p: PhysicalDamageForm.Bludgeoning
+                Step2_rank_dice(twice: false),
+                Step3_rank_bonus(half_bonus: false),
+                Step4_dc(),
+                Step5_burn(actions, infusion: 3, blast: 2),
+                Step6_feat(chain_feat),
+                //Step7_projectile(Resource.Projectile.LightningBolt00, false, AbilityProjectileType.Simple, 0, 0),
+                Step7b_chain_projectile(Resource.Projectile.Kinetic_Thunderstorm00_Projectile, Resource.Cache.WeaponBlastPhysical, 0.5f),
+                Step8_spell_description(SpellDescriptor.Electricity),
+                Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Electric),
+                Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Electric)
+                ).TargetEnemy(CastAnimationStyle.Kineticist);
+            electric_chain_ab.SpellResistance = false;
+            Helper.AppendAndReplace(ref actions.Actions, new ContextActionChangeRankValue(AbilityRankChangeType.Add, AbilityRankType.DamageDice, -1));
+
+            // TODO: add thunderstorm blast
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, chain_feat.ToRef());
             Helper.AddToAbilityVariants(electric_base, electric_chain_ab);
+            Helper.AddToAbilityVariants(Tree.Composite_Thunder.BaseAbility, thunderstorm_chain_ab);
         }
 
         [PatchInfo(Severity.Extend, "Gather Power", "Kineticist Gather Power can be used manually", false, Requirement: typeof(Patch_TrueGatherPowerLevel))]
@@ -847,7 +877,7 @@ namespace DarkCodex
         }
 
         /// <summary>
-        /// Defines damage dice. Set twice for composite blasts. You shouldn't need half at all.
+        /// Defines damage dice. Set twice for composite blasts that are pure energy or pure physical. You shouldn't need half at all.
         /// </summary>
         public static ContextRankConfig Step2_rank_dice(bool twice = false, bool half = false)
         {
