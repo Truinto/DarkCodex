@@ -1936,7 +1936,6 @@ namespace DarkCodex
             result.LocalizedSavingThrow = savingThrow ?? Resource.Strings.Empty;
 
             AddAsset(result, guid);
-            // todo add blueprint to Resource.Cache.Ability
             return result;
         }
 
@@ -2030,7 +2029,6 @@ namespace DarkCodex
             AddAsset(buff, buff.AssetGuid);
 
             result.m_Buff = buff.ToRef();
-            // todo add blueprint to Resource.Cache.Activatable
             return result;
         }
 

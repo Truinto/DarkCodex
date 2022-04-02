@@ -1,6 +1,10 @@
 # Changelog
+
+## [1.2.4]
 - added dispel effects to Resourceful Caster conditions
 - added thunderstorm chain variant
+- added logic to organize ability groups via drag&drop (needs unlock in mod menu)
+- fixed destrutive dispel not scaling for non-spellcaster classes (like Kineticist)
 
 ## [1.2.3]
 - fixed Arcane Weapon buff not getting replaced on cast

@@ -240,7 +240,7 @@ namespace DarkCodex
                     Add(ResourcesLibrary.BlueprintsCache.Load(key));
             }
 
-            public static void Ensure() // TODO use EnsurePre
+            public static void Ensure()
             {
                 if (IsLoaded)
                     return;

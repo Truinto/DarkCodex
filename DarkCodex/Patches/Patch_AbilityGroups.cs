@@ -18,6 +18,10 @@ using System.IO;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.EntitySystem;
+using Kingmaker.UI.DragNDrop;
+using Kingmaker.UI.MVVM._PCView.ActionBar;
+using UnityEngine.EventSystems;
+using Kingmaker;
 
 namespace DarkCodex
 {
@@ -111,11 +115,22 @@ namespace DarkCodex
             try
             {
                 Helper.Serialize(Groups, path: Path.Combine(Main.ModPath, "DefGroups.json"));
+                var actionbar = Game.Instance.RootUiContext.InGameVM.StaticPartVM.ActionBarVM;
+                actionbar.m_NeedReset = true;
+                actionbar.OnUpdateHandler();
             }
             catch (Exception e)
             {
                 Helper.PrintException(e);
             }
+        }
+
+        public static void ToggleLocked()
+        {
+            Locked = !Locked;
+            var actionbar = Game.Instance.RootUiContext.InGameVM.StaticPartVM.ActionBarVM;
+            actionbar.m_NeedReset = true;
+            actionbar.OnUpdateHandler();
         }
 
         public static BlueprintUnitFact GetBlueprint(MechanicActionBarSlot slot)
@@ -176,7 +191,7 @@ namespace DarkCodex
                         mechanic.Slots = list;
                 }
 
-                Helper.PrintDebug($"CollectAbilities Hash={hash} Title={group.Title} LCount={list.Count}");
+                //Helper.PrintDebug($"CollectAbilities Hash={hash} Title={group.Title} LCount={list.Count}");
             }
         }
 
@@ -240,66 +255,68 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.MoveSlot))]
+        [HarmonyPatch(typeof(ActionBarPCView), "Kingmaker.UI.MVVM._PCView.ActionBar.IActionBarDragHandler.EndDrag")]
         [HarmonyPostfix]
-        private static void DragAndDrop(ActionBarSlotVM sourceSlotVM, ActionBarSlotVM targetSlotVM)
+        private static void DragSlot(ActionBarSlotVM viewModel, PointerEventData data, ActionBarPCView __instance)
         {
-            Helper.PrintDebug($"MoveSlot: source slot={sourceSlotVM.MechanicActionBarSlot.GetType().Name} at {sourceSlotVM.Index} target slot={sourceSlotVM.MechanicActionBarSlot.GetType().Name} at {targetSlotVM.Index}");
-            // TODO: this isn't triggered inside the ability tab!
-
             if (Locked)
                 return;
-                        
-            if (targetSlotVM.Index == -1 && sourceSlotVM.Index == -1) // if both are in the abilities tab
-            {
-                if (targetSlotVM.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // if the target is a group, try add source
-                {
-                    mechanic.AddToGroup(sourceSlotVM.MechanicActionBarSlot);
-                }
-                else
-                {
-                    var source = GetBlueprint(sourceSlotVM.MechanicActionBarSlot);
-                    var target = GetBlueprint(targetSlotVM.MechanicActionBarSlot);
 
-                    if (source != null && target != null) // if both are abilities make a new group; prompts to get title
+            var source = viewModel;
+            var target = data.pointerEnter?.transform?.parent?.GetComponentInParent<ActionBarBaseSlotPCView>()?.GetViewModel();
+            Helper.PrintDebug($"Drag3 source={GetBlueprint(source.MechanicActionBarSlot)?.name} target={GetBlueprint(target?.MechanicActionBarSlot)?.name}");
+
+            if (source == null || source.Index != -1) // do nothing
+            {
+                return;
+            }
+
+            else if (target == null) // remove
+            {
+                if (source.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // remove whole group
+                {
+                    Helper.ShowMessageBox("Remove group?", onYes: () => RemoveGroup(mechanic.GetTitle()));
+                    return;
+                }
+
+                foreach (var slot in __instance.m_AbilityGroup.GetGroup())  // remove single ability
+                {
+                    if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic2)
                     {
-                        Helper.ShowInputBox("Create new group: ", onOK: a => AddGroup(a, "", null, source.AssetGuid.ToString(), target.AssetGuid.ToString()));
+                        var mechanic3 = mechanic2.Slots.FirstOrDefault(a => ReferenceEquals(a, source.MechanicActionBarSlot));
+                        if (mechanic3 != null)
+                        {
+                            mechanic2.RemoveFromGroup(mechanic3);
+                            return;
+                        }
                     }
+                }
+            }
+
+            else if (target.Index == -1) // add
+            {
+                if (target.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // if the target is a group, try add source
+                {
+                    mechanic.AddToGroup(source.MechanicActionBarSlot);
+                    return;
+                }
+
+                var ab1 = GetBlueprint(source.MechanicActionBarSlot);
+                var ab2 = GetBlueprint(target.MechanicActionBarSlot);
+                if (ab1 != null && ab2 != null && ab1 != ab2) // if both are abilities make a new group; prompts to get title
+                {
+                    Helper.ShowInputBox("Create new group: ", onOK: a => AddGroup(a, "", null, ab1.AssetGuid.ToString(), ab2.AssetGuid.ToString()));
+                    return;
                 }
             }
         }
 
-        [HarmonyPatch(typeof(ActionBarVM), nameof(ActionBarVM.ClearSlot))]
-        private static void DragClear(ActionBarSlotVM viewModel, ActionBarVM __instance)
+        [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.UpdateResource))]
+        [HarmonyPostfix]
+        private static void UpdateSlot(ActionBarSlotVM __instance)
         {
-            Helper.PrintDebug($"ClearSlot: slot={viewModel.MechanicActionBarSlot.GetType().Name} at {viewModel.Index}");
-
-            if (Locked)
-                return;
-
-            if (__instance.SelectedUnitValue == null
-                || __instance.SelectedUnitValue != viewModel.MechanicActionBarSlot?.Unit)
-                return;
-
-            if (viewModel.Index == -1 && viewModel.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic3)
-            {
-                Helper.ShowMessageBox("Remove group?", onYes: () => RemoveGroup(mechanic3.GetTitle()));
-                return;
-            }
-
-            // find parent and remove from that group // perhaps should check for index == -1
-            foreach (var slot in __instance.GroupAbilities)
-            {
-                if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic)
-                {
-                    var mechanic2 = mechanic.Slots.FirstOrDefault(a => ReferenceEquals(a, viewModel.MechanicActionBarSlot));
-                    if (mechanic2 != null)
-                    {
-                        mechanic.RemoveFromGroup(mechanic2);
-                        break;
-                    }
-                }
-            }
+            if (__instance.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic)
+                __instance.Icon.Value = mechanic.GetIcon();
         }
 
         public class MechanicActionBarSlotGroup : MechanicActionBarSlot
@@ -340,7 +357,7 @@ namespace DarkCodex
                 var guid = GetGuid(mechanic);
                 if (guid != BlueprintGuid.Empty && CanAddGroup(guid))
                 {
-                    Slots.Add(mechanic);
+                    //Slots.Add(mechanic);
                     Group.Guids?.Add(guid);
                     Save();
                 }
@@ -387,8 +404,8 @@ namespace DarkCodex
 
             public override Sprite GetIcon()
             {
-                return Group.GetIcon()
-                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon()   // TODO: icon is only changed when selected unit is changed; make update
+                return Group.GetIcon() 
+                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon() 
                     ?? Slots.FirstOrDefault()?.GetIcon();
             }
 

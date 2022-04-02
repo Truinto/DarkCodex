@@ -85,7 +85,7 @@ namespace DarkCodex
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
 #if DEBUG
             if (GUILayout.Button(Patch_AbilityGroups.Locked ? "Unlock ability groups" : "Lock ability groups", GUILayout.ExpandWidth(false)))
-                Patch_AbilityGroups.Locked = !Patch_AbilityGroups.Locked;
+                Patch_AbilityGroups.ToggleLocked();
 #endif
             if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.Reload();
@@ -375,6 +375,8 @@ namespace DarkCodex
 
             try
             {
+                //_ = AppDomain.CurrentDomain.GetAssemblies().FindOrDefault(a => a.GetName().Name == "").GetName().Version;
+
                 harmony = new Harmony(modEntry.Info.Id);
                 Helper.Patch(typeof(StartGameLoader_LoadAllJson));
                 Helper.Patch(typeof(MainMenu_Start));

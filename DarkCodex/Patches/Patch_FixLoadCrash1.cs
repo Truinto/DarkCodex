@@ -16,7 +16,7 @@ namespace DarkCodex
             if (__result == null || __result == "")
                 return;
 
-            Helper.Print(__result);
+            //Helper.Print(__result);
             __result = Regex.Replace(__result, @"{""\$id"":""[0-9]+"",""\$type"":""Kingmaker\.View\.MapObjects\.Traps\.Simple\.SimpleTrapObjectData, Assembly-CSharp"",.*?""UniqueId"":.*?},?", "");
         }
     }

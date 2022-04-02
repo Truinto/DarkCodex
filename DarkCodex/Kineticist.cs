@@ -633,8 +633,6 @@ namespace DarkCodex
             electric_chain_ab.SpellResistance = false;
             Helper.AppendAndReplace(ref actions.Actions, new ContextActionChangeRankValue(AbilityRankChangeType.Add, AbilityRankType.DamageDice, -1));
 
-            // TODO: add thunderstorm blast
-
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, chain_feat.ToRef());
             Helper.AddToAbilityVariants(electric_base, electric_chain_ab);
             Helper.AddToAbilityVariants(Tree.Composite_Thunder.BaseAbility, thunderstorm_chain_ab);
