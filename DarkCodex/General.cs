@@ -18,12 +18,14 @@ using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.View.MapObjects;
 using System;
 using System.Linq;
@@ -254,16 +256,22 @@ namespace DarkCodex
                 .Descriptor &= ~SpellDescriptor.Shaken & ~SpellDescriptor.Confusion;
 
             // add icon to CompletelyNormal metamagic
-            if (UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal == null)
-            {
-                var cnfeat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("094b6278f7b570f42aeaa98379f07cf2"); //CompletelyNormalSpellFeat
-                cnfeat.m_Icon = Helper.CreateSprite("CompletelyNormal.png");
-                UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal = cnfeat.m_Icon;
-            }
+            //if (UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal == null)
+            //{
+            //    var cnfeat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("094b6278f7b570f42aeaa98379f07cf2"); //CompletelyNormalSpellFeat
+            //    cnfeat.m_Icon = Helper.CreateSprite("CompletelyNormal.png");
+            //    UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal = cnfeat.m_Icon;
+            //}
 
             // add confusion descriptor to song of discord
             var songDiscord = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("2e1646c2449c88a4188e58043455a43a"); //SongOfDiscordBuff
             songDiscord.GetComponent<SpellDescriptorComponent>().Descriptor |= SpellDescriptor.Confusion;
+
+            // fix destrutive dispel scaling
+            Helper.Get<BlueprintUnitProperty>("13e4f1dd08954723b173335a54b48746") //DestructiveDispelProperty
+                .SetComponents(
+                new PropertyAttributeMax { MentalStat = true },
+                new SimplePropertyGetter { Property = UnitProperty.Level });
 
         }
 
