@@ -13,7 +13,7 @@ namespace DarkCodex
         {
             var line = instr.ToList();
             var original1 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.D20));
-            var original2 = AccessTools.PropertyGetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.CriticalConfirmationD20));
+            var original2 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.CriticalConfirmationD20));
 
             for (int i = 0; i < line.Count; i++)
             {
@@ -34,7 +34,7 @@ namespace DarkCodex
 
         public static void SetD20Crit(RuleAttackRoll instance, RuleRollD20 d20)
         {
-            if (instance.D20 == null)
+            if (instance.CriticalConfirmationD20 == null)
                 instance.CriticalConfirmationD20 = d20;
         }
     }

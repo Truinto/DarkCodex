@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.5]
+- fixed "Unlock ability groups" not showing up in menu
+- fixed oversight in Patch_AOEAttackRolls
+- fixed Dismiss Anything
+
 ## [1.2.4]
 - added dispel effects to Resourceful Caster conditions
 - added thunderstorm chain variant

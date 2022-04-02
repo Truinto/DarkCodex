@@ -25,7 +25,7 @@ using Kingmaker;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony | Severity.WIP, "Patch: Ability Groups", "merges similar abilities into foldable categories", false)]
+    [PatchInfo(Severity.Harmony, "Patch: Ability Groups", "merges similar abilities into foldable categories", false)]
     [HarmonyPatch]
     public class Patch_AbilityGroups
     {

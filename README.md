@@ -36,15 +36,15 @@ Content
 |Hexcrafter.FixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:heavy_check_mark:|
 |Items.CreateImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|
-|Items.CreateKineticArtifact|new weapon for Kineticists|:house:|:x:|
+|Items.CreateKineticArtifact|new weapon for Kineticists|:house:|:heavy_check_mark:|
 |Items.PatchArrows|will pick up non-magical arrows after combat|:book:|:heavy_check_mark:|
 |Items.PatchTerendelevScale|make the revive scale usable once per day|:house:|:heavy_check_mark:|
 |Kineticist.CreateAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:book:|:heavy_check_mark:|
 |Kineticist.CreateBladeRushInfusion|infusion: Blade Rush, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Kineticist.CreateChainInfusion|infusion: Chain|:book:|:heavy_check_mark:|
-|Kineticist.CreateExpandedElement|basic feat: select extra elements|:house:|:construction:|
+|Kineticist.CreateExpandedElement|basic feat: select extra elements|:house:|:heavy_check_mark:|
 |Kineticist.CreateExtraWildTalentFeat|basic feat: Extra Wild Talent|:book:|:heavy_check_mark:|
-|Kineticist.CreateHurricaneQueen|Wild Talent: Hurricane Queen|:book:|:construction:|
+|Kineticist.CreateHurricaneQueen|Wild Talent: Hurricane Queen|:book:|:heavy_check_mark:|
 |Kineticist.CreateImpaleInfusion|infusion: Impale|:book:|:heavy_check_mark:|
 |Kineticist.CreateKineticistBackground|regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:house:|:heavy_check_mark:|
 |Kineticist.CreateMindShield|Wild Talent: half Psychokineticist's penalties|:house:|:heavy_check_mark:|
@@ -62,19 +62,19 @@ Content
 |Mythic.CreateDemonMastery|mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect|:house:|:heavy_check_mark:|
 |Mythic.CreateExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:house:|:heavy_check_mark:|
 |Mythic.CreateKineticMastery|mythic feat: physical Kinetic Blasts gain attack bonus equal to mythic level, or half with energy Blasts|:house:|:heavy_check_mark:|
-|Mythic.CreateLimitlessArcanePool|mythic ability: infinite arcane pool, expect spell recall|:house:|:construction:|
-|Mythic.CreateLimitlessArcaneReservoir|mythic ability: infinite arcane reservoir|:house:|:construction:|
+|Mythic.CreateLimitlessArcanePool|mythic ability: infinite arcane pool, expect spell recall|:house:|:heavy_check_mark:|
+|Mythic.CreateLimitlessArcaneReservoir|mythic ability: infinite arcane reservoir|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources mythic ability: Skald's Raging Song cost no resources|:house:|:heavy_check_mark:|
-|Mythic.CreateLimitlessBombs|mythic ability: infinite alchemist bombs and incenses|:house:|:construction:|
+|Mythic.CreateLimitlessBombs|mythic ability: infinite alchemist bombs and incenses|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessDomain|mythic ability: use domain powers at will|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessKi|mythic ability: reduce ki costs by 1|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessSmite|mythic ability: infinite Smites (chaotic and evil), requires Abundant Smite|:house:|:heavy_check_mark:|
-|Mythic.CreateLimitlessWarpriest|mythic ability: infinite scared weapon uses|:house:|:construction:|
+|Mythic.CreateLimitlessWarpriest|mythic ability: infinite scared weapon uses|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:house:|:heavy_check_mark:|
 |Mythic.CreateMagicItemAdept|mythic feat: trinket items use character level as caster level|:house:|:heavy_check_mark:|
 |Mythic.CreateResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:house:|:heavy_check_mark:|
-|Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:construction:|
+|Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.PatchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:house:|:heavy_check_mark:|
 |Mythic.PatchJudgementAura|Everlasting Judgement also applies to Judgement Aura|:house:|:heavy_check_mark:|
@@ -83,7 +83,7 @@ Content
 |Mythic.PatchRangingShots|doesn't get weaker when hitting|:house:|:construction:|
 |Mythic.PatchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:house:|:heavy_check_mark:|
 |Mythic.PatchVarious|allow quicken on Demon Teleport|:house:|:heavy_check_mark:|
-|Mythic.PatchWanderingHex|can swap hex at will|:house:|:construction:|
+|Mythic.PatchWanderingHex|can swap hex at will|:house:|:heavy_check_mark:|
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
@@ -94,7 +94,7 @@ Content
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
 |Patch.Patch_AbilityAtWill|provides logic for at will spells|:house:|:heavy_check_mark:|
-|Patch.Patch_AbilityGroups|merges similar abilities into foldable categories|:book:|:construction:|
+|Patch.Patch_AbilityGroups|merges similar abilities into foldable categories|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableActionBar|adds logic for automatic-only activatable|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableHandleUnitRunCommand|fixes move actions disabling the activatable (since we have 2 of them)|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnNewRound|uses up move action when triggered; deactivates activatable if no action left|:book:|:heavy_check_mark:|
@@ -109,7 +109,7 @@ Content
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
 |Patch.Patch_FeralCombat|collection of patches for Feral Combat Training|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaDoubleDamage|fixes area effects triggering twice when cast|:book:|:heavy_check_mark:|
-|Patch.Patch_FixAreaEndOfTurn|in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round|:book:|:construction:|
+|Patch.Patch_FixAreaEndOfTurn|in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round|:book:|:heavy_check_mark:|
 |Patch.Patch_FixPolymorphGather|makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade|:book:|:heavy_check_mark:|
 |Patch.Patch_KineticistAllowOpportunityAttack|allows Attack of Opportunities with anything but standard Kinetic Blade; so that Kinetic Whip works; also allows natural attacks to be used, if Whip isn't available|:book:|:heavy_check_mark:|
 |Patch.Patch_MagicItemAdept|patches for Magic Item Adept|:house:|:heavy_check_mark:|

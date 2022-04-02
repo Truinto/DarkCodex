@@ -86,6 +86,7 @@
     <Compile Include="Kineticist.cs" />
     <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
+    <Compile Include="Patches\Patch_DismissAnything.cs" />
     <Compile Include="Patches\Patch_AbilityAtWill.cs" />
     <Compile Include="Patches\Patch_ActivatableHandleUnitRunCommand.cs" />
     <Compile Include="Patches\Patch_ActivatableOnNewRound.cs" />
@@ -142,6 +143,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /i /e /y /f "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /i /e /y /f "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
+cd /d "$(ModFolder)\$(TargetName)\"
+"C:\Program Files\7-Zip\7z.exe" u "-x!*.zip" "$(TargetName).zip" @"filelist.txt" &gt;NUL
+echo Updated $(TargetName).zip</PostBuildEvent>
   </PropertyGroup>
 </Project>

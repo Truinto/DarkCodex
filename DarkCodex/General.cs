@@ -208,13 +208,6 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Extend | Severity.DefaultOff, "Dismiss Anything", "dismiss any spell regardless of who the caster is", true)]
-        public static void PatchDismissAnything()
-        {
-            Helper.Get<BlueprintAbility>("97a23111df7547fd8f6417f9ba9b9775").RemoveComponents<AbilityTargetIsAreaEffectFromCaster>();
-            Helper.Get<BlueprintAbility>("feba4322f7614276a69efece6d5093c3").RemoveComponents<AbilityTargetIsAreaEffectFromCaster>();
-        }
-
         [PatchInfo(Severity.Extend, "Various Tweaks", "removed PreciousTreat penalty, extend protection from X to 10 minutes", true)]
         public static void PatchVarious()
         {
@@ -271,8 +264,7 @@ namespace DarkCodex
             Helper.Get<BlueprintUnitProperty>("13e4f1dd08954723b173335a54b48746") //DestructiveDispelProperty
                 .SetComponents(
                 new PropertyAttributeMax { MentalStat = true },
-                new SimplePropertyGetter { Property = UnitProperty.Level });
-
+                new SimplePropertyGetter { Property = UnitProperty.Level, Settings = new() { m_Progression = PropertySettings.Progression.Div2 } });
         }
 
         [PatchInfo(Severity.Create, "Stop Activatable", "adds ability to stop any activatable immediately", false)]

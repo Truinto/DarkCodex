@@ -83,10 +83,10 @@ namespace DarkCodex
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
-#if DEBUG
+
             if (GUILayout.Button(Patch_AbilityGroups.Locked ? "Unlock ability groups" : "Lock ability groups", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.ToggleLocked();
-#endif
+
             if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.Reload();
 
@@ -267,7 +267,7 @@ namespace DarkCodex
         private static string lastEnum;
         private static void Checkbox<T>(ref T value, string label, Action<T> action = null) where T : Enum
         {
-            if (GUILayout.Button(label))
+            if (GUILayout.Button(label, GUILayout.ExpandWidth(false)))
             {
                 if (lastEnum == label)
                     lastEnum = null;
@@ -471,12 +471,12 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_UnlockClassLevels));
                     PatchSafe(typeof(Patch_AbilityAtWill));
                     PatchSafe(typeof(Patch_DarkElementalistBurn));
+                    PatchSafe(typeof(Patch_DismissAnything));
 
                     // General
                     LoadSafe(General.PatchAngelsLight);
                     LoadSafe(General.PatchBasicFreebieFeats);
                     LoadSafe(General.PatchHideBuffs);
-                    LoadSafe(General.PatchDismissAnything);
                     LoadSafe(General.PatchVarious);
 
                     // Items

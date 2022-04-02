@@ -349,7 +349,7 @@ namespace DarkCodex
 
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Expanded Element", "basic feat: select extra elements", true, Priority: 300)]
+        [PatchInfo(Severity.Create, "Expanded Element", "basic feat: select extra elements", true, Priority: 300)]
         public static void CreateExpandedElement()
         {
             var t = Kineticist.Tree;
@@ -786,7 +786,7 @@ namespace DarkCodex
             quickenbuff2.GetComponent<AutoMetamagic>().Once = true;
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Hurricane Queen", "Wild Talent: Hurricane Queen", false, Requirement: typeof(Patch_EnvelopingWindsCap))]
+        [PatchInfo(Severity.Create, "Hurricane Queen", "Wild Talent: Hurricane Queen", false, Requirement: typeof(Patch_EnvelopingWindsCap))]
         public static void CreateHurricaneQueen()
         {
             var windsBuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff

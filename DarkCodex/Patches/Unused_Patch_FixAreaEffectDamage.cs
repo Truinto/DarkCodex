@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony | Severity.Event | Severity.WIP, "Patch: Fix Area Effects", "enforces a 6 second cooldown on area effects")]
+    [PatchInfo(Severity.Harmony | Severity.Event, "Patch: Fix Area Effects", "enforces a 6 second cooldown on area effects")]
     [HarmonyPatch(typeof(AbilityAreaEffectRunAction))]
     public class Unused_Patch_FixAreaEffectDamage : IPartyCombatHandler, IGlobalSubscriber, ISubscriber
     {

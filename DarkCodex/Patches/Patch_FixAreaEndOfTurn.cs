@@ -10,7 +10,7 @@ using TurnBased.Controllers;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony | Severity.WIP, "Patch: Area Effect End Of Turn", "in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round", false)]
+    [PatchInfo(Severity.Harmony, "Patch: Area Effect End Of Turn", "in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round", false)]
     [HarmonyPatch]
     public class Patch_FixAreaEndOfTurn
     {
