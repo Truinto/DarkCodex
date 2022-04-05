@@ -8,5 +8,5 @@
     "AssemblyName": "BlueprintLoader.dll",
     "HomePage": "https://github.com/Truinto/DarkCodex/releases",
     "Repository": "https://raw.githubusercontent.com/Truinto/DarkCodex/master/BlueprintLoader/Settings/Repository.json",
-    "EntryMethod": "BlueprintLoader.Main.Load"
+    "EntryMethod": "BlueprintLoader.Main.ExLoad"
 }

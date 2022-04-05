@@ -21,7 +21,7 @@ using UnityEngine;
 namespace BlueprintLoader
 {
     [HarmonyPatch]
-    public class BlueprintLoader //: MonoBehaviour
+    public class BlueprintLoader
     {
         public static readonly BlueprintLoader Instance = new();
 
@@ -35,13 +35,7 @@ namespace BlueprintLoader
         public bool IsFinished { get; private set; }
         private Thread LoadingThread;
         private object Lock = new();
-
-        //static BlueprintLoader()
-        //{
-        //    Instance = new GameObject().AddComponent<BlueprintLoader>();
-        //    DontDestroyOnLoad(Instance.gameObject);
-        //    //Instance.Invoke();
-        //}
+        private BlueprintGuid[] Guids;
 
         public BlueprintLoader()
         {
@@ -60,6 +54,8 @@ namespace BlueprintLoader
                 return;
 
             this.WasStarted = true;
+            lock (ResourcesLibrary.BlueprintsCache.m_Lock)
+                this.Guids = ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Keys.ToArray();
             LoadingThread = new Thread(Load);
             LoadingThread.Start();
         }
@@ -67,70 +63,33 @@ namespace BlueprintLoader
         private void Load()
         {
             var __instance = ResourcesLibrary.BlueprintsCache;
-            int total = __instance.m_LoadedBlueprints.Count;
             int count = 0;
-
-#if true
-            using var stream = new FileStream(BundlesLoadService.BundlesPath("blueprints-pack.bbp"), FileMode.Open, FileAccess.Read);
-            var deserializer = new ReflectionBasedSerializer(new PrimitiveSerializer(new BinaryReader(stream), UnityObjectConverter.AssetList));
-#else
-            var deserializer = __instance.m_PackSerializer;
-            var stream = deserializer.m_Primitive.m_Reader.BaseStream;
-#endif
-
+            if (this.Guids == null)
+                lock (__instance.m_Lock)
+                    this.Guids = __instance.m_LoadedBlueprints.Keys.ToArray();
+            int total = this.Guids.Length;
             var watch = Stopwatch.StartNew();
-            foreach (var (guid, bpCache) in __instance.m_LoadedBlueprints.ToArray())
+
+            foreach (var guid in this.Guids)
             {
-                //lock (__instance.m_Lock)
+                var bp = __instance.Load(guid);
+                if (bp != null)
                 {
-                    // add if already loaded, but not in our cache
-                    if (bpCache.Blueprint != null)
-                    {
-                        lock (Lock)
-                        {
-                            var list = ListByType[bpCache.Blueprint.GetType()];
-                            foreach (var bp in list)
-                                if (bp == bpCache.Blueprint)
-                                    continue;
-                            list.Add(bpCache.Blueprint);
-                        }
-                        count++;
-                        continue;
-                    }
-
-                    // try load
-                    uint offset = bpCache.Offset;
-                    if (offset == 0)
-                        continue;
-                    stream.Seek(offset, SeekOrigin.Begin);
-                    SimpleBlueprint sbp = null;
-                    deserializer.Blueprint(ref sbp);
-                    if (sbp == null)
-                        continue;
-
-                    OwlcatModificationsManager.Instance.OnResourceLoaded(sbp, guid.ToString(), out object obj);
-                    var blueprint = (obj as SimpleBlueprint) ?? sbp;
-                    if (blueprint == null)
-                        continue;
-
-                    blueprint.OnEnable();
-                    lock (__instance.m_Lock)
-                    {
-                        __instance.m_LoadedBlueprints[guid] = new() { Offset = offset, Blueprint = blueprint };
-                    }
-
-                    // add if could load
-                    lock (Lock)
-                    {
-                        ListByType[blueprint.GetType()].Add(blueprint);
-                    }
+                    lock (this.Lock)
+                        ListByType[bp.GetType()].Add(bp);
                     this.Progress = (float)++count / total;
                 }
             }
+
             this.Progress = 1f;
             this.IsFinished = true;
+            this.Guids = null;
             watch.Stop();
-            Main.logger.Log($"loaded {count} of {total} blueprints in {watch.ElapsedMilliseconds} milliseconds");
+            Main.Print($"loaded {count} of {total} blueprints in {watch.ElapsedMilliseconds} milliseconds");
+#if DEBUG
+            foreach (var list in ListByType.Values)
+                Main.Print($"List of '{list.GetType()}' holds {list.Count} blueprints");
+#endif
         }
 
         /// <summary>Gets a new list of a specific blueprint type.</summary>
@@ -138,11 +97,10 @@ namespace BlueprintLoader
         /// <param name="includeDerived">Whenever the list should contain derived types like BlueprintSelection in List≺BlueprintFeature≻</param>
         public List<T> Get<T>(bool includeDerived = true) where T : SimpleBlueprint
         {
-            var result = new List<T>();
-
             if (!includeDerived)
-                return ListByType.FirstOrDefault(f => f.Key == typeof(T)).Value as List<T>;
+                return ((List<T>)ListByType[typeof(T)]).ToList();
 
+            var result = new List<T>();
             foreach (var (type, list) in ListByType)
             {
                 if (typeof(T).IsAssignableFrom(type))
@@ -156,7 +114,7 @@ namespace BlueprintLoader
             return result;
         }
 
-        /// <summary>Gets a new list of blueprints which matching a condition. Always includes derived types.</summary>
+        /// <summary>Gets a new list of blueprints which match a condition. Always includes derived types.</summary>
         /// <param name="predicate">Condition to match the blueprint.</param>
         public List<T> Get<T>(Func<T, bool> predicate) where T : SimpleBlueprint
         {
@@ -171,14 +129,14 @@ namespace BlueprintLoader
             return result;
         }
 
-        /// <summary>Gets a new list of blueprints which matching a condition.</summary>
+        /// <summary>Gets a new list of blueprints which match a condition.</summary>
         /// <param name="predicate">Condition to match the blueprint.</param>
         public List<BlueprintScriptableObject> Get(Func<BlueprintScriptableObject, bool> predicate)
         {
             var result = new List<BlueprintScriptableObject>();
 
-            foreach (var pair in ListByType)
-                foreach (var bp in pair.Value)
+            foreach (var list in ListByType.Values)
+                foreach (var bp in list)
                     if (bp is BlueprintScriptableObject bps)
                         if (predicate(bps))
                             result.Add(bps);
@@ -202,26 +160,24 @@ namespace BlueprintLoader
             if (bp == null)
                 return;
 
-            lock (Instance.Lock)
+            var type = bp.GetType();
+            if (Instance.ListByType.TryGetValue(type, out var list))
             {
-                var type = bp.GetType();
-                if (Instance.ListByType.TryGetValue(type, out var list))
-                {
+                lock (Instance.Lock)
                     list.Add(bp);
-                }
             }
         }
 
         [HarmonyPatch(typeof(BlueprintsCache), nameof(BlueprintsCache.Init))]
+        [HarmonyPriority(Priority.First)]
         [HarmonyPostfix]
         private static void Postfix2()
         {
 #if true
             Instance.Start();   // multithreaded
 #else
-            Instaance.Load();   // on main thread
+            Instance.Load();   // on main thread
 #endif
         }
-
     }
 }
