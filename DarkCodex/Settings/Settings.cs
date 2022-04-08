@@ -7,7 +7,7 @@ using System.IO;
 
 namespace DarkCodex
 {
-    public class Settings
+    public class Settings : ISettings
     {
         [JsonProperty]
         public int version = 4;
@@ -106,6 +106,10 @@ namespace DarkCodex
 
             return !newFeatureDefaultOn;
         }
+
+        [JsonIgnore] public bool NewFeatureDefaultOn => newFeatureDefaultOn;
+        [JsonIgnore] public HashSet<string> Blacklist => blacklist;
+        [JsonIgnore] public HashSet<string> Whitelist => whitelist;
 
         public static Config.Manager<Settings> StateManager = new(Path.Combine(Main.ModPath, "settings.json"), OnUpdate);
 

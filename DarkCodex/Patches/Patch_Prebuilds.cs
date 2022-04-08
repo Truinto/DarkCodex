@@ -173,7 +173,7 @@ namespace DarkCodex
             {
                 if (!action.Check(__instance.State, unit.Descriptor))
                 {
-                    Helper.PrintFile("Log-LevelUp.txt", $"ERROR: illegal {action.GetType().Name}\n");
+                    Helper.TryPrintFile("Log-LevelUp.txt", $"ERROR: illegal {action.GetType().Name}\n");
                     PFLog.Default.Log("Invalid action: " + action, Array.Empty<object>());
                 }
                 else

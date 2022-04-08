@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -82,5 +84,113 @@ namespace DarkCodex
         Faulty = 512,
         Hidden = 1024,
         DefaultOff = 2048,
+    }
+
+    public class PatchInfoCollection : IEnumerable<PatchInfoAttribute>
+    {
+        private List<PatchInfoAttribute> list = new();
+        private ISettings state;
+
+        public PatchInfoCollection(ISettings state)
+        {
+            this.state = state;
+        }
+
+        public void Add(PatchInfoAttribute attr, MemberInfo info)
+        {
+            attr.Class = info.DeclaringType?.Name ?? "Patch";
+            attr.Method = info.Name;
+            attr.Hash = (attr.Class + "." + attr.Method).GetHashCode();
+
+            if (!list.Contains(attr))
+                list.Add(attr);
+        }
+
+        public void SetEnable(bool value, string name)
+        {
+            if (value)
+            {
+                state.Blacklist.Remove(name);
+                if (!name.Contains(".*"))
+                    state.Whitelist.Add(name);
+            }
+            else
+            {
+                state.Whitelist.Remove(name);
+                state.Blacklist.Add(name);
+            }
+        }
+
+        public void Update()
+        {
+            string category = null;
+            bool disableAll = false;
+
+            foreach (var info in list)
+            {
+                if (info.Class != category)
+                {
+                    category = info.Class;
+                    disableAll = IsDisenabledCategory(category + ".*");
+                }
+                info.DisabledAll = disableAll;
+                info.Disabled = IsDisenabledSingle(info.Class + "." + info.Method);
+            }
+        }
+
+        private bool IsDisenabledCategory(string name)
+        {
+            if (state.Blacklist.Contains(name))
+                return true;
+            return false;
+        }
+
+        private bool IsDisenabledSingle(string name)
+        {
+            if (state.Blacklist.Contains(name))
+                return true;
+
+            if (state.Whitelist.Contains(name))
+                return false;
+
+            int hash = name.GetHashCode();
+            if (Main.patchInfos.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+                return true;
+
+            return !state.NewFeatureDefaultOn;
+        }
+
+        public bool IsDisenabled(string name)
+        {
+            if (state.Blacklist.Contains(name))
+                return true;
+
+            if (state.Blacklist.Contains(name.TrySubstring('.') + ".*"))
+                return true;
+
+            if (state.Whitelist.Contains(name))
+                return false;
+
+            int hash = name.GetHashCode();
+            if (Main.patchInfos.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+                return true;
+
+            return !state.NewFeatureDefaultOn;
+        }
+
+        public bool IsEnabled(string name)
+        {
+            return !IsDisenabled(name);
+        }
+
+        public IEnumerator<PatchInfoAttribute> GetEnumerator()
+        {
+            return list.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return list.GetEnumerator();
+        }
     }
 }

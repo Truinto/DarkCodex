@@ -25,9 +25,11 @@ using Kingmaker.UI;
 using Kingmaker.EntitySystem.Stats;
 using System.Runtime.CompilerServices;
 using Kingmaker.UnitLogic;
+using Kingmaker.EntitySystem;
 
 namespace DarkCodex
 {
+    //#if DEBUG [EnableReloading] #endif
     public class Main
     {
         public static Harmony harmony;
@@ -37,6 +39,8 @@ namespace DarkCodex
         public static bool Enabled { get; set; } = true;
         /// <summary>Path of current mod.</summary>
         public static string ModPath;
+
+        //[SaveOnReload] internal static int IsLoad;
 
         internal static UnityModManager.ModEntry.ModLogger logger;
 
@@ -364,7 +368,7 @@ namespace DarkCodex
         /// <param name="modEntry.OnLateUpdate">Called by MonoBehaviour.LateUpdate.</param>
         /// <param name="modEntry.OnFixedUpdate">Called by MonoBehaviour.FixedUpdate.</param>
         /// <returns>Returns true, if no error occurred.</returns>
-        internal static bool Load(UnityModManager.ModEntry modEntry)
+        public static bool Load(UnityModManager.ModEntry modEntry)
         {
             ModPath = modEntry.Path;
             logger = modEntry.Logger;
@@ -372,11 +376,10 @@ namespace DarkCodex
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnHideGUI = OnHideGUI;
+            modEntry.OnUnload = Unload;
 
             try
             {
-                //_ = AppDomain.CurrentDomain.GetAssemblies().FindOrDefault(a => a.GetName().Name == "").GetName().Version;
-
                 harmony = new Harmony(modEntry.Info.Id);
                 Helper.Patch(typeof(StartGameLoader_LoadAllJson));
                 Helper.Patch(typeof(MainMenu_Start));
@@ -388,9 +391,15 @@ namespace DarkCodex
             catch (Exception ex)
             {
                 Helper.PrintException(ex);
+                return false;
             }
 
+            return true;
+        }
 
+        public static bool Unload(UnityModManager.ModEntry modEntry)
+        {
+            harmony?.UnpatchAll(modEntry.Info.Id);
             return true;
         }
 

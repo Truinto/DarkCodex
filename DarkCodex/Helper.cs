@@ -521,7 +521,20 @@ namespace DarkCodex
             return default;
         }
 
-        public static void PrintFile(string path, string content, bool append = true)
+        public static T TryDeserialize<T>(string path = null, string value = null)
+        {
+            try
+            {
+                return Deserialize<T>(path, value);
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
+                return default;
+            }
+        }
+
+        public static void TryPrintFile(string path, string content, bool append = true)
         {
             try
             {
@@ -536,7 +549,7 @@ namespace DarkCodex
             }
         }
 
-        public static void PrintBytes(string path, byte[] data)
+        public static void TryPrintBytes(string path, byte[] data)
         {
             try
             {
@@ -550,7 +563,7 @@ namespace DarkCodex
             }
         }
 
-        public static byte[] ReadBytes(string path)
+        public static byte[] TryReadBytes(string path)
         {
             try
             {
@@ -560,6 +573,18 @@ namespace DarkCodex
             {
                 Helper.PrintException(e);
                 return new byte[0];
+            }
+        }
+
+        public static void TryDelete(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
             }
         }
 
@@ -666,10 +691,24 @@ namespace DarkCodex
             }
         }
 
-        public static string TrySubstring(this string str, char c, int start = 0)
+        /// <summary>Returns substring. Always excludes char 'c'. Returns null, if index is out of range or char not found.</summary>
+        /// <param name="str">source string</param>
+        /// <param name="c">char to search for</param>
+        /// <param name="start">start index; negative number search last index instead</param>
+        /// <param name="tail">get tail instead of head</param>
+        public static string TrySubstring(this string str, char c, int start = 0, bool tail = false)
         {
             try
             {
+                if (tail)
+                {
+                    if (start < 0)
+                        return str.Substring(str.LastIndexOf(c) + 1);
+                    return str.Substring(str.IndexOf(c, start) + 1);
+                }
+
+                if (start < 0)
+                    return str.Substring(0, str.LastIndexOf(c));
                 return str.Substring(start, str.IndexOf(c, start));
             }
             catch (Exception)

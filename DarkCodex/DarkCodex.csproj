@@ -76,6 +76,7 @@
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
     <Compile Include="Components\UIData.cs" />
     <Compile Include="DEBUG.cs" />
+    <Compile Include="Interfaces\ISettings.cs" />
     <Compile Include="Patches\Event_AreaEffects.cs" />
     <Compile Include="General.cs" />
     <Compile Include="GuidManager.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Patches\Patch_Polymorph.cs" />
     <Compile Include="Patches\Patch_FixLoadCrash1.cs" />
     <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
+    <Compile Include="Patches\Patch_SaveExtension.cs" />
     <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
     <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
     <Compile Include="Patches\Patch_AlwaysAChance.cs" />
@@ -138,9 +140,7 @@
     <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
     <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /i /e /y /f "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
