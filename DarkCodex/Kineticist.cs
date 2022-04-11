@@ -695,8 +695,8 @@ namespace DarkCodex
                 blast.Get().Type = AbilityType.SpellLike;
         }
 
-        [PatchInfo(Severity.Fix, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
-        public static void FixWallInfusion()
+        [PatchInfo(Severity.Fix | Severity.Faulty, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
+        public static void FixWallInfusion() // TODO: seems not to work anymore
         {
             int counter = 0;
 

@@ -224,6 +224,18 @@ dotnet_naming_style.begins_with_i.required_suffix =
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
+# CS8625: Ein NULL-Literal kann nicht in einen Non-Nullable-Verweistyp konvertiert werden.
+dotnet_diagnostic.CS8625.severity = none
+
+# CS8618: Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
+dotnet_diagnostic.CS8618.severity = none
+
+# CS8600: Das NULL-Literal oder ein möglicher NULL-Wert wird in einen Non-Nullable-Typ konvertiert.
+dotnet_diagnostic.CS8600.severity = none
+
+# CS8602: Dereferenzierung eines möglichen Nullverweises.
+dotnet_diagnostic.CS8602.severity = silent
+
 [*.{cs,vb}]
 dotnet_style_qualification_for_method=false:silent
 dotnet_style_qualification_for_property=true:silent

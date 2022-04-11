@@ -12,10 +12,10 @@ namespace DarkCodex
     {
         public PatchInfoAttribute() { }
 
-        public PatchInfoAttribute(Severity PatchType, string Name = null, string Description = null, bool Homebrew = true, int Priority = 400, Type Requirement = null)
+        public PatchInfoAttribute(Severity PatchType, string DisplayName = null, string Description = null, bool Homebrew = true, int Priority = 400, Type Requirement = null)
         {
             this.PatchType = PatchType;
-            this.Name = Name;
+            this.DisplayName = DisplayName;
             this.Description = Description;
             this.Homebrew = Homebrew;
             this.Requirement = Requirement;
@@ -23,7 +23,7 @@ namespace DarkCodex
         }
 
         public Severity PatchType;
-        public string Name;
+        public string DisplayName;
         public string Description;
         public bool Homebrew;
         public Type Requirement;
@@ -42,6 +42,7 @@ namespace DarkCodex
         public bool IsHidden => (PatchType & Severity.Hidden) > 0;
         public bool IsDefaultOff => (PatchType & Severity.DefaultOff) > 0;
 
+        public string FullName => Class + "." + Method;
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";
         public string StatusStr => IsFaulty ? ":x:" : IsWIP ? ":construction:" : ":heavy_check_mark:";
 
@@ -67,6 +68,11 @@ namespace DarkCodex
         public bool Equals(PatchInfoAttribute other)
         {
             return this.Method == other.Method && this.Class == other.Class;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Hash;
         }
     }
 
@@ -106,19 +112,24 @@ namespace DarkCodex
                 list.Add(attr);
         }
 
-        public void SetEnable(bool value, string name)
+        public void SetEnable(bool value, string category) // TODO: update immediately; slit into attr and category!
         {
             if (value)
             {
-                state.Blacklist.Remove(name);
-                if (!name.Contains(".*"))
-                    state.Whitelist.Add(name);
+                state.Blacklist.Remove(category);
+                if (!category.Contains(".*"))
+                    state.Whitelist.Add(category);
             }
             else
             {
-                state.Whitelist.Remove(name);
-                state.Blacklist.Add(name);
+                state.Whitelist.Remove(category);
+                state.Blacklist.Add(category);
             }
+        }
+
+        public void SetEnable(bool value, PatchInfoAttribute attr)
+        {
+            throw new NotImplementedException();
         }
 
         public void Update()
@@ -154,7 +165,7 @@ namespace DarkCodex
                 return false;
 
             int hash = name.GetHashCode();
-            if (Main.patchInfos.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+            if (list.Find(f => f.Hash == hash)?.IsDefaultOff == true)
                 return true;
 
             return !state.NewFeatureDefaultOn;
@@ -172,7 +183,7 @@ namespace DarkCodex
                 return false;
 
             int hash = name.GetHashCode();
-            if (Main.patchInfos.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+            if (list.Find(f => f.Hash == hash)?.IsDefaultOff == true)
                 return true;
 
             return !state.NewFeatureDefaultOn;
@@ -192,5 +203,27 @@ namespace DarkCodex
         {
             return list.GetEnumerator();
         }
+
+        public void Sort()
+        {
+            list.Sort();
+        }
+
+        public IEnumerable<string> GetCriticalPatches()
+        {
+            return list.Where(w => w.IsDangerous && !w.Disabled && !w.DisabledAll).Select(s => s.FullName);
+        }
+
+        public IEnumerable<string> IsEnabledAll(IEnumerable<string> source)
+        {
+            var list = source.ToList();
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                if (IsEnabled(list[i]))
+                    list.RemoveAt(i);
+            }
+            return list;
+        }
+
     }
 }

@@ -19,11 +19,57 @@ namespace BlueprintPurge
         private string pathSave;
         private ZipFile zip;
         private HashSet<Guid> blueprints = new();
-        private List<PurgeRange> purges = new();
+        private BindingList<PurgeRange> purges = new();
+        private BindingSource binding = new();
 
         public BlueprintPurge()
         {
             InitializeComponent();
+
+            purges.RaiseListChangedEvents = true;
+            binding.DataSource = purges;
+            dataGridView1.DataSource = binding;
+
+            //DataGridViewCheckBoxColumn { Name = Enabled, Index = 0 }
+            dataGridView1.Columns[0].ReadOnly = false;
+            dataGridView1.Columns[0].Width = 55;
+            dataGridView1.Columns[0].Resizable = DataGridViewTriState.False;
+
+            //DataGridViewTextBoxColumn { Name = Guid, Index = 1 }
+            dataGridView1.Columns[1].ReadOnly = true;
+            dataGridView1.Columns[1].Width = 225;
+            dataGridView1.Columns[1].Resizable = DataGridViewTriState.False;
+
+            //DataGridViewTextBoxColumn { Name = Type, Index = 2 }
+            dataGridView1.Columns[2].ReadOnly = true;
+            dataGridView1.Columns[2].Width = 200;
+
+            //DataGridViewTextBoxColumn { Name = File, Index = 3 }
+            dataGridView1.Columns[3].ReadOnly = true;
+            dataGridView1.Columns[3].Width = 100;
+
+            //DataGridViewTextBoxColumn { Name = Start, Index = 4 }
+            dataGridView1.Columns[4].ReadOnly = true;
+            dataGridView1.Columns[4].Width = 64;
+
+            //DataGridViewTextBoxColumn { Name = End, Index = 5 }
+            dataGridView1.Columns[5].ReadOnly = true;
+            dataGridView1.Columns[5].Width = 64;
+
+            //DataGridViewCheckBoxColumn { Name = Null, Index = 6 }
+            dataGridView1.Columns[6].ReadOnly = true;
+            dataGridView1.Columns[6].Width = 35;
+            dataGridView1.Columns[6].Resizable = DataGridViewTriState.False;
+
+            //DataGridViewTextBoxColumn { Name = Ref, Index = 7 }
+            dataGridView1.Columns[7].ReadOnly = true;
+            dataGridView1.Columns[7].Width = 48;
+
+            //DataGridViewTextBoxColumn { Name = Peek, Index = 8 }
+            dataGridView1.Columns[8].ReadOnly = true;
+            dataGridView1.Columns[8].Width = 100;
+            dataGridView1.Columns[8].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
 
             radioWhitelist.Enabled = false; // todo: implement whitelist mode -> add type check
         }
@@ -98,19 +144,18 @@ namespace BlueprintPurge
             var sw = new MemoryStream();
             entry.Extract(sw);
             byte[] data = sw.ToArray();
-            Debug.Print(data.Length.ToString());
 
-            char last = default;
-            char last2 = default;
-            bool isQuote = false;
-            bool isId = false;
-            string lastId = "";
-            bool isRef = false;
-            var refs = new HashSet<string>();
-            var sb = new StringBuilder();
-            var stack = new Stack<int>();
-            int depth = 0;
-            var purge = new Stack<PurgeRange>();
+            char last = default;                 // escape detection
+            char last2 = default;                // escape detection
+            bool isQuote = false;                // true while 'c' is inside a quote
+            bool isId = false;                   // true if last quote was "$id"
+            var lastId = new Dictionary<int, string>(); // value of last id by depth
+            bool isRef = false;                  // true if last quote was "$ref"
+            var refs = new HashSet<string>();    // ref ids by detected segments
+            var sb = new StringBuilder();        // stringbuilder used for quote reconstruction
+            var stack = new Stack<int>();        // stack of '{' indexes which points to the segment start
+            var depth = new Stack<int>();        // stack of 'stack'-depth which so we can distinguish nested segments
+            var purge = new Stack<PurgeRange>(); // stack of unfinished segments waiting for their end point (which is at '}' and the correct depth)
             for (int i = 0; i < data.Length; i++)
             {
                 char c = (char)data[i];
@@ -127,24 +172,27 @@ namespace BlueprintPurge
                         string quote = sb.ToString();
 
                         if (isId)
-                            lastId = quote;
+                            //lastId = quote;
+                            lastId[stack.Count] = quote;
 
-                        if (isRef && refs.Contains(quote))
+                        else if (isRef && refs.Contains(quote))
                         {
-                            var x = purges.First(f => f.Ref == quote);
-                            purge.Push(new PurgeRange { File = x.File, Guid = x.Guid, Data = data, Ref = quote });
+                            var x = purges.First(f => f.Ref == quote && f.File == entry.FileName);
+                            purge.Push(new PurgeRange { File = entry.FileName, Guid = x.Guid, Data = data, Ref = quote, Type = "$ref" });
+                            depth.Push(stack.Count);
+                        }
+
+                        else if (Guid.TryParse(quote, out var guid)
+                           && this.blueprints.Contains(guid) ^ this.radioWhitelist.Checked)
+                        {
+                            if (lastId.TryGetValue(stack.Count, out var id))
+                                refs.Add(id);
+                            purge.Push(new PurgeRange { File = entry.FileName, Guid = guid, Data = data, Ref = id! });
+                            depth.Push(stack.Count);
                         }
 
                         isId = quote == "$id";
                         isRef = quote == "$ref";
-
-                        if (Guid.TryParse(quote, out var guid)
-                           && this.blueprints.Contains(guid) ^ this.radioWhitelist.Checked)
-                        {
-                            purge.Push(new PurgeRange { File = entry.FileName, Guid = guid, Data = data, Ref = lastId });
-                            refs.Add(lastId);
-                            depth = stack.Count;
-                        }
                         sb.Clear();
                     }
                     goto end;
@@ -154,15 +202,16 @@ namespace BlueprintPurge
                     sb.Append(c);
                     goto end;
                 }
-
                 if (c == '{')
                 {
                     stack.Push(i);
+                    goto end;
                 }
-                else if (c == '}')
+                if (c == '}')
                 {
-                    if (purge.Count > 0 && stack.Count == depth)
+                    if (purge.Count > 0 && stack.Count == depth.Peek())
                     {
+                        depth.Pop();
                         var p = purge.Pop();
                         p.Start = stack.Pop();
                         p.End = i;
@@ -171,15 +220,22 @@ namespace BlueprintPurge
                     }
                     else
                         stack.Pop();
+                    goto end;
                 }
 
             end:
                 last2 = last;
                 last = c;
             }
+
+            if (purge.Count > 0)
+                throw new FormatException("bad json formatting, leftover purge");
+            if (stack.Count > 0)
+                throw new FormatException("bad json formatting, stack not 0");
         }
 
         private Regex rxType = new("([A-z\\.]*), Assembly-CSharp\"");
+        private Regex rxType2 = new("([A-z]*), Assembly-CSharp");
         private Regex rxId = new("\"\\$id\"[\\s:]*\"([0-9]+)\"");
         private void Cleanup()
         {
@@ -208,7 +264,7 @@ namespace BlueprintPurge
                     if (char.IsWhiteSpace(c))
                         continue;
                     if (c == ':')
-                        purge.NullReplace = true;
+                        purge.Null = true;
                     break;
                 }
 
@@ -224,19 +280,17 @@ namespace BlueprintPurge
                 }
 
                 // parse Type
-                var match = rxType.Match(purge.Peek);
-                if (match.Success)
-                    purge.Type = match.Groups[1].Value;
-
-                // parse id
-                var match2 = rxId.Match(purge.Peek);
-                if (match2.Success)
-                    purge.Ref = match.Groups[1].Value;
+                if (purge.Type == null)
+                {
+                    var match = rxType2.Match(purge.Peek);
+                    if (match.Success)
+                        purge.Type = match.Groups[1].Value;
+                }
 
                 purge.Enabled = true;
             }
 
-            // TODO: remove refs; sanity json check
+            // TODO: sanity json check
         }
 
         private void Clear()
@@ -259,46 +313,29 @@ namespace BlueprintPurge
             zip.UpdateEntry("header.json", header);
         }
 
-        private void PurgeRefs(string file, byte[] data)
-        {
-            var list = new List<string>();
-            foreach (var purge in purges.Where(w => w.File == file && w.Enabled && w.Ref != null))
-                list.Add(purge.Ref);
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                // TODO:
-                // {"$ref": "13"}
-            }
-        }
-
-        private string Get(byte[] data, int start)
-        {
-            for (int i = 0; i < data.Length; i++)
-            {
-                // TODO:
-                // {"$ref": "13"}
-            }
-            return null;
-        }
-
         private void ButtonPurge_Click(object sender, EventArgs e)
         {
             if (zip == null)
                 return;
 
+            if (MessageBox.Show("You are about to purge your save file. This might corrupt your save without you noticing immediately. If this is an auto save, make a manual backup. If this is a manual save, do not delete the original.\nThis process is dangerous. Use at own risk and don't blame me.", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+                return;
+
             // process purge entries
             var edited = new Dictionary<string, byte[]>();
+            int count = 0;
             foreach (var purge in purges)
             {
                 if (!purge.Enabled)
                     continue;
 
+                count++;
                 edited[purge.File] = purge.Data;
+
                 for (int i = purge.Start; i <= purge.End; i++)
                     purge.Data[i] = (byte)' ';
 
-                if (purge.NullReplace)
+                if (purge.Null)
                 {
                     int i = purge.Start;
                     purge.Data[i++] = (byte)'n';
@@ -313,13 +350,12 @@ namespace BlueprintPurge
             {
                 foreach (var (file, data) in edited)
                 {
-                    PurgeRefs(file, data);
                     zip.UpdateEntry(file, data);
                 }
 
                 UpdateHeader();
                 zip.Save(pathSave + ".purged.zks");
-                MessageBox.Show($"Removed {edited.Count} entries. Saved in new file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Removed {count} entries in {edited.Count} files. Saved in new file.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
@@ -333,10 +369,17 @@ namespace BlueprintPurge
         {
             MessageBox.Show($"Warning: This is just a test version. It may create invalid save data which could immediately or during your playthrough fail.\n"
                 + "This app will never override your original save. It will instead create a duplicate with the description 'PURGED!'.\n"
-                + "How to use: Enter file path to save data you want to purge. List blueprint guids you want to purge from your save. Click 'Search'. Click 'Purge Now!'.\n"
-                + "The grey box has currently no function. In the future you will see a preview of the purges there.",
+                + "How to use: Enter file path to save data you want to purge. List blueprint guids you want to purge from your save. Click 'Search'. "
+                + "Review the entries in the list. You may deselect entries, but it is advised to instead change the blacklist. Click 'Purge Now!'.",
 
                 "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            var list = (System.Collections.IList)dataGridView1.Columns;
+            for (int i = 0; i < list.Count; i++)
+            {
+                var column = (DataGridViewColumn)list[i];
+                Debug.WriteLine($"{i} : {column.Width}");
+            }
         }
     }
 }

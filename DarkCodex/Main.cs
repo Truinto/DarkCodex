@@ -56,9 +56,9 @@ namespace DarkCodex
             return true;
         }
 
-        internal static List<PatchInfoAttribute> patchInfos = new();
+        internal static PatchInfoCollection patchInfos;
 
-        private static bool restart;
+        internal static bool restart;
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
         /// <summary>Draws the GUI</summary>
@@ -119,25 +119,13 @@ namespace DarkCodex
                     + " Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
             if (GUILayout.Button("Disable all homebrew", GUILayout.ExpandWidth(false)))
-                patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method).ForEach(name => state.SetEnable(false, name));
+                patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method).ForEach(name => patchInfos.SetEnable(false, name));
             GUILayout.Space(10);
             Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
 
+            patchInfos.Update();
+
             string category = null;
-            bool disableAll = false;
-
-            foreach (var info in patchInfos)
-            {
-                if (info.Class != category)
-                {
-                    category = info.Class;
-                    disableAll = state.IsDisenabledCategory(category + ".*");
-                }
-                info.DisabledAll = disableAll;
-                info.Disabled = state.IsDisenabledSingle(info.Class + "." + info.Method);
-            }
-
-            category = null;
             foreach (var info in patchInfos)
             {
 #if !DEBUG
@@ -148,13 +136,12 @@ namespace DarkCodex
                     GUILayout.Box(GUIContent.none, StyleLine);
                     GUILayout.Label(info.Class);
                     category = info.Class;
-                    disableAll = info.DisabledAll;
 
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(!disableAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
+                    if (GUILayout.Button(!info.DisabledAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
                     {
                         restart = true;
-                        state.SetEnable(disableAll, category + ".*");
+                        patchInfos.SetEnable(info.DisabledAll, category + ".*");
                     }
                     GUILayout.Space(5);
                     GUILayout.Label("Disable all", GUILayout.ExpandWidth(false));
@@ -167,10 +154,10 @@ namespace DarkCodex
                 {
                     string str = info.Class + "." + info.Method;
                     restart = true;
-                    state.SetEnable(info.Disabled, str);
+                    patchInfos.SetEnable(info.Disabled, str);
                 }
                 GUILayout.Space(5);
-                GUILayout.Label(info.Name.Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
+                GUILayout.Label(info.DisplayName.Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
                 GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
             }
@@ -228,7 +215,7 @@ namespace DarkCodex
             }
         }
 
-        private static void OnSaveGUI(UnityModManager.ModEntry modEntry)
+        internal static void OnSaveGUI(UnityModManager.ModEntry modEntry)
         {
             foreach (var entry in NumberTable)
             {
@@ -432,6 +419,8 @@ namespace DarkCodex
                 try
                 {
                     Helper.Print("Loading Dark Codex");
+
+                    patchInfos = new(Settings.StateManager.State);
 
                     // Debug
                     LoadSafe(DEBUG.Enchantments.NameAll);
@@ -721,7 +710,7 @@ namespace DarkCodex
 
         private static bool CheckSetting(string name)
         {
-            return Settings.StateManager.State.IsDisenabled(name);
+            return patchInfos.IsDisenabled(name);
         }
 
         private static void ProcessInfo(MemberInfo info)
@@ -735,12 +724,7 @@ namespace DarkCodex
                 return;
             }
 
-            attr.Class = info.DeclaringType?.Name ?? "Patch";
-            attr.Method = info.Name;
-            attr.Hash = (attr.Class + "." + attr.Method).GetHashCode();
-
-            if (!patchInfos.Contains(attr))
-                patchInfos.Add(attr);
+            patchInfos.Add(attr, info);
         }
 
         private static void ExportPlayerData()
