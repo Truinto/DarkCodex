@@ -486,10 +486,11 @@ namespace DarkCodex
             teleport.Range = AbilityRange.DoubleMove;
 
             // fix wings
-            // BuffWingsDemon_3c958be25ab34dc448569331488bee27.json
-            // Airborne_70cffb448c132fa409e49156d013b175.json
-            // SpellImmunityToSpellDescriptor AddMechanicsFeature AddFacts
-
+            var wingsDemon = Helper.Get<BlueprintBuff>("3c958be25ab34dc448569331488bee27"); //BuffWingsDemon
+            wingsDemon.AddComponents(
+                Helper.CreateSpellImmunityToSpellDescriptor(SpellDescriptor.Ground),
+                Helper.CreateAddFacts(Helper.ToRef<BlueprintUnitFactReference>("c1b26f97b974aec469613f968439e7bb")),   //TripImmune
+                Helper.CreateAddMechanicsFeature(AddMechanicsFeature.MechanicsFeatureType.Flying));
         }
 
         [PatchInfo(Severity.Create, "Demon Mastery", "mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect")]

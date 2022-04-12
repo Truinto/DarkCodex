@@ -1,4 +1,5 @@
 # Changelog
+- added airborne features to demon wings
 
 ## [1.2.5]
 - fixed "Unlock ability groups" not showing up in menu

@@ -1522,6 +1522,21 @@ namespace DarkCodex
             return new SpellDescriptorComponent { Descriptor = descriptor };
         }
 
+        public static SpellImmunityToSpellDescriptor CreateSpellImmunityToSpellDescriptor(SpellDescriptor descriptor, BlueprintUnitFactReference ignoreFact = null)
+        {
+            var result = new SpellImmunityToSpellDescriptor();
+            result.Descriptor = descriptor;
+            result.m_CasterIgnoreImmunityFact = ignoreFact;
+            return result;
+        }
+
+        public static AddMechanicsFeature CreateAddMechanicsFeature(AddMechanicsFeature.MechanicsFeatureType feature)
+        {
+            var result = new AddMechanicsFeature();
+            result.m_Feature = feature;
+            return result;
+        }
+
         public static AbilityTargetHasFact CreateAbilityTargetHasFact(bool inverted, params BlueprintUnitFactReference[] facts)
         {
             var result = new AbilityTargetHasFact();
