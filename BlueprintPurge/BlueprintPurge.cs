@@ -153,8 +153,8 @@ namespace BlueprintPurge
             bool isRef = false;                  // true if last quote was "$ref"
             var refs = new HashSet<string>();    // ref ids by detected segments
             var sb = new StringBuilder();        // stringbuilder used for quote reconstruction
-            var stack = new Stack<int>();        // stack of '{' indexes which points to the segment start
-            var depth = new Stack<int>();        // stack of 'stack'-depth which so we can distinguish nested segments
+            var stack = new Stack<int>();        // stack of '{' indexes which points to the segment start; stack.Count is also the current depth
+            var depth = new Stack<int>();        // stack of 'stack'-depth so we can distinguish nested segments
             var purge = new Stack<PurgeRange>(); // stack of unfinished segments waiting for their end point (which is at '}' and the correct depth)
             for (int i = 0; i < data.Length; i++)
             {
@@ -172,7 +172,6 @@ namespace BlueprintPurge
                         string quote = sb.ToString();
 
                         if (isId)
-                            //lastId = quote;
                             lastId[stack.Count] = quote;
 
                         else if (isRef && refs.Contains(quote))
@@ -209,6 +208,10 @@ namespace BlueprintPurge
                 }
                 if (c == '}')
                 {
+                    // clear id so segments without $id don't parse the wrong value
+                    lastId.Remove(stack.Count);
+
+                    // finish segment when their range closes
                     if (purge.Count > 0 && stack.Count == depth.Peek())
                     {
                         depth.Pop();
@@ -239,8 +242,6 @@ namespace BlueprintPurge
         private Regex rxId = new("\"\\$id\"[\\s:]*\"([0-9]+)\"");
         private void Cleanup()
         {
-            int lastStart = 0;
-            int lastEnd = 0;
             for (int i = purges.Count - 1; i >= 0; i--)
             {
                 var purge = purges[i];
@@ -248,8 +249,8 @@ namespace BlueprintPurge
                 // remove entries that are contained by its predecessor
                 if (i > 0)
                 {
-                    lastStart = purges[i - 1].Start;
-                    lastEnd = purges[i - 1].End;
+                    int lastStart = purges[i - 1].Start;
+                    int lastEnd = purges[i - 1].End;
                     if (purge.Start <= lastStart && lastEnd <= purge.End)
                     {
                         purges.RemoveAt(i - 1);
@@ -269,14 +270,17 @@ namespace BlueprintPurge
                 }
 
                 // include tailing comma
-                for (int j = purge.End + 1; j < purge.Data.Length; j++)
+                if (!purge.Null)
                 {
-                    char c = (char)purge.Data[j];
-                    if (char.IsWhiteSpace(c))
-                        continue;
-                    if (c == ',')
-                        purge.End = j;
-                    break;
+                    for (int j = purge.End + 1; j < purge.Data.Length; j++)
+                    {
+                        char c = (char)purge.Data[j];
+                        if (char.IsWhiteSpace(c))
+                            continue;
+                        if (c == ',')
+                            purge.End = j;
+                        break;
+                    }
                 }
 
                 // parse Type
