@@ -42,7 +42,7 @@ namespace BlueprintPurge
 
             //DataGridViewTextBoxColumn { Name = Type, Index = 2 }
             dataGridView1.Columns[2].ReadOnly = true;
-            dataGridView1.Columns[2].Width = 200;
+            dataGridView1.Columns[2].Width = 180;
 
             //DataGridViewTextBoxColumn { Name = File, Index = 3 }
             dataGridView1.Columns[3].ReadOnly = true;
@@ -56,9 +56,9 @@ namespace BlueprintPurge
             dataGridView1.Columns[5].ReadOnly = true;
             dataGridView1.Columns[5].Width = 64;
 
-            //DataGridViewCheckBoxColumn { Name = Null, Index = 6 }
+            //DataGridViewCheckBoxColumn { Name = IsList, Index = 6 }
             dataGridView1.Columns[6].ReadOnly = true;
-            dataGridView1.Columns[6].Width = 35;
+            dataGridView1.Columns[6].Width = 40;
             dataGridView1.Columns[6].Resizable = DataGridViewTriState.False;
 
             //DataGridViewTextBoxColumn { Name = Ref, Index = 7 }
@@ -141,6 +141,7 @@ namespace BlueprintPurge
 
         private void Search(ZipEntry entry)
         {
+            bool doPeek = checkBoxPeek.Checked;
             var sw = new MemoryStream();
             entry.Extract(sw);
             byte[] data = sw.ToArray();
@@ -171,9 +172,11 @@ namespace BlueprintPurge
                     {
                         string quote = sb.ToString();
 
+                        // if it's an id, remember it if needed later
                         if (isId)
                             lastId[stack.Count] = quote;
 
+                        // if it's an ref, check if it's blacklisted
                         else if (isRef && refs.Contains(quote))
                         {
                             var x = purges.First(f => f.Ref == quote && f.File == entry.FileName);
@@ -181,11 +184,14 @@ namespace BlueprintPurge
                             depth.Push(stack.Count);
                         }
 
+                        // try parse the quote as an guid and check if it's blacklisted
                         else if (Guid.TryParse(quote, out var guid)
-                           && this.blueprints.Contains(guid) ^ this.radioWhitelist.Checked)
+                           && this.blueprints.Contains(guid)) // ^ this.radioWhitelist.Checked); whitelist is not implemented anyway
                         {
+                            // get id, if it has any
                             if (lastId.TryGetValue(stack.Count, out var id))
                                 refs.Add(id);
+                            // generate new range, which is finalized later
                             purge.Push(new PurgeRange { File = entry.FileName, Guid = guid, Data = data, Ref = id! });
                             depth.Push(stack.Count);
                         }
@@ -201,12 +207,12 @@ namespace BlueprintPurge
                     sb.Append(c);
                     goto end;
                 }
-                if (c == '{')
+                if (c == '{' || c == '[')
                 {
                     stack.Push(i);
                     goto end;
                 }
-                if (c == '}')
+                if (c == '}' || c == ']')
                 {
                     // clear id so segments without $id don't parse the wrong value
                     lastId.Remove(stack.Count);
@@ -218,7 +224,8 @@ namespace BlueprintPurge
                         var p = purge.Pop();
                         p.Start = stack.Pop();
                         p.End = i;
-                        p.Peek = Encoding.Default.GetString(data[p.Start..(p.End + 1)]);
+                        if (doPeek)
+                            p.Peek = Encoding.Default.GetString(data[p.Start..(p.End + 1)]);
                         purges.Add(p);
                     }
                     else
@@ -265,12 +272,12 @@ namespace BlueprintPurge
                     if (char.IsWhiteSpace(c))
                         continue;
                     if (c == ':')
-                        purge.Null = true;
+                        purge.IsList = true;
                     break;
                 }
 
                 // include tailing comma
-                if (!purge.Null)
+                if (!purge.IsList)
                 {
                     for (int j = purge.End + 1; j < purge.Data.Length; j++)
                     {
@@ -284,7 +291,7 @@ namespace BlueprintPurge
                 }
 
                 // parse Type
-                if (purge.Type == null)
+                if (purge.Type == null && purge.Peek != null)
                 {
                     var match = rxType2.Match(purge.Peek);
                     if (match.Success)
@@ -293,8 +300,6 @@ namespace BlueprintPurge
 
                 purge.Enabled = true;
             }
-
-            // TODO: sanity json check
         }
 
         private void Clear()
@@ -336,16 +341,25 @@ namespace BlueprintPurge
                 count++;
                 edited[purge.File] = purge.Data;
 
-                for (int i = purge.Start; i <= purge.End; i++)
-                    purge.Data[i] = (byte)' ';
-
-                if (purge.Null)
+                if (purge.IsList)
                 {
+                    // close the segment with the correct symbol, either } or ]
+                    // then clear all other chars; todo clear only blacklisted guids
                     int i = purge.Start;
-                    purge.Data[i++] = (byte)'n';
-                    purge.Data[i++] = (byte)'u';
-                    purge.Data[i++] = (byte)'l';
-                    purge.Data[i++] = (byte)'l';
+                    if (purge.Data[purge.Start] == '{')
+                        purge.Data[++purge.Start] = (byte)'}';
+                    else if (purge.Data[purge.Start] == '[')
+                        purge.Data[++purge.Start] = (byte)']';
+                    else
+                        throw new InvalidDataException("data error, expected range to start with '{' or '['");
+                    for (++i; i <= purge.End; i++)
+                        purge.Data[i] = (byte)' ';
+                }
+                else
+                {
+                    // simply clear all chars
+                    for (int i = purge.Start; i <= purge.End; i++)
+                        purge.Data[i] = (byte)' ';
                 }
             }
 
@@ -383,6 +397,35 @@ namespace BlueprintPurge
             {
                 var column = (DataGridViewColumn)list[i];
                 Debug.WriteLine($"{i} : {column.Width}");
+            }
+        }
+
+        private void DataGridView1_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (sender is not DataGridView view)
+                return;
+
+            if (e.Button == MouseButtons.Right)
+            {
+                var hit = view.HitTest(e.Location.X, e.Location.Y);
+                if (hit.Type == DataGridViewHitTestType.Cell)
+                {
+                    var cell = view[hit.ColumnIndex, hit.RowIndex];
+                    cell.Selected = true;
+
+                    switch (cell.Value)
+                    {
+                        case string text:
+                            Clipboard.SetText(text);
+                            break;
+                        case Guid guid:
+                            Clipboard.SetText(guid.ToString("N"));
+                            break;
+                        case int number:
+                            Clipboard.SetText(number.ToString());
+                            break;
+                    }
+                }
             }
         }
     }

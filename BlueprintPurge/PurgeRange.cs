@@ -16,7 +16,7 @@ namespace BlueprintPurge
         public string File { get; set; }
         public int Start { get; set; }
         public int End { get; set; }
-        public bool Null { get; set; }
+        public bool IsList { get; set; }
         public string Ref { get; set; }
         public string Peek { get; set; }
         public byte[] Data;

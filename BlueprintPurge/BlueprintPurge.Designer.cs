@@ -42,6 +42,7 @@
             this.openFileDialogBlueprints = new System.Windows.Forms.OpenFileDialog();
             this.buttonHelp = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.checkBoxPeek = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -69,9 +70,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 99);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 15);
+            this.label1.Size = new System.Drawing.Size(60, 15);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Blueprint";
+            this.label1.Text = "Blueprints";
             // 
             // label2
             // 
@@ -85,7 +86,7 @@
             // radioWhitelist
             // 
             this.radioWhitelist.AutoSize = true;
-            this.radioWhitelist.Location = new System.Drawing.Point(174, 97);
+            this.radioWhitelist.Location = new System.Drawing.Point(168, 97);
             this.radioWhitelist.Name = "radioWhitelist";
             this.radioWhitelist.Size = new System.Drawing.Size(71, 19);
             this.radioWhitelist.TabIndex = 5;
@@ -123,11 +124,13 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Location = new System.Drawing.Point(12, 295);
+            this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 25;
             this.dataGridView1.Size = new System.Drawing.Size(814, 182);
             this.dataGridView1.TabIndex = 8;
+            this.dataGridView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.DataGridView1_MouseClick);
             // 
             // buttonPurge
             // 
@@ -189,11 +192,24 @@
     "️\r\n☠️ It may cause more errors or corrupt certain areas. Use at your own risk! ☠" +
     "️";
             // 
+            // checkBoxPeek
+            // 
+            this.checkBoxPeek.AutoSize = true;
+            this.checkBoxPeek.Checked = true;
+            this.checkBoxPeek.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxPeek.Location = new System.Drawing.Point(256, 97);
+            this.checkBoxPeek.Name = "checkBoxPeek";
+            this.checkBoxPeek.Size = new System.Drawing.Size(106, 19);
+            this.checkBoxPeek.TabIndex = 13;
+            this.checkBoxPeek.Text = "Generate Peeks";
+            this.checkBoxPeek.UseVisualStyleBackColor = true;
+            // 
             // BlueprintPurge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(838, 518);
+            this.Controls.Add(this.checkBoxPeek);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.buttonHelp);
             this.Controls.Add(this.buttonBrowse);
@@ -230,5 +246,6 @@
         private System.Windows.Forms.OpenFileDialog openFileDialogBlueprints;
         private System.Windows.Forms.Button buttonHelp;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkBoxPeek;
     }
 }
