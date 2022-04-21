@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Json;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -346,10 +347,10 @@ namespace BlueprintPurge
                     // close the segment with the correct symbol, either } or ]
                     // then clear all other chars; todo clear only blacklisted guids
                     int i = purge.Start;
-                    if (purge.Data[purge.Start] == '{')
-                        purge.Data[++purge.Start] = (byte)'}';
-                    else if (purge.Data[purge.Start] == '[')
-                        purge.Data[++purge.Start] = (byte)']';
+                    if (purge.Data[i] == '{')
+                        purge.Data[++i] = (byte)'}';
+                    else if (purge.Data[i] == '[')
+                        purge.Data[++i] = (byte)']';
                     else
                         throw new InvalidDataException("data error, expected range to start with '{' or '['");
                     for (++i; i <= purge.End; i++)
@@ -368,6 +369,7 @@ namespace BlueprintPurge
             {
                 foreach (var (file, data) in edited)
                 {
+                    CheckSyntax(data);
                     zip.UpdateEntry(file, data);
                 }
 
@@ -381,6 +383,20 @@ namespace BlueprintPurge
             }
 
             Clear();
+        }
+
+        private bool CheckSyntax(byte[] data)
+        {
+            try
+            {
+                JsonValue.Parse(Encoding.Default.GetString(data));
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString());
+                throw new Exception("Syntax error in output file", e);
+            }
         }
 
         private void ButtonHelp_Click(object sender, EventArgs e)
