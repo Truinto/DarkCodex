@@ -112,24 +112,49 @@ namespace DarkCodex
                 list.Add(attr);
         }
 
-        public void SetEnable(bool value, string category) // TODO: update immediately; slit into attr and category!
+        public void SetEnable(bool value, string category)
         {
-            if (value)
+            if (category.Last() != '*')
             {
-                state.Blacklist.Remove(category);
-                if (!category.Contains(".*"))
-                    state.Whitelist.Add(category);
+                if (value)
+                {
+                    state.Blacklist.Remove(category);
+                }
+                else
+                {
+                    state.Whitelist.Remove(category);
+                    state.Blacklist.Add(category);
+                }
+                Update();
             }
             else
             {
-                state.Whitelist.Remove(category);
-                state.Blacklist.Add(category);
+                var attr = list.FirstOrDefault(f => f.FullName == category);
+                if (attr != null)
+                {
+                    SetEnable(value, attr);
+
+                    if (value && attr.DisabledAll) // force enable category
+                        SetEnable(true, attr.Class + ".*");
+                }
             }
         }
 
         public void SetEnable(bool value, PatchInfoAttribute attr)
         {
-            throw new NotImplementedException();
+            attr.Disabled = !value;
+
+            string fullName = attr.FullName;
+            if (value)
+            {
+                state.Blacklist.Remove(fullName);
+                state.Whitelist.Add(fullName);
+            }
+            else
+            {
+                state.Whitelist.Remove(fullName);
+                state.Blacklist.Add(fullName);
+            }
         }
 
         public void Update()
@@ -173,20 +198,23 @@ namespace DarkCodex
 
         public bool IsDisenabled(string name)
         {
-            if (state.Blacklist.Contains(name))
+            if (state.Blacklist.Contains(name)) // blacklist has priority
                 return true;
 
-            if (state.Blacklist.Contains(name.TrySubstring('.') + ".*"))
+            if (name.Last() == '*') // categories are always enabled unless they are on the blacklist
+                return false;
+
+            if (state.Blacklist.Contains(name.TrySubstring('.') + ".*")) // check if disabled by category
                 return true;
 
-            if (state.Whitelist.Contains(name))
+            if (state.Whitelist.Contains(name)) // check whitelist
                 return false;
 
             int hash = name.GetHashCode();
-            if (list.Find(f => f.Hash == hash)?.IsDefaultOff == true)
+            if (list.Find(f => f.Hash == hash)?.IsDefaultOff == true) // check default off flag
                 return true;
 
-            return !state.NewFeatureDefaultOn;
+            return !state.NewFeatureDefaultOn;  // if setting was never set, check for generic default
         }
 
         public bool IsEnabled(string name)

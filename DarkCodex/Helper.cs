@@ -939,7 +939,7 @@ namespace DarkCodex
         public static T Clone<T>(this T obj, string name, string guid = null, string guid2 = null) where T : SimpleBlueprint
         {
             if (guid2 != null)
-                guid = MergeIds(obj.AssetGuid.ToString(), guid2);
+                guid = MergeIds(name, obj.AssetGuid.ToString(), guid2);
 
             if (guid == null)
                 guid = GuidManager.i.Get(name);
@@ -981,7 +981,7 @@ namespace DarkCodex
 
         private static ulong ParseGuidLow(string id) => ulong.Parse(id.Substring(id.Length - 16), System.Globalization.NumberStyles.HexNumber);
         private static ulong ParseGuidHigh(string id) => ulong.Parse(id.Substring(0, id.Length - 16), System.Globalization.NumberStyles.HexNumber);
-        public static string MergeIds(string guid1, string guid2, string guid3 = null)
+        public static string MergeIds(string name, string guid1, string guid2, string guid3 = null)
         {
             // Parse into low/high 64-bit numbers, and then xor the two halves.
             ulong low = ParseGuidLow(guid1);
@@ -998,6 +998,7 @@ namespace DarkCodex
 
             var result = high.ToString("x16") + low.ToString("x16");
             PrintDebug($"MergeIds {guid1} + {guid2} + {guid3} = {result}");
+            GuidManager.i.AddDynamic(name, result);
             return result;
         }
 
@@ -1515,6 +1516,14 @@ namespace DarkCodex
             {
                 Condition = condition
             };
+        }
+
+        public static AddConditionExceptions CreateAddConditionExceptions(UnitCondition condition, params BlueprintBuffReference[] buffs)
+        {
+            var result = new AddConditionExceptions();
+            result.Condition = condition;
+            result.Exception = new UnitConditionExceptionsFromBuff { Exceptions = buffs };
+            return result;
         }
 
         public static SpellDescriptorComponent CreateSpellDescriptorComponent(SpellDescriptor descriptor)
@@ -2688,7 +2697,23 @@ namespace DarkCodex
                 var bytes = File.ReadAllBytes(Path.Combine(Main.ModPath, "Icons", filename));
                 var texture = new Texture2D(width, height);
                 texture.LoadImage(bytes);
-                return Sprite.Create(texture, new Rect(0, 0, 64, 64), new Vector2(0, 0));
+                return Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0, 0));
+            }
+            catch (Exception e)
+            {
+                PrintException(e);
+                return null;
+            }
+        }
+
+        public static Texture CreateTexture(string filename, int width = 64, int height = 64)
+        {
+            try
+            {
+                var bytes = File.ReadAllBytes(Path.Combine(Main.ModPath, "Icons", filename));
+                var texture = new Texture2D(width, height);
+                texture.LoadImage(bytes);
+                return texture;
             }
             catch (Exception e)
             {

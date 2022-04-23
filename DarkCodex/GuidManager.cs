@@ -23,7 +23,9 @@ namespace DarkCodex
 #endif
 
         public string filepath = Path.Combine(Main.ModPath, "blueprints.txt");
+        public string filepath2 = Path.Combine(Main.ModPath, "blueprints_dynamic.txt");
         public Dictionary<string, string> guid_list = new();
+        public HashSet<string> guid_dynamic = new();
         public List<string> register = new();
 
         private bool loaded = false;
@@ -32,19 +34,33 @@ namespace DarkCodex
             if (loaded) return;
             else loaded = true;
 
-            if (!File.Exists(filepath)) return;
-
             try
             {
-                string[] lines = File.ReadAllLines(filepath);
-                foreach (string line in lines)
+                if (File.Exists(filepath))
                 {
-                    string[] items = line.Split('\t');
-                    if (items.Length >= 2)
-                        guid_list[items[0]] = items[1];
+                    string[] lines = File.ReadAllLines(filepath);
+                    foreach (string line in lines)
+                    {
+                        string[] items = line.Split('\t');
+                        if (items.Length >= 2)
+                            guid_list[items[0]] = items[1];
+                    }
                 }
-            } catch (Exception e) {
-                Helper.Print(e.ToString());
+
+                if (File.Exists(filepath2))
+                {
+                    string[] lines = File.ReadAllLines(filepath2);
+                    foreach (string line in lines)
+                    {
+                        string[] items = line.Split('\t');
+                        if (items.Length >= 2)
+                            guid_dynamic.Add(items[1]);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
             }
         }
 
@@ -52,12 +68,12 @@ namespace DarkCodex
         {
             try
             {
-                using (StreamWriter writer = new(filepath, append: true))
-                {
-                    writer.WriteLine(key + '\t' + guid);
-                }
-            } catch (Exception e) {
-                Debug.LogError(e.ToString());
+                using StreamWriter writer = new(filepath, append: true);
+                writer.WriteLine(key + '\t' + guid);
+            }
+            catch (Exception e)
+            {
+                Helper.PrintException(e);
             }
         }
 
@@ -67,40 +83,39 @@ namespace DarkCodex
             if (!allow_guid_generation) return;
             TryLoad();
 
-            using (StreamWriter writer = new(filepath, append: false))
+            using StreamWriter writer = new(filepath, append: false);
+
+            foreach (KeyValuePair<string, string> pair in guid_list)
             {
-                foreach (KeyValuePair<string, string> pair in guid_list)
+                SimpleBlueprint obj = null;
+                try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(pair.Value); } catch (Exception e) { Helper.Print("WriteAll guid_list: " + e.Message); }
+                if (obj != null)
                 {
-                    SimpleBlueprint obj = null;
-                    try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(pair.Value); } catch (Exception e) { Helper.Print("WriteAll guid_list: " + e.Message); }
-                    if (obj != null)
-                    {
-                        writer.WriteLine(pair.Key + '\t' + pair.Value + '\t' + obj.GetType().FullName);
-                        if (pair.Key != obj.name) Helper.Print(pair.Key + " != " + obj.name);
-                    }
-                    else
-                    {
-                        Helper.Print(pair.Value + " does not exist");
-                        writer.WriteLine(pair.Key + '\t' + pair.Value + '\t' + "NULL");
-                    }
+                    writer.WriteLine(pair.Key + '\t' + pair.Value + '\t' + obj.GetType().FullName);
+                    if (pair.Key != obj.name) Helper.Print(pair.Key + " != " + obj.name);
                 }
-
-                foreach (string guid in register)
+                else
                 {
-                    if (guid_list.ContainsValue(guid))
-                        continue;
+                    Helper.Print(pair.Value + " does not exist");
+                    writer.WriteLine(pair.Key + '\t' + pair.Value + '\t' + "NULL");
+                }
+            }
 
-                    BlueprintScriptableObject obj = null;
-                    try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(guid); } catch (Exception e) { Helper.Print("WriteAll register: " + e.Message); }
-                    if (obj != null)
-                    {
-                        writer.WriteLine(obj.name + '\t' + guid + '\t' + obj.GetType().FullName);
-                    }
-                    else
-                    {
-                        Helper.Print(guid + " does not exist");
-                        writer.WriteLine("UNKNOWN" + '\t' + guid + '\t' + "NULL");
-                    }
+            foreach (string guid in register)
+            {
+                if (guid_list.ContainsValue(guid))
+                    continue;
+
+                BlueprintScriptableObject obj = null;
+                try { obj = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(guid); } catch (Exception e) { Helper.Print("WriteAll register: " + e.Message); }
+                if (obj != null)
+                {
+                    writer.WriteLine(obj.name + '\t' + guid + '\t' + obj.GetType().FullName);
+                }
+                else
+                {
+                    Helper.Print(guid + " does not exist");
+                    writer.WriteLine("UNKNOWN" + '\t' + guid + '\t' + "NULL");
                 }
             }
         }
@@ -134,6 +149,25 @@ namespace DarkCodex
             }
 
             return result;
+        }
+
+        /// <summary>Used for guid that are allowed to be generated on the spot.</summary>
+        public void AddDynamic(string name, string guid)
+        {
+            TryLoad();
+
+            if (guid_dynamic.Add(guid))
+            {
+                try
+                {
+                    using StreamWriter writer = new(filepath2, append: true);
+                    writer.WriteLine(name + "\t" + guid);
+                }
+                catch (Exception e)
+                {
+                    Helper.PrintException(e);
+                }
+            }
         }
     }
 }

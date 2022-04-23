@@ -9,6 +9,7 @@ using UnityEngine;
 using Kingmaker.UI.MVVM._VM.Tooltip.Bricks;
 using UniRx;
 using Kingmaker.UI.MVVM._PCView.Slots;
+using Owlcat.Runtime.UI.Tooltips;
 
 namespace DarkCodex
 {

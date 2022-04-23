@@ -267,7 +267,7 @@ namespace DarkCodex
                 new SimplePropertyGetter { Property = UnitProperty.Level, Settings = new() { m_Progression = PropertySettings.Progression.Div2 } });
         }
 
-        [PatchInfo(Severity.Create, "Stop Activatable", "adds ability to stop any activatable immediately", false)]
+        [PatchInfo(Severity.Create, "Stop Activatable", "adds ability to stop any activatable immediately", false)] // TODO: playtest
         public static void CreateBardStopSong()
         {
             //ContextActionStopActivatables
@@ -284,6 +284,27 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreateAbilityExecuteActionOnCast(new ContextActionStopActivatables())
                 );
+        }
+
+        [PatchInfo(Severity.Create, "Mad Magic", "combat feat: allows spell casting during a rage", false)]
+        public static void CreateMadMagic()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "MadMagicFeat",
+                "Mad Magic",
+                "You can cast spells from any class while in a rage.",
+                group: FeatureGroup.CombatFeat
+                ).SetComponents(
+                //Helper.CreatePrerequisiteFeature(Helper.ToRef<BlueprintFeatureReference>("6991ee8175d87c04790067515f6fb322"), // BloodragerRageFeature
+                Helper.CreateAddConditionExceptions(UnitCondition.SpellcastingForbidden,
+                    Helper.ToRef<BlueprintBuffReference>("da8ce41ac3cd74742b80984ccc3c9613"), //StandartRageBuff
+                    Helper.ToRef<BlueprintBuffReference>("3513326cd64f475781799685c57fa452"), //StandartFocusedRageBuff
+                    Helper.ToRef<BlueprintBuffReference>("345d36cd45f5614409824209f26d0130"), //InspiredRageEffectBuffBeforeMasterSkald
+                    Helper.ToRef<BlueprintBuffReference>("6928adfa56f0dcc468162efde545786b"), //RageSpellBuff
+                    Helper.ToRef<BlueprintBuffReference>("2ff155ab5a6316e4e809f42148ef4d09")  //InfectiousRageBuff
+                ));
+
+            Helper.AddCombatFeat(feat);
         }
     }
 }

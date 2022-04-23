@@ -202,6 +202,9 @@ namespace DarkCodex
             }
 
             public LevelUpActionPriority Priority => Parent.Priority;
+
+            public bool NeedUpdateUnitView => Parent.NeedUpdateUnitView;
+
             public void PostLoad() => Parent.PostLoad();
 
             public void Apply(LevelUpState state, UnitDescriptor unit)
@@ -253,6 +256,9 @@ namespace DarkCodex
             }
 
             public LevelUpActionPriority Priority => LevelUpActionPriority.RemoveAttribute;
+
+            public bool NeedUpdateUnitView => false;
+
             public void Apply(LevelUpState state, UnitDescriptor unit)
             {
                 unit.Stats.GetStat(Attribute).BaseValue = Value;

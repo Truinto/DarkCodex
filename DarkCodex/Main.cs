@@ -26,6 +26,7 @@ using Kingmaker.EntitySystem.Stats;
 using System.Runtime.CompilerServices;
 using Kingmaker.UnitLogic;
 using Kingmaker.EntitySystem;
+using Kingmaker.UI.MVVM;
 
 namespace DarkCodex
 {
@@ -33,7 +34,7 @@ namespace DarkCodex
     public class Main
     {
         public static Harmony harmony;
-        public static bool IsInGame { get { return Game.Instance.Player?.Party?.Any() ?? false; } }
+        public static bool IsInGame => RootUIContext.Instance?.IsInGame ?? false; // Game.Instance.Player?.Party?.Any() ?? false;
 
         /// <summary>True if mod is enabled. Doesn't do anything right now.</summary>
         public static bool Enabled { get; set; } = true;
@@ -82,6 +83,8 @@ namespace DarkCodex
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
 
+            Checkbox(ref Settings.StateManager.State.saveMetadata, "Save Metadata (warns when loading incompatible saves)");
+
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
             Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
 
@@ -119,11 +122,11 @@ namespace DarkCodex
                     + " Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
             if (GUILayout.Button("Disable all homebrew", GUILayout.ExpandWidth(false)))
-                patchInfos.Where(w => w.Homebrew).Select(s => s.Class + "." + s.Method).ForEach(name => patchInfos.SetEnable(false, name));
+                patchInfos.Where(w => w.Homebrew).ForEach(attr => patchInfos.SetEnable(false, attr));
             GUILayout.Space(10);
             Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
 
-            patchInfos.Update();
+            patchInfos.Update(); // TODO: check if update can be skipped here
 
             string category = null;
             foreach (var info in patchInfos)
@@ -152,11 +155,15 @@ namespace DarkCodex
                 GUILayout.Space(5);
                 if (DrawInfoButton(info))
                 {
-                    string str = info.Class + "." + info.Method;
                     restart = true;
-                    patchInfos.SetEnable(info.Disabled, str);
+                    patchInfos.SetEnable(info.Disabled, info);
                 }
                 GUILayout.Space(5);
+                //if (info.Homebrew) // TODO: improve menu
+                //    GUILayout.Label(Helper.CreateTexture("PlaceHolderIcon.png"), GUILayout.ExpandWidth(false));
+                //else
+                //    GUILayout.Label(Helper.CreateTexture("PlaceHolderIcon.png"), GUILayout.ExpandWidth(false));
+                //GUILayout.Space(5);
                 GUILayout.Label(info.DisplayName.Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
                 GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
@@ -204,6 +211,12 @@ namespace DarkCodex
 
             if (GUILayout.Button("Save settings!"))
                 OnSaveGUI(modEntry);
+
+            //if (GUI.tooltip != null && GUI.tooltip != "")
+            //{
+            //    var mouse = Event.current.mousePosition;
+            //    GUI.Label(new Rect(mouse.x, mouse.y, 0, 0), "Test tooltip");// GUI.tooltip);
+            //}
         }
 
         private static void OnHideGUI(UnityModManager.ModEntry modEntry)
@@ -371,6 +384,7 @@ namespace DarkCodex
                 Helper.Patch(typeof(StartGameLoader_LoadAllJson));
                 Helper.Patch(typeof(MainMenu_Start));
                 Helper.Patch(typeof(Patch_LoadBlueprints));
+                //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
                 //harmony.PatchAll(typeof(Main).Assembly);
                 //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
                 //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
@@ -470,8 +484,10 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_AbilityAtWill));
                     PatchSafe(typeof(Patch_DarkElementalistBurn));
                     PatchSafe(typeof(Patch_DismissAnything));
+                    PatchSafe(typeof(Patch_ConditionExemption));
 
                     // General
+                    LoadSafe(General.CreateMadMagic);
                     LoadSafe(General.PatchAngelsLight);
                     LoadSafe(General.PatchBasicFreebieFeats);
                     LoadSafe(General.PatchHideBuffs);
@@ -564,12 +580,20 @@ namespace DarkCodex
                     SubscribeSafe(typeof(Event_AreaEffects));
 
                     patchInfos.Sort(); // sort info list for GUI
+                    patchInfos.Update();
 
                     Helper.Print("Finished loading Dark Codex");
 #if DEBUG
-                    Helper.PrintDebug("Running in debug.");
+                    Helper.PrintDebug("Running in debug. " + Main.IsInGame);
                     Helper.ExportStrings();
                     Guid.i.WriteAll();
+
+                    //var nullFinalizer = new HarmonyMethod(typeof(Main).GetMethod(nameof(Main.NullFinalizer)));
+                    //foreach (var patch in harmony.GetPatchedMethods().ToArray())
+                    //{
+                    //    //if (Harmony.GetPatchInfo(patch).Finalizers.Count == 0)
+                    //    harmony.Patch(patch, finalizer: nullFinalizer);
+                    //}
 #endif
                 }
                 catch (Exception ex)
@@ -772,6 +796,12 @@ namespace DarkCodex
             {
                 Helper.PrintException(e);
             }
+        }
+
+        private static Exception NullFinalizer(Exception __exception)
+        {
+            Helper.PrintException(__exception);
+            return null;
         }
 
         #endregion

@@ -22,6 +22,8 @@ using Kingmaker.UI.DragNDrop;
 using Kingmaker.UI.MVVM._PCView.ActionBar;
 using UnityEngine.EventSystems;
 using Kingmaker;
+using Owlcat.Runtime.UI.Tooltips;
+using Kingmaker.UI.MVVM;
 
 namespace DarkCodex
 {
@@ -255,15 +257,15 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(ActionBarPCView), "Kingmaker.UI.MVVM._PCView.ActionBar.IActionBarDragHandler.EndDrag")]
+        [HarmonyPatch(typeof(ActionBarSlotPCView), "UnityEngine.EventSystems.IEndDragHandler.OnEndDrag")]
         [HarmonyPostfix]
-        private static void DragSlot(ActionBarSlotVM viewModel, PointerEventData data, ActionBarPCView __instance)
+        private static void DragSlot(PointerEventData eventData, ActionBarSlotPCView __instance)
         {
             if (Locked)
                 return;
 
-            var source = viewModel;
-            var target = data.pointerEnter?.transform?.parent?.GetComponentInParent<ActionBarBaseSlotPCView>()?.GetViewModel();
+            ActionBarSlotVM source = __instance.ViewModel;
+            ActionBarSlotVM target = (ActionBarSlotVM)eventData.pointerEnter?.transform?.parent?.GetComponentInParent<ActionBarBaseSlotPCView>()?.GetViewModel();
             Helper.PrintDebug($"Drag3 source={GetBlueprint(source.MechanicActionBarSlot)?.name} target={GetBlueprint(target?.MechanicActionBarSlot)?.name}");
 
             if (source == null || source.Index != -1) // do nothing
@@ -279,7 +281,9 @@ namespace DarkCodex
                     return;
                 }
 
-                foreach (var slot in __instance.m_AbilityGroup.GetGroup())  // remove single ability
+                List<ActionBarSlotVM> actionbar_group = RootUIContext.Instance.InGameVM.StaticPartVM.ActionBarVM.GroupAbilities; //__instance.m_AbilityGroup.GetGroup()
+
+                foreach (var slot in actionbar_group)  // remove single ability
                 {
                     if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic2)
                     {

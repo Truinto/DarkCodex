@@ -19,6 +19,9 @@ namespace DarkCodex
         public bool allowAchievements = true;
 
         [JsonProperty]
+        public bool saveMetadata = true;
+
+        [JsonProperty]
         public bool stopAreaEffectsDuringCutscenes = true;
 
         [JsonProperty]

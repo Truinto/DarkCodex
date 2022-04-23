@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
+    [PatchInfo(Severity.Harmony, "Save Metadata", "will add extra metadata of enabled patches and warn if you try to load a game with missing patches", false)]
     [HarmonyPatch]
     public class Patch_SaveExtension
     {
@@ -31,7 +32,7 @@ namespace DarkCodex
                 {
                     line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
                     line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnSave2)));
-                    Helper.PrintDebug("Patched at " + i);
+                    Helper.PrintDebug("Patched SaveRoutine at " + i);
                     return line;
                 }
             }
@@ -43,6 +44,9 @@ namespace DarkCodex
         {
             try
             {
+                if (!Settings.StateManager.State.saveMetadata)
+                    return;
+
                 if (Main.patchInfos == null)
                     return;
 
@@ -68,12 +72,13 @@ namespace DarkCodex
                 {
                     line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
                     line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnLoad2)));
-                    Helper.PrintDebug("Patched at " + i);
-                    break;
+                    Helper.PrintDebug("Patched LoadRoutine at " + i);
+                    return line;
                 }
             }
 
-            return line;
+            Helper.PrintError("Did not patch TranspilerSave");
+            return instr;
         }
         public static void OnLoad2(SaveInfo saveInfo)
         {
@@ -87,12 +92,15 @@ namespace DarkCodex
         {
             try
             {
+                if (!Settings.StateManager.State.saveMetadata)
+                    return true;
+
                 if (Main.patchInfos == null)
                     return true;
 
                 if (Main.restart)
                 {
-                    Helper.ShowMessageBox("Settings were changed. Restart game to apply new patches.", yesLabel: "Ignore this time",
+                    Helper.ShowMessageBox("Settings were changed recently. Restart game to apply new patches.", yesLabel: "Ignore this time", noLabel: "I understand",
                         onYes: () =>
                         {
                             Main.restart = false;
@@ -112,17 +120,17 @@ namespace DarkCodex
                 if (saveData == null)
                     return true;
 
-                var mustEnable = Main.patchInfos.IsEnabledAll(saveData);// TODO: check data
+                var mustEnable = Main.patchInfos.IsEnabledAll(saveData);
                 if (mustEnable.Count() > 0)
                 {
-                    Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + mustEnable.Join(), yesLabel: "Enable",
+                    Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + mustEnable.Join(), yesLabel: "Quit Game & Enable",
                         onYes: () =>
                         {
                             foreach (var info in mustEnable)
                                 Main.patchInfos.SetEnable(true, info);
                             Main.OnSaveGUI(null);
-                            SystemUtil.ApplicationQuit();
-                            //SystemUtil.ApplicationRestart();
+                            //SystemUtil.ApplicationQuit();
+                            SystemUtil.ApplicationRestart();
                         });
                     return false;
                 }
@@ -139,75 +147,74 @@ namespace DarkCodex
 
         //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.PrepareSave))]
         //[HarmonyPostfix]
-        public static void OnSave(SaveInfo saveInfo)
-        {
-            if ((int)saveInfo.Type > 2)
-                return;
+        //public static void OnSave(SaveInfo saveInfo)
+        //{
+        //    if ((int)saveInfo.Type > 2)
+        //        return;
 
-            string path = saveInfo.FolderName.TrySubstring('.', -1, true);
-            if (path == null)
-                return;
-            path += ".json";
+        //    string path = saveInfo.FolderName.TrySubstring('.', -1, true);
+        //    if (path == null)
+        //        return;
+        //    path += ".json";
 
-            var data = new EntityPartKeyValueStorage().GetStorage("DarkCodex-Patches"); // TODO: get data
+        //    var data = new EntityPartKeyValueStorage().GetStorage("DarkCodex-Patches"); // TODO: get data
 
-            foreach (var p in Main.patchInfos)
-            {
-                if (p.IsDangerous && !p.Disabled && !p.DisabledAll)
-                    data[p.FullName] = "true";
-            }
+        //    foreach (var p in Main.patchInfos)
+        //    {
+        //        if (p.IsDangerous && !p.Disabled && !p.DisabledAll)
+        //            data[p.FullName] = "true";
+        //    }
 
-            Helper.Serialize(data, path: path);
-        }
+        //    Helper.Serialize(data, path: path);
+        //}
 
         //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.DeleteSave))]
         //[HarmonyPostfix]
-        public static void OnDelete(SaveInfo saveInfo)
-        {
-            string path = saveInfo.FolderName.TrySubstring('.', -1, true);
-            if (path == null)
-                return;
-            path += ".json";
+        //public static void OnDelete(SaveInfo saveInfo)
+        //{
+        //    string path = saveInfo.FolderName.TrySubstring('.', -1, true);
+        //    if (path == null)
+        //        return;
+        //    path += ".json";
 
-            Helper.TryDelete(path);
-        }
+        //    Helper.TryDelete(path);
+        //}
 
         //[HarmonyPatch(typeof(SaveSlot), nameof(SaveSlot.OnButtonSaveLoad))]
         //[HarmonyPriority(Priority.HigherThanNormal)]
         //[HarmonyPrefix]
-        public static bool BeforeLoad(SaveSlot __instance)
-        {
-            var saveInfo = __instance.SaveInfo;
-            string path = saveInfo.FolderName.TrySubstring('.', -1, true);
-            if (path == null)
-                return true;
-            path += ".json";
+        //public static bool BeforeLoad(SaveSlot __instance)
+        //{
+        //    var saveInfo = __instance.SaveInfo;
+        //    string path = saveInfo.FolderName.TrySubstring('.', -1, true);
+        //    if (path == null)
+        //        return true;
+        //    path += ".json";
 
-            var data = Helper.TryDeserialize<EntityPartKeyValueStorage>(path: path);
-            if (data == null)
-                return true;
+        //    var data = Helper.TryDeserialize<EntityPartKeyValueStorage>(path: path);
+        //    if (data == null)
+        //        return true;
 
-            var dic = data.GetStorage("DarkCodex-Patches");
-            if (dic == null)
-                return true;
+        //    var dic = data.GetStorage("DarkCodex-Patches");
+        //    if (dic == null)
+        //        return true;
 
-            foreach (string p in dic.Keys)
-            {
-            }
+        //    foreach (string p in dic.Keys)
+        //    {
+        //    }
 
-            // TODO: check data
-            if (false)
-            {
-                string patches = null;
-                Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + patches, yesLabel: "Enable",
-                    onYes: () =>
-                    {
-                        SystemUtil.ApplicationQuit();
-                    });
-                return false;
-            }
+        //    if (false)
+        //    {
+        //        string patches = null;
+        //        Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + patches, yesLabel: "Enable",
+        //            onYes: () =>
+        //            {
+        //                SystemUtil.ApplicationQuit();
+        //            });
+        //        return false;
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
     }
 }

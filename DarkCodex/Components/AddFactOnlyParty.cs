@@ -18,7 +18,7 @@ namespace DarkCodex.Components
     {
         public override void OnActivate()
         {
-            if (!(bool)Game.Instance.Player?.Party.Any())
+            if (!Main.IsInGame)
                 return;
 
             bool isParty = this.Owner.IsPet || this.Owner.IsMainCharacter || this.Owner.IsCustomCompanion() || this.Owner.IsStoryCompanion();

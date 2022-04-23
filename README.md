@@ -27,10 +27,10 @@ Content
 |--------|-------------|----|--------|
 |General.CreateAbilityFocus|basic feat: Ability Focus, increase DC of one ability by +2|:book:|:x:|
 |General.CreateBardStopSong|adds ability to stop any activatable immediately|:book:|:heavy_check_mark:|
+|General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
 |General.PatchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:house:|:heavy_check_mark:|
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
-|General.PatchDismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|
 |General.PatchHideBuffs|unclogs UI by hidding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
 |Hexcrafter.FixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
@@ -56,7 +56,7 @@ Content
 |Kineticist.PatchGatherPower|Kineticist Gather Power can be used manually|:book:|:heavy_check_mark:|
 |Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting|:house:|:heavy_check_mark:|
 |Kineticist.FixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
-|Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:heavy_check_mark:|
+|Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:x:|
 |Monk.CreateFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
 |Mythic.CreateDemonLord|adds features of Demon Lords to the mythic Demon progression: teleport at will, ...|:house:|:construction:|
 |Mythic.CreateDemonMastery|mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect|:house:|:heavy_check_mark:|
@@ -103,8 +103,10 @@ Content
 |Patch.Patch_AllowAchievements|clears the 'has used mods before' flag and also pretends that no mods are active|:book:|:heavy_check_mark:|
 |Patch.Patch_AlwaysAChance|Always A Chance succeeds on a natural one and applies to most d20 rolls|:house:|:heavy_check_mark:|
 |Patch.Patch_AOEAttackRolls|allows Impale Infusion and other AOE attacks to roll once for all|:book:|:heavy_check_mark:|
+|Patch.Patch_ConditionExemption|Adds logic to ignore status effects under certain conditions.|:book:|:heavy_check_mark:|
 |Patch.Patch_DarkElementalistBurn|for Wild Talents your current amount of burn includes the number of successful Soul Power uses|:house:|:heavy_check_mark:|
 |Patch.Patch_DebugReport|fixes error log crashes due to unnamed components|:book:|:heavy_check_mark:|
+|Patch.Patch_DismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|
 |Patch.Patch_EnduringSpells|allows Enduring Spell to apply to spells from any source; fix for Magic Weapon|:book:|:heavy_check_mark:|
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
 |Patch.Patch_FeralCombat|collection of patches for Feral Combat Training|:book:|:heavy_check_mark:|

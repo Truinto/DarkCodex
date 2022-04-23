@@ -78,6 +78,7 @@
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
     <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
     <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
+    <Compile Include="Components\AddConditionExceptions.cs" />
     <Compile Include="Components\AddFactOnlyParty.cs" />
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Components\ScalingCMBonus.cs" />
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
     <Compile Include="Components\UIData.cs" />
+    <Compile Include="Components\UnitConditionExceptionsFromBuff.cs" />
     <Compile Include="DEBUG.cs" />
     <Compile Include="Interfaces\ISettings.cs" />
     <Compile Include="Patches\Event_AreaEffects.cs" />
@@ -123,6 +125,7 @@
     <Compile Include="Kineticist.cs" />
     <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
+    <Compile Include="Patches\Patch_ConditionExemption.cs" />
     <Compile Include="Patches\Patch_DismissAnything.cs" />
     <Compile Include="Patches\Patch_AbilityAtWill.cs" />
     <Compile Include="Patches\Patch_ActivatableHandleUnitRunCommand.cs" />
@@ -145,7 +148,6 @@
     <Compile Include="Patches\Patch_FixLoadCrash1.cs" />
     <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
     <Compile Include="Patches\Patch_SaveExtension.cs" />
-    <Compile Include="Patches\Patch_SaveRescue.cs" />
     <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
     <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
     <Compile Include="Patches\Patch_AlwaysAChance.cs" />

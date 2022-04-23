@@ -1,5 +1,10 @@
 # Changelog
+- ~~added save metadata to keep track of enabled patches~~ not yet
+
+## [1.2.6]
 - added airborne features to demon wings
+- added Mad Magic
+- updated to new game version
 
 ## [1.2.5]
 - fixed "Unlock ability groups" not showing up in menu
