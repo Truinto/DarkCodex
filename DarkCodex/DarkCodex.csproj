@@ -134,6 +134,7 @@
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
     <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
+    <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />
     <Compile Include="Patches\Patch_LoadBlueprints.cs" />
     <Compile Include="Patches\Patch_Prebuilds.cs" />
     <Compile Include="Patches\Patch_AllowAchievements.cs" />

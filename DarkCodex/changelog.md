@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.2.7]
+- fixed quickened abilities taking more time than normal, if you already have used your swift action
+- fixed freebie feats
+- fixed Mad Magic not working under most conditions
+
 ## [1.2.6]
 - added airborne features to demon wings
 - added Mad Magic

@@ -3,6 +3,15 @@ Mod for Pathfinder: Wrath of the Righteous
 
 :construction: <span style="color:red">**This mod is under development! Some features are untested and work not properly, cause crashes, or corrupt your save.**</span> :construction:
 
+Index
+-----------
+* [Disclaimers](#disclaimers)
+* [Installation](#installation)
+* [Contact](#contact)
+* [Highlight: Ability Groups](#highlight-ability-groups)
+* [Content](#content)
+* [FAQ](#faq)
+
 Disclaimers
 -----------
 * This mod will affect your save! Uninstalling it will break your save.
@@ -21,6 +30,40 @@ Contact
 -----------
 @Fumihiko me on the Owlcat Pathfinder discord: [https://discord.com/invite/wotr](https://discord.com/invite/wotr)
 
+Highlight: Ability Groups
+-----------
+Ability Groups let you bundle abilities and activatables into a single foldable actionbar slot. \
+![example group](/resources/example-group.jpg) \
+There are already some predefined groups for class features that are related to each other or use the same resource (like bard songs).
+You can place the group on your action bar or open the folding view to place the abilities on your action bar directly. \
+The groups are defined in this file: "Mods/DarkCodex/DefGroups.json"
+
+Each group has these properties:
+- Title: Name of the group; must be unique
+- Description: Text displayed in the group's body; can be empty/null
+- Icon: Icon to use for this group; if icon is null, it will display the first active activatable or, if non are active, the first ability's icon
+- Guids: a identifier list of all abilities/activatables that are related to that group; if a guid is used in multiple groups, only the first group will apply
+
+You may edit this file and reload the groups with the button in the mod's menu. There is also a button to unlock the groups. 
+This will display all groups for all characters, even if they have no matching abilities. It also allows you to add/remove abilities with drag&drop mechanic.
+Simply drag any ability on the group's icon to add it. \
+![add ability](/resources/adding-ability.jpg) \
+Unfold a group and drag an ability from it onto the map to remove it again. \
+![remove ability](/resources/remove-ability.jpg) \
+Drag an ability onto another ability to create a new group. You will be prompted to give a new unique title name. \
+![creating group](/resources/creating-group.jpg) \
+To delete a group altogether, drag the group onto the map. This will also prompt a confirmation. \
+![delete group](/resources/delete-group.jpg) \
+Changes will affect all party members equally. Remember to disable 'Unlock Groups' again, otherwise you might edit them unintentionally.
+
+If you want to use *only* this feature from DarkCodex do the following:
+* install the mod like normal
+* boot up the game
+* open the mod's menu
+* set 'New features default on' to ✖ which should change all patches to ✖ as well
+* scroll down and enable 'Patch: Ability Groups' ✔
+* reboot the game
+
 Content
 -----------
 | Option | Description | HB | Status |
@@ -31,7 +74,7 @@ Content
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
 |General.PatchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:house:|:heavy_check_mark:|
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
-|General.PatchHideBuffs|unclogs UI by hidding a few buffs|:book:|:construction:|
+|General.PatchHideBuffs|unclogs UI by hiding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
 |Hexcrafter.FixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:heavy_check_mark:|
@@ -137,3 +180,6 @@ A: At the moment I have enough ideas to fill out my coding hobby. If the scope i
 
 Q: I cannot find my question in the FAQ, what now? \
 A: Ask me about it :smile:
+
+Q: What are the options in red? \
+A: These cannot be disabled during a playthrough. They become save permanent. I am working to make the menu more clear.

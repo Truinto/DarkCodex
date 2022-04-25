@@ -26,6 +26,7 @@ namespace DarkCodex
             {
                 if (exception is UnitConditionExceptionsFromBuff buffException && buffException.IsException(source))
                 {
+                    Helper.PrintDebug($"ConditionExemption {condition} from {source}");
                     __instance.m_Conditions[(int)condition]--;
                     source = null;
                     break;

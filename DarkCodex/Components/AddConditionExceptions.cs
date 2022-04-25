@@ -19,12 +19,19 @@ namespace DarkCodex.Components
 
         public override void OnTurnOn()
         {
-            Owner.State.m_ConditionsExceptions[(int)Condition].Add(Exception);
+            int index = (int)Condition;
+            var exceptions = Owner.State.m_ConditionsExceptions;
+            if (exceptions[index] == null)
+                exceptions[index] = new();
+            exceptions[index].Add(Exception);
         }
 
         public override void OnTurnOff()
         {
-            Owner.State.m_ConditionsExceptions[(int)Condition].Remove(Exception);
+            int index = (int)Condition;
+            var exceptions = Owner.State.m_ConditionsExceptions;
+            if (exceptions[index] != null)
+                exceptions[index].Remove(Exception);
         }
     }
 }

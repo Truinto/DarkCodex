@@ -34,7 +34,7 @@ namespace DarkCodex
     public class Main
     {
         public static Harmony harmony;
-        public static bool IsInGame => RootUIContext.Instance?.IsInGame ?? false; // Game.Instance.Player?.Party?.Any() ?? false;
+        public static bool IsInGame => Game.Instance.Player?.Party?.Any() ?? false; // RootUIContext.Instance?.IsInGame ?? false; //
 
         /// <summary>True if mod is enabled. Doesn't do anything right now.</summary>
         public static bool Enabled { get; set; } = true;
@@ -126,7 +126,7 @@ namespace DarkCodex
             GUILayout.Space(10);
             Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
 
-            patchInfos.Update(); // TODO: check if update can be skipped here
+            patchInfos.Update(); // TODO: check if update can be skipped here; check if settings are applied correctly; put favorite settings on top
 
             string category = null;
             foreach (var info in patchInfos)
@@ -485,6 +485,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_DarkElementalistBurn));
                     PatchSafe(typeof(Patch_DismissAnything));
                     PatchSafe(typeof(Patch_ConditionExemption));
+                    PatchSafe(typeof(Patch_FixQuickenMetamagic));
 
                     // General
                     LoadSafe(General.CreateMadMagic);

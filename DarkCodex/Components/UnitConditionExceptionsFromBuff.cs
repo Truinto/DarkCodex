@@ -1,4 +1,5 @@
-﻿using Kingmaker.Blueprints;
+﻿using HarmonyLib;
+using Kingmaker.Blueprints;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
@@ -17,7 +18,7 @@ namespace DarkCodex.Components
 
         public override string GetCaption()
         {
-            return nameof(UnitConditionExceptionsFromBuff);
+            return "exempting [" + Exceptions.Select(s => s.Get().name).Join() + "]";
         }
 
         public bool IsException(Buff source)

@@ -185,7 +185,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref wizard.m_AllFeatures, feat.ToRef());
         }
 
-        [PatchInfo(Severity.Extend | Severity.WIP, "Hide Buffs", "unclogs UI by hidding a few buffs", false)]
+        [PatchInfo(Severity.Extend | Severity.WIP, "Hide Buffs", "unclogs UI by hiding a few buffs", false)]
         public static void PatchHideBuffs()
         {
             string[] guids = new string[] {
@@ -286,7 +286,7 @@ namespace DarkCodex
                 );
         }
 
-        [PatchInfo(Severity.Create, "Mad Magic", "combat feat: allows spell casting during a rage", false)]
+        [PatchInfo(Severity.Create, "Mad Magic", "combat feat: allows spell casting during a rage", false, Requirement: typeof(Patch_ConditionExemption))]
         public static void CreateMadMagic()
         {
             var feat = Helper.CreateBlueprintFeature(
