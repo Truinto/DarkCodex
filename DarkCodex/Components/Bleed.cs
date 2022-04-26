@@ -99,7 +99,7 @@ namespace DarkCodex.Components
             var caster = this.Context.MaybeCaster;
             var target = this.Target.Unit;
 
-            this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue; // todo: fix rank not getting set?
+            //this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue;
             int rank = this.Context[AbilityRankType.Default];
             int sneak = caster.Stats.SneakAttack.ModifiedValue;
 
