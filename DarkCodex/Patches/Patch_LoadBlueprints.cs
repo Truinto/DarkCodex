@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.JsonSystem;
@@ -25,6 +26,8 @@ namespace DarkCodex
             {
                 if (bp is BlueprintAbility ability && !Resource.Cache.Ability.Contains(ability))
                     Resource.Cache.Ability.Add(ability);
+                else if (bp is BlueprintFeature feature && !Resource.Cache.Feature.Contains(feature))
+                    Resource.Cache.Feature.Add(feature);
                 else if (bp is BlueprintActivatableAbility activatable && !Resource.Cache.Activatable.Contains(activatable))
                     Resource.Cache.Activatable.Add(activatable);
                 else if (bp is BlueprintItem item && !Resource.Cache.Item.Contains(item))

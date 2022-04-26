@@ -168,8 +168,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="Attributes\PatchInfoAttribute.cs" />
     <Compile Include="Settings\Settings.cs" />
-    <Compile Include="Patches\Unused_Patch_CopyGuids.cs" />
-    <Compile Include="Patches\Unused_Patch_FixAreaEffectDamage.cs" />
     <Compile Include="Unlock.cs" />
     <Compile Include="Witch.cs" />
     <None Include="..\.editorconfig">

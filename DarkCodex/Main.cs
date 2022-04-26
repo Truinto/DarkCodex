@@ -440,6 +440,8 @@ namespace DarkCodex
                     LoadSafe(DEBUG.Enchantments.NameAll);
                     PatchSafe(typeof(DEBUG.Enchantments));
 #if DEBUG
+                    PatchSafe(typeof(DEBUG.WatchCalculateParams));
+                    PatchSafe(typeof(DEBUG.WatchParameterizedCanSelect));
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
@@ -448,7 +450,6 @@ namespace DarkCodex
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
                     LoadSafe(General.CreateBardStopSong);
-                    //PatchSafe(typeof(General.DEBUGTEST));
 
                     // Cache
                     LoadSafe(PropertyAttributeMax.CreatePropertyMaxMentalAttribute);

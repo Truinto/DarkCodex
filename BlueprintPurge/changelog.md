@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [0.4.0]
+- added ability to filter $type; simply put it in the blueprint textbox
+
 ## [0.3.0]
 - fixed json syntax error
 - added basic syntax validation

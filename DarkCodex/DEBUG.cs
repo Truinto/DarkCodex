@@ -5,6 +5,7 @@ using Kingmaker.Armies;
 using Kingmaker.Armies.TacticalCombat;
 using Kingmaker.Armies.TacticalCombat.Controllers;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items;
@@ -23,6 +24,7 @@ using Kingmaker.Kingdom.Settlements;
 using Kingmaker.Localization;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
+using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UI.Common;
 using Kingmaker.UI.Loot;
 using Kingmaker.UI.MVVM._VM.Loot;
@@ -33,6 +35,7 @@ using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Class.Kineticist;
+using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.Utility;
 using Kingmaker.View.MapObjects;
 using Owlcat.Runtime.Core.Utils;
@@ -376,6 +379,42 @@ namespace DarkCodex
                     __result *= sell_multiplier; // re-buying a sold building should cost the same
                 else
                     __result *= buy_multiplier;
+            }
+        }
+
+        [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.CanSelect))]
+        public class WatchParameterizedCanSelect
+        {
+            public static bool Prefix(BlueprintParametrizedFeature __instance, ref bool __result, UnitDescriptor unit, LevelUpState state, FeatureSelectionState selectionState, IFeatureSelectionItem item)
+            {
+                if (__instance.ParameterType != FeatureParameterType.Custom)
+                    return true;
+
+                if (item.Param == null)
+                    __result = false;
+                //else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
+                //    __result = false;
+                else if (unit.GetFeature(__instance, item.Param) != null)
+                    __result = false;
+                else if (!unit.HasFact(item.Param.Blueprint as BlueprintFact))
+                    __result = false;
+                else
+                    __result = true;
+
+                return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(RuleCalculateAbilityParams), nameof(RuleCalculateAbilityParams.OnTrigger))]
+        public class WatchCalculateParams
+        {
+            public static void Postfix(RulebookEventContext context, RuleCalculateAbilityParams __instance)
+            {
+                if (__instance.Initiator == null || !__instance.Initiator.IsPlayerFaction)
+                    return;
+
+                AbilityParams para = __instance.Result;
+                Helper.PrintDebug($"RuleCalculateAbilityParams blueprint={__instance.Blueprint} CL={para.CasterLevel} SL={para.SpellLevel} DC={para.DC} Metamagic={para.Metamagic} Bonus={para.RankBonus}");
             }
         }
     }

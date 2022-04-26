@@ -53,6 +53,7 @@ namespace DarkCodex
         {
             public static bool IsLoaded;
             public static List<BlueprintAbility> Ability = new();
+            public static List<BlueprintFeature> Feature = new();
             public static List<BlueprintActivatableAbility> Activatable = new();
             public static List<BlueprintItem> Item = new();
             public static List<BlueprintItemEnchantment> Enchantment = new();
@@ -249,6 +250,7 @@ namespace DarkCodex
 
                 Stopwatch timer = Stopwatch.StartNew();
                 Load(Ability, Path.Combine(Main.ModPath, "resources", "Ability.bin"));
+                Load(Feature, Path.Combine(Main.ModPath, "resources", "Feature.bin"));
                 Load(Activatable, Path.Combine(Main.ModPath, "resources", "Activatable.bin"));
                 Load(Item, Path.Combine(Main.ModPath, "resources", "Item.bin"));
                 Load(Enchantment, Path.Combine(Main.ModPath, "resources", "Enchantment.bin"));
@@ -262,6 +264,8 @@ namespace DarkCodex
             {
                 if (bp is BlueprintAbility ability)
                     Ability.Add(ability);
+                else if (bp is BlueprintFeature feature)
+                    Feature.Add(feature);
                 else if (bp is BlueprintActivatableAbility activatable)
                     Activatable.Add(activatable);
                 else if (bp is BlueprintItem item)
@@ -273,6 +277,7 @@ namespace DarkCodex
             public static void Clear()
             {
                 Ability.Clear();
+                Feature.Clear();
                 Activatable.Clear();
                 Item.Clear();
                 Enchantment.Clear();
@@ -291,6 +296,7 @@ namespace DarkCodex
 
                 // save blueprints guids to binary files
                 Save(Ability, Path.Combine(Main.ModPath, "resources", "Ability.bin"));
+                Save(Feature, Path.Combine(Main.ModPath, "resources", "Feature.bin"));
                 Save(Activatable, Path.Combine(Main.ModPath, "resources", "Activatable.bin"));
                 Save(Item, Path.Combine(Main.ModPath, "resources", "Item.bin"));
                 Save(Enchantment, Path.Combine(Main.ModPath, "resources", "Enchantment.bin"));

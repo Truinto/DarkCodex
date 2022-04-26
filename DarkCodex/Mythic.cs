@@ -51,7 +51,7 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(bardic_prereq)
-                ); // todo: icon?
+                );
 
             SetResourceDecreasing(bardic_resource, limitless.ToRef2());
             Helper.AddMythicTalent(limitless);

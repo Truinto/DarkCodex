@@ -20,6 +20,7 @@ namespace BlueprintPurge
         private string pathSave;
         private ZipFile zip;
         private HashSet<Guid> blueprints = new();
+        private HashSet<string> types = new();
         private BindingList<PurgeRange> purges = new();
         private BindingSource binding = new();
 
@@ -85,6 +86,7 @@ namespace BlueprintPurge
                 textBoxSavePath.Text = openFileDialogSave.FileName;
         }
 
+        private Regex rxAlphaNumerical = new(@"^[a-zA-Z0-9\-_]+$");
         private void ButtonSearch_Click(object sender, EventArgs e)
         {
             try
@@ -110,11 +112,16 @@ namespace BlueprintPurge
                     bps = File.ReadAllText(openFileDialogBlueprints.FileName);
                 }
 
-                //parse blueprints
+                //parse blueprints and types
                 foreach (var bp in bps.Split('\n', '\t', ' ', ';', ','))
+                {
                     if (Guid.TryParse(bp, out var guid))
                         blueprints.Add(guid);
-                if (blueprints.Count == 0)
+                    else if (rxAlphaNumerical.IsMatch(bp))
+                        types.Add(", " + bp);
+                }
+
+                if (blueprints.Count == 0 && types.Count == 0)
                 {
                     MessageBox.Show("Could not parse any blueprints", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -154,6 +161,7 @@ namespace BlueprintPurge
             var lastId = new Dictionary<int, string>(); // value of last id by depth
             bool isRef = false;                  // true if last quote was "$ref"
             var refs = new HashSet<string>();    // ref ids by detected segments
+            bool isType = false;                 // true if last quote was "$type"
             var sb = new StringBuilder();        // stringbuilder used for quote reconstruction
             var stack = new Stack<int>();        // stack of '{' indexes which points to the segment start; stack.Count is also the current depth
             var depth = new Stack<int>();        // stack of 'stack'-depth so we can distinguish nested segments
@@ -180,8 +188,19 @@ namespace BlueprintPurge
                         // if it's an ref, check if it's blacklisted
                         else if (isRef && refs.Contains(quote))
                         {
-                            var x = purges.First(f => f.Ref == quote && f.File == entry.FileName);
-                            purge.Push(new PurgeRange { File = entry.FileName, Guid = x.Guid, Data = data, Ref = quote, Type = "$ref" });
+                            var parentpurge = purges.First(f => f.Ref == quote && f.File == entry.FileName);
+                            purge.Push(new PurgeRange { File = entry.FileName, Guid = parentpurge.Guid, Data = data, Ref = quote, Type = "$ref" });
+                            depth.Push(stack.Count);
+                        }
+
+                        // if it's an type, check if it's blacklisted
+                        else if (isType && this.types.Any(a => quote.EndsWith(a)))
+                        {
+                            // get id, if it has any
+                            if (lastId.TryGetValue(stack.Count, out var id))
+                                refs.Add(id);
+                            // generate new range, which is finalized later
+                            purge.Push(new PurgeRange { File = entry.FileName, Guid = Guid.Empty, Data = data, Ref = id!, Type = quote });
                             depth.Push(stack.Count);
                         }
 
@@ -199,6 +218,7 @@ namespace BlueprintPurge
 
                         isId = quote == "$id";
                         isRef = quote == "$ref";
+                        isType = quote == "$type";
                         sb.Clear();
                     }
                     goto end;
@@ -308,6 +328,7 @@ namespace BlueprintPurge
             zip?.Dispose();
             zip = null;
             blueprints.Clear();
+            types.Clear();
             purges.Clear();
             buttonPurge.Enabled = false;
         }
@@ -403,7 +424,7 @@ namespace BlueprintPurge
         {
             MessageBox.Show($"Warning: This is just a test version. It may create invalid save data which could immediately or during your playthrough fail.\n"
                 + "This app will never override your original save. It will instead create a duplicate with the description 'PURGED!'.\n"
-                + "How to use: Enter file path to save data you want to purge. List blueprint guids you want to purge from your save. Click 'Search'. "
+                + "How to use: Enter file path to save data you want to purge. List blueprint guids or types you want to purge from your save. Click 'Search'. "
                 + "Review the entries in the list. You may deselect entries, but it is advised to instead change the blacklist. Click 'Purge Now!'.",
 
                 "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);

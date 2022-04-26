@@ -28,6 +28,7 @@ using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.View.MapObjects;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,29 +37,6 @@ namespace DarkCodex
 {
     public class General
     {
-        [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.CanSelect))]
-        public class DEBUGTEST // todo: bugfix ability focus
-        {
-            public static bool Prefix(BlueprintParametrizedFeature __instance, ref bool __result, UnitDescriptor unit, LevelUpState state, FeatureSelectionState selectionState, IFeatureSelectionItem item)
-            {
-                if (__instance.ParameterType != FeatureParameterType.Custom)
-                    return true;
-
-                if (item.Param == null)
-                    __result = false;
-                //else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
-                //    __result = false;
-                else if (unit.GetFeature(__instance, item.Param) != null)
-                    __result = false;
-                else if (!unit.HasFact(item.Param.Blueprint as BlueprintFact))
-                    __result = false;
-                else
-                    __result = true;
-
-                return false;
-            }
-        }
-
         [PatchInfo(Severity.Create | Severity.Faulty, "Ability Focus", "basic feat: Ability Focus, increase DC of one ability by +2", false)]
         public static void CreateAbilityFocus()
         {
@@ -72,31 +50,35 @@ namespace DarkCodex
                 );
             feat.Ranks = 10;
 
-            return;
-
             Resource.Cache.Ensure();
-            var abilities = Resource.Cache.Ability.Where(ability =>
+            var list = new List<AnyBlueprintReference>();
+
+            foreach (var ab in Resource.Cache.Ability)
             {
-                if (ability.Type == AbilityType.Spell)
-                    return false;
+                if (ab.Type == AbilityType.Spell 
+                    || ab.m_DisplayName.IsEmpty() 
+                    || ab.HasVariants)
+                    continue;
+                var run = ab.GetComponent<AbilityEffectRunAction>();
+                if (run == null || run.SavingThrowType == SavingThrowType.Unknown)
+                    continue;
 
-                if (ability.m_DisplayName.IsEmpty())
-                    return false;
+                list.Add(ab.ToReference<AnyBlueprintReference>());
+            }
 
-                if (ability.HasVariants)
-                    return false;
+            foreach (var ft in Resource.Cache.Feature)
+            {
+                if (ft.m_DisplayName.IsEmpty()
+                    || ft.GetComponent<ContextCalculateAbilityParams>() == null)
+                    continue;
 
-                var run = ability.GetComponent<AbilityEffectRunAction>();
-                if (run == null)
-                    return false;
+                list.Add(ft.ToReference<AnyBlueprintReference>());
+            }
 
-                return run.SavingThrowType != SavingThrowType.Unknown;
-            }).ToArray();
-            feat.BlueprintParameterVariants = abilities.ToRef3();
-
-            return;
-
-            Helper.AddFeats(feat);
+            feat.BlueprintParameterVariants = list.ToArray();
+#if DEBUG
+            Helper.AddFeats(feat); // TODO: bugfix ability focus
+#endif
         }
 
         [PatchInfo(Severity.Extend, "Empower Angels Light", "'Light of the Angels' give temporary HP equal to character level", true)]
@@ -112,8 +94,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend | Severity.DefaultOff, "Basic Freebie Feats", "reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/", true)]
         public static void PatchBasicFreebieFeats()
         {
-            //https://michaeliantorno.com/feat-taxes-in-pathfinder/
-
             var basics = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("5b72dd2ca2cb73b49903806ee8986325"); //BasicFeatsProgression
             basics.AddComponents(
                 Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("9972f33f977fc724c838e59641b2fca5")), //PowerAttackFeature
