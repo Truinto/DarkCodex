@@ -27,6 +27,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace DarkCodex
 {
@@ -65,6 +66,9 @@ namespace DarkCodex
             public static readonly BlueprintItemWeaponReference WeaponBlastPhysical = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8"); //KineticBlastPhysicalWeapon
             public static readonly BlueprintItemWeaponReference WeaponBlastEnergy = Helper.ToRef<BlueprintItemWeaponReference>("4d3265a5b9302ee4cab9c07adddb253f"); //KineticBlastEnergyWeapon
 
+            // Sprites
+            public static readonly Sprite BorderFancy1 = Helper.CreateSprite("border_fancy1.png");
+
             // Mods
             public static readonly BlueprintBuffReference BuffKineticWhip = new();
             public static readonly BlueprintBuffReference BuffBleed = new();
@@ -76,6 +80,9 @@ namespace DarkCodex
             public static readonly BlueprintFeatureReference FeatureMagicItemAdept = new();
             public static readonly BlueprintFeatureReference FeatureMindShield = new();
             public static readonly BlueprintWeaponTypeReference WeaponTypeButchering = new();
+
+            // Cross Feature
+            public static List<BlueprintAbility> AccursedStrike = new();
 
             public static void EnsureFast()
             {

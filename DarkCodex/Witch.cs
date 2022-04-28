@@ -66,13 +66,46 @@ namespace DarkCodex
         [PatchInfo(Severity.Create | Severity.Faulty, "Hex Strike", "", false)]
         public static void CreateHexStrike()
         {
-
+            /*
+            Chanting and cursing, you put a hex on your enemy as part of your unarmed strike.
+            Prerequisite: Hex class feature, Improved Unarmed Strike.
+            Benefit: When you gain this feat, choose one hex that you can use to affect no more than one opponent. If you make a successful unarmed strike against an opponent, in addition to dealing your unarmed strike damage, you can use a swift action to deliver the effects of the chosen hex to that opponent. Doing so does not provoke attacks of opportunity.
+            Special: You can take this feat multiple times. Each time you take it, you apply it to a different qualifying hex.
+             */
         }
 
-        [PatchInfo(Severity.Create | Severity.Faulty, "Split Hex", "", false)]
+        [PatchInfo(Severity.Create | Severity.Faulty, "Split Hex", "basic feat: Split Hex", false)]
         public static void CreateSplitHex()
         {
-            //DublicateSpellComponent
+            /*
+            You can split the effect of one of your targeted hexes, affecting another creature you can see.
+            Prerequisites: Witch level 10th.
+            Benefit: When you use one of your hexes (not a major hex or a grand hex) that targets a single creature, you can choose another creature within 30 feet of the first target to also be targeted by the hex.
+             */
+
+            /*
+            You can split the effect of one of your targeted hexes, affecting another creature you can see.
+            Prerequisites: Split hex, caster level 18th.
+            Benefit: When you use one of your major hexes (not a grand hex) that targets a creature, you can choose another creature within 30 feet of the first target to also be targeted by the major hex. 
+             */
+
+            var feat = Helper.CreateBlueprintFeature(
+                "SplitHex",
+                "Split Hex",
+                "When you use one of your hexes (not a major hex or a grand hex) that targets a single creature, you can choose another creature within 30 feet of the first target to also be targeted by the hex.",                
+                group: FeatureGroup.Feat
+                ).SetComponents(
+                Helper.CreateDuplicateSpell(f => !f.IsAOE && f.Blueprint.SpellDescriptor.HasFlag(SpellDescriptor.Hex))
+                );
+
+            //foreach (var ab in Resource.Cache.Ability) // TODO: exclude major and grand
+            //{
+            //}
+
+
+#if DEBUG
+            Helper.AddFeats(feat); // TODO: bugtest split hex
+#endif
         }
 
         [PatchInfo(Severity.Create, "Cackle Activatable", "Cackle/Chant can be toggled to use move action passively", Requirement: typeof(Patch_ActivatableOnNewRound))]
@@ -149,7 +182,6 @@ namespace DarkCodex
             var WitchMajorHex = Helper.ToRef<BlueprintFeatureReference>("8ac781b33e380c84aa578f1b006dd6c5");
             var Staggered = Helper.ToRef<BlueprintBuffReference>("df3950af5a783bd4d91ab73eb8fa0fd3");
             var IcyPrisonParalyzedBuff = Helper.ToRef<BlueprintBuffReference>("6f0e450771cc7d446aea798e1fef1c7a");
-            var WitchHexSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
 
             var icetomb_cooldown = Helper.CreateBlueprintBuff("WitchHexIceTombCooldownBuff", "", "").Flags(hidden: true);
 
@@ -202,7 +234,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(WitchMajorHex)
                 );
 
-            Helper.AppendAndReplace(ref WitchHexSelection.m_AllFeatures, icetomb.ToRef());
+            Helper.AddHex(icetomb, false);
         }
 
         [PatchInfo(Severity.Fix, "Boundless Healing Hex", "boundless healing applies to healing hex", false)]

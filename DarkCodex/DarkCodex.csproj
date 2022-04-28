@@ -89,6 +89,8 @@
     <Compile Include="Components\ContextActionStopActivatables.cs" />
     <Compile Include="Components\ContextConditionHasFactRank.cs" />
     <Compile Include="Components\ContextConditionMoreHitDice.cs" />
+    <Compile Include="Components\DuplicateSpell.cs" />
+    <Compile Include="Components\FeatureRank.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />
     <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
     <Compile Include="Components\KineticistReduceBurnPooled.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
     <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
     <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />
+    <Compile Include="Patches\Patch_HexcrafterSpellStrike.cs" />
     <Compile Include="Patches\Patch_LoadBlueprints.cs" />
     <Compile Include="Patches\Patch_Prebuilds.cs" />
     <Compile Include="Patches\Patch_AllowAchievements.cs" />

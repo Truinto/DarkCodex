@@ -81,7 +81,7 @@ namespace DarkCodex
             return Math.Max(min, Math.Min(number, max));
         }
 
-        public static void AttackRollPrint(RuleAttackRoll attackRoll)
+        public static void AttackRollPrint(this RuleAttackRoll attackRoll)
         {
             if (attackRoll != null)
             {
@@ -873,6 +873,22 @@ namespace DarkCodex
                 AppendAndReplace(ref obj.RemoveFeatures, CreateLevelEntry(level, feature));
         }
 
+        public static bool IsRank(this AbilityData ability, int min = -1, int max = int.MaxValue, bool ifEmpty = true)
+        {
+            var rank = ability.Blueprint.GetComponent<FeatureRank>();
+            if (rank == null)
+                return ifEmpty;
+            return rank.Rank >= min && rank.Rank <= max;
+        }
+
+        public static bool IsRank(this BlueprintAbility ability, int min = -1, int max = int.MaxValue, bool ifEmpty = true)
+        {
+            var rank = ability.GetComponent<FeatureRank>();
+            if (rank == null)
+                return ifEmpty;
+            return rank.Rank >= min && rank.Rank <= max;
+        }
+
         #endregion
 
         #region Context Values
@@ -931,13 +947,14 @@ namespace DarkCodex
         /// <summary>
         /// This creates a shallow copy. This means BlueprintComponents are shared and morphing can happen.<br/><br/>
         /// Watch out for these fields:<br/>
+        /// BlueprintFeature: IsPrerequisiteFor
         /// BlueprintAbility: m_Parent
         /// </summary>
-        /// <param name="guid">guid to use, recommended to always leave empty</param>
         /// <param name="guid2">guid to merge with, use for dynamic blueprints (unknown list of blueprints), otherwise empty</param>
         /// <returns></returns>
-        public static T Clone<T>(this T obj, string name, string guid = null, string guid2 = null) where T : SimpleBlueprint
+        public static T Clone<T>(this T obj, string name, string guid2 = null) where T : SimpleBlueprint
         {
+            string guid = null;
             if (guid2 != null)
                 guid = MergeIds(name, obj.AssetGuid.ToString(), guid2);
 
@@ -954,6 +971,10 @@ namespace DarkCodex
             if (result is BlueprintFeature feature)
             {
                 feature.IsPrerequisiteFor = new();
+            }
+            else if (result is BlueprintAbility ability)
+            {
+                ability.m_Parent = null;
             }
 
             return result;
@@ -1083,17 +1104,45 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref _vivsectionistfeats.m_AllFeatures, reference);
         }
 
-        public static bool AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
+        private static BlueprintFeatureSelection _witchhexes;
+        private static BlueprintFeatureSelection _shamanhexes;
+        private static BlueprintFeatureSelection _hexcrafterhexes;
+        public static void AddHex(BlueprintFeature hex, bool allowShaman = true)
+        {
+            if (_witchhexes == null)
+                _witchhexes = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
+            if (_shamanhexes == null)
+                _shamanhexes = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7");
+            if (_hexcrafterhexes == null)
+                _hexcrafterhexes = Helper.Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf");
+
+            var reference = hex.ToRef();
+
+            Helper.AppendAndReplace(ref _witchhexes.m_AllFeatures, reference);
+            if (allowShaman)
+                Helper.AppendAndReplace(ref _shamanhexes.m_AllFeatures, reference);
+            Helper.AppendAndReplace(ref _hexcrafterhexes.m_AllFeatures, reference);
+        }
+
+        public static BlueprintAbility AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
         {
             var comp = parent.GetComponent<AbilityVariants>();
-
-            Helper.AppendAndReplace(ref comp.m_Variants, variants.ToRef());
+            if (comp == null)
+            {
+                comp = new AbilityVariants();
+                comp.m_Variants = variants.ToRef();
+                parent.AddComponents(comp);
+            }
+            else
+            {
+                Helper.AppendAndReplace(ref comp.m_Variants, variants.ToRef());
+            }
 
             foreach (var v in variants)
             {
                 v.Parent = parent;
             }
-            return true;
+            return parent;
         }
 
         public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = null, bool? stayOnDeath = null, bool? isFromSpell = null, bool? harmful = null)
@@ -1173,12 +1222,11 @@ namespace DarkCodex
             return result;
         }
 
-        public static void MakeStickySpell(string guid, out BlueprintAbility cast, out BlueprintAbility effect)
+        public static void MakeStickySpell(BlueprintAbility spell, out BlueprintAbility cast, out BlueprintAbility effect)
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
             const string guid_effect = "73749154177c4f8c83231da1c9dc9f6f";
 
-            var spell = Get<BlueprintAbility>(guid);
             cast = spell.Clone(spell.name + "_Cast", guid2: guid_cast)
                     .RemoveComponents<AbilityDeliverProjectile>()
                     .RemoveComponents<AbilityEffectRunAction>();
@@ -1197,6 +1245,7 @@ namespace DarkCodex
         public static BlueprintAbility TargetPoint(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = false)
         {
             ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
+            ability.EffectOnAlly = AbilityEffectOnUnit.Harmful;
             ability.CanTargetEnemies = true;
             ability.CanTargetPoint = true;
             ability.CanTargetFriends = true;
@@ -1207,6 +1256,7 @@ namespace DarkCodex
         public static BlueprintAbility TargetEnemy(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional)
         {
             ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
+            ability.EffectOnAlly = AbilityEffectOnUnit.None;
             ability.CanTargetEnemies = true;
             ability.CanTargetPoint = false;
             ability.CanTargetFriends = false;
@@ -1214,8 +1264,32 @@ namespace DarkCodex
             ability.Animation = animation;
             return ability;
         }
+        public static BlueprintAbility TargetAlly(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true)
+        {
+            ability.EffectOnEnemy = AbilityEffectOnUnit.None;
+            ability.EffectOnAlly = AbilityEffectOnUnit.Helpful;
+            ability.CanTargetEnemies = false;
+            ability.CanTargetPoint = false;
+            ability.CanTargetFriends = true;
+            ability.CanTargetSelf = self;
+            ability.Animation = animation;
+            return ability;
+        }
+        public static BlueprintAbility TargetAny(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true)
+        {
+            ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
+            ability.EffectOnAlly = AbilityEffectOnUnit.Harmful;
+            ability.CanTargetEnemies = true;
+            ability.CanTargetPoint = false;
+            ability.CanTargetFriends = true;
+            ability.CanTargetSelf = self;
+            ability.Animation = animation;
+            return ability;
+        }
         public static BlueprintAbility TargetSelf(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Omni)
         {
+            ability.EffectOnEnemy = AbilityEffectOnUnit.None;
+            ability.EffectOnAlly = AbilityEffectOnUnit.Helpful;
             ability.CanTargetEnemies = false;
             ability.CanTargetPoint = false;
             ability.CanTargetFriends = false;
@@ -1907,11 +1981,11 @@ namespace DarkCodex
             return result;
         }
 
-        public static PrerequisiteArchetypeLevel CreatePrerequisiteArchetypeLevel(BlueprintArchetypeReference m_Archetype, int level = 1, bool any = false, BlueprintCharacterClassReference m_CharacterClass = null)
+        public static PrerequisiteArchetypeLevel CreatePrerequisiteArchetypeLevel(BlueprintArchetypeReference archetype, int level = 1, bool any = false, BlueprintCharacterClassReference characterClass = null)
         {
             var result = new PrerequisiteArchetypeLevel();
-            result.m_Archetype = m_Archetype;
-            result.m_CharacterClass = m_CharacterClass ?? m_Archetype.Get().GetParentClass().ToRef();
+            result.m_Archetype = archetype;
+            result.m_CharacterClass = characterClass ?? archetype.Get().GetParentClass().ToRef();
             result.Level = level;
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
             return result;
@@ -1932,12 +2006,47 @@ namespace DarkCodex
             return result;
         }
 
+        public static DuplicateSpell CreateDuplicateSpell(Func<AbilityData, bool> abilityCheck, int radius = 30)
+        {
+            return new DuplicateSpell
+            {
+                Radius = radius,
+                AbilityCheck = abilityCheck
+            };
+        }
+
         public static LevelUpAddSelectionHasFact CreateLevelUpAddSelectionHasFact(BlueprintUnitFact[] facts, IFeatureSelection selection)
         {
             var result = new LevelUpAddSelectionHasFact();
             result.Facts = facts;
             result.Selection = selection; // takes BlueprintFeatureSelection or BlueprintParametrizedFeature
             return result;
+        }
+
+        public static LearnSpellList CreateLearnSpellList(BlueprintSpellListReference spellList, BlueprintCharacterClassReference characterClass = null, BlueprintArchetypeReference archetype = null)
+        {
+            var result = new LearnSpellList();
+            result.m_SpellList = spellList;
+            result.m_CharacterClass = characterClass ?? archetype.Get().GetParentClass().ToRef();
+            result.m_Archetype = archetype;
+            return result;
+        }
+
+        public static AddKnownSpell CreateAddKnownSpell(BlueprintAbilityReference spell, int SpellLevel, BlueprintCharacterClassReference characterClass = null, BlueprintArchetypeReference archetype = null)
+        {
+            var result = new AddKnownSpell(); //AddSpellKnownTemporary
+            result.m_Spell = spell;
+            result.SpellLevel = SpellLevel;
+            result.m_CharacterClass = characterClass ?? archetype.Get().GetParentClass().ToRef();
+            result.m_Archetype = archetype;
+            return result;
+        }
+
+        public static BlueprintSpellList CreateBlueprintSpellList()
+        {
+            throw new NotImplementedException();
+            //var result = new BlueprintSpellList();
+            //return result;
         }
 
         public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, string guid = null, Sprite icon = null, PrefabLink fxOnStart = null)

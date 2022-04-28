@@ -487,6 +487,7 @@ namespace DarkCodex
                     PatchSafe(typeof(Patch_DismissAnything));
                     PatchSafe(typeof(Patch_ConditionExemption));
                     PatchSafe(typeof(Patch_FixQuickenMetamagic));
+                    PatchSafe(typeof(Patch_HexcrafterSpellStrike));
 
                     // General
                     LoadSafe(General.CreateMadMagic);
@@ -551,9 +552,11 @@ namespace DarkCodex
 
                     // Witch
                     LoadSafe(Witch.CreateIceTomb);
+                    LoadSafe(Witch.CreateSplitHex);
                     LoadSafe(Witch.FixBoundlessHealing);
 
                     // Hexcrafter
+                    LoadSafe(Hexcrafter.CreateAccursedStrike);
                     LoadSafe(Hexcrafter.FixProgression);
 
                     // Rogue
