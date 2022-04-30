@@ -71,6 +71,22 @@ namespace DarkCodex
 
             SetResourceDecreasing(ragesong_resource, limitless2.ToRef2());
             Helper.AddMythicTalent(limitless2);
+
+            // same again for azata
+            var azatasong_resource = BlueprintGuid.Parse("83f8a1c45ed205a4a989b7826f5c0687"); //AzataSongResource
+            var azatasong_prereq = Helper.ToRef<BlueprintFeatureReference>("cb208b98ceacca84baee15dba53b1979"); //Azata Song of Resolve
+
+            var limitless3 = Helper.CreateBlueprintFeature(
+                "LimitlessAzataSong",
+                "Limitless Azata Song",
+                "Your inspiration knows no bounds.\nBenefit: You no longer have a limited amount of Azata Performance rounds per day.",
+                group: FeatureGroup.MythicAbility
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature(azatasong_prereq)
+                );
+
+            SetResourceDecreasing(azatasong_resource, limitless3.ToRef2());
+            Helper.AddMythicTalent(limitless3);
         }
 
         [PatchInfo(Severity.Create, "Limitless Witch Hexes", "mythic ability: Hexes ignore their cooldown", true)]
