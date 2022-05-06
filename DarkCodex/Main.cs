@@ -63,7 +63,7 @@ namespace DarkCodex
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
         /// <summary>Draws the GUI</summary>
-        private static void OnGUI(UnityModManager.ModEntry modEntry)
+        private static void OnGUI(UnityModManager.ModEntry modEntry) // TODO: fix disable all not working!!!!
         {
             Settings state = Settings.StateManager.State;
 
@@ -441,12 +441,13 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.Enchantments));
 #if DEBUG
                     PatchSafe(typeof(DEBUG.WatchCalculateParams));
-                    PatchSafe(typeof(DEBUG.WatchParameterizedCanSelect));
                     PatchSafe(typeof(DEBUG.Settlement1));
                     PatchSafe(typeof(DEBUG.Settlement2));
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.SpellReach));
                     PatchSafe(typeof(Patch_Prebuilds));
+                    PatchSafe(typeof(Patch_SaveExtension));
+                    //PatchSafe(typeof(Patch_FactSelectionParameterized));
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));
                     LoadSafe(General.CreateBardStopSong);
@@ -583,6 +584,7 @@ namespace DarkCodex
                     // Event subscriptions
                     SubscribeSafe(typeof(RestoreEndOfCombat));
                     SubscribeSafe(typeof(Event_AreaEffects));
+                    SubscribeSafe(typeof(Patch_AbilityGroups));
 
                     patchInfos.Sort(); // sort info list for GUI
                     patchInfos.Update();

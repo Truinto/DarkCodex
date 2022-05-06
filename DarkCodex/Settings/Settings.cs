@@ -47,6 +47,8 @@ namespace DarkCodex
         public bool polymorphKeepModel = false;
 
         [JsonProperty]
+        public bool verbose = true;
+        [JsonProperty]
         public bool debug_1 = false;
         [JsonProperty]
         public bool debug_2 = false;

@@ -382,35 +382,12 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.CanSelect))]
-        public class WatchParameterizedCanSelect
-        {
-            public static bool Prefix(BlueprintParametrizedFeature __instance, ref bool __result, UnitDescriptor unit, LevelUpState state, FeatureSelectionState selectionState, IFeatureSelectionItem item)
-            {
-                if (__instance.ParameterType != FeatureParameterType.Custom)
-                    return true;
-
-                if (item.Param == null)
-                    __result = false;
-                //else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
-                //    __result = false;
-                else if (unit.GetFeature(__instance, item.Param) != null)
-                    __result = false;
-                else if (!unit.HasFact(item.Param.Blueprint as BlueprintFact))
-                    __result = false;
-                else
-                    __result = true;
-
-                return false;
-            }
-        }
-
         [HarmonyPatch(typeof(RuleCalculateAbilityParams), nameof(RuleCalculateAbilityParams.OnTrigger))]
         public class WatchCalculateParams
         {
             public static void Postfix(RulebookEventContext context, RuleCalculateAbilityParams __instance)
             {
-                if (__instance.Initiator == null || !__instance.Initiator.IsPlayerFaction)
+                if (__instance.Initiator == null || !__instance.Initiator.IsPlayerFaction || !Settings.StateManager.State.verbose)
                     return;
 
                 AbilityParams para = __instance.Result;

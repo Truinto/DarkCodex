@@ -12,6 +12,7 @@ using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.Loot;
+using Kingmaker.Blueprints.Root.Strings.GameLog;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.Designers.Mechanics.EquipmentEnchants;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -30,6 +31,7 @@ using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UI;
 using Kingmaker.UI.Log;
 using Kingmaker.UI.Log.CombatLog_ThreadSystem;
+using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -105,6 +107,12 @@ namespace DarkCodex
                 }
             }
             throw new NotImplementedException();
+        }
+
+        public static string Clipboard
+        {
+            get => GUIUtility.systemCopyBuffer;
+            set => GUIUtility.systemCopyBuffer = value;
         }
 
         #endregion
@@ -442,6 +450,32 @@ namespace DarkCodex
                     maxInputTextLength: uint.MaxValue,
                     items: null);
             }, true);
+        }
+
+        public static void PrintCombatLog(string text, string header = null, string tooltip = null)
+        {
+            //var log = LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat];
+
+            var color = GameLogStrings.Instance.DefaultColor;
+            var icon = PrefixIcon.RightArrow;
+            var tooltipmessage = new TooltipTemplateCombatLogMessage(header ?? text, tooltip);
+
+            var message = new CombatLogMessage(text, color, icon, tooltipmessage, true);
+            LogThreadController.Instance.HitDiceRestrictionLogThread.AddMessage(message);
+        }
+
+        public static void PrintNotification(string text)
+        {
+            EventBus.RaiseEvent<IWarningNotificationUIHandler>(h => h.HandleWarning(text, false));
+        }
+
+        #endregion
+
+        #region Keyboard
+
+        public static void KeyBind()
+        {
+            //Game.Instance.Keyboard.m_Bindings
         }
 
         #endregion

@@ -1,5 +1,12 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
+- added limitless azata songs
+- fixed possible memory leak
+- added logic to edit ability groups while pressing shift
+- added logic to display all abilities while ability groups are unlocked
+- added spell groups
+- added icon border (ability group is black, spell group is gray)
+- changed drag behaviour; action slots dragged into groups will be placed left or right depending on which side is closer
 
 ## [1.2.7]
 - fixed quickened abilities taking more time than normal, if you already have used your swift action

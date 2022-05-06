@@ -112,35 +112,34 @@ namespace DarkCodex
                 list.Add(attr);
         }
 
-        public void SetEnable(bool value, string category)
+        public void SetEnable(bool value, string category, bool force = false)
         {
-            if (category.Last() != '*')
+            if (category.Last() == '*')
+            {
+                if (value)
+                    state.Blacklist.Remove(category);
+                else
+                    state.Blacklist.Add(category);
+            }
+            else
             {
                 if (value)
                 {
+                    state.Whitelist.Add(category);
                     state.Blacklist.Remove(category);
+                    if (force)
+                        state.Blacklist.Remove(category.TrySubstring('.') + ".*");
                 }
                 else
                 {
                     state.Whitelist.Remove(category);
                     state.Blacklist.Add(category);
                 }
-                Update();
             }
-            else
-            {
-                var attr = list.FirstOrDefault(f => f.FullName == category);
-                if (attr != null)
-                {
-                    SetEnable(value, attr);
-
-                    if (value && attr.DisabledAll) // force enable category
-                        SetEnable(true, attr.Class + ".*");
-                }
-            }
+            Update();
         }
 
-        public void SetEnable(bool value, PatchInfoAttribute attr)
+        public void SetEnable(bool value, PatchInfoAttribute attr, bool force = false)
         {
             attr.Disabled = !value;
 
@@ -149,6 +148,11 @@ namespace DarkCodex
             {
                 state.Blacklist.Remove(fullName);
                 state.Whitelist.Add(fullName);
+                if (force)
+                {
+                    state.Blacklist.Remove(fullName.TrySubstring('.') + ".*");
+                    Update();
+                }
             }
             else
             {

@@ -127,7 +127,7 @@ namespace DarkCodex
                         onYes: () =>
                         {
                             foreach (var info in mustEnable)
-                                Main.patchInfos.SetEnable(true, info);
+                                Main.patchInfos.SetEnable(true, info, force: true);
                             Main.OnSaveGUI(null);
                             //SystemUtil.ApplicationQuit();
                             SystemUtil.ApplicationRestart();

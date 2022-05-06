@@ -56,6 +56,7 @@ namespace DarkCodex
             foreach (var ab in Resource.Cache.Ability)
             {
                 if (ab.Type == AbilityType.Spell 
+                    || ab.m_DisplayName == null
                     || ab.m_DisplayName.IsEmpty() 
                     || ab.HasVariants)
                     continue;
@@ -68,7 +69,8 @@ namespace DarkCodex
 
             foreach (var ft in Resource.Cache.Feature)
             {
-                if (ft.m_DisplayName.IsEmpty()
+                if (ft.m_DisplayName == null
+                    || ft.m_DisplayName.IsEmpty()
                     || ft.GetComponent<ContextCalculateAbilityParams>() == null)
                     continue;
 

@@ -24,7 +24,7 @@ namespace DarkCodex
 
             // touch hexes
             Resource.Cache.Ensure();
-            var hexes_harmful = Resource.Cache.Ability.Where(w => w.EffectOnEnemy == AbilityEffectOnUnit.Harmful && (w.name.StartsWith("WitchHex") || w.name.StartsWith("ShamanHex")));
+            var hexes_harmful = Resource.Cache.Ability.Where(w => w.EffectOnEnemy == AbilityEffectOnUnit.Harmful && (w.name.StartsWith("WitchHex") || w.name.StartsWith("ShamanHex"))).ToArray();
             var accursed_strike_variants = new List<BlueprintAbility>();
             foreach (var hex in hexes_harmful)
             {

@@ -68,6 +68,7 @@ namespace DarkCodex
 
             // Sprites
             public static readonly Sprite BorderFancy1 = Helper.CreateSprite("border_fancy1.png");
+            public static readonly Sprite BorderFancy3 = Helper.CreateSprite("border_fancy3.png");
 
             // Mods
             public static readonly BlueprintBuffReference BuffKineticWhip = new();
@@ -364,21 +365,6 @@ namespace DarkCodex
             //            field.SetValue(null, null);
             //    }
             //}
-        }
-
-        public class Log
-        {
-            public static void Print(string text, string header = null, string tooltip = null)
-            {
-                //var log = LogThreadController.Instance.m_Logs[LogChannelType.AnyCombat];
-
-                var color = GameLogStrings.Instance.DefaultColor;
-                var icon = PrefixIcon.RightArrow;
-                var tooltipmessage = new TooltipTemplateCombatLogMessage(header ?? text, tooltip);
-
-                var message = new CombatLogMessage(text, color, icon, tooltipmessage, true);
-                LogThreadController.Instance.HitDiceRestrictionLogThread.AddMessage(message);
-            }
         }
 
         public class Strings

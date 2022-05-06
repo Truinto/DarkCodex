@@ -136,7 +136,7 @@ namespace DarkCodex
                     spell = spell.ConvertedFrom ?? spell;
 
                     Helper.PrintDebug("Refunding spell");
-                    Resource.Log.Print($"{__instance.Context.Caster.CharacterName} regained {spell.Name}");
+                    Helper.PrintCombatLog($"{__instance.Context.Caster.CharacterName} regained {spell.Name}");
 
                     int level = spellbook.GetSpellLevel(spell);
                     if (spellbook.Blueprint.Spontaneous)

@@ -69,10 +69,13 @@
     <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
     <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
     <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\AbilityRegister.cs" />
+    <Compile Include="Classes\DefGroup.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
+    <Compile Include="Classes\SpellSlotLevel.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
     <Compile Include="Components\AbilityRequirementBuffs.cs" />
@@ -116,6 +119,7 @@
     <Compile Include="Components\UIData.cs" />
     <Compile Include="Components\UnitConditionExceptionsFromBuff.cs" />
     <Compile Include="DEBUG.cs" />
+    <Compile Include="Interfaces\IMechanicGroup.cs" />
     <Compile Include="Interfaces\ISettings.cs" />
     <Compile Include="Patches\Event_AreaEffects.cs" />
     <Compile Include="General.cs" />
@@ -135,6 +139,7 @@
     <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
+    <Compile Include="Patches\Patch_FactSelectionParameterized.cs" />
     <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
     <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />
     <Compile Include="Patches\Patch_HexcrafterSpellStrike.cs" />
