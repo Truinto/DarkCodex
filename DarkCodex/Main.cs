@@ -58,12 +58,14 @@ namespace DarkCodex
         }
 
         internal static PatchInfoCollection patchInfos;
+        internal static IEnumerable<string> patchInfoSaved;
 
         internal static bool restart;
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
+        private static List<string> CategoryFolded = new();
         /// <summary>Draws the GUI</summary>
-        private static void OnGUI(UnityModManager.ModEntry modEntry) // TODO: fix disable all not working!!!!
+        private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
             Settings state = Settings.StateManager.State;
 
@@ -83,16 +85,14 @@ namespace DarkCodex
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
 
-            Checkbox(ref Settings.StateManager.State.saveMetadata, "Save Metadata (warns when loading incompatible saves)");
+            Checkbox(ref Settings.StateManager.State.saveMetadata, "Save Metadata (warns when loading incompatible saves) WIP");
 
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
             Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
+            Checkbox(ref Patch_AbilityGroups.Locked, "Show all Ability Groups", b => Patch_AbilityGroups.Refresh());
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
-
-            if (GUILayout.Button(Patch_AbilityGroups.Locked ? "Unlock ability groups" : "Lock ability groups", GUILayout.ExpandWidth(false)))
-                Patch_AbilityGroups.ToggleLocked();
 
             if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
                 Patch_AbilityGroups.Reload();
@@ -118,7 +118,7 @@ namespace DarkCodex
 
             GUILayout.Space(10);
             GUILayout.Label("Advanced: Patch Control");
-            GUILayout.Label("Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
+            GUILayout.Label("Options in red font may not be disabled during a playthrough. Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
                     + " Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section."
                     + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
             if (GUILayout.Button("Disable all homebrew", GUILayout.ExpandWidth(false)))
@@ -126,9 +126,10 @@ namespace DarkCodex
             GUILayout.Space(10);
             Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
 
-            patchInfos.Update(); // TODO: check if update can be skipped here; check if settings are applied correctly; put favorite settings on top
+            //patchInfos.Update(); // TODO: check if update can be skipped here; check if settings are applied correctly; put favorite settings on top
 
             string category = null;
+            bool folded = false;
             foreach (var info in patchInfos)
             {
 #if !DEBUG
@@ -136,34 +137,50 @@ namespace DarkCodex
 #endif
                 if (info.Class != category)
                 {
-                    GUILayout.Box(GUIContent.none, StyleLine);
-                    GUILayout.Label(info.Class);
-                    category = info.Class;
+                    folded = CategoryFolded.Contains(category);
 
+                    GUILayout.Box(GUIContent.none, StyleLine);
                     GUILayout.BeginHorizontal();
+
                     if (GUILayout.Button(!info.DisabledAll ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
                     {
                         restart = true;
                         patchInfos.SetEnable(info.DisabledAll, category + ".*");
                     }
-                    GUILayout.Space(5);
-                    GUILayout.Label("Disable all", GUILayout.ExpandWidth(false));
+                    GUILayout.Space(7);
+
+                    if (GUILayout.Button(folded ? "<color=yellow><b>▶</b></color>" : "<color=lime><b>▼</b></color>", StyleBox, GUILayout.Width(20)))
+                    {
+                        if (folded)
+                            CategoryFolded.Remove(category);
+                        else
+                            CategoryFolded.Add(category);
+                    }
+
+                    GUILayout.Space(3);
+                    GUILayout.Label(info.Class);
+                    category = info.Class;
+
                     GUILayout.EndHorizontal();
                 }
 
+                if (folded) continue;
+
                 GUILayout.BeginHorizontal();
-                GUILayout.Space(5);
+                GUILayout.Space(20);
                 if (DrawInfoButton(info))
                 {
                     restart = true;
                     patchInfos.SetEnable(info.Disabled, info);
                 }
                 GUILayout.Space(5);
-                //if (info.Homebrew) // TODO: improve menu
-                //    GUILayout.Label(Helper.CreateTexture("PlaceHolderIcon.png"), GUILayout.ExpandWidth(false));
-                //else
-                //    GUILayout.Label(Helper.CreateTexture("PlaceHolderIcon.png"), GUILayout.ExpandWidth(false));
-                //GUILayout.Space(5);
+#if DEBUG
+                if (info.Homebrew) // TODO: improve menu
+                    GUILayout.Label(Resource.Cache.IconPotBlack, GUILayout.ExpandWidth(false));
+                else
+                    GUILayout.Label(Resource.Cache.IconBookBlack, GUILayout.ExpandWidth(false));
+                GUILayout.Space(5);
+#endif
                 GUILayout.Label(info.DisplayName.Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
                 GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
@@ -202,6 +219,7 @@ namespace DarkCodex
                 Resource.Cache.SaveBaseGame();
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref state.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
+            Checkbox(ref state.verbose, "Debug: Verbose");
             Checkbox(ref state.debug_1, "Debug: Flag1");
             Checkbox(ref state.debug_2, "Debug: Flag2");
             Checkbox(ref state.debug_3, "Debug: Flag3");
@@ -446,7 +464,7 @@ namespace DarkCodex
                     PatchSafe(typeof(DEBUG.ArmyLeader1));
                     PatchSafe(typeof(DEBUG.SpellReach));
                     PatchSafe(typeof(Patch_Prebuilds));
-                    PatchSafe(typeof(Patch_SaveExtension));
+                    //PatchSafe(typeof(Patch_SaveExtension));
                     //PatchSafe(typeof(Patch_FactSelectionParameterized));
 #endif
                     PatchSafe(typeof(Patch_FixLoadCrash1));

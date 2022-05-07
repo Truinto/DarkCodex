@@ -1,5 +1,7 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
+
+## [1.2.8]
 - added limitless azata songs
 - fixed possible memory leak
 - added logic to edit ability groups while pressing shift

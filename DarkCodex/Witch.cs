@@ -98,10 +98,10 @@ namespace DarkCodex
                 Helper.CreateDuplicateSpell(f => !f.IsAOE && f.Blueprint.SpellDescriptor.HasFlag(SpellDescriptor.Hex))
                 );
 
-            //foreach (var ab in Resource.Cache.Ability) // TODO: exclude major and grand
+            // TODO: exclude major and grand
+            //foreach (var ab in Resource.Cache.Ability) 
             //{
             //}
-
 
 #if DEBUG
             Helper.AddFeats(feat); // TODO: bugtest split hex

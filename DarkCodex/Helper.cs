@@ -493,7 +493,7 @@ namespace DarkCodex
             PreserveReferencesHandling = PreserveReferencesHandling.None
         };
 
-        public static string Serialize(object value, bool indent = true, string path = null, bool append = false)
+        public static string Serialize(object value, bool indent = true, bool type = true, string path = null, bool append = false)
         {
             _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
             string result = JsonConvert.SerializeObject(value, _jsetting);
@@ -510,9 +510,10 @@ namespace DarkCodex
             return result;
         }
 
-        public static string Serialize<T>(T value, bool indent = true, string path = null, bool append = false)
+        public static string Serialize<T>(T value, bool indent = true, bool type = true, string path = null, bool append = false)
         {
             _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
+            _jsetting.TypeNameHandling = type ? TypeNameHandling.Auto : TypeNameHandling.None;
             string result = JsonConvert.SerializeObject(value, typeof(T), _jsetting);
 
             if (path != null)

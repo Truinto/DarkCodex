@@ -55,6 +55,7 @@
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
     <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
     <Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
+    <Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
     <Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
     <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
     <Reference Include="Owlcat.Runtime.UI_publicized" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_publicized.dll" />

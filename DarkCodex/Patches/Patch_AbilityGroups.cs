@@ -49,8 +49,10 @@ namespace DarkCodex
          *    ReactiveProperties Icon, ForeIcon, Name, DecorationSprite, DecorationColor, ResourceCount, ..
          * - ActionBarConvertedVM: child instance for foldable box; only one per ActionBarSlotVM; holds List<ActionBarSlotVM>
          * - MechanicActionBarSlot: child of ActionBarSlotVM; holds type depending logic
-         * - ActionBarBaseSlotView: MonoBehaviour that is attached to GameObjects
-         * - ActionBarConvertedView: MonoBehaviour that is attached to GameObjects
+         * - ActionBarBaseSlotView: MonoBehaviour
+         * - ActionBarConvertedView: MonoBehaviour
+         * - ActionBarPCView
+         * - ActionBarSlotPCView
          * 
          * - ActionBarSlot: related to inventory/spellbook only
          * - ActionBarSlots
@@ -378,7 +380,7 @@ namespace DarkCodex
              * InGameConsoleView
              * 
              */
-#if true//VERBOSE
+#if DEBUG//VERBOSE
             try
             {
                 int count = 0;
@@ -453,59 +455,6 @@ namespace DarkCodex
             }
 
             return false;
-#if false   // ------ old ------
-            ActionBarSlotVM source = __instance.ViewModel;
-            if (source == null)
-                return true;
-            ActionBarSlotVM target = eventData.pointerEnter?.transform?.parent?.GetComponentInParent<ActionBarBaseSlotPCView>()?.ViewModel; // TODO: ActionBarConvertedView
-            Helper.PrintDebug($"Drag3 source={GetBlueprint(source.MechanicActionBarSlot)?.name} target={GetBlueprint(target?.MechanicActionBarSlot)?.name}");
-
-            if (source.Index != -1) // do nothing
-            {
-                return true;
-            }
-
-            else if (target == null) // remove
-            {
-                if (source.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // remove whole group
-                {
-                    Helper.ShowMessageBox("Remove group?", onYes: () => RemoveGroup(mechanic.GetTitle()));
-                    return true;
-                }
-
-                List<ActionBarSlotVM> actionbar_group = RootVM.GroupAbilities; //__instance.m_AbilityGroup.GetGroup()
-
-                foreach (var slot in actionbar_group)  // remove single ability
-                {
-                    if (slot.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic2)
-                    {
-                        var mechanic3 = mechanic2.Slots.FirstOrDefault(a => ReferenceEquals(a, source.MechanicActionBarSlot));
-                        if (mechanic3 != null)
-                        {
-                            mechanic2.RemoveFromGroup(mechanic3);
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            else if (target.Index == -1) // add
-            {
-                if (target.MechanicActionBarSlot is MechanicActionBarSlotGroup mechanic) // if the target is a group, try add source
-                {
-                    mechanic.AddToGroup(source.MechanicActionBarSlot);
-                    return true;
-                }
-
-                var ab1 = GetBlueprint(source.MechanicActionBarSlot);
-                var ab2 = GetBlueprint(target.MechanicActionBarSlot);
-                if (ab1 != null && ab2 != null && ab1 != ab2) // if both are abilities make a new group; prompts to get title
-                {
-                    Helper.ShowInputBox("Create new group: ", onOK: a => AddGroup(a, "", null, ab1.AssetGuid.ToString(), ab2.AssetGuid.ToString()));
-                    return true;
-                }
-            }
-#endif
         }
 
         [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.UpdateResource))]
@@ -751,83 +700,63 @@ namespace DarkCodex
 
             public override Color GetDecorationColor() => Color.gray;
             public override Sprite GetDecorationSprite() => Resource.Cache.BorderFancy3;
-            public override bool IsBad() => Ability == null;
+            public override bool IsBad() => Ability == null || Slots.Count == 0;
             public override void OnClick()
             {
-                UpdateResourceCount();
                 base.OnClick();
             }
             public override void OnRightClick()
             {
-                UpdateResourceCount();
                 base.OnRightClick();
             }
             public override int GetResource()
             {
                 int count = 0;
-                //bool flag = true;
+                bool flag = true;
                 foreach (var slot in Slots)
                 {
-                    // sum resources other than infinites
                     slot.UpdateResourceCount();
-                    if (slot.ResourceCount > 0)
+                    if (slot.ResourceCount != 0)
                     {
                         var abilityData = slot.GetContentData() as AbilityData;
                         if (abilityData == null)
                             continue;
 
-                        var spell = new SpellSlotLevel(abilityData);
-                        if (!cacheSpellSlots.Contains(spell))
+                        // update master and AutoUse, if necessary
+                        if (flag)
                         {
-                            cacheSpellSlots.Add(spell);
-                            count += slot.ResourceCount;
+                            flag = false;
+                            if (!ReferenceEquals(this.Ability, abilityData))
+                            {
+                                if (Unit.Brain.IsAutoUseAbility(this.Ability) && abilityData.IsSuitableForAutoUse)
+                                    Unit.Brain.AutoUseAbility = abilityData;
+                                this.Ability = abilityData;
+                            }
+                        }
+
+                        // sum resources other than infinites
+                        if (slot.ResourceCount > 0)
+                        {
+                            var spell = new SpellSlotLevel(abilityData);
+                            if (!cacheSpellSlots.Contains(spell))
+                            {
+                                cacheSpellSlots.Add(spell);
+                                count += slot.ResourceCount;
+                            }
                         }
                     }
-
-                    //// find the first ability that can be cast, set it as master, update auto cast if necessary
-                    //if (flag && slot.ResourceCount != 0)
-                    //{
-                    //    flag = false;
-                    //    if (this.Ability != abilityData)
-                    //    {
-                    //        if (Unit.Brain.IsAutoUseAbility(this.Ability) && abilityData.IsSuitableForAutoUse)
-                    //        {
-                    //            Unit.Brain.AutoUseAbility = abilityData;
-                    //        }
-                    //        this.Ability = abilityData;
-                    //    }
-                    //}
                 }
                 cacheSpellSlots.Clear();
                 return count;
             }
 
-            /// <summary>Advances AutoUse. Call after ability cast.</summary>
             /// <returns>true if AutoUse is managed by this group</returns>
             public bool UpdateAutoUse()
             {
-                if (!Unit.Brain.IsAutoUseAbility(this.Ability))
+                if (!ReferenceEquals(this.Ability, Unit.Brain.m_AutoUseAbility)) 
                     return false;
 
-                foreach (var slot in Slots)
-                {
-                    if (slot.GetResource() != 0)
-                    {
-                        var abilityData = slot.GetContentData() as AbilityData;
-                        if (abilityData == null)
-                            continue;
-
-                        if (this.Ability != abilityData)
-                        {
-                            if (abilityData.IsSuitableForAutoUse)
-                            {
-                                Unit.Brain.AutoUseAbility = abilityData;
-                            }
-                            this.Ability = abilityData;
-                        }
-                        break;
-                    }
-                }
+                UpdateResourceCount();
                 return true;
             }
 

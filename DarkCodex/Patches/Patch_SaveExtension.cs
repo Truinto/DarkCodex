@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony, "Save Metadata", "will add extra metadata of enabled patches and warn if you try to load a game with missing patches", false)]
+    [PatchInfo(Severity.Harmony, "Save Metadata", "will add extra metadata of enabled patches and warn if you try to load a game with missing patches", false)] // TODO: rework
     [HarmonyPatch]
     public class Patch_SaveExtension
     {
         public const string SaveKey = "DarkCodex-Patches";
 
-        [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.SaveRoutine))]
-        [HarmonyTranspiler]
+        //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.SaveRoutine))]
+        //[HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> TranspilerSave(IEnumerable<CodeInstruction> instr)
         {
             var line = instr.ToList();
@@ -28,30 +28,44 @@ namespace DarkCodex
 
             for (int i = 0; i < line.Count; i++)
             {
+                Helper.PrintDebug($"i={i} {line[i]}");
+
                 if (line[i].Calls(original))
                 {
-                    line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
-                    line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnSave2)));
-                    Helper.PrintDebug("Patched SaveRoutine at " + i);
-                    return line;
+                    //line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
+                    //line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnSave2)));
+                    //Helper.PrintDebug("Patched SaveRoutine at " + i);
+                    //return line;
                 }
             }
 
             Helper.PrintError("Did not patch TranspilerSave");
             return instr;
         }
+
+
+        [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.SerializeAndSaveThread))]
+        [HarmonyPrefix]
         public static void OnSave2(SaveInfo saveInfo)
         {
             try
             {
-                if (!Settings.StateManager.State.saveMetadata)
-                    return;
-
-                if (Main.patchInfos == null)
+                if (!Settings.StateManager.State.saveMetadata || Main.patchInfos == null)
                     return;
 
                 Main.patchInfos.Update();
-                saveInfo.Saver.SaveJson(SaveKey, Helper.Serialize(Main.patchInfos.GetCriticalPatches()));
+                if (!Main.restart)
+                    Main.patchInfoSaved = Main.patchInfos.GetCriticalPatches();
+
+                if (Main.patchInfoSaved == null)
+                    return;
+
+                string json = Helper.Serialize(Main.patchInfoSaved, indent: false, type: false);
+                if (json == null || json == "")
+                    return;
+
+                saveInfo.Saver.SaveBytes(SaveKey, Encoding.Default.GetBytes(json));
+                Helper.Print("Saved patch metadata");
             }
             catch (Exception e)
             {
@@ -93,10 +107,10 @@ namespace DarkCodex
             try
             {
                 if (!Settings.StateManager.State.saveMetadata)
+                {
+                    Main.patchInfoSaved = null;
                     return true;
-
-                if (Main.patchInfos == null)
-                    return true;
+                }
 
                 if (Main.restart)
                 {
@@ -108,11 +122,19 @@ namespace DarkCodex
                     return false;
                 }
 
-                var saveInfo = __instance.SaveInfo;
-                if (saveInfo?.Saver == null)
+                Main.patchInfoSaved = null;
+
+                if (Main.patchInfos == null)
                     return true;
 
-                string json = saveInfo.Saver.ReadJson(SaveKey);
+                //(__instance.SaveInfo?.Saver as ZipSaver)?.ZipFile?.UpdateEntry(SaveKey, "");
+                //var json2 = (__instance.SaveInfo?.Saver as ZipSaver)?.ZipFile?[SaveKey];
+
+                var bytes = __instance.SaveInfo?.Saver?.ReadBytes(SaveKey);
+                if (bytes == null)
+                    return true;
+
+                var json = Encoding.Default.GetString(bytes);
                 if (json == null || json == "")
                     return true;
 
@@ -120,6 +142,7 @@ namespace DarkCodex
                 if (saveData == null)
                     return true;
 
+                Main.patchInfoSaved = saveData;
                 var mustEnable = Main.patchInfos.IsEnabledAll(saveData);
                 if (mustEnable.Count() > 0)
                 {
@@ -142,79 +165,5 @@ namespace DarkCodex
                 return true;
             }
         }
-
-        // --------- variant which saves outside the zks
-
-        //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.PrepareSave))]
-        //[HarmonyPostfix]
-        //public static void OnSave(SaveInfo saveInfo)
-        //{
-        //    if ((int)saveInfo.Type > 2)
-        //        return;
-
-        //    string path = saveInfo.FolderName.TrySubstring('.', -1, true);
-        //    if (path == null)
-        //        return;
-        //    path += ".json";
-
-        //    var data = new EntityPartKeyValueStorage().GetStorage("DarkCodex-Patches"); // TODO: get data
-
-        //    foreach (var p in Main.patchInfos)
-        //    {
-        //        if (p.IsDangerous && !p.Disabled && !p.DisabledAll)
-        //            data[p.FullName] = "true";
-        //    }
-
-        //    Helper.Serialize(data, path: path);
-        //}
-
-        //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.DeleteSave))]
-        //[HarmonyPostfix]
-        //public static void OnDelete(SaveInfo saveInfo)
-        //{
-        //    string path = saveInfo.FolderName.TrySubstring('.', -1, true);
-        //    if (path == null)
-        //        return;
-        //    path += ".json";
-
-        //    Helper.TryDelete(path);
-        //}
-
-        //[HarmonyPatch(typeof(SaveSlot), nameof(SaveSlot.OnButtonSaveLoad))]
-        //[HarmonyPriority(Priority.HigherThanNormal)]
-        //[HarmonyPrefix]
-        //public static bool BeforeLoad(SaveSlot __instance)
-        //{
-        //    var saveInfo = __instance.SaveInfo;
-        //    string path = saveInfo.FolderName.TrySubstring('.', -1, true);
-        //    if (path == null)
-        //        return true;
-        //    path += ".json";
-
-        //    var data = Helper.TryDeserialize<EntityPartKeyValueStorage>(path: path);
-        //    if (data == null)
-        //        return true;
-
-        //    var dic = data.GetStorage("DarkCodex-Patches");
-        //    if (dic == null)
-        //        return true;
-
-        //    foreach (string p in dic.Keys)
-        //    {
-        //    }
-
-        //    if (false)
-        //    {
-        //        string patches = null;
-        //        Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + patches, yesLabel: "Enable",
-        //            onYes: () =>
-        //            {
-        //                SystemUtil.ApplicationQuit();
-        //            });
-        //        return false;
-        //    }
-
-        //    return true;
-        //}
     }
 }

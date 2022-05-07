@@ -121,7 +121,7 @@ namespace DarkCodex
         [HarmonyPrefix]
         public static void Debug1(UnitEntityData unit, bool autoCommit, LevelUpState.CharBuildMode mode, LevelUpController __instance)
         {
-            if (Main.IsInGame)
+            if (Main.IsInGame && Settings.StateManager.State.verbose)
                 Helper.PrintDebug($"LevelUpController Constructor: unit={unit.CharacterName} auto={autoCommit} mode={mode}");
         }
 

@@ -69,6 +69,8 @@ namespace DarkCodex
             // Sprites
             public static readonly Sprite BorderFancy1 = Helper.CreateSprite("border_fancy1.png");
             public static readonly Sprite BorderFancy3 = Helper.CreateSprite("border_fancy3.png");
+            public static readonly Texture IconPotBlack = Helper.CreateTexture("pot black.png", 16, 16);
+            public static readonly Texture IconBookBlack = Helper.CreateTexture("book black.png", 16, 16);
 
             // Mods
             public static readonly BlueprintBuffReference BuffKineticWhip = new();
