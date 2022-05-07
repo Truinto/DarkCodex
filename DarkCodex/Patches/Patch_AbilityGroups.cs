@@ -63,7 +63,7 @@ namespace DarkCodex
         public static ActionBarVM RootVM => RootUIContext.Instance.InGameVM.StaticPartVM.ActionBarVM;
         public static ActionBarPCView RootPCView => (RootUIContext.Instance.m_UIView as InGamePCView)?.m_StaticPartPCView?.m_ActionBarPCView;
 
-        public static bool Locked = true;
+        public static bool Unlocked = false;
 
         public static HashSet<DefGroup> Groups;
 
@@ -165,13 +165,15 @@ namespace DarkCodex
         public static void Refresh()
         {
             var actionbar = RootVM;
+            if (actionbar == null)
+                return;
             actionbar.m_NeedReset = true;
             actionbar.OnUpdateHandler();
         }
 
         public static void ToggleLocked()
         {
-            Locked = !Locked;
+            Unlocked = !Unlocked;
             Refresh();
         }
 
@@ -242,7 +244,7 @@ namespace DarkCodex
                 }
 
                 // fill unavailable abilities with placeholders
-                if (!Locked)
+                if (Unlocked)
                 {
                     for (int i = 0; i < group.Guids.Count; i++)
                         if (!dic.ContainsKey(i))
@@ -251,7 +253,7 @@ namespace DarkCodex
 
                 // add group to actionbar
                 var list = dic.OrderBy(o => o.Key).Select(s => s.Value).ToList(); // keep list in order of guids in the settings
-                if (list.Count > 0 || !Locked)
+                if (list.Count > 0 || Unlocked)
                     __instance.GroupAbilities.Add(new ActionBarSlotVM(new MechanicActionBarSlotGroup(unit, hash, list)));
 
                 // update existing toolbar slots
@@ -791,7 +793,7 @@ namespace DarkCodex
             public override int GetResource() => -1;
             public override bool IsCasting() => false;
             public override bool IsDisabled(int resourceCount) => true;
-            public override bool IsBad() => Locked;
+            public override bool IsBad() => !Unlocked;
         }
 
         public class ActionBarConvertedVMAny : ActionBarConvertedVM // overwrites logic to use any MechanicActionBarSlot

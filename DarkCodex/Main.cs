@@ -89,7 +89,7 @@ namespace DarkCodex
 
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
             Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
-            Checkbox(ref Patch_AbilityGroups.Locked, "Show all Ability Groups", b => Patch_AbilityGroups.Refresh());
+            Checkbox(ref Patch_AbilityGroups.Unlocked, "Show all Ability Groups", b => Patch_AbilityGroups.Refresh());
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
@@ -124,7 +124,11 @@ namespace DarkCodex
             if (GUILayout.Button("Disable all homebrew", GUILayout.ExpandWidth(false)))
                 patchInfos.Where(w => w.Homebrew).ForEach(attr => patchInfos.SetEnable(false, attr));
             GUILayout.Space(10);
-            Checkbox(ref state.newFeatureDefaultOn, "New features default on", b => restart = true);
+            Checkbox(ref state.newFeatureDefaultOn, "New features default on", b =>
+            {
+                restart = true;
+                patchInfos.Update();
+            });
 
             //patchInfos.Update(); // TODO: check if update can be skipped here; check if settings are applied correctly; put favorite settings on top
 
@@ -137,6 +141,7 @@ namespace DarkCodex
 #endif
                 if (info.Class != category)
                 {
+                    category = info.Class;
                     folded = CategoryFolded.Contains(category);
 
                     GUILayout.Box(GUIContent.none, StyleLine);
@@ -159,7 +164,6 @@ namespace DarkCodex
 
                     GUILayout.Space(3);
                     GUILayout.Label(info.Class);
-                    category = info.Class;
 
                     GUILayout.EndHorizontal();
                 }
@@ -167,7 +171,7 @@ namespace DarkCodex
                 if (folded) continue;
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Space(20);
+                GUILayout.Space(30);
                 if (DrawInfoButton(info))
                 {
                     restart = true;
