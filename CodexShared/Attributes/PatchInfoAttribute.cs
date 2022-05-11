@@ -128,7 +128,7 @@ namespace Shared
                     state.Whitelist.Add(category);
                     state.Blacklist.Remove(category);
                     if (force)
-                        state.Blacklist.Remove(category.TrySubstring('.') + ".*");
+                        state.Blacklist.Remove(TrySubstring(category, '.') + ".*");
                 }
                 else
                 {
@@ -150,7 +150,7 @@ namespace Shared
                 state.Whitelist.Add(fullName);
                 if (force)
                 {
-                    state.Blacklist.Remove(fullName.TrySubstring('.') + ".*");
+                    state.Blacklist.Remove(TrySubstring(fullName, '.') + ".*");
                     Update();
                 }
             }
@@ -208,7 +208,7 @@ namespace Shared
             if (name.Last() == '*') // categories are always enabled unless they are on the blacklist
                 return false;
 
-            if (state.Blacklist.Contains(name.TrySubstring('.') + ".*")) // check if disabled by category
+            if (state.Blacklist.Contains(TrySubstring(name, '.') + ".*")) // check if disabled by category
                 return true;
 
             if (state.Whitelist.Contains(name)) // check whitelist
@@ -255,6 +255,27 @@ namespace Shared
                     list.RemoveAt(i);
             }
             return list;
+        }
+
+        private static string TrySubstring(string str, char c, int start = 0, bool tail = false)
+        {
+            try
+            {
+                if (tail)
+                {
+                    if (start < 0)
+                        return str.Substring(str.LastIndexOf(c) + 1);
+                    return str.Substring(str.IndexOf(c, start) + 1);
+                }
+
+                if (start < 0)
+                    return str.Substring(0, str.LastIndexOf(c));
+                return str.Substring(start, str.IndexOf(c, start));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
     }

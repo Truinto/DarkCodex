@@ -27,6 +27,7 @@ using Kingmaker.UnitLogic;
 using Kingmaker.EntitySystem;
 using Kingmaker.UI.MVVM;
 using DarkCodex;
+using CodexLib;
 
 namespace Shared
 {
@@ -396,6 +397,7 @@ namespace Shared
 
             try
             {
+                using var scope = new Scope(Main.ModPath, Main.logger);
                 Print("Loading Dark Codex");
 
                 patchInfos = new(Settings.State);
@@ -553,9 +555,9 @@ namespace Shared
                 patchInfos.Sort(); // sort info list for GUI
                 patchInfos.Update();
 
-                Helper.Print("Finished loading Dark Codex");
+                Print("Finished loading Dark Codex");
 #if DEBUG
-                Helper.PrintDebug("Running in debug. " + Main.IsInGame);
+                PrintDebug("Running in debug. " + Main.IsInGame);
                 Helper.ExportStrings();
                 Guid.i.WriteAll();
 #endif

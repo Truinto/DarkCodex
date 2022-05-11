@@ -183,7 +183,13 @@
     <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
     <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\CodexLib\CodexLib.csproj">
+      <Project>{c518e346-ddbd-498a-bef9-d50ff314ad38}</Project>
+      <Name>CodexLib</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\CodexShared\CodexShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,5 +1,4 @@
-﻿using DarkCodex.Components;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -66,7 +65,7 @@ using UnityModManagerNet;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 
-namespace DarkCodex
+namespace CodexLib
 {
     /* 
      * Notes:

@@ -33,6 +33,8 @@ namespace Shared
         private static UnityModManager.ModEntry.ModLogger logger;
         private static bool applyNullFinalizer;
 
+        #region UnityModManager
+
         public static bool Load(UnityModManager.ModEntry modEntry)
         {
             /// <summary>Loads on game start.</summary>
@@ -145,6 +147,8 @@ namespace Shared
                 catch (Exception ex) { logger?.LogException(ex); }
             }
         }
+
+        #endregion
 
         #region Helper
 

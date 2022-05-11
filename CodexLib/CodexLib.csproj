@@ -82,7 +82,10 @@
     <None Include="strong-name-key.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GuidManager.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scope.cs" />
     <Compile Include="Test.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

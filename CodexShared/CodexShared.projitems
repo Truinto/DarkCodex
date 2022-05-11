@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Attributes\ManualPatchAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Attributes\PatchInfoAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BaseSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Main.cs" />
   </ItemGroup>

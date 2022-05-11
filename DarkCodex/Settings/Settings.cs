@@ -80,6 +80,5 @@ namespace DarkCodex
 
             return true;
         }
-
     }
 }
