@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 
-namespace DarkCodex
+namespace Shared
 {
-    class ManualPatchAttribute : System.Attribute
+    public class ManualPatchAttribute : System.Attribute
     {
         public Type declaringType;
         public string methodName;

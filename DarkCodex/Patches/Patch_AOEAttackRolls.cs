@@ -2,6 +2,7 @@
 using System.Linq;
 using HarmonyLib;
 using Kingmaker.RuleSystem.Rules;
+using Shared;
 
 namespace DarkCodex
 {

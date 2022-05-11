@@ -7,6 +7,7 @@ using Kingmaker.Utility;
 using System;
 using System.Linq;
 using TurnBased.Controllers;
+using Shared;
 
 namespace DarkCodex
 {

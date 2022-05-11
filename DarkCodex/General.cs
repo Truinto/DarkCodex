@@ -32,6 +32,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
+using System.IO;
 
 namespace DarkCodex
 {
@@ -258,7 +260,7 @@ namespace DarkCodex
                 "Stop Activatables",
                 "Immediately stop all disabled activatables. Useful for bardic performance.",
                 null,
-                icon: Helper.CreateSprite("StopSong.png"),
+                icon: Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "StopSong.png")),
                 AbilityType.Special,
                 UnitCommand.CommandType.Free,
                 AbilityRange.Personal

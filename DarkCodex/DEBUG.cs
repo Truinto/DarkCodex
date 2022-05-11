@@ -22,6 +22,7 @@ using Kingmaker.Items.Slots;
 using Kingmaker.Kingdom;
 using Kingmaker.Kingdom.Settlements;
 using Kingmaker.Localization;
+using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Abilities;
@@ -50,6 +51,7 @@ using System.Threading.Tasks;
 using TurnBased.Controllers;
 using UnityEngine;
 using UnityModManagerNet;
+using Shared;
 
 namespace DarkCodex
 {
@@ -63,7 +65,8 @@ namespace DarkCodex
                 {
                     try
                     {
-                        Helper.SaveSprite(fact.m_Icon);
+                        Texture.allowThreadedTextureCreation = true;
+                        File.WriteAllBytes(Path.Combine(Main.ModPath, "IconsExport", fact.m_Icon.name), ImageConversion.EncodeToPNG(fact.m_Icon.texture));
                         Helper.PrintDebug($"Export sprite {fact.m_Icon.name} from {fact.name} ");
                     }
                     catch (Exception)
@@ -140,7 +143,7 @@ namespace DarkCodex
         {
             public static void Prefix(AbilityData __instance, BlueprintAbility blueprint, UnitDescriptor caster)
             {
-                if (!Settings.StateManager.State.debug_1)
+                if (!Settings.State.debug_1)
                     return;
 
                 if (blueprint.Range == AbilityRange.Personal)
@@ -148,7 +151,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Hidden | Severity.WIP, "Display All", "makes enchantments visible for items that don't usually display them", false)]
+        [PatchInfo(Severity.Extend | Severity.WIP, "Display All", "makes enchantments visible for items that don't usually display them", false)]
         [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
         public class Enchantments
         {
@@ -202,7 +205,7 @@ namespace DarkCodex
                 }
             }
 
-            [PatchInfo(Severity.Hidden | Severity.WIP, "Name All", "gives all enchantments a name and description", false)]
+            [PatchInfo(Severity.Extend | Severity.WIP, "Name All", "gives all enchantments a name and description", false)]
             public static void NameAll()
             {
                 Resource.Cache.Ensure();
@@ -387,11 +390,34 @@ namespace DarkCodex
         {
             public static void Postfix(RulebookEventContext context, RuleCalculateAbilityParams __instance)
             {
-                if (__instance.Initiator == null || !__instance.Initiator.IsPlayerFaction || !Settings.StateManager.State.verbose)
+                if (__instance.Initiator == null || !__instance.Initiator.IsPlayerFaction || !Settings.State.verbose)
                     return;
 
                 AbilityParams para = __instance.Result;
                 Helper.PrintDebug($"RuleCalculateAbilityParams blueprint={__instance.Blueprint} CL={para.CasterLevel} SL={para.SpellLevel} DC={para.DC} Metamagic={para.Metamagic} Bonus={para.RankBonus}");
+            }
+        }
+
+        public class TestEventBus
+        {
+            //RulebookEventBus.Subscribe([CanBeNull] IInitiatorRulebookSubscriber subscriber, [CanBeNull] ISubscriptionProxy proxy)
+            public static void Postfix(IInitiatorRulebookSubscriber subscriber, ISubscriptionProxy proxy, RulebookEventBus __instance)
+            {
+                if (subscriber == null)
+                    return;
+                var unitEntityData = (proxy?.GetSubscribingUnit()) ?? subscriber.GetSubscribingUnit();
+                if (unitEntityData == null)
+                    return;
+
+                var types = InterfaceFinder<IInitiatorRulebookSubscriber>.GetSubscribedRulebookTypes(subscriber);
+                var listeners = RulebookEventBus.InitiatorRulebookSubscribers.Sure(unitEntityData).m_Listeners;
+                foreach (var (type, listener) in listeners)
+                {
+                    if (listener.GetType().GetField("List", Helper.BindingInstance)?.GetValue(listener) is List<object> list)
+                    {
+                        list.Sort(); //list[i] is IRulebookHandler<RuleCastSpell>                        
+                    }
+                }
             }
         }
     }

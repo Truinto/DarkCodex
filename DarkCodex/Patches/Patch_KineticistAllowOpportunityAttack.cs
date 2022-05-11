@@ -8,6 +8,7 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items.Slots;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.FactLogic;
+using Shared;
 
 namespace DarkCodex
 {

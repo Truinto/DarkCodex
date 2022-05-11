@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Modding;
+using Shared;
 
 namespace DarkCodex
 {
@@ -11,7 +12,7 @@ namespace DarkCodex
         public static bool Patched;
         public static bool Prefix(ref bool __result)
         {
-            if (!Settings.StateManager.State.allowAchievements)
+            if (!Settings.State.allowAchievements)
                 return true;
 
             if (Game.Instance?.Player != null)

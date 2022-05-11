@@ -1,5 +1,4 @@
-﻿using Config;
-using DarkCodex.Components;
+﻿using DarkCodex.Components;
 using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
@@ -63,6 +62,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityModManagerNet;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 
@@ -115,55 +115,72 @@ namespace DarkCodex
             set => GUIUtility.systemCopyBuffer = value;
         }
 
+        //https://stackoverflow.com/questions/52797/how-do-i-get-the-path-of-the-assembly-the-code-is-in
+        public static string AssemblyDirectory
+        {
+            get
+            {
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
+            }
+        }
+
         #endregion
 
         #region Patching/Harmony
 
-        /// <summary>Needs ManualPatch attribute.</summary>
-        public static void Patch(Type patch, bool _)
-        {
-            Print("ManualPatch " + patch.Name);
-            if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) is not ManualPatchAttribute manual)
-                throw new ArgumentException("Type must have ManualPatchAttribute");
+        public const BindingFlags BindingAll = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+        public const BindingFlags BindingInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        public const BindingFlags BindingStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
-            var prefix = patch.GetMethod("Prefix");
-            var postfix = patch.GetMethod("Postfix");
-
-            var attr = new HarmonyPatch(manual.declaringType, manual.methodName, manual.methodType);
-            Main.harmony.Patch(
-                        original: GetOriginalMethod(attr.info),
-                        prefix: prefix != null ? new HarmonyMethod(prefix) : null,
-                        postfix: postfix != null ? new HarmonyMethod(postfix) : null);
-
-            patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
-        }
-
-        /// <summary>Needs HarmonyPatch attribute.</summary>
-        public static void Patch(Type patch)
+        public static void Patch(this Harmony harmony, Type patch)
         {
             Print("Patching " + patch.Name);
-            Main.harmony.CreateClassProcessor(patch).Patch();
+            harmony.CreateClassProcessor(patch).Patch();
         }
 
-        public static void Unpatch(Type patch, HarmonyPatchType patchType)
+        //private static void PatchManual(this Harmony harmony, Type patch)
+        //{
+        //    /// <summary>Needs ManualPatch attribute.</summary>
+        //    /// Leftover.
+        //    Print("ManualPatch " + patch.Name);
+        //    if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is ManualPatchAttribute) is not ManualPatchAttribute manual)
+        //        throw new ArgumentException("Type must have ManualPatchAttribute");
+        //    var prefix = patch.GetMethod("Prefix");
+        //    var postfix = patch.GetMethod("Postfix");
+        //    var attr = new HarmonyPatch(manual.declaringType, manual.methodName, manual.methodType);
+        //    harmony.Patch(
+        //        original: GetOriginalMethod(attr.info),
+        //        prefix: prefix != null ? new HarmonyMethod(prefix) : null,
+        //        postfix: postfix != null ? new HarmonyMethod(postfix) : null);
+        //    patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
+        //}
+
+        public static void Unpatch(this Harmony harmony, Type patch, HarmonyPatchType patchType)
         {
             Print("Unpatch " + patch);
             if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
                 return;
 
             MethodBase orignal = attr.info.GetOriginalMethod();
-            Main.harmony.Unpatch(orignal, patchType, Main.harmony.Id);
+            harmony.Unpatch(orignal, patchType, harmony.Id);
         }
 
-        /// <summary>Only works with HarmonyPatch.</summary>
         public static bool IsPatched(Type patch)
         {
-            if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
-                throw new ArgumentException("Type must have HarmonyPatch attribute");
+            try
+            {
+                if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
+                    throw new ArgumentException("Type must have HarmonyPatch attribute");
 
-            MethodBase orignal = attr.info.GetOriginalMethod();
-            var info = Harmony.GetPatchInfo(orignal);
-            return info != null && (info.Prefixes?.Any() == true || info.Postfixes?.Any() == true || info.Transpilers?.Any() == true);
+                MethodBase orignal = attr.info.GetOriginalMethod();
+                var info = Harmony.GetPatchInfo(orignal);
+                return info != null && (info.Prefixes.Any() || info.Postfixes.Any() || info.Transpilers.Any());
+            }
+            catch (Exception e) { PrintException(e); }
+            return true;
         }
 
         public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
@@ -344,32 +361,33 @@ namespace DarkCodex
 
         private static bool _sb2_flag;
         private static StringBuilder _sb2 = new();
+        private static UnityModManager.ModEntry.ModLogger logger = new("CodexLib");
 
         /// <summary>Only prints message, if compiled on DEBUG.</summary>
         [System.Diagnostics.Conditional("DEBUG")]
         internal static void PrintDebug(string msg)
         {
-            Main.logger?.Log(msg);
+            logger?.Log(msg);
         }
 
         internal static void Print(string msg)
         {
-            Main.logger?.Log(msg);
+            logger?.Log(msg);
         }
 
         internal static void PrintError(string msg)
         {
-            Main.logger?.Log("[Exception/Error] " + msg);
+            logger?.Log("[Exception/Error] " + msg);
         }
 
         internal static void PrintException(Exception ex)
         {
-            Main.logger?.LogException(ex);
+            logger?.LogException(ex);
         }
 
         private static readonly FieldInfo _fieldLabel = AccessTools.Field(typeof(Label), "label");
         [System.Diagnostics.Conditional("DEBUG")]
-        internal static void PrintInstruction(CodeInstruction code, string str = "")
+        public static void PrintInstruction(CodeInstruction code, string str = "")
         {
             var labels = code.labels.Select(s => (int)_fieldLabel.GetValue(s)).Join();
             if (code.operand is Label label)
@@ -379,7 +397,7 @@ namespace DarkCodex
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        internal static void PrintJoinDebug(string msg = "", string delimiter = ", ", bool flush = false)
+        public static void PrintJoinDebug(string msg = "", string delimiter = ", ", bool flush = false)
         {
             PrintJoin(msg, delimiter, flush);
         }
@@ -390,7 +408,7 @@ namespace DarkCodex
         /// <param name="msg">Part of text to print.</param>
         /// <param name="delimiter">Delimiter to use. Set null for prefix.</param>
         /// <param name="flush">Flushes BEFORE appending msg.</param>
-        internal static void PrintJoin(string msg = "", string delimiter = ", ", bool flush = false)
+        public static void PrintJoin(string msg = "", string delimiter = ", ", bool flush = false)
         {
             if (flush)
             {
@@ -500,7 +518,7 @@ namespace DarkCodex
 
             if (path != null)
             {
-                path = Path.Combine(Main.ModPath, path);
+                //path = Path.Combine(Main.ModPath, path);
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(result);
@@ -518,7 +536,7 @@ namespace DarkCodex
 
             if (path != null)
             {
-                path = Path.Combine(Main.ModPath, path);
+                //path = Path.Combine(Main.ModPath, path);
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(result);
@@ -532,7 +550,8 @@ namespace DarkCodex
         {
             if (path != null)
             {
-                using var sr = new StreamReader(Path.Combine(Main.ModPath, path));
+                //path = Path.Combine(Main.ModPath, path);
+                using var sr = new StreamReader(path);
                 value = sr.ReadToEnd();
                 sr.Close();
             }
@@ -546,7 +565,8 @@ namespace DarkCodex
         {
             if (path != null)
             {
-                using var sr = new StreamReader(Path.Combine(Main.ModPath, path));
+                //path = Path.Combine(Main.ModPath, path);
+                using var sr = new StreamReader(path);
                 value = sr.ReadToEnd();
                 sr.Close();
             }
@@ -564,7 +584,7 @@ namespace DarkCodex
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
                 return default;
             }
         }
@@ -573,14 +593,14 @@ namespace DarkCodex
         {
             try
             {
-                path = Path.Combine(Main.ModPath, path);
+                //path = Path.Combine(Main.ModPath, path);
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(content);
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
             }
         }
 
@@ -588,13 +608,13 @@ namespace DarkCodex
         {
             try
             {
-                path = Path.Combine(Main.ModPath, path);
+                //path = Path.Combine(Main.ModPath, path);
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
                 File.WriteAllBytes(path, data);
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
             }
         }
 
@@ -602,11 +622,12 @@ namespace DarkCodex
         {
             try
             {
-                return File.ReadAllBytes(Path.Combine(Main.ModPath, path));
+                //path = Path.Combine(Main.ModPath, path);
+                return File.ReadAllBytes(path);
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
                 return new byte[0];
             }
         }
@@ -619,7 +640,7 @@ namespace DarkCodex
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
             }
         }
 
@@ -645,7 +666,7 @@ namespace DarkCodex
             return false;
         }
 
-        private static SHA1 _SHA = SHA1Managed.Create();
+        private static SHA1 _SHA = SHA1.Create();
         private static StringBuilder _sb1 = new();
         private static Locale _lastLocale = Locale.enGB;
         private static Dictionary<string, string> _mappedStrings;
@@ -669,7 +690,9 @@ namespace DarkCodex
                 _lastLocale = LocalizationManager.CurrentPack.Locale;
                 try
                 {
-                    _mappedStrings = new JsonManager().Deserialize<Dictionary<string, string>>(Path.Combine(Main.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
+                    string path = LocalizationManager.CurrentPack.Locale.ToString() + "enGB.json";
+                    path = Path.Combine(Main.ModPath, path);
+                    _mappedStrings = Deserialize<Dictionary<string, string>>(path: path);
                     foreach (var entry in _mappedStrings)
                         pack.PutString(entry.Key, entry.Value);
                     _mappedStrings = null;
@@ -707,7 +730,7 @@ namespace DarkCodex
 
             try
             {
-                oldmap = Helper.Deserialize<Dictionary<string, string>>(path: Path.Combine(Main.ModPath, "enGB.json"));
+                oldmap = Deserialize<Dictionary<string, string>>(path: Path.Combine(Main.ModPath, "enGB.json"));
 
                 foreach (var entry in _mappedStrings)
                     if (!oldmap.ContainsKey(entry.Key))
@@ -717,7 +740,7 @@ namespace DarkCodex
 
             try
             {
-                Helper.Serialize(oldmap ?? _mappedStrings, path: Path.Combine(Main.ModPath, "enGB.json"));
+                Serialize(oldmap ?? _mappedStrings, path: Path.Combine(Main.ModPath, "enGB.json"));
                 _mappedStrings = null;
             }
             catch (Exception e)
@@ -1067,25 +1090,25 @@ namespace DarkCodex
         {
             if (_basicfeats1 == null) //BasicFeatSelection
                 _basicfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45");
-            Helper.AppendAndReplace(ref _basicfeats1.m_AllFeatures, feats.ToRef());
+            AppendAndReplace(ref _basicfeats1.m_AllFeatures, feats.ToRef());
 
             if (_basicfeats2 == null) //ExtraFeatMythicFeat
                 _basicfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
-            Helper.AppendAndReplace(ref _basicfeats2.m_AllFeatures, feats.ToRef());
+            AppendAndReplace(ref _basicfeats2.m_AllFeatures, feats.ToRef());
         }
         public static void AddCombatFeat(BlueprintFeature feats)
         {
             if (_combatfeats1 == null) //FighterFeatSelection
                 _combatfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("41c8486641f7d6d4283ca9dae4147a9f");
-            Helper.AppendAndReplace(ref _combatfeats1.m_AllFeatures, feats.ToRef());
+            AppendAndReplace(ref _combatfeats1.m_AllFeatures, feats.ToRef());
 
             if (_combatfeats2 == null) //CombatTrick
                 _combatfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c5158a6622d0b694a99efb1d0025d2c1");
-            Helper.AppendAndReplace(ref _combatfeats2.m_AllFeatures, feats.ToRef());
+            AppendAndReplace(ref _combatfeats2.m_AllFeatures, feats.ToRef());
 
             if (_combatfeats3 == null) //ExtraFeatMythicFeat
                 _combatfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
-            Helper.AppendAndReplace(ref _combatfeats3.m_AllFeatures, feats.ToRef());
+            AppendAndReplace(ref _combatfeats3.m_AllFeatures, feats.ToRef());
 
             AddFeats(feats);
         }
@@ -1100,7 +1123,7 @@ namespace DarkCodex
             if (_mythicextratalents == null)
                 _mythicextratalents = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
 
-            Helper.AppendAndReplace(ref _mythictalents.m_AllFeatures, feat.ToRef());
+            AppendAndReplace(ref _mythictalents.m_AllFeatures, feat.ToRef());
             _mythicextratalents.m_AllFeatures = _mythictalents.m_AllFeatures;
         }
 
@@ -1109,7 +1132,7 @@ namespace DarkCodex
             if (_mythicfeats == null)
                 _mythicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81");
 
-            Helper.AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat.ToRef());
+            AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat.ToRef());
         }
 
         private static BlueprintFeatureSelection _roguefeats;
@@ -1132,11 +1155,11 @@ namespace DarkCodex
 
             var reference = feat.ToRef();
 
-            Helper.AppendAndReplace(ref _roguefeats.m_AllFeatures, reference);
-            Helper.AppendAndReplace(ref _slayerfeats1.m_AllFeatures, reference);
-            Helper.AppendAndReplace(ref _slayerfeats2.m_AllFeatures, reference);
-            Helper.AppendAndReplace(ref _slayerfeats3.m_AllFeatures, reference);
-            Helper.AppendAndReplace(ref _vivsectionistfeats.m_AllFeatures, reference);
+            AppendAndReplace(ref _roguefeats.m_AllFeatures, reference);
+            AppendAndReplace(ref _slayerfeats1.m_AllFeatures, reference);
+            AppendAndReplace(ref _slayerfeats2.m_AllFeatures, reference);
+            AppendAndReplace(ref _slayerfeats3.m_AllFeatures, reference);
+            AppendAndReplace(ref _vivsectionistfeats.m_AllFeatures, reference);
         }
 
         private static BlueprintFeatureSelection _witchhexes;
@@ -1145,18 +1168,18 @@ namespace DarkCodex
         public static void AddHex(BlueprintFeature hex, bool allowShaman = true)
         {
             if (_witchhexes == null)
-                _witchhexes = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
+                _witchhexes = Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
             if (_shamanhexes == null)
-                _shamanhexes = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7");
+                _shamanhexes = Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7");
             if (_hexcrafterhexes == null)
-                _hexcrafterhexes = Helper.Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf");
+                _hexcrafterhexes = Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf");
 
             var reference = hex.ToRef();
 
-            Helper.AppendAndReplace(ref _witchhexes.m_AllFeatures, reference);
+            AppendAndReplace(ref _witchhexes.m_AllFeatures, reference);
             if (allowShaman)
-                Helper.AppendAndReplace(ref _shamanhexes.m_AllFeatures, reference);
-            Helper.AppendAndReplace(ref _hexcrafterhexes.m_AllFeatures, reference);
+                AppendAndReplace(ref _shamanhexes.m_AllFeatures, reference);
+            AppendAndReplace(ref _hexcrafterhexes.m_AllFeatures, reference);
         }
 
         public static BlueprintAbility AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
@@ -1170,7 +1193,7 @@ namespace DarkCodex
             }
             else
             {
-                Helper.AppendAndReplace(ref comp.m_Variants, variants.ToRef());
+                AppendAndReplace(ref comp.m_Variants, variants.ToRef());
             }
 
             foreach (var v in variants)
@@ -1383,11 +1406,11 @@ namespace DarkCodex
 
         public static void GenerateEnchantedWeapons(this BlueprintWeaponType weaponType, List<BlueprintItemWeapon> list, BlueprintWeaponEnchantment enchantment, bool full, params object[] BlueprintWeaponEnchantment)
         {
-            var plus1 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("d42fc23b92c640846ac137dc26e000d4");
-            var plus2 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("eb2faccc4c9487d43b3575d7e77ff3f5");
-            var plus3 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b");
-            var plus4 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("783d7d496da6ac44f9511011fc5f1979");
-            var plus5 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("bdba267e951851449af552aa9f9e3992");
+            var plus1 = ToRef<BlueprintWeaponEnchantmentReference>("d42fc23b92c640846ac137dc26e000d4");
+            var plus2 = ToRef<BlueprintWeaponEnchantmentReference>("eb2faccc4c9487d43b3575d7e77ff3f5");
+            var plus3 = ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b");
+            var plus4 = ToRef<BlueprintWeaponEnchantmentReference>("783d7d496da6ac44f9511011fc5f1979");
+            var plus5 = ToRef<BlueprintWeaponEnchantmentReference>("bdba267e951851449af552aa9f9e3992");
 
             throw new NotImplementedException();
         }
@@ -1410,7 +1433,7 @@ namespace DarkCodex
 
             if (entries.Count > 0)
             {
-                Helper.AppendAndReplace(ref progression.LevelEntries, entries);
+                AppendAndReplace(ref progression.LevelEntries, entries);
             }
         }
         public static void AddEntries(this BlueprintProgression progression, params LevelEntry[] entries) => AddEntries(progression, entries.ToList());
@@ -1461,7 +1484,7 @@ namespace DarkCodex
 
         public static BlueprintFeatureSelection Add(this BlueprintFeatureSelection selection, params BlueprintFeatureReference[] features)
         {
-            Helper.AppendAndReplace(ref selection.m_AllFeatures, features);
+            AppendAndReplace(ref selection.m_AllFeatures, features);
 
             return selection;
         }
@@ -2834,11 +2857,11 @@ namespace DarkCodex
             return null;
         }
 
-        public static Sprite CreateSprite(string filename, int width = 64, int height = 64)
+        public static Sprite CreateSprite(string path, int width = 64, int height = 64)
         {
             try
             {
-                var bytes = File.ReadAllBytes(Path.Combine(Main.ModPath, "Icons", filename));
+                var bytes = File.ReadAllBytes(path);
                 var texture = new Texture2D(width, height);
                 texture.LoadImage(bytes);
                 return Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0, 0));
@@ -2850,11 +2873,11 @@ namespace DarkCodex
             }
         }
 
-        public static Texture CreateTexture(string filename, int width = 64, int height = 64)
+        public static Texture CreateTexture(string path, int width = 64, int height = 64)
         {
             try
             {
-                var bytes = File.ReadAllBytes(Path.Combine(Main.ModPath, "Icons", filename));
+                var bytes = File.ReadAllBytes(path);
                 var texture = new Texture2D(width, height);
                 texture.LoadImage(bytes);
                 return texture;
@@ -2864,12 +2887,6 @@ namespace DarkCodex
                 PrintException(e);
                 return null;
             }
-        }
-
-        public static void SaveSprite(Sprite icon) // not working
-        {
-            Texture.allowThreadedTextureCreation = true;
-            File.WriteAllBytes(Path.Combine(Main.ModPath, "IconsExport", icon.name), ImageConversion.EncodeToPNG(icon.texture));
         }
 
         #endregion

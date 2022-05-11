@@ -1,6 +1,7 @@
 ﻿using Kingmaker.UnitLogic.ActivatableAbilities;
 using System;
 using System.Linq;
+using Shared;
 
 namespace DarkCodex
 {

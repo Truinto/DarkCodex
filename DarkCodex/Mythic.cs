@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 //using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
 //global using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
 
@@ -154,7 +155,7 @@ namespace DarkCodex
             smite_evil.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
             smite_chaos.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
             mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
-            if (Settings.StateManager.State.reallyFreeCost)
+            if (Settings.State.reallyFreeCost)
                 mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
 
             Helper.AddMythicTalent(limitless);
@@ -694,7 +695,7 @@ namespace DarkCodex
         public static void SetResourceDecreasing(BlueprintGuid resource, BlueprintUnitFactReference limitless, bool repeat = false)
         {
             Resource.Cache.Ensure();
-            repeat |= Settings.StateManager.State.reallyFreeCost;
+            repeat |= Settings.State.reallyFreeCost;
 
             Helper.PrintJoinDebug(" -free abilities: ", null);
 

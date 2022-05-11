@@ -8,6 +8,7 @@ using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.Utility;
 using Kingmaker.View.MapObjects;
 using System;
+using Shared;
 
 namespace DarkCodex
 {

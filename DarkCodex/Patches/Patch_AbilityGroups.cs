@@ -34,6 +34,7 @@ using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.Commands;
 using Owlcat.Runtime.UI.Controls.Button;
+using Shared;
 
 namespace DarkCodex
 {
@@ -279,6 +280,12 @@ namespace DarkCodex
             {
                 __instance.CloseConvert();
                 return false;
+            }
+
+            for (int i = group.Slots.Count - 1; i >= 0; i--)
+            {
+                if (group.Slots[i].IsBad())
+                    group.Slots.RemoveAt(i);
             }
 
             __instance.ConvertedVm.Value = new ActionBarConvertedVMAny(__instance, group.Slots, __instance.CloseConvert); // if null is used, it won't close; possible useful for nesting

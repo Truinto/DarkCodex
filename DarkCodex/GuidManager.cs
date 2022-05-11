@@ -9,6 +9,7 @@ using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Shared;
 
 namespace DarkCodex
 {

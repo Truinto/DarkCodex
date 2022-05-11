@@ -3,6 +3,7 @@ using HarmonyLib;
 using Kingmaker.UnitLogic.Class.Kineticist;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Shared;
 
 namespace DarkCodex
 {

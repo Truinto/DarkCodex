@@ -7,6 +7,7 @@ using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
 using Kingmaker.Items;
 using Kingmaker.Blueprints.Items.Armors;
+using Shared;
 
 namespace DarkCodex
 {

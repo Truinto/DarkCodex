@@ -1,16 +1,16 @@
 ﻿using Kingmaker.EntitySystem.Stats;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace DarkCodex
 {
-    public class Settings : ISettings
+    public class Settings : BaseSettings<Settings>
     {
-        [JsonProperty]
-        public int version = 4;
+        public Settings() => version = 4;
 
         [JsonProperty]
         public bool showBootupWarning = true;
@@ -26,15 +26,6 @@ namespace DarkCodex
 
         [JsonProperty]
         public bool reallyFreeCost = false;
-
-        [JsonProperty]
-        public bool newFeatureDefaultOn = true;
-
-        [JsonProperty]
-        public HashSet<string> Blacklist { get; private set; } = new();
-
-        [JsonProperty]
-        public HashSet<string> Whitelist { get; private set; } = new();
 
         [JsonProperty]
         [JsonConverter(typeof(StringEnumConverter))]
@@ -57,24 +48,22 @@ namespace DarkCodex
         [JsonProperty]
         public bool debug_4 = false;
 
-        [JsonIgnore] public bool NewFeatureDefaultOn => newFeatureDefaultOn;
+        public static Settings State = TryLoad(Main.ModPath);
 
-        public static Config.Manager<Settings> StateManager = new(Path.Combine(Main.ModPath, "settings.json"), OnUpdate);
-
-        private static bool OnUpdate(Settings settings)
+        protected override bool OnUpdate()
         {
-            if (settings.version < 4 && settings.Whitelist != null && settings.Blacklist != null)
+            if (version < 4 && Whitelist != null && Blacklist != null)
             {
-                settings.showBootupWarning = true;
+                showBootupWarning = true;
                 var hash = new HashSet<string>();
-                foreach (string str in settings.Whitelist)
+                foreach (string str in Whitelist)
                     hash.Add(toUpper(str));
-                settings.Whitelist = hash;
+                Whitelist = hash;
 
                 hash = new HashSet<string>();
-                foreach (string str in settings.Blacklist)
+                foreach (string str in Blacklist)
                     hash.Add(toUpper(str));
-                settings.Blacklist = hash;
+                Blacklist = hash;
 
                 string toUpper(string text)
                 {
@@ -91,5 +80,6 @@ namespace DarkCodex
 
             return true;
         }
+
     }
 }

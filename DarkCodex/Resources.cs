@@ -28,6 +28,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Shared;
 
 namespace DarkCodex
 {
@@ -67,10 +68,10 @@ namespace DarkCodex
             public static readonly BlueprintItemWeaponReference WeaponBlastEnergy = Helper.ToRef<BlueprintItemWeaponReference>("4d3265a5b9302ee4cab9c07adddb253f"); //KineticBlastEnergyWeapon
 
             // Sprites
-            public static readonly Sprite BorderFancy1 = Helper.CreateSprite("border_fancy1.png");
-            public static readonly Sprite BorderFancy3 = Helper.CreateSprite("border_fancy3.png");
-            public static readonly Texture IconPotBlack = Helper.CreateTexture("pot black.png", 16, 16);
-            public static readonly Texture IconBookBlack = Helper.CreateTexture("book black.png", 16, 16);
+            public static readonly Sprite BorderFancy1 = Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "border_fancy1.png"));
+            public static readonly Sprite BorderFancy3 = Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "border_fancy3.png"));
+            public static readonly Texture IconPotBlack = Helper.CreateTexture(Path.Combine(Main.ModPath, "icons", "pot black.png"), 16, 16);
+            public static readonly Texture IconBookBlack = Helper.CreateTexture(Path.Combine(Main.ModPath, "icons", "book black.png"), 16, 16);
 
             // Mods
             public static readonly BlueprintBuffReference BuffKineticWhip = new();

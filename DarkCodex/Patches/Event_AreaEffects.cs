@@ -11,6 +11,7 @@ using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.Visual.Particles;
 using System.Collections.Generic;
+using Shared;
 
 namespace DarkCodex
 {
@@ -65,7 +66,7 @@ namespace DarkCodex
         {
             Helper.PrintDebug("Dialog started...");
 
-            if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
+            if (Settings.State.stopAreaEffectsDuringCutscenes)
                 Stop();
         }
 
@@ -116,7 +117,7 @@ namespace DarkCodex
         {
             Helper.PrintDebug("Cutscene started...");
 
-            if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
+            if (Settings.State.stopAreaEffectsDuringCutscenes)
                 Stop();
         }
 
@@ -124,7 +125,7 @@ namespace DarkCodex
         {
             Helper.PrintDebug("Cutscene restarted...");
 
-            if (Settings.StateManager.State.stopAreaEffectsDuringCutscenes)
+            if (Settings.State.stopAreaEffectsDuringCutscenes)
                 Stop();
         }
 

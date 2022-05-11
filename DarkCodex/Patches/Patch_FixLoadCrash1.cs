@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kingmaker.EntitySystem.Persistence;
 using System.Text.RegularExpressions;
+using Shared;
 
 namespace DarkCodex
 {
@@ -10,7 +11,7 @@ namespace DarkCodex
     {
         public static void Postfix(ref string __result)
         {
-            if (!Settings.StateManager.State.debug_2)
+            if (!Settings.State.debug_2)
                 return;
 
             if (__result == null || __result == "")

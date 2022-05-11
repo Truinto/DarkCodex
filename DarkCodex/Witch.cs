@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using DarkCodex.Components;
 using Kingmaker.Designers.Mechanics.Facts;
+using Shared;
 
 namespace DarkCodex
 {

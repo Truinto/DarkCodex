@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Kingmaker.ElementsSystem;
+using Shared;
 
 namespace DarkCodex
 {

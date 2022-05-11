@@ -13,6 +13,7 @@ using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.Blueprints.Classes.Spells;
+using Shared;
 
 namespace DarkCodex
 {

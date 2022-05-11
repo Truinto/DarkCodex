@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Shared;
 
 namespace DarkCodex
 {

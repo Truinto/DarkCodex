@@ -216,20 +216,4 @@ namespace Config
             if (!Directory.Exists(path)) Directory.CreateDirectory(path);
         }
     }
-
-    public class Helper
-    {
-        //https://stackoverflow.com/questions/52797/how-do-i-get-the-path-of-the-assembly-the-code-is-in
-        public static string AssemblyDirectory
-        {
-            get
-            {
-                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new(codeBase);
-                string path = Uri.UnescapeDataString(uri.Path);
-                return Path.GetDirectoryName(path);
-            }
-        }
-    }
-
 }

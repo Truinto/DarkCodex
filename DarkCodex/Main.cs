@@ -14,7 +14,6 @@ using DarkCodex.Components;
 using Kingmaker.Modding;
 using Kingmaker.Achievements;
 using Kingmaker;
-using Config;
 using System.IO;
 using Newtonsoft.Json;
 using Kingmaker.PubSubSystem;
@@ -27,23 +26,16 @@ using System.Runtime.CompilerServices;
 using Kingmaker.UnitLogic;
 using Kingmaker.EntitySystem;
 using Kingmaker.UI.MVVM;
+using DarkCodex;
 
-namespace DarkCodex
+namespace Shared
 {
     //#if DEBUG [EnableReloading] #endif
-    public class Main
+    public static partial class Main
     {
-        public static Harmony harmony;
         public static bool IsInGame => Game.Instance.Player?.Party?.Any() ?? false; // RootUIContext.Instance?.IsInGame ?? false; //
 
-        /// <summary>True if mod is enabled. Doesn't do anything right now.</summary>
-        public static bool Enabled { get; set; } = true;
-        /// <summary>Path of current mod.</summary>
-        public static string ModPath;
-
         //[SaveOnReload] internal static int IsLoad;
-
-        internal static UnityModManager.ModEntry.ModLogger logger;
 
         #region GUI
 
@@ -67,7 +59,7 @@ namespace DarkCodex
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
-            Settings state = Settings.StateManager.State;
+            Settings state = Settings.State;
 
             if (StyleBox == null)
             {
@@ -85,7 +77,7 @@ namespace DarkCodex
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
 
-            Checkbox(ref Settings.StateManager.State.saveMetadata, "Save Metadata (warns when loading incompatible saves) WIP");
+            Checkbox(ref Settings.State.saveMetadata, "Save Metadata (warns when loading incompatible saves) WIP");
 
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
             Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
@@ -260,12 +252,12 @@ namespace DarkCodex
                     if (field.FieldType == typeof(int))
                     {
                         if (int.TryParse(entry.Value, out int num))
-                            field.SetValue(Settings.StateManager.State, num);
+                            field.SetValue(Settings.State, num);
                     }
                     else if (field.FieldType == typeof(float))
                     {
                         if (float.TryParse(entry.Value, out float num))
-                            field.SetValue(Settings.StateManager.State, num);
+                            field.SetValue(Settings.State, num);
                     }
                 }
                 catch (Exception)
@@ -274,7 +266,7 @@ namespace DarkCodex
                 }
             }
 
-            Settings.StateManager.TrySaveConfigurationState();
+            Settings.State.TrySave();
         }
 
         private static void Checkbox(ref bool value, string label, Action<bool> action = null)
@@ -331,7 +323,7 @@ namespace DarkCodex
         private static void NumberField(string key, string label)
         {
             NumberTable.TryGetValue(key, out string str);
-            if (str == null) try { str = typeof(Settings).GetField(key).GetValue(Settings.StateManager.State).ToString(); } catch (Exception) { }
+            if (str == null) try { str = typeof(Settings).GetField(key).GetValue(Settings.State).ToString(); } catch (Exception) { }
             if (str == null) str = "couldn't read";
 
             GUILayout.BeginHorizontal();
@@ -378,407 +370,203 @@ namespace DarkCodex
 
         #region Load
 
-        /// <summary>Loads on game start.</summary>
-        /// <param name="modEntry.Info">Contains all fields from the 'Info.json' file.</param>
-        /// <param name="modEntry.Path">The path to the mod folder e.g. '\Steam\steamapps\common\YourGame\Mods\TestMod\'.</param>
-        /// <param name="modEntry.Active">Active or inactive.</param>
-        /// <param name="modEntry.Logger">Writes logs to the 'Log.txt' file.</param>
-        /// <param name="modEntry.OnToggle">The presence of this function will let the mod manager know that the mod can be safely disabled during the game.</param>
-        /// <param name="modEntry.OnGUI">Called to draw UI.</param>
-        /// <param name="modEntry.OnSaveGUI">Called while saving.</param>
-        /// <param name="modEntry.OnUpdate">Called by MonoBehaviour.Update.</param>
-        /// <param name="modEntry.OnLateUpdate">Called by MonoBehaviour.LateUpdate.</param>
-        /// <param name="modEntry.OnFixedUpdate">Called by MonoBehaviour.FixedUpdate.</param>
-        /// <returns>Returns true, if no error occurred.</returns>
-        public static bool Load(UnityModManager.ModEntry modEntry)
+        static partial void OnLoad()
         {
-            ModPath = modEntry.Path;
-            logger = modEntry.Logger;
-            modEntry.OnToggle = OnToggle;
-            modEntry.OnGUI = OnGUI;
-            modEntry.OnSaveGUI = OnSaveGUI;
-            modEntry.OnHideGUI = OnHideGUI;
-            modEntry.OnUnload = Unload;
+            Patch(typeof(Patch_LoadBlueprints));
+            //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
+
+            //harmony.PatchAll(typeof(Main).Assembly);
+            //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
+            //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
+        }
+
+        static partial void OnMainMenu()
+        {
+            if (Settings.State.showBootupWarning)
+            {
+                UIUtility.ShowMessageBox("Installed Dark Codex.\nIf you want to disable certain features, do it now. Disabling 'red' features during a playthrough is not possible. Enabling features can be done at any time.", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
+                Settings.State.showBootupWarning = false;
+                Settings.State.TrySave();
+            }
+        }
+
+        static partial void OnBlueprintsLoaded()
+        {
+            //if (Run) return; Run = true;
 
             try
             {
-                harmony = new Harmony(modEntry.Info.Id);
-                Helper.Patch(typeof(StartGameLoader_LoadAllJson));
-                Helper.Patch(typeof(MainMenu_Start));
-                Helper.Patch(typeof(Patch_LoadBlueprints));
-                //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
-                //harmony.PatchAll(typeof(Main).Assembly);
-                //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
-                //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
+                Print("Loading Dark Codex");
+
+                patchInfos = new(Settings.State);
+
+                // Debug
+                LoadSafe(DEBUG.Enchantments.NameAll);
+                PatchSafe(typeof(DEBUG.Enchantments));
+#if DEBUG
+                PatchSafe(typeof(DEBUG.WatchCalculateParams));
+                PatchSafe(typeof(DEBUG.Settlement1));
+                PatchSafe(typeof(DEBUG.Settlement2));
+                PatchSafe(typeof(DEBUG.ArmyLeader1));
+                PatchSafe(typeof(DEBUG.SpellReach));
+                PatchSafe(typeof(Patch_Prebuilds));
+                //PatchSafe(typeof(Patch_SaveExtension));
+                //PatchSafe(typeof(Patch_FactSelectionParameterized));
+#endif
+                PatchSafe(typeof(Patch_FixLoadCrash1));
+                LoadSafe(General.CreateBardStopSong);
+
+                // Cache
+                LoadSafe(PropertyAttributeMax.CreatePropertyMaxMentalAttribute);
+                LoadSafe(PropertyGetterSneakAttack.CreatePropertyGetterSneakAttack);
+                LoadSafe(PropertyMythicLevel.CreateMythicDispelProperty);
+                LoadSafe(ContextActionIncreaseBleed.CreateBleedBuff);
+
+                // Harmony Patches
+                PatchUnique(typeof(Patch_AllowAchievements));
+                PatchUnique(typeof(Patch_DebugReport));
+                PatchSafe(typeof(Patch_FixPolymorphGather));
+                PatchSafe(typeof(Patch_TrueGatherPowerLevel));
+                PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
+                PatchSafe(typeof(Patch_EnvelopingWindsCap));
+                PatchSafe(typeof(Patch_AOEAttackRolls));
+                PatchSafe(typeof(Patch_MagicItemAdept));
+                PatchSafe(typeof(Patch_ActivatableOnNewRound));
+                PatchSafe(typeof(Patch_ActivatableActionBar));
+                PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
+                PatchSafe(typeof(Patch_ActivatableOnTurnOn));
+                PatchSafe(typeof(Patch_ActivatableTryStart));
+                PatchSafe(typeof(Patch_ResourcefulCaster));
+                PatchSafe(typeof(Patch_FeralCombat));
+                PatchSafe(typeof(Patch_SpellSelectionParametrized));
+                PatchSafe(typeof(Patch_PreferredSpellMetamagic));
+                PatchSafe(typeof(Patch_AlwaysAChance));
+                PatchSafe(typeof(Patch_FixAreaDoubleDamage));
+                PatchSafe(typeof(Patch_FixAreaEndOfTurn));
+                PatchSafe(typeof(Patch_Polymorph));
+                PatchSafe(typeof(Patch_AbilityGroups));
+                PatchSafe(typeof(Patch_EnduringSpells));
+                PatchSafe(typeof(Patch_UnlockClassLevels));
+                PatchSafe(typeof(Patch_AbilityAtWill));
+                PatchSafe(typeof(Patch_DarkElementalistBurn));
+                PatchSafe(typeof(Patch_DismissAnything));
+                PatchSafe(typeof(Patch_ConditionExemption));
+                PatchSafe(typeof(Patch_FixQuickenMetamagic));
+                PatchSafe(typeof(Patch_HexcrafterSpellStrike));
+
+                // General
+                LoadSafe(General.CreateMadMagic);
+                LoadSafe(General.PatchAngelsLight);
+                LoadSafe(General.PatchBasicFreebieFeats);
+                LoadSafe(General.PatchHideBuffs);
+                LoadSafe(General.PatchVarious);
+
+                // Items
+                LoadSafe(Items.PatchArrows);
+                LoadSafe(Items.PatchTerendelevScale);
+                LoadSafe(Items.CreateKineticArtifact);
+                LoadSafe(Items.CreateButcheringAxe);
+                LoadSafe(Items.CreateImpactEnchantment);
+
+                // Mythic
+                LoadSafe(Mythic.CreateLimitlessBardicPerformance);
+                LoadSafe(Mythic.CreateLimitlessSmite);
+                LoadSafe(Mythic.CreateLimitlessBombs);
+                LoadSafe(Mythic.CreateLimitlessArcanePool);
+                LoadSafe(Mythic.CreateLimitlessArcaneReservoir);
+                LoadSafe(Mythic.CreateLimitlessKi);
+                LoadSafe(Mythic.CreateLimitlessDomain);
+                LoadSafe(Mythic.CreateLimitlessShaman);
+                LoadSafe(Mythic.CreateLimitlessWarpriest);
+                LoadSafe(Mythic.CreateKineticMastery);
+                LoadSafe(Mythic.CreateMagicItemAdept);
+                LoadSafe(Mythic.CreateResourcefulCaster);
+                LoadSafe(Mythic.CreateSwiftHuntersBond);
+                LoadSafe(Mythic.CreateDemonMastery);
+                LoadSafe(Mythic.CreateDemonLord);
+                LoadSafe(Mythic.PatchKineticOvercharge);
+                LoadSafe(Mythic.PatchLimitlessDemonRage);
+                LoadSafe(Mythic.PatchUnstoppable);
+                LoadSafe(Mythic.PatchBoundlessHealing);
+                LoadSafe(Mythic.PatchRangingShots);
+                LoadSafe(Mythic.PatchWanderingHex);
+                LoadSafe(Mythic.PatchJudgementAura);
+                LoadSafe(Mythic.PatchVarious);
+
+                // Kineticist
+                LoadSafe(Kineticist.FixWallInfusion);
+                LoadSafe(Kineticist.CreateKineticistBackground);
+                LoadSafe(Kineticist.CreateMobileGatheringFeat);
+                LoadSafe(Kineticist.CreateImpaleInfusion);
+                LoadSafe(Kineticist.CreateChainInfusion);
+                LoadSafe(Kineticist.CreateWhipInfusion);
+                LoadSafe(Kineticist.CreateBladeRushInfusion);
+                LoadSafe(Kineticist.CreateAutoMetakinesis);
+                LoadSafe(Kineticist.CreateHurricaneQueen);
+                LoadSafe(Kineticist.CreateMindShield);
+                LoadSafe(Kineticist.PatchGatherPower);
+                LoadSafe(Kineticist.PatchDarkElementalist);
+                LoadSafe(Kineticist.PatchDemonCharge); // after createMobileGatheringFeat
+                LoadSafe(Kineticist.CreateExpandedElement);
+                LoadSafe(Kineticist.PatchVarious);
+                LoadSafe(Kineticist.FixBlastsAreSpellLike);
+                LoadSafe(Kineticist.CreateSelectiveMetakinesis); // keep late
+
+                // Monk
+                LoadSafe(Monk.CreateFeralCombatTraining);
+
+                // Witch
+                LoadSafe(Witch.CreateIceTomb);
+                LoadSafe(Witch.CreateSplitHex);
+                LoadSafe(Witch.FixBoundlessHealing);
+
+                // Hexcrafter
+                LoadSafe(Hexcrafter.CreateAccursedStrike);
+                LoadSafe(Hexcrafter.FixProgression);
+
+                // Rogue
+                LoadSafe(Rogue.CreateBleedingAttack);
+
+                // Ranger
+                LoadSafe(Ranger.CreateImprovedHuntersBond);
+
+                // Unlocks
+                LoadSafe(Unlock.UnlockAnimalCompanion);
+                LoadSafe(Unlock.UnlockKineticist); // keep late
+
+                // Extra Features - keep last
+                LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
+                LoadSafe(General.CreatePreferredSpell); // keep last
+                LoadSafe(General.CreateAbilityFocus); // keep last
+                LoadSafe(Kineticist.CreateExtraWildTalentFeat); // keep last
+                LoadSafe(Witch.CreateExtraHex); // keep last
+                LoadSafe(Witch.CreateCackleActivatable); // keep last
+                LoadSafe(Rogue.CreateExtraRogueTalent); // keep last
+                LoadSafe(Mythic.CreateExtraMythicFeats); // keep last
+                LoadSafe(Mythic.CreateSwiftHex); // keep last
+
+                // Event subscriptions
+                SubscribeSafe(typeof(RestoreEndOfCombat));
+                SubscribeSafe(typeof(Event_AreaEffects));
+                SubscribeSafe(typeof(Patch_AbilityGroups));
+
+                patchInfos.Sort(); // sort info list for GUI
+                patchInfos.Update();
+
+                Helper.Print("Finished loading Dark Codex");
+#if DEBUG
+                Helper.PrintDebug("Running in debug. " + Main.IsInGame);
+                Helper.ExportStrings();
+                Guid.i.WriteAll();
+#endif
             }
             catch (Exception ex)
             {
-                Helper.PrintException(ex);
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool Unload(UnityModManager.ModEntry modEntry)
-        {
-            harmony?.UnpatchAll(modEntry.Info.Id);
-            return true;
-        }
-
-        #endregion
-
-        #region Load_Patch
-
-        [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
-        public static class MainMenu_Start
-        {
-            public static void Postfix()
-            {
-                if (Settings.StateManager.State.showBootupWarning)
-                {
-                    UIUtility.ShowMessageBox("Installed Dark Codex.\nIf you want to disable certain features, do it now. Disabling 'red' features during a playthrough is not possible. Enabling features can be done at any time.", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
-                    Settings.StateManager.State.showBootupWarning = false;
-                    Settings.StateManager.TrySaveConfigurationState();
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(StartGameLoader), "LoadAllJson")]
-        public static class StartGameLoader_LoadAllJson
-        {
-            private static bool Run = false;
-            public static void Postfix()
-            {
-                if (Run) return; Run = true;
-
-                try
-                {
-                    Helper.Print("Loading Dark Codex");
-
-                    patchInfos = new(Settings.StateManager.State);
-
-                    // Debug
-                    LoadSafe(DEBUG.Enchantments.NameAll);
-                    PatchSafe(typeof(DEBUG.Enchantments));
-#if DEBUG
-                    PatchSafe(typeof(DEBUG.WatchCalculateParams));
-                    PatchSafe(typeof(DEBUG.Settlement1));
-                    PatchSafe(typeof(DEBUG.Settlement2));
-                    PatchSafe(typeof(DEBUG.ArmyLeader1));
-                    PatchSafe(typeof(DEBUG.SpellReach));
-                    PatchSafe(typeof(Patch_Prebuilds));
-                    //PatchSafe(typeof(Patch_SaveExtension));
-                    //PatchSafe(typeof(Patch_FactSelectionParameterized));
-#endif
-                    PatchSafe(typeof(Patch_FixLoadCrash1));
-                    LoadSafe(General.CreateBardStopSong);
-
-                    // Cache
-                    LoadSafe(PropertyAttributeMax.CreatePropertyMaxMentalAttribute);
-                    LoadSafe(PropertyGetterSneakAttack.CreatePropertyGetterSneakAttack);
-                    LoadSafe(PropertyMythicLevel.CreateMythicDispelProperty);
-                    LoadSafe(ContextActionIncreaseBleed.CreateBleedBuff);
-
-                    // Harmony Patches
-                    PatchUnique(typeof(Patch_AllowAchievements));
-                    PatchUnique(typeof(Patch_DebugReport));
-                    PatchSafe(typeof(Patch_FixPolymorphGather));
-                    PatchSafe(typeof(Patch_TrueGatherPowerLevel));
-                    PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
-                    PatchSafe(typeof(Patch_EnvelopingWindsCap));
-                    PatchSafe(typeof(Patch_AOEAttackRolls));
-                    PatchSafe(typeof(Patch_MagicItemAdept));
-                    PatchSafe(typeof(Patch_ActivatableOnNewRound));
-                    PatchSafe(typeof(Patch_ActivatableActionBar));
-                    PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
-                    PatchSafe(typeof(Patch_ActivatableOnTurnOn));
-                    PatchSafe(typeof(Patch_ActivatableTryStart));
-                    PatchSafe(typeof(Patch_ResourcefulCaster));
-                    PatchSafe(typeof(Patch_FeralCombat));
-                    PatchSafe(typeof(Patch_SpellSelectionParametrized));
-                    PatchSafe(typeof(Patch_PreferredSpellMetamagic));
-                    PatchSafe(typeof(Patch_AlwaysAChance));
-                    PatchSafe(typeof(Patch_FixAreaDoubleDamage));
-                    PatchSafe(typeof(Patch_FixAreaEndOfTurn));
-                    PatchSafe(typeof(Patch_Polymorph));
-                    PatchSafe(typeof(Patch_AbilityGroups));
-                    PatchSafe(typeof(Patch_EnduringSpells));
-                    PatchSafe(typeof(Patch_UnlockClassLevels));
-                    PatchSafe(typeof(Patch_AbilityAtWill));
-                    PatchSafe(typeof(Patch_DarkElementalistBurn));
-                    PatchSafe(typeof(Patch_DismissAnything));
-                    PatchSafe(typeof(Patch_ConditionExemption));
-                    PatchSafe(typeof(Patch_FixQuickenMetamagic));
-                    PatchSafe(typeof(Patch_HexcrafterSpellStrike));
-
-                    // General
-                    LoadSafe(General.CreateMadMagic);
-                    LoadSafe(General.PatchAngelsLight);
-                    LoadSafe(General.PatchBasicFreebieFeats);
-                    LoadSafe(General.PatchHideBuffs);
-                    LoadSafe(General.PatchVarious);
-
-                    // Items
-                    LoadSafe(Items.PatchArrows);
-                    LoadSafe(Items.PatchTerendelevScale);
-                    LoadSafe(Items.CreateKineticArtifact);
-                    LoadSafe(Items.CreateButcheringAxe);
-                    LoadSafe(Items.CreateImpactEnchantment);
-
-                    // Mythic
-                    LoadSafe(Mythic.CreateLimitlessBardicPerformance);
-                    LoadSafe(Mythic.CreateLimitlessSmite);
-                    LoadSafe(Mythic.CreateLimitlessBombs);
-                    LoadSafe(Mythic.CreateLimitlessArcanePool);
-                    LoadSafe(Mythic.CreateLimitlessArcaneReservoir);
-                    LoadSafe(Mythic.CreateLimitlessKi);
-                    LoadSafe(Mythic.CreateLimitlessDomain);
-                    LoadSafe(Mythic.CreateLimitlessShaman);
-                    LoadSafe(Mythic.CreateLimitlessWarpriest);
-                    LoadSafe(Mythic.CreateKineticMastery);
-                    LoadSafe(Mythic.CreateMagicItemAdept);
-                    LoadSafe(Mythic.CreateResourcefulCaster);
-                    LoadSafe(Mythic.CreateSwiftHuntersBond);
-                    LoadSafe(Mythic.CreateDemonMastery);
-                    LoadSafe(Mythic.CreateDemonLord);
-                    LoadSafe(Mythic.PatchKineticOvercharge);
-                    LoadSafe(Mythic.PatchLimitlessDemonRage);
-                    LoadSafe(Mythic.PatchUnstoppable);
-                    LoadSafe(Mythic.PatchBoundlessHealing);
-                    LoadSafe(Mythic.PatchRangingShots);
-                    LoadSafe(Mythic.PatchWanderingHex);
-                    LoadSafe(Mythic.PatchJudgementAura);
-                    LoadSafe(Mythic.PatchVarious);
-
-                    // Kineticist
-                    LoadSafe(Kineticist.FixWallInfusion);
-                    LoadSafe(Kineticist.CreateKineticistBackground);
-                    LoadSafe(Kineticist.CreateMobileGatheringFeat);
-                    LoadSafe(Kineticist.CreateImpaleInfusion);
-                    LoadSafe(Kineticist.CreateChainInfusion);
-                    LoadSafe(Kineticist.CreateWhipInfusion);
-                    LoadSafe(Kineticist.CreateBladeRushInfusion);
-                    LoadSafe(Kineticist.CreateAutoMetakinesis);
-                    LoadSafe(Kineticist.CreateHurricaneQueen);
-                    LoadSafe(Kineticist.CreateMindShield);
-                    LoadSafe(Kineticist.PatchGatherPower);
-                    LoadSafe(Kineticist.PatchDarkElementalist);
-                    LoadSafe(Kineticist.PatchDemonCharge); // after createMobileGatheringFeat
-                    LoadSafe(Kineticist.CreateExpandedElement);
-                    LoadSafe(Kineticist.PatchVarious);
-                    LoadSafe(Kineticist.FixBlastsAreSpellLike);
-                    LoadSafe(Kineticist.CreateSelectiveMetakinesis); // keep late
-
-                    // Monk
-                    LoadSafe(Monk.CreateFeralCombatTraining);
-
-                    // Witch
-                    LoadSafe(Witch.CreateIceTomb);
-                    LoadSafe(Witch.CreateSplitHex);
-                    LoadSafe(Witch.FixBoundlessHealing);
-
-                    // Hexcrafter
-                    LoadSafe(Hexcrafter.CreateAccursedStrike);
-                    LoadSafe(Hexcrafter.FixProgression);
-
-                    // Rogue
-                    LoadSafe(Rogue.CreateBleedingAttack);
-
-                    // Ranger
-                    LoadSafe(Ranger.CreateImprovedHuntersBond);
-
-                    // Unlocks
-                    LoadSafe(Unlock.UnlockAnimalCompanion);
-                    LoadSafe(Unlock.UnlockKineticist); // keep late
-
-                    // Extra Features - keep last
-                    LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
-                    LoadSafe(General.CreatePreferredSpell); // keep last
-                    LoadSafe(General.CreateAbilityFocus); // keep last
-                    LoadSafe(Kineticist.CreateExtraWildTalentFeat); // keep last
-                    LoadSafe(Witch.CreateExtraHex); // keep last
-                    LoadSafe(Witch.CreateCackleActivatable); // keep last
-                    LoadSafe(Rogue.CreateExtraRogueTalent); // keep last
-                    LoadSafe(Mythic.CreateExtraMythicFeats); // keep last
-                    LoadSafe(Mythic.CreateSwiftHex); // keep last
-
-                    // Event subscriptions
-                    SubscribeSafe(typeof(RestoreEndOfCombat));
-                    SubscribeSafe(typeof(Event_AreaEffects));
-                    SubscribeSafe(typeof(Patch_AbilityGroups));
-
-                    patchInfos.Sort(); // sort info list for GUI
-                    patchInfos.Update();
-
-                    Helper.Print("Finished loading Dark Codex");
-#if DEBUG
-                    Helper.PrintDebug("Running in debug. " + Main.IsInGame);
-                    Helper.ExportStrings();
-                    Guid.i.WriteAll();
-
-                    //var nullFinalizer = new HarmonyMethod(typeof(Main).GetMethod(nameof(Main.NullFinalizer)));
-                    //foreach (var patch in harmony.GetPatchedMethods().ToArray())
-                    //{
-                    //    //if (Harmony.GetPatchInfo(patch).Finalizers.Count == 0)
-                    //    harmony.Patch(patch, finalizer: nullFinalizer);
-                    //}
-#endif
-                }
-                catch (Exception ex)
-                {
-                    Helper.PrintException(ex);
-                }
+                PrintException(ex);
             }
         }
 
         #endregion
-
-        #region Helper
-
-        public static bool LoadSafe(Action action)
-        {
-            ProcessInfo(action.Method);
-#if DEBUG
-            var watch = Stopwatch.StartNew();
-#endif
-            string name = action.Method.DeclaringType.Name + "." + action.Method.Name;
-
-            if (CheckSetting(name))
-            {
-                Helper.Print($"Skipped loading {name}");
-                return false;
-            }
-
-            try
-            {
-                Helper.Print($"Loading {name}");
-                action();
-#if DEBUG
-                watch.Stop();
-                Helper.PrintDebug("Loaded in milliseconds: " + watch.ElapsedMilliseconds);
-#endif
-                return true;
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                watch.Stop();
-#endif
-                Helper.PrintException(e);
-                return false;
-            }
-        }
-
-        public static bool LoadSafe(Action<bool> action, bool flag)
-        {
-            ProcessInfo(action.Method);
-#if DEBUG
-            var watch = Stopwatch.StartNew();
-#endif
-            string name = action.Method.DeclaringType.Name + "." + action.Method.Name;
-
-            if (CheckSetting(name))
-            {
-                Helper.Print($"Skipped loading {name}");
-                return false;
-            }
-
-            try
-            {
-                Helper.Print($"Loading {name}:{flag}");
-                action(flag);
-#if DEBUG
-                watch.Stop();
-                Helper.PrintDebug("Loaded in milliseconds: " + watch.ElapsedMilliseconds);
-#endif
-                return true;
-            }
-            catch (Exception e)
-            {
-#if DEBUG
-                watch.Stop();
-#endif
-                Helper.PrintException(e);
-                return false;
-            }
-        }
-
-        public static void PatchUnique(Type patch)
-        {
-            ProcessInfo(patch);
-            if (Helper.IsPatched(patch))
-            {
-                Helper.Print("Skipped patching because not unique " + patch.Name);
-                return;
-            }
-
-            if (PatchSafe(patch))
-                patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
-        }
-
-        public static bool PatchSafe(Type patch)
-        {
-            ProcessInfo(patch);
-            if (CheckSetting("Patch." + patch.Name))
-            {
-                Helper.Print("Skipped patching " + patch.Name);
-                return false;
-            }
-
-            try
-            {
-                if (patch.GetCustomAttributes(false).Any(a => a is ManualPatchAttribute))
-                    Helper.Patch(patch, false);
-                else
-                    Helper.Patch(patch);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Helper.PrintException(e);
-                return false;
-            }
-        }
-
-        public static void SubscribeSafe(Type type)
-        {
-            ProcessInfo(type);
-            if (CheckSetting("Patch." + type.Name))
-            {
-                Helper.Print("Skipped subscribing to " + type.Name);
-                return;
-            }
-
-            try
-            {
-                Helper.Print("Subscribing to " + type.Name);
-                EventBus.Subscribe(Activator.CreateInstance(type));
-            }
-            catch (Exception e)
-            {
-                Helper.PrintException(e);
-            }
-        }
-
-        private static bool CheckSetting(string name)
-        {
-            return patchInfos.IsDisenabled(name);
-        }
-
-        private static void ProcessInfo(MemberInfo info)
-        {
-            if (info == null)
-                return;
-
-            if (Attribute.GetCustomAttribute(info, typeof(PatchInfoAttribute)) is not PatchInfoAttribute attr)
-            {
-                Helper.PrintDebug(info.Name + " has no PatchInfo");
-                return;
-            }
-
-            patchInfos.Add(attr, info);
-        }
 
         private static void ExportPlayerData()
         {
@@ -797,11 +585,11 @@ namespace DarkCodex
                     serializer.Serialize(writer, Game.Instance.Player.Party);
                 }
 
-                Helper.Print("Exported player data.");
+                Print("Exported player data.");
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
             }
         }
 
@@ -818,22 +606,13 @@ namespace DarkCodex
                     list.Add(unit.Progression.m_LevelPlans);
                 }
 
-                Helper.Serialize(list, path: "partylevelplan.json");
-                Helper.Print("Exported player data.");
+                Helper.Serialize(list, path: Path.Combine(Main.ModPath, "partylevelplan.json"));
+                Print("Exported player data.");
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                PrintException(e);
             }
         }
-
-        private static Exception NullFinalizer(Exception __exception)
-        {
-            Helper.PrintException(__exception);
-            return null;
-        }
-
-        #endregion
-
     }
 }

@@ -4,6 +4,7 @@ using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using System.Collections.Generic;
+using Shared;
 
 namespace DarkCodex
 {

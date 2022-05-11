@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodexLib</RootNamespace>
+    <AssemblyName>CodexLib</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>false</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <ProjectGuid>{C518E346-DDBD-498A-BEF9-D50FF314AD38}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>strong-name-key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <!-- Common references -->
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
+    <Reference Include="0Harmony" HintPath="$(WrathManaged)\UnityModManager\0Harmony.dll" />
+    <Reference Include="Assembly-CSharp_publicized" HintPath="$(WrathManaged)\Assembly-CSharp_publicized.dll" />
+    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
+    <Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
+    <Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
+    <Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
+    <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
+    <Reference Include="Owlcat.Runtime.UI_publicized" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_publicized.dll" />
+    <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
+    <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
+    <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
+    <Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
+    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
+    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
+    <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
+    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="strong-name-key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

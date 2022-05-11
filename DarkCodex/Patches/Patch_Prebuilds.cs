@@ -25,6 +25,7 @@ using Kingmaker.EntitySystem.Stats;
 using Newtonsoft.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Linq;
+using Shared;
 
 namespace DarkCodex
 {
@@ -114,14 +115,14 @@ namespace DarkCodex
             {
                 new LevelPlanData(2, new ILevelUpAction[] { new Wrapper(new ApplySkillPoints()), new SetStat(StatType.Strength, 20) }),
             };
-            Helper.Serialize(list, path: Path.Combine("builds", "testdata.json"));
+            Helper.Serialize(list, path: Path.Combine(Main.ModPath, "builds", "testdata.json"));
         }
 
         [HarmonyPatch(typeof(LevelUpController), MethodType.Constructor, typeof(UnitEntityData), typeof(bool), typeof(LevelUpState.CharBuildMode))]
         [HarmonyPrefix]
         public static void Debug1(UnitEntityData unit, bool autoCommit, LevelUpState.CharBuildMode mode, LevelUpController __instance)
         {
-            if (Main.IsInGame && Settings.StateManager.State.verbose)
+            if (Main.IsInGame && Settings.State.verbose)
                 Helper.PrintDebug($"LevelUpController Constructor: unit={unit.CharacterName} auto={autoCommit} mode={mode}");
         }
 
@@ -150,7 +151,7 @@ namespace DarkCodex
                 sw.WriteLine("\ttotal=" + __instance.LevelUpActions.Count);
                 foreach (var action in __instance.LevelUpActions)
                 {
-                    var data = Helper.Serialize(action, false);
+                    var data = Helper.Serialize(action, indent: false);
                     data = rx.Replace(data, m =>
                     {
                         var ret = Alias.FirstOrDefault(f => f.Value == m.Groups[1].Value).Key;
@@ -173,7 +174,7 @@ namespace DarkCodex
             {
                 if (!action.Check(__instance.State, unit.Descriptor))
                 {
-                    Helper.TryPrintFile("Log-LevelUp.txt", $"ERROR: illegal {action.GetType().Name}\n");
+                    Helper.TryPrintFile(Path.Combine(Main.ModPath, "Log-LevelUp.txt"), $"ERROR: illegal {action.GetType().Name}\n");
                     PFLog.Default.Log("Invalid action: " + action, Array.Empty<object>());
                 }
                 else

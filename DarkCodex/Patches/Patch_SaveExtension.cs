@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 
 namespace DarkCodex
 {
@@ -50,7 +51,7 @@ namespace DarkCodex
         {
             try
             {
-                if (!Settings.StateManager.State.saveMetadata || Main.patchInfos == null)
+                if (!Settings.State.saveMetadata || Main.patchInfos == null)
                     return;
 
                 Main.patchInfos.Update();
@@ -106,7 +107,7 @@ namespace DarkCodex
         {
             try
             {
-                if (!Settings.StateManager.State.saveMetadata)
+                if (!Settings.State.saveMetadata)
                 {
                     Main.patchInfoSaved = null;
                     return true;
@@ -138,7 +139,7 @@ namespace DarkCodex
                 if (json == null || json == "")
                     return true;
 
-                var saveData = Helper.Deserialize<IEnumerable<string>>(json);
+                var saveData = Helper.Deserialize<IEnumerable<string>>(value: json);
                 if (saveData == null)
                     return true;
 

@@ -4,6 +4,7 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Items;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 
 namespace DarkCodex
 {

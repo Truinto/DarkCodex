@@ -12,6 +12,7 @@ using Kingmaker.Blueprints;
 using Kingmaker;
 using Kingmaker.Controllers;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Shared;
 
 namespace DarkCodex
 {

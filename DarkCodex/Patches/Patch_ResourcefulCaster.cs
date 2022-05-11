@@ -8,6 +8,7 @@ using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
 using System;
 using System.Collections.Generic;
+using Shared;
 
 namespace DarkCodex
 {

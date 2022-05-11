@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Kingmaker.UnitLogic.Buffs;
+using Shared;
 
 namespace DarkCodex
 {
@@ -10,14 +11,14 @@ namespace DarkCodex
         [HarmonyPrefix]
         public static void KeepSlots(Polymorph __instance)
         {
-            __instance.m_KeepSlots = __instance.m_KeepSlots || Settings.StateManager.State.polymorphKeepInventory;
+            __instance.m_KeepSlots = __instance.m_KeepSlots || Settings.State.polymorphKeepInventory;
         }
 
         [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.TryReplaceView))]
         [HarmonyPrefix]
         public static bool KeepModel(Polymorph __instance)
         {
-            return !Settings.StateManager.State.polymorphKeepModel;
+            return !Settings.State.polymorphKeepModel;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.RuleSystem.Rules;
+using Shared;
 
 namespace DarkCodex
 {

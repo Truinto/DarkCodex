@@ -49,6 +49,7 @@ using Kingmaker.RuleSystem.Rules;
 using JetBrains.Annotations;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.JsonSystem;
+using Shared;
 
 namespace DarkCodex
 {
@@ -266,7 +267,7 @@ namespace DarkCodex
                 "Mobile Gathering Debuff",
                 "Your movement speed is halved after gathering power.",
                 null,
-                Helper.CreateSprite("GatherMobileHigh.png"),
+                Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileHigh.png")),
                 null
                 ).SetComponents(
                 new TurnBasedBuffMovementSpeed(multiplier: 0.5f));
@@ -291,7 +292,7 @@ namespace DarkCodex
                 "Mobile Gathering (Move Action)",
                 "You may move up to half your normal speed while gathering power.",
                 null,
-                Helper.CreateSprite("GatherMobileLow.png"),
+                Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileLow.png")),
                 AbilityType.Special,
                 UnitCommand.CommandType.Move,
                 AbilityRange.Personal,
@@ -315,7 +316,7 @@ namespace DarkCodex
                 "Mobile Gathering (Full Round)",
                 "You may move up to half your normal speed while gathering power.",
                 null,
-                Helper.CreateSprite("GatherMobileMedium.png"),
+                Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileMedium.png")),
                 AbilityType.Special,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Personal,
@@ -677,7 +678,7 @@ namespace DarkCodex
             ExpandSubstance(bowling, sandstorm);
 
             // apply PsychokineticistStat setting
-            var pstat = Settings.StateManager.State.PsychokineticistStat;
+            var pstat = Settings.State.PsychokineticistStat;
             if (pstat != StatType.Wisdom)
             {
                 var pfeat = Helper.Get<BlueprintFeature>("2fa48527ba627254ba9bf4556330a4d4"); //PsychokineticistBurnFeature

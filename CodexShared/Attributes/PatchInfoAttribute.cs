@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DarkCodex
+namespace Shared
 {
     public class PatchInfoAttribute : Attribute, IComparable<PatchInfoAttribute>, IEquatable<PatchInfoAttribute>
     {
