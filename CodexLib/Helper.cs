@@ -1097,7 +1097,7 @@ namespace CodexLib
             }
 
             var result = high.ToString("x16") + low.ToString("x16");
-            PrintDebug($"MergeIds {guid1} + {guid2} + {guid3} = {result}");
+            //PrintDebug($"MergeIds {guid1} + {guid2} + {guid3} = {result}");
             RegGuid(name, result);
             return result;
         }

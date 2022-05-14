@@ -49,7 +49,7 @@ namespace DarkCodex
         [JsonProperty]
         public bool debug_4 = false;
 
-        public static Settings State = TryLoad(Main.ModPath);
+        public static Settings State = TryLoad(Main.ModPath, "settings.json");
 
         protected override bool OnUpdate()
         {

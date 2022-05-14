@@ -32,6 +32,7 @@ namespace Shared
         public static Harmony harmony;
         public static bool Enabled;
         public static string ModPath;
+        internal static PatchInfoCollection patchInfos;
         private static UnityModManager.ModEntry.ModLogger logger;
         private static bool applyNullFinalizer;
 
@@ -71,7 +72,7 @@ namespace Shared
             }
             catch (Exception ex)
             {
-                logger.LogException(ex);
+                logger?.LogException(ex);
                 return false;
             }
         }
@@ -87,7 +88,7 @@ namespace Shared
         {
             try
             {
-                logger.Log(args.Name);
+                PrintDebug("Requested " + args.Name);
 
                 if (ModPath != null && args.Name.StartsWith("CodexLib, "))
                 {
@@ -106,7 +107,7 @@ namespace Shared
 
                     if (path != null)
                     {
-                        logger.Log("AssemblyResolve " + path);
+                        Print("AssemblyResolve " + path);
                         return Assembly.LoadFrom(path);
                     }
                 }
@@ -347,7 +348,7 @@ namespace Shared
 
         private static bool CheckSetting(string name)
         {
-            return patchInfos.IsDisenabled(name);
+            return patchInfos?.IsDisenabled(name) ?? false;
         }
 
         private static void ProcessInfo(MemberInfo info)
@@ -361,7 +362,7 @@ namespace Shared
                 return;
             }
 
-            patchInfos.Add(attr, info);
+            patchInfos?.Add(attr, info);
         }
 
         private static Exception NullFinalizer(Exception __exception)

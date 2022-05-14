@@ -50,7 +50,7 @@ namespace Shared
             string filePath = Path.Combine(modPath, file);
             try
             {
-                using var sr = new StreamReader(Path.Combine(Main.ModPath, modPath));
+                using var sr = new StreamReader(filePath);
                 T state = JsonConvert.DeserializeObject<T>(sr.ReadToEnd());
                 sr.Close();
                 state.FilePath = filePath;

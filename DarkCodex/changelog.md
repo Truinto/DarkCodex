@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.0]
+- changed project framework
+
 ## [1.2.8]
 - added limitless azata songs
 - fixed possible memory leak

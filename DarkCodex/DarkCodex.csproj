@@ -132,9 +132,7 @@
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Unlock.cs" />
     <Compile Include="Witch.cs" />
-    <None Include="..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="Settings\Repository.json" />
     <None Include="..\README.md" />
     <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
@@ -150,7 +148,8 @@
   <Import Project="..\CodexShared\CodexShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /i /e /y /f "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
+    <PostBuildEvent>xcopy /i /e /y /f /d "$(SolutionDir)CodexLib\bin\$(Configuration)\CodexLib.dll" "$(ModFolder)\$(TargetName)\"
+xcopy /i /e /y /f /d "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
 
 if "$(Configuration)"=="Release" (
    cd /d "$(ModFolder)\$(TargetName)\"
