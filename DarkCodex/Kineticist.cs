@@ -10,7 +10,6 @@ using HarmonyLib;
 using Kingmaker.UnitLogic.Class.Kineticist;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
-using DarkCodex.Components;
 using Kingmaker.Utility;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.Visual.Animation.Kingmaker.Actions;
@@ -50,6 +49,7 @@ using JetBrains.Annotations;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.JsonSystem;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -80,7 +80,6 @@ namespace DarkCodex
                 "Elemental Plane Outsider",
                 "Elemental Plane Outsider count as 1 Kineticist level higher for determining prerequisites for wild talents.",
                 null,
-                null,
                 0
                 ).SetComponents(Helper.CreateClassLevelsForPrerequisites(kineticist_class, 1));
 
@@ -98,8 +97,7 @@ namespace DarkCodex
                 "ExtraWildTalentFeat",
                 "Extra Wild Talent",
                 "You gain a wild talent for which you meet the prerequisites. You can select an infusion or a non-infusion wild talent, but not a blast or defense wild talent.\nSpecial: You can take this feat multiple times. Each time, you must choose a different wild talent.",
-                null,
-                ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("42f96fc8d6c80784194262e51b0a1d25").Icon, //ExtraArcanePool.Icon
+                ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("42f96fc8d6c80784194262e51b0a1d25").Icon,
                 FeatureGroup.Feat
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 1, true)
@@ -121,7 +119,7 @@ namespace DarkCodex
             var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
             var applicable = Blasts.Where(g => g.Get().name.StartsWith("KineticBlade")).ToArray();
-            Helper.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
+            Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
             var icon = Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3");
 
             var ability = Helper.CreateBlueprintActivatableAbility(
@@ -197,7 +195,6 @@ namespace DarkCodex
                 "KineticBladeRushAbility",
                 name,
                 description,
-                null,
                 icon,
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
@@ -221,7 +218,6 @@ namespace DarkCodex
                 "KineticBladeRush",
                 name,
                 description,
-                null,
                 icon,
                 FeatureGroup.KineticBlastInfusion
                 ).SetComponents(
@@ -266,7 +262,6 @@ namespace DarkCodex
                 "MobileGatheringDebuff",
                 "Mobile Gathering Debuff",
                 "Your movement speed is halved after gathering power.",
-                null,
                 Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileHigh.png")),
                 null
                 ).SetComponents(
@@ -291,7 +286,6 @@ namespace DarkCodex
                 "MobileGatheringShort",
                 "Mobile Gathering (Move Action)",
                 "You may move up to half your normal speed while gathering power.",
-                null,
                 Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileLow.png")),
                 AbilityType.Special,
                 UnitCommand.CommandType.Move,
@@ -315,7 +309,6 @@ namespace DarkCodex
                 "MobileGatheringLong",
                 "Mobile Gathering (Full Round)",
                 "You may move up to half your normal speed while gathering power.",
-                null,
                 Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileMedium.png")),
                 AbilityType.Special,
                 UnitCommand.CommandType.Standard,
@@ -335,7 +328,6 @@ namespace DarkCodex
                 "MobileGatheringFeat",
                 "Mobile Gathering",
                 "While gathering power, you can move up to half your normal speed. This movement provokes attacks of opportunity as normal.",
-                null,
                 mobile_debuff.Icon,
                 FeatureGroup.Feat
                 ).SetComponents(
@@ -462,7 +454,6 @@ namespace DarkCodex
                 "Impale",
                 "Element: earth\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: earth, metal, ice\n"
                 + "You extend a long, sharp spike of elemental matter along a line, impaling multiple foes. Make a single attack roll against each creature or object in a 30-foot line.",
-                null,
                 icon,
                 FeatureGroup.KineticBlastInfusion
                 ).SetComponents(
@@ -475,7 +466,6 @@ namespace DarkCodex
                 "ImpaleEarthBlastAbility",
                 impale_feat.m_DisplayName,
                 impale_feat.m_Description,
-                null,
                 icon,
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
@@ -500,7 +490,6 @@ namespace DarkCodex
                 "ImpaleMetalBlastAbility",
                 impale_feat.m_DisplayName,
                 impale_feat.m_Description,
-                null,
                 icon,
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
@@ -525,7 +514,6 @@ namespace DarkCodex
                 "ImpaleIceBlastAbility",
                 impale_feat.m_DisplayName,
                 impale_feat.m_Description,
-                null,
                 icon,
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
@@ -570,7 +558,6 @@ namespace DarkCodex
                 "Chain",
                 "Element: air\nType: form infusion\nLevel: 4\nBurn: 3\nAssociated Blasts: electric\n"
                 + "Your electric blast leaps from target to target. When you hit a target with your infused blast, you can attempt a ranged touch attack against an additional target that is within 30 feet of the first. Each additional attack originates from the previous target, which could alter cover and other conditions. Each additional target takes 1d6 fewer points of damage than the last, and you can’t chain the blast back to a previous target. You can continue chaining your blasts until it misses or it's reduced to a single damage die.",
-                null,
                 icon,
                 FeatureGroup.KineticBlastInfusion
                 ).SetComponents(
@@ -583,7 +570,6 @@ namespace DarkCodex
                 "ChainElectricBlastAbility",
                 chain_feat.m_DisplayName,
                 chain_feat.m_Description,
-                null,
                 icon,
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
@@ -611,7 +597,6 @@ namespace DarkCodex
                 "ChainThunderstormBlastAbility",
                 chain_feat.m_DisplayName,
                 chain_feat.m_Description,
-                null,
                 icon,
                 AbilityType.SpellLike,
                 UnitCommand.CommandType.Standard,
@@ -714,7 +699,7 @@ namespace DarkCodex
                 areaRun.Round = areaRun.UnitEnter;
                 counter++;
             }
-            Helper.Print("Patched Wall Infusions: " + counter);
+            Main.Print("Patched Wall Infusions: " + counter);
         }
 
         [PatchInfo(Severity.Create, "Selective Metakinesis", "gain selective metakinesis at level 7", true)]
@@ -734,7 +719,7 @@ namespace DarkCodex
                   || g.GetComponent<AbilityTargetsAround>() && g.CanTargetFriends
                   || g.GetComponent<AbilityDeliverChain>());
 
-            Helper.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
+            Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
 
             BlueprintActivatableAbility ab1 = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisSelectiveAbility",

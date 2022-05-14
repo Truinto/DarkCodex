@@ -15,20 +15,22 @@ using System.Reflection;
 using System.Text;
 using UnityModManagerNet;
 
+#pragma warning disable 649
+
 namespace Shared
 {
     public static partial class Main
     {
         #region Partial Methods
 
-        static partial void OnLoad();
+        static partial void OnLoad(UnityModManager.ModEntry modEntry);
         static partial void OnBlueprintsLoaded();
         static partial void OnMainMenu();
 
         #endregion
 
         public static Harmony harmony;
-        public static bool Enabled = true;
+        public static bool Enabled;
         public static string ModPath;
         private static UnityModManager.ModEntry.ModLogger logger;
         private static bool applyNullFinalizer;
@@ -63,8 +65,8 @@ namespace Shared
                 harmony = new Harmony(modEntry.Info.Id);
                 Patch(typeof(StartGameLoader_LoadAllJson));
                 Patch(typeof(MainMenu_Start));
-                OnLoad();
-
+                OnLoad(modEntry);
+                Enabled = true;
                 return true;
             }
             catch (Exception ex)
@@ -77,6 +79,7 @@ namespace Shared
         public static bool Unload(UnityModManager.ModEntry modEntry)
         {
             harmony?.UnpatchAll(modEntry.Info.Id);
+            Enabled = false;
             return true;
         }
 
@@ -158,6 +161,7 @@ namespace Shared
         internal static void PrintDebug(string msg) => logger?.Log(msg);
 
         internal static void PrintException(Exception ex) => logger?.LogException(ex);
+        internal static void PrintError(string msg) => logger?.Log("[Error/Exception] " + msg);
 
         public static void Patch(Type patch)
         {

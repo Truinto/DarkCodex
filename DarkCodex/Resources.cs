@@ -1,5 +1,4 @@
-﻿using DarkCodex.Components;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items;
@@ -29,6 +28,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Shared;
+using CodexLib;
+using Kingmaker.Utility;
 
 namespace DarkCodex
 {
@@ -147,7 +148,7 @@ namespace DarkCodex
                                 deserializer.Blueprint(ref sbp);
                                 if (sbp == null)
                                 {
-                                    Helper.PrintDebug("spb is null " + type.Name);
+                                    Main.PrintDebug("spb is null " + type.Name);
                                     return;
                                 }
 
@@ -155,7 +156,7 @@ namespace DarkCodex
                                 var blueprint = (obj as T) ?? sbp as T;
                                 if (blueprint == null)
                                 {
-                                    Helper.PrintDebug("blueprint is null " + type.Name);
+                                    Main.PrintDebug("blueprint is null " + type.Name);
                                     return;
                                 }
 
@@ -170,7 +171,7 @@ namespace DarkCodex
                 }
 
                 timer.Stop();
-                Helper.Print($"Loaded {count} out of {total} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
+                Main.Print($"Loaded {count} out of {total} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
             }
 
             public static void EnsureMod()
@@ -230,14 +231,14 @@ namespace DarkCodex
                             if (__instance.Load(guid) is T bp)
                                 list.Add(bp);
                             else
-                                Helper.PrintError("unable to load " + guid);
+                                Main.Print("[Exception] unable to load " + guid);
                         }
                     }
                     //else Helper.PrintDebug("unkown type: " + typeGuidString);
                 }
 
                 timer.Stop();
-                Helper.Print($"Loaded {count} out of {assets.Length} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
+                Main.Print($"Loaded {count} out of {assets.Length} blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
             }
 
             public static void EnsureSlow()
@@ -267,7 +268,7 @@ namespace DarkCodex
                 Load(Enchantment, Path.Combine(Main.ModPath, "resources", "Enchantment.bin"));
 
                 timer.Stop();
-                Helper.Print($"Loaded blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
+                Main.Print($"Loaded blueprints in {timer.ElapsedMilliseconds}ms, abilities={Ability.Count} activatables={Activatable.Count} items={Item.Count} enchantments={Enchantment.Count}");
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -327,7 +328,7 @@ namespace DarkCodex
                 }
                 catch (Exception e)
                 {
-                    Helper.PrintException(e);
+                    Main.PrintException(e);
                 }
             }
 
@@ -346,16 +347,16 @@ namespace DarkCodex
                             if (!list.Contains(bp))
                                 list.Add(bp);
                             else
-                                Helper.PrintDebug("duplicate blueprint: " + bp.AssetGuid);
+                                Main.PrintDebug("duplicate blueprint: " + bp.AssetGuid);
                         }
                         else
-                            Helper.Print($"wrong guid in {path}");
+                            Main.Print($"wrong guid in {path}");
                     }
 
                 }
                 catch (Exception e)
                 {
-                    Helper.PrintException(e);
+                    Main.PrintException(e);
                 }
                 // Helper.Print($"loaded {list.Count} {typeof(T).Name}");
             }

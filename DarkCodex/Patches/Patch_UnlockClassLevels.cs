@@ -9,6 +9,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -26,7 +27,7 @@ namespace DarkCodex
             {
                 if (lines[i].LoadsConstant(20))// || lines[i].LoadsConstant(10))
                 {
-                    Helper.PrintDebug("Patched at " + i);
+                    Main.PrintDebug("Patched at " + i);
                     lines[i] = CodeInstruction.Call(typeof(Patch_UnlockClassLevels), nameof(GetMaxLevel));
                     lines.Insert(i, new CodeInstruction(OpCodes.Ldarg_0));
 
@@ -35,7 +36,7 @@ namespace DarkCodex
             }
 
             if (count != 1)
-                Helper.PrintDebug("unexcepted count: " + count);
+                Main.PrintDebug("unexcepted count: " + count);
 
             return lines;
         }

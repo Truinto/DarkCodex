@@ -1,7 +1,9 @@
-﻿using Kingmaker.Blueprints;
+﻿using CodexLib;
+using Kingmaker.Blueprints;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Class.Kineticist;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +50,7 @@ namespace DarkCodex
         public void Register(BlueprintScriptableObject blueprint)
         {
             if (blueprint == null)
-                Helper.PrintError("AbilityRegister blueprint is null");
+                Main.PrintError("AbilityRegister blueprint is null");
 
             bool found = false;
             foreach (var comp in blueprint.ComponentsArray)
@@ -60,7 +62,7 @@ namespace DarkCodex
                 }
             }
             if (!found)
-                Helper.PrintError("AbilityRegister unsupported blueprint: " + blueprint.name);
+                Main.PrintError("AbilityRegister unsupported blueprint: " + blueprint.name);
         }
 
         /// <summary>Adds this ability to all components.</summary>
@@ -91,7 +93,7 @@ namespace DarkCodex
             else if (comp is AutoMetamagic comp2)
                 comp2.Abilities = this;
             else
-                Helper.PrintError("Illegal Set component");
+                Main.PrintError("Illegal Set component");
         }
 
         private List<BlueprintAbilityReference> Get(BlueprintComponent comp)
@@ -101,7 +103,7 @@ namespace DarkCodex
             else if (comp is AutoMetamagic comp2)
                 return comp2.Abilities;
             else
-                Helper.PrintError("Illegal Get component");
+                Main.PrintError("Illegal Get component");
             return null;
         }
     }

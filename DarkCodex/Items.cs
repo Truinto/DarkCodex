@@ -1,5 +1,4 @@
-﻿using DarkCodex.Components;
-using Kingmaker.Blueprints;
+﻿using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Equipment;
 using Kingmaker.Blueprints.Items.Weapons;
@@ -19,12 +18,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
     public class Items
     {
-        [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false, Requirement: typeof(RestoreEndOfCombat))]
+        [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false, Requirement: typeof(Event_RestoreEndOfCombat))]
         public static void PatchArrows()
         {
             var ColdIronArrowsQuiverItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("a5a537ad28053ad48a7be1c53d7fd7ed");
@@ -33,7 +33,7 @@ namespace DarkCodex
             ColdIronArrowsQuiverItem.RestoreChargesOnRest = true;
             ColdIronArrowsQuiverItem_20Charges.RestoreChargesOnRest = true;
 
-            ColdIronArrowsQuiverItem.AddComponents(new RestoreEndOfCombat());
+            ColdIronArrowsQuiverItem.AddComponents(new Event_RestoreEndOfCombat());
             ColdIronArrowsQuiverItem_20Charges.Components = ColdIronArrowsQuiverItem.Components;
         }
 
@@ -58,8 +58,7 @@ namespace DarkCodex
                 "KineticCatalystDamage",
                 "",
                 "",
-                null, null,
-                AbilityType.Special,
+                null, AbilityType.Special,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close
                 ).TargetEnemy()
@@ -71,8 +70,7 @@ namespace DarkCodex
                 "KineticCatalystBurn",
                 "",
                 "",
-                null, null,
-                AbilityType.Special,
+                null, AbilityType.Special,
                 UnitCommand.CommandType.Free,
                 AbilityRange.Close
                 ).TargetSelf()
@@ -99,7 +97,7 @@ namespace DarkCodex
             weapon.m_DisplayNameText = Helper.CreateString("Elemental Catalyst");
             weapon.m_DescriptionText = Helper.CreateString("This +3 staff grants its wearer its enchantment bonus on attack and damage rolls with kinetic blasts. It can be used like a simple physical kinetic blade. Wielding this weapon doesn’t prevent a kineticst from gathering power.");
             weapon.name = "KineticCatalystStaff";
-            weapon.AddAsset(GuidManager.i.Get(weapon.name));
+            weapon.AddAsset(Helper.GetGuid(weapon.name));
             weapon.SetComponents(new WeaponKineticBlade() { m_ActivationAbility = fake_blade_burn.ToRef(), m_Blast = fake_blade_damage.ToRef() });
 
             //Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);

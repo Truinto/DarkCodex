@@ -1,4 +1,5 @@
-﻿using Kingmaker.Blueprints;
+﻿using CodexLib;
+using Kingmaker.Blueprints;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

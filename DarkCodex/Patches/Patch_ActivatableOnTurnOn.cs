@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using UniRx;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -22,7 +23,7 @@ namespace DarkCodex
             {
                 if (list[i].Calls(original))
                 {
-                    Helper.PrintDebug("Patched at " + i);
+                    Main.PrintDebug("Patched at " + i);
                     list[i] = CodeInstruction.Call(typeof(Patch_ActivatableOnTurnOn), nameof(NullReplacement));
                 }
             }

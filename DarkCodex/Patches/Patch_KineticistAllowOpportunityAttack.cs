@@ -9,6 +9,7 @@ using Kingmaker.Items.Slots;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.FactLogic;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -30,7 +31,7 @@ namespace DarkCodex
             {
                 if (list[i].Calls(original))
                 {
-                    Helper.PrintDebug("Patched at " + i);
+                    Main.PrintDebug("Patched at " + i);
                     list[i] = CodeInstruction.Call(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
                 }
             }

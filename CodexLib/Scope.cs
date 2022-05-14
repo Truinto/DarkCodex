@@ -24,8 +24,8 @@ namespace CodexLib
             Stack.Pop();
         }
 
-        public static Stack<Scope> Stack = new(new Scope[] { new Scope("", new UnityModManager.ModEntry.ModLogger("CodexLib")) });
-        public static string ModPath => Stack.Last().modPath;
-        public static UnityModManager.ModEntry.ModLogger Logger => Stack.Last().logger;
+        public static Stack<Scope> Stack = new(new Scope[] { new Scope("Mods", new UnityModManager.ModEntry.ModLogger("CodexLib")) });
+        public static string ModPath => Stack.Peek().modPath;
+        public static UnityModManager.ModEntry.ModLogger Logger => Stack.Peek().logger;
     }
 }

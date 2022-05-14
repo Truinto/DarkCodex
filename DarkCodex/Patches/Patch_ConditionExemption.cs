@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DarkCodex.Components;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -27,7 +27,7 @@ namespace DarkCodex
             {
                 if (exception is UnitConditionExceptionsFromBuff buffException && buffException.IsException(source))
                 {
-                    Helper.PrintDebug($"ConditionExemption {condition} from {source}");
+                    Main.PrintDebug($"ConditionExemption {condition} from {source}");
                     __instance.m_Conditions[(int)condition]--;
                     source = null;
                     break;

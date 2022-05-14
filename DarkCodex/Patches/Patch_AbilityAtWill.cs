@@ -1,5 +1,4 @@
-﻿using DarkCodex.Components;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {

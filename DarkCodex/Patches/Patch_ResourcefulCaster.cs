@@ -9,6 +9,7 @@ using Kingmaker.UnitLogic.Commands.Base;
 using System;
 using System.Collections.Generic;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -78,7 +79,7 @@ namespace DarkCodex
                 if (__instance.Context?.MaybeCaster == null)
                     return;
 
-                Helper.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster.CharacterName}");
+                Main.PrintDebug($"Cast complete {__instance.Context.AbilityBlueprint.name} from {__instance.Context.MaybeCaster.CharacterName}");
                 if (!__instance.Context.MaybeCaster.Descriptor.HasFact(Resource.Cache.FeatureResourcefulCaster))
                     return;
                 if (__instance.Context.IsDuplicateSpellApplied)
@@ -98,7 +99,7 @@ namespace DarkCodex
                 {
                     if (rule is RuleSpellResistanceCheck resistance)
                     {
-                        Helper.PrintDebug($" -SR {resistance.Target} {resistance.IsSpellResisted}");
+                        Main.PrintDebug($" -SR {resistance.Target} {resistance.IsSpellResisted}");
                         hasSaves = true;
                         if (!resistance.IsSpellResisted)
                             unitsSpellNotResisted.Add(resistance.Target);
@@ -106,7 +107,7 @@ namespace DarkCodex
 
                     else if (rule is RuleSavingThrow save) // this works if Context.TriggerRule is used
                     {
-                        Helper.PrintDebug($" -{save.Type} Save {save.Initiator} {save.IsPassed}");
+                        Main.PrintDebug($" -{save.Type} Save {save.Initiator} {save.IsPassed}");
                         hasSaves = true;
                         if (save.IsPassed)
                             unitsSpellNotResisted.Remove(save.Initiator);
@@ -119,7 +120,7 @@ namespace DarkCodex
 
                     else if (rule is RuleDispelMagic dispel)
                     {
-                        Helper.PrintDebug($" -Dispel {dispel.Buff?.Blueprint?.name} {dispel.AreaEffect?.Blueprint?.name} {dispel.Success}");
+                        Main.PrintDebug($" -Dispel {dispel.Buff?.Blueprint?.name} {dispel.AreaEffect?.Blueprint?.name} {dispel.Success}");
                         hasSaves = true;
                         if (dispel.Success)
                         {
@@ -136,7 +137,7 @@ namespace DarkCodex
                     // refund spell if all targets resisted
                     spell = spell.ConvertedFrom ?? spell;
 
-                    Helper.PrintDebug("Refunding spell");
+                    Main.PrintDebug("Refunding spell");
                     Helper.PrintCombatLog($"{__instance.Context.Caster.CharacterName} regained {spell.Name}");
 
                     int level = spellbook.GetSpellLevel(spell);
@@ -174,7 +175,7 @@ namespace DarkCodex
             try
             {
                 __instance.Context?.SourceAbilityContext?.RulebookContext?.m_AllEvents?.Add(__instance);
-                Helper.PrintDebug("added SR check to stack");
+                Main.PrintDebug("added SR check to stack");
             }
             catch (Exception)
             {

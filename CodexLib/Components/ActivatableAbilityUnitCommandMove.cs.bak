@@ -1,0 +1,84 @@
+﻿using Kingmaker;
+using Kingmaker.Controllers.Units;
+using Kingmaker.EntitySystem.Entities;
+using Kingmaker.TurnBasedMode.Controllers;
+using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Commands.Base;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CodexLib
+{
+    //! it still starts the sfx immediately; maybe not a problem
+    //! SpendMoveAction never triggers
+    //! prediction only shows while hovering
+    //! does never get deactivated (except in RT)
+    //? check if turn off happens before apply effect; if not consider checking in AreaEffectEntityData.EndEffectIfNecessary if action was payed
+
+    public class ActivatableAbilityUnitCommandMove : UnitFactComponentDelegate
+    {
+        public float StartTimerAt = 0f;
+
+        // delay new round tick until after end turn
+        public bool CanTickNewRound(UnitActivatableAbilitiesController instance, UnitEntityData unit) // UnitActivatableAbilitiesController.CanTickNewRound
+        {
+            if (unit.IsCurrentUnit())
+            {
+                //Helper.PrintDebug("ActivatableAbilityUnitCommandMove not ticked because IsCurrentUnit");
+                return false;
+            }
+            if (!instance.CanTickNewRound(unit))
+            {
+                //Helper.PrintDebug("ActivatableAbilityUnitCommandMove not ticked because CanTickNewRound");
+                return false;
+            }
+            //if (!unit.HasMoveAction())
+            //{
+            //    Helper.PrintDebug("ActivatableAbilityUnitCommandMove not ticked because HasMoveAction");
+            //    return false;
+            //}
+            return true;
+        }
+
+        // delay start until move action possible // does not work, either remove or check ActivatableAbility.OnDidTurnOff for this component and force turn off
+        public bool CanTurnOn(ActivatableAbility ability) //ActivatableAbility.TryStart
+        {
+            if (ability.Owner.Unit.HasMoveAction() || this.StartTimerAt > 0f)
+                return true;
+            Helper.PrintDebug("ActivatableAbilityUnitCommandMove cannot turn on yet");
+            return false;
+        }
+
+        public void SpendMoveAction(ActivatableAbility ability) // ActivatableAbility.OnNewRound
+        {
+            if (ability.IsOn == false)
+                return;
+
+            UnitEntityData unit = ability.Owner.Unit;
+            if (!unit.HasMoveAction())
+            {
+                Helper.PrintDebug("ActivatableAbilityUnitCommandMove force stop because no cooldown left");
+                ability.Stop(true);
+                return;
+            }
+
+            var states = Game.Instance.TurnBasedCombatController.CurrentTurn.GetActionsStates(unit);
+            if (unit.UsedOneMoveAction())
+            {
+                Helper.PrintDebug("ActivatableAbilityUnitCommandMove spend Standard action");
+                unit.SpendAction(UnitCommand.CommandType.Move, false, 0f);
+                //states.Standard.SetPrediction(CombatAction.UsageType.UseAbility, CombatAction.ActivityType.Ability, CombatAction.ActivityState.Used, ability);
+            }
+            else
+            {
+                Helper.PrintDebug("ActivatableAbilityUnitCommandMove spend Move action");
+                unit.SpendAction(UnitCommand.CommandType.Move, false, 0f);
+                //states.Move.SetPrediction(CombatAction.UsageType.UseAbility, CombatAction.ActivityType.Ability, CombatAction.ActivityState.Used, ability);
+            }
+        }
+    }
+}

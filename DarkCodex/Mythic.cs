@@ -1,5 +1,4 @@
-﻿using DarkCodex.Components;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -32,6 +31,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using CodexLib;
 //using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
 //global using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
 
@@ -102,8 +102,6 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility
                 );
 
-            Helper.PrintJoinDebug(" -remove cooldown ", null);
-
             // cooldown based
             foreach (var ability in Resource.Cache.Ability)
             {
@@ -114,7 +112,6 @@ namespace DarkCodex
                 if (check == null)
                     continue;
 
-                Helper.PrintJoinDebug(ability.name);
                 var checknew = new AbilityTargetHasFactExcept();
                 checknew.m_CheckedFacts = check.m_CheckedFacts;
                 checknew.Inverted = check.Inverted;
@@ -122,8 +119,6 @@ namespace DarkCodex
 
                 ability.ReplaceComponent(check, checknew);
             }
-
-            Helper.PrintJoinDebug(flush: true);
 
             // resource based
             ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
@@ -265,8 +260,6 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility
                 );
 
-            Helper.PrintJoinDebug(" -free ability ", null);
-
             foreach (var ability in Resource.Cache.Ability)
             {
                 var logic = ability.GetComponent<AbilityResourceLogic>();
@@ -278,10 +271,7 @@ namespace DarkCodex
                     continue;
 
                 logic.ResourceCostDecreasingFacts.Add(limitless.ToRef2());
-                Helper.PrintJoinDebug(ability.name);
             }
-
-            Helper.PrintJoinDebug(" -free activatable ", null, true);
 
             foreach (var ability in Resource.Cache.Activatable)
             {
@@ -292,9 +282,8 @@ namespace DarkCodex
                     continue;
 
                 if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
-                    Helper.Print($"ERROR: {ability.name} has already a FreeBlueprint");
+                    Main.Print($"ERROR: {ability.name} has already a FreeBlueprint");
                 logic.m_FreeBlueprint = limitless.ToRef2();
-                Helper.PrintJoinDebug(ability.name);
             }
 
             Helper.AddMythicTalent(limitless);
@@ -551,8 +540,7 @@ namespace DarkCodex
                 "MythicDemonMastery",
                 "Demon Mastery",
                 "You perfect a demonic aspect. Select a demon aspect. You can apply its active effect even outside a demon rage.",
-                null,
-                Helper.StealIcon("9ca1d01966a44b7e88ef91cdae230817"), // DemonAbyssalStorm
+                Helper.StealIcon("9ca1d01966a44b7e88ef91cdae230817"),
                 FeatureGroup.MythicFeat
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(Helper.ToRef<BlueprintCharacterClassReference>("8e19495ea576a8641964102d177e34b7"), 4));
@@ -697,8 +685,6 @@ namespace DarkCodex
             Resource.Cache.Ensure();
             repeat |= Settings.State.reallyFreeCost;
 
-            Helper.PrintJoinDebug(" -free abilities: ", null);
-
             foreach (var ability in Resource.Cache.Ability)
             {
                 var logic = ability.GetComponent<AbilityResourceLogic>();
@@ -710,10 +696,7 @@ namespace DarkCodex
                 int total = !repeat ? 1 : logic.Amount + logic.ResourceCostIncreasingFacts.Count;
                 for (int i = 0; i < total; i++)
                     logic.ResourceCostDecreasingFacts.Add(limitless);
-                Helper.PrintJoinDebug(ability.name);
             }
-
-            Helper.PrintJoinDebug(" -free activatable: ", null, true);
 
             foreach (var ability in Resource.Cache.Activatable)
             {
@@ -721,13 +704,10 @@ namespace DarkCodex
                 if (logic == null || logic.m_RequiredResource?.deserializedGuid != resource)
                     continue;
 
-                Helper.PrintJoinDebug(ability.name);
                 if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
-                    Helper.Print($"ERROR: {ability.name} has already a FreeBlueprint");
+                    Main.Print($"ERROR: {ability.name} has already a FreeBlueprint");
                 logic.m_FreeBlueprint = limitless;
             }
-
-            Helper.PrintJoinDebug(flush: true);
         }
 
         #endregion

@@ -21,9 +21,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
-using DarkCodex.Components;
 using Kingmaker.Designers.Mechanics.Facts;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -93,7 +93,7 @@ namespace DarkCodex
             var feat = Helper.CreateBlueprintFeature(
                 "SplitHex",
                 "Split Hex",
-                "When you use one of your hexes (not a major hex or a grand hex) that targets a single creature, you can choose another creature within 30 feet of the first target to also be targeted by the hex.",                
+                "When you use one of your hexes (not a major hex or a grand hex) that targets a single creature, you can choose another creature within 30 feet of the first target to also be targeted by the hex.",
                 group: FeatureGroup.Feat
                 ).SetComponents(
                 Helper.CreateDuplicateSpell(f => !f.IsAOE && f.Blueprint.SpellDescriptor.HasFlag(SpellDescriptor.Hex))
@@ -134,7 +134,7 @@ namespace DarkCodex
             var cackle_passiv = Helper.CreateBlueprintActivatableAbility(
                 "WitchHexCacklePassive",
                 "Cackle (passive)",
-                cackle.m_Description, 
+                cackle.m_Description,
                 out BlueprintBuff cackle_buff,
                 icon: cackle.Icon,
                 //activationType: AbilityActivationType.WithUnitCommand,
@@ -210,7 +210,6 @@ namespace DarkCodex
                 "WitchHexIceTombAbility",
                 "Ice Tomb",
                 "A storm of ice and freezing wind envelops the creature, which takes 3d8 points of cold damage (Fortitude half). If the target fails its save, it is paralyzed and unconscious for 1 minute/level. A successful save destroys the ice freeing the creature, which is staggered for 1d4 rounds. Whether or not the target’s saving throw is successful, it cannot be the target of this hex again for 1 day.",
-                null,
                 IcyPrison.Icon,
                 AbilityType.Supernatural,
                 CommandType.Standard,
@@ -227,7 +226,6 @@ namespace DarkCodex
                 "WitchHexIceTombFeature",
                 icetomb_ab.m_DisplayName,
                 icetomb_ab.m_Description,
-                null,
                 IcyPrison.Icon,
                 FeatureGroup.WitchHex
                 ).SetComponents(

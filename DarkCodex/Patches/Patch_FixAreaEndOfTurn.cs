@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using TurnBased.Controllers;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -175,7 +176,7 @@ namespace DarkCodex
                 {
                     using (area.m_Context.GetDataScope(unit))
                     {
-                        Helper.PrintDebug($"Patch_FixAreaEffectDamage3 applying OnRound {unit.CharacterName}");
+                        Main.PrintDebug($"Patch_FixAreaEffectDamage3 applying OnRound {unit.CharacterName}");
                         actions.Round.Run();
                     }
                 }

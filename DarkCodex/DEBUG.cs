@@ -52,6 +52,7 @@ using TurnBased.Controllers;
 using UnityEngine;
 using UnityModManagerNet;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -67,11 +68,11 @@ namespace DarkCodex
                     {
                         Texture.allowThreadedTextureCreation = true;
                         File.WriteAllBytes(Path.Combine(Main.ModPath, "IconsExport", fact.m_Icon.name), ImageConversion.EncodeToPNG(fact.m_Icon.texture));
-                        Helper.PrintDebug($"Export sprite {fact.m_Icon.name} from {fact.name} ");
+                        Main.PrintDebug($"Export sprite {fact.m_Icon.name} from {fact.name} ");
                     }
                     catch (Exception)
                     {
-                        Helper.PrintDebug($"Didn't like sprite {fact.m_Icon.name} from {fact.name} ");
+                        Main.PrintDebug($"Didn't like sprite {fact.m_Icon.name} from {fact.name} ");
                     }
                 }
             }
@@ -93,10 +94,10 @@ namespace DarkCodex
         {
             public static void Open()
             {
-                Helper.PrintDebug("opening shared stash with items " + Game.Instance.Player.SharedStash.Count());
+                Main.PrintDebug("opening shared stash with items " + Game.Instance.Player.SharedStash.Count());
 
-                Helper.PrintDebug("Stash: " + Game.Instance.Player.SharedStash.Select(s => s.Blueprint.name).Join());
-                Helper.PrintDebug("Inventory: " + Game.Instance.Player.Inventory.Select(s => s.Blueprint.name).Join());
+                Main.PrintDebug("Stash: " + Game.Instance.Player.SharedStash.Select(s => s.Blueprint.name).Join());
+                Main.PrintDebug("Inventory: " + Game.Instance.Player.Inventory.Select(s => s.Blueprint.name).Join());
 
                 try
                 {
@@ -104,22 +105,22 @@ namespace DarkCodex
 
                     if (Game.Instance.UI.LootWindowController == null)
                     {
-                        Helper.PrintDebug("MainCharacter is null");
+                        Main.PrintDebug("MainCharacter is null");
                         Game.Instance.UI.LootWindowController.Initialize();
                     }
 
                     if (Game.Instance == null)
-                        Helper.PrintDebug("Instance is null");
+                        Main.PrintDebug("Instance is null");
                     if (Game.Instance.UI == null)
-                        Helper.PrintDebug("UI is null");
+                        Main.PrintDebug("UI is null");
                     if (Game.Instance.UI?.LootWindowController == null)
-                        Helper.PrintDebug("LootWindowController is null");
+                        Main.PrintDebug("LootWindowController is null");
                     if (Game.Instance.UI?.LootWindowController?.m_Collector == null)
-                        Helper.PrintDebug("m_Collector is null");
+                        Main.PrintDebug("m_Collector is null");
                     if (Game.Instance.Player?.MainCharacter.Value == null)
-                        Helper.PrintDebug("MainCharacter is null");
+                        Main.PrintDebug("MainCharacter is null");
                     if (Game.Instance.Player.Party.FirstOrDefault() == null)
-                        Helper.PrintDebug("Party is empty");
+                        Main.PrintDebug("Party is empty");
 
                     //Kingmaker.UI.Loot.LootWindowController window = Game.Instance.UI.LootWindowController;
                     //window.HandleLootInterraction(Game.Instance.Player.Party.First(), Game.Instance.Player.SharedStash, "Remote Stash");
@@ -128,7 +129,7 @@ namespace DarkCodex
                 }
                 catch (Exception e)
                 {
-                    Helper.Print(e.ToString());
+                    Main.Print(e.ToString());
                 }
 
                 //window.WindowMode = LootWindowMode.PlayerChest;
@@ -394,7 +395,7 @@ namespace DarkCodex
                     return;
 
                 AbilityParams para = __instance.Result;
-                Helper.PrintDebug($"RuleCalculateAbilityParams blueprint={__instance.Blueprint} CL={para.CasterLevel} SL={para.SpellLevel} DC={para.DC} Metamagic={para.Metamagic} Bonus={para.RankBonus}");
+                Main.PrintDebug($"RuleCalculateAbilityParams blueprint={__instance.Blueprint} CL={para.CasterLevel} SL={para.SpellLevel} DC={para.DC} Metamagic={para.Metamagic} Bonus={para.RankBonus}");
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CodexLib;
 using HarmonyLib;
 using Kingmaker.RuleSystem.Rules;
 using Shared;

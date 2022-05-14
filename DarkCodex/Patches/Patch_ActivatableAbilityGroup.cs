@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -20,7 +21,7 @@ namespace DarkCodex
                 return 0;
 
             ExtraGroups++;
-            Helper.PrintDebug("GetNewGroup new: " + (Enum.GetValues(typeof(ActivatableAbilityGroup)).Cast<int>().Max() + ExtraGroups).ToString());
+            Main.PrintDebug("GetNewGroup new: " + (Enum.GetValues(typeof(ActivatableAbilityGroup)).Cast<int>().Max() + ExtraGroups).ToString());
             return (ActivatableAbilityGroup)(Enum.GetValues(typeof(ActivatableAbilityGroup)).Cast<int>().Max() + ExtraGroups);
         }
 

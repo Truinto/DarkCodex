@@ -1,4 +1,5 @@
-﻿using Kingmaker.EntitySystem.Stats;
+﻿using CodexLib;
+using Kingmaker.EntitySystem.Stats;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Shared;

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using CodexLib;
+using JetBrains.Annotations;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.UnitLogic.Abilities.Blueprints;

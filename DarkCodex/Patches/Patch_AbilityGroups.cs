@@ -14,7 +14,6 @@ using Kingmaker.UI.ActionBar;
 using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Newtonsoft.Json;
 using UnityEngine;
-using DarkCodex.Components;
 using UniRx;
 using System.IO;
 using Kingmaker.UnitLogic.Abilities.Components;
@@ -35,6 +34,7 @@ using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.Commands;
 using Owlcat.Runtime.UI.Controls.Button;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -101,7 +101,7 @@ namespace DarkCodex
             }
             catch (Exception e1)
             {
-                Helper.PrintException(e1);
+                Main.PrintException(e1);
                 try
                 {
                     Groups = Helper.Deserialize<HashSet<DefGroup>>(value: DefaultDef);
@@ -109,7 +109,7 @@ namespace DarkCodex
                 }
                 catch (Exception e2)
                 {
-                    Helper.PrintException(e2);
+                    Main.PrintException(e2);
                     Groups = new();
                 }
             }
@@ -159,7 +159,7 @@ namespace DarkCodex
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                Main.PrintException(e);
             }
         }
 
@@ -327,7 +327,7 @@ namespace DarkCodex
             {
                 if (slot.Index == __state && slot.MechanicActionBarSlot is IMechanicGroup)
                 {
-                    Helper.PrintDebug("reopend OnShowConvertRequest after refresh");
+                    Main.PrintDebug("reopend OnShowConvertRequest after refresh");
                     slot.OnShowConvertRequest();
                     break;
                 }
@@ -398,7 +398,7 @@ namespace DarkCodex
                 while (prev != curr && curr != null)
                 {
                     var comps = curr.GetComponents<Component>();
-                    Helper.PrintDebug($"DragSlot:{count}: {comps.Join(f => $"{f.GetType().Name} {(f.transform as RectTransform)?.rect.center}")}");
+                    Main.PrintDebug($"DragSlot:{count}: {comps.Join(f => $"{f.GetType().Name} {(f.transform as RectTransform)?.rect.center}")}");
                     prev = curr;
                     curr = curr.parent;
                     count++;
@@ -428,7 +428,7 @@ namespace DarkCodex
             var a1 = GetBlueprint(sourceMechanic);
             var a2 = GetBlueprint(targetMechanic);
 
-            Helper.PrintDebug($"DragSlot sourceSlot={sourceSlot.Index} targetSlot={targetSlot?.Index} sourceParent={sourceParent} targetParent={targetParent} sourceMechanic={sourceMechanic} targetMechanic={targetMechanic} a1={a1} a2={a2}");
+            Main.PrintDebug($"DragSlot sourceSlot={sourceSlot.Index} targetSlot={targetSlot?.Index} sourceParent={sourceParent} targetParent={targetParent} sourceMechanic={sourceMechanic} targetMechanic={targetMechanic} a1={a1} a2={a2}");
 
             if (targetMechanic == null) // remove
             {
@@ -444,7 +444,7 @@ namespace DarkCodex
                 bool hit = RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, eventData.position, eventData.pressEventCamera, out var localPosition);
                 var normalizedPosition = Rect.PointToNormalized(rect.rect, localPosition);
                 bool placeRight = localPosition.x >= 0;
-                Helper.PrintDebug($"position right={placeRight} hit={hit} local={localPosition} normalized={normalizedPosition} rect={rect?.rect} mouse-x={eventData.position.x}");
+                Main.PrintDebug($"position right={placeRight} hit={hit} local={localPosition} normalized={normalizedPosition} rect={rect?.rect} mouse-x={eventData.position.x}");
                 targetParent.AddToGroup(sourceMechanic, targetMechanic, placeRight);
             }
 
@@ -481,7 +481,7 @@ namespace DarkCodex
             if (slot is MechanicActionBarSlotGroup || slot is MechanicActionBarSlotSpellGroup || slot is MechanicActionBarSlotPlaceholder)
             {
                 __result = null;
-                Helper.PrintDebug($"BadReplacement {slot} to null");
+                Main.PrintDebug($"BadReplacement {slot} to null");
                 return false;
             }
             return true;

@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Kingmaker.UI.MVVM._PCView.ActionBar;
 using Owlcat.Runtime.UI.Controls.Other;
-using Config;
 using System.IO;
 using Kingmaker.Settings;
 using Kingmaker.UnitLogic.Class.LevelUp;
@@ -26,6 +25,7 @@ using Newtonsoft.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Linq;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -100,7 +100,7 @@ namespace DarkCodex
             }
             catch (Exception ex)
             {
-                Helper.PrintException(ex);
+                Main.PrintException(ex);
             }
             if (list == null || list.Count == 0)
                 return;
@@ -123,7 +123,7 @@ namespace DarkCodex
         public static void Debug1(UnitEntityData unit, bool autoCommit, LevelUpState.CharBuildMode mode, LevelUpController __instance)
         {
             if (Main.IsInGame && Settings.State.verbose)
-                Helper.PrintDebug($"LevelUpController Constructor: unit={unit.CharacterName} auto={autoCommit} mode={mode}");
+                Main.PrintDebug($"LevelUpController Constructor: unit={unit.CharacterName} auto={autoCommit} mode={mode}");
         }
 
         [HarmonyPatch(typeof(LevelUpController), nameof(LevelUpController.ApplyLevelUpPlan))]
@@ -166,7 +166,7 @@ namespace DarkCodex
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                Main.PrintException(e);
             }
 
             var list = new List<ILevelUpAction>();
@@ -216,7 +216,7 @@ namespace DarkCodex
                 }
                 catch (Exception e)
                 {
-                    Helper.PrintException(e);
+                    Main.PrintException(e);
                 }
             }
 
@@ -228,16 +228,16 @@ namespace DarkCodex
                         return true;
                     else if (this.ForceApply)
                     {
-                        Helper.Print($"Action {Parent.GetType().Name} did not fulfill requirements, but was applied anyway.");
+                        Main.Print($"Action {Parent.GetType().Name} did not fulfill requirements, but was applied anyway.");
                         return true;
                     }
 
-                    Helper.Print($"Action {Parent.GetType().Name} did not fulfill requirements and was discarded.");
+                    Main.Print($"Action {Parent.GetType().Name} did not fulfill requirements and was discarded.");
                     return false;
                 }
                 catch (Exception e)
                 {
-                    Helper.PrintException(e);
+                    Main.PrintException(e);
                     return false;
                 }
             }

@@ -12,6 +12,7 @@ using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.Visual.Particles;
 using System.Collections.Generic;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -40,7 +41,7 @@ namespace DarkCodex
                 effect.View.m_SpawnedFx = null;
 
                 paused.Add(effect);
-                Helper.PrintDebug(" pausing effect " + effect);
+                Main.PrintDebug(" pausing effect " + effect);
             }
         }
 
@@ -55,7 +56,7 @@ namespace DarkCodex
                 {
                     //paused[i].View.m_SpawnedFx?.SetActive(true);
                     paused[i].View?.SpawnFxs();
-                    Helper.PrintDebug(" continuing effect " + paused[i]);
+                    Main.PrintDebug(" continuing effect " + paused[i]);
                 }
 
                 paused.RemoveAt(i);
@@ -64,7 +65,7 @@ namespace DarkCodex
 
         public void HandleDialogStarted(BlueprintDialog dialog)
         {
-            Helper.PrintDebug("Dialog started...");
+            Main.PrintDebug("Dialog started...");
 
             if (Settings.State.stopAreaEffectsDuringCutscenes)
                 Stop();
@@ -72,7 +73,7 @@ namespace DarkCodex
 
         public void HandleDialogFinished(BlueprintDialog dialog, bool success)
         {
-            Helper.PrintDebug("Dialog finished...");
+            Main.PrintDebug("Dialog finished...");
             Continue();
         }
 
@@ -93,14 +94,14 @@ namespace DarkCodex
 
                     if (areaeffect.Data.AreaEffectInstance == null)
                     {
-                        Helper.PrintDebug("Enabling missing area effect for " + areaeffect.AreaEffect.NameSafe());
+                        Main.PrintDebug("Enabling missing area effect for " + areaeffect.AreaEffect.NameSafe());
                         areaeffect.OnActivate();
                         continue;
                     }
 
                     if (!AreaService.Instance.CurrentAreaPart.Bounds.MechanicBounds.Contains(areaeffect.Data.AreaEffectInstance.Entity.Position))
                     {
-                        Helper.PrintDebug("Restarting area effect stuck in wrong area " + areaeffect.AreaEffect.NameSafe());
+                        Main.PrintDebug("Restarting area effect stuck in wrong area " + areaeffect.AreaEffect.NameSafe());
                         areaeffect.OnDeactivate();
                         areaeffect.OnActivate();
                     }
@@ -110,12 +111,12 @@ namespace DarkCodex
 
         public void HandleDialogVisible(bool state)
         {
-            Helper.PrintDebug("HandleDialogVisible: " + state);
+            Main.PrintDebug("HandleDialogVisible: " + state);
         }
 
         public void HandleCutsceneStarted(CutscenePlayerData cutscene, bool queued)
         {
-            Helper.PrintDebug("Cutscene started...");
+            Main.PrintDebug("Cutscene started...");
 
             if (Settings.State.stopAreaEffectsDuringCutscenes)
                 Stop();
@@ -123,7 +124,7 @@ namespace DarkCodex
 
         public void HandleCutsceneRestarted(CutscenePlayerData cutscene)
         {
-            Helper.PrintDebug("Cutscene restarted...");
+            Main.PrintDebug("Cutscene restarted...");
 
             if (Settings.State.stopAreaEffectsDuringCutscenes)
                 Stop();
@@ -139,7 +140,7 @@ namespace DarkCodex
 
         public void HandleCutsceneStopped(CutscenePlayerData cutscene)
         {
-            Helper.PrintDebug("Cutscene stopped...");
+            Main.PrintDebug("Cutscene stopped...");
             Continue();
         }
     }

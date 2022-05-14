@@ -11,6 +11,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -29,7 +30,7 @@ namespace DarkCodex
 
             for (int i = 0; i < line.Count; i++)
             {
-                Helper.PrintDebug($"i={i} {line[i]}");
+                Main.PrintDebug($"i={i} {line[i]}");
 
                 if (line[i].Calls(original))
                 {
@@ -40,7 +41,7 @@ namespace DarkCodex
                 }
             }
 
-            Helper.PrintError("Did not patch TranspilerSave");
+            Main.PrintError("Did not patch TranspilerSave");
             return instr;
         }
 
@@ -66,11 +67,11 @@ namespace DarkCodex
                     return;
 
                 saveInfo.Saver.SaveBytes(SaveKey, Encoding.Default.GetBytes(json));
-                Helper.Print("Saved patch metadata");
+                Main.Print("Saved patch metadata");
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                Main.PrintException(e);
             }
         }
 
@@ -87,12 +88,12 @@ namespace DarkCodex
                 {
                     line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
                     line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnLoad2)));
-                    Helper.PrintDebug("Patched LoadRoutine at " + i);
+                    Main.PrintDebug("Patched LoadRoutine at " + i);
                     return line;
                 }
             }
 
-            Helper.PrintError("Did not patch TranspilerSave");
+            Main.PrintError("Did not patch TranspilerSave");
             return instr;
         }
         public static void OnLoad2(SaveInfo saveInfo)
@@ -162,7 +163,7 @@ namespace DarkCodex
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                Main.PrintException(e);
                 return true;
             }
         }

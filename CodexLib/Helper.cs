@@ -348,87 +348,45 @@ namespace CodexLib
             }
         }
 
-        public static void Deconstruct<K, V>(this KeyValuePair<K, V> pair, out K key, out V val)
+        //public static void Deconstruct<K, V>(this KeyValuePair<K, V> pair, out K key, out V val) // using Kingmaker.Utility;
+        //{
+        //    key = pair.Key;
+        //    val = pair.Value;
+        //}
+
+        /// <returns>true if new value was created</returns>
+        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value) where TValue : new()
         {
-            key = pair.Key;
-            val = pair.Value;
+            if (dic.TryGetValue(key, out value))
+                return false;
+            dic[key] = value = new();
+            return true;
         }
 
         #endregion
 
         #region Log
 
-        private static bool _sb2_flag;
-        private static StringBuilder _sb2 = new();
-        private static UnityModManager.ModEntry.ModLogger logger = new("CodexLib");
-
         /// <summary>Only prints message, if compiled on DEBUG.</summary>
         [System.Diagnostics.Conditional("DEBUG")]
         internal static void PrintDebug(string msg)
         {
-            logger?.Log(msg);
+            Scope.Logger.Log(msg);
         }
 
         internal static void Print(string msg)
         {
-            logger?.Log(msg);
+            Scope.Logger.Log(msg);
         }
 
         internal static void PrintError(string msg)
         {
-            logger?.Log("[Exception/Error] " + msg);
+            Scope.Logger.Log("[Exception/Error] " + msg);
         }
 
         internal static void PrintException(Exception ex)
         {
-            logger?.LogException(ex);
-        }
-
-        private static readonly FieldInfo _fieldLabel = AccessTools.Field(typeof(Label), "label");
-        [System.Diagnostics.Conditional("DEBUG")]
-        public static void PrintInstruction(CodeInstruction code, string str = "")
-        {
-            var labels = code.labels.Select(s => (int)_fieldLabel.GetValue(s)).Join();
-            if (code.operand is Label label)
-                Print($"{str} code:{code.opcode} goto:{_fieldLabel.GetValue(label)} labels:{labels}");
-            else
-                Print($"{str} code:{code.opcode} operand:{code.operand} type:{code.operand?.GetType().FullName} labels:{labels}");
-        }
-
-        [System.Diagnostics.Conditional("DEBUG")]
-        public static void PrintJoinDebug(string msg = "", string delimiter = ", ", bool flush = false)
-        {
-            PrintJoin(msg, delimiter, flush);
-        }
-
-        /// <summary>
-        /// Joins text before printing.
-        /// </summary>
-        /// <param name="msg">Part of text to print.</param>
-        /// <param name="delimiter">Delimiter to use. Set null for prefix.</param>
-        /// <param name="flush">Flushes BEFORE appending msg.</param>
-        public static void PrintJoin(string msg = "", string delimiter = ", ", bool flush = false)
-        {
-            if (flush)
-            {
-                if (_sb2_flag)
-                {
-                    Print(_sb2.ToString());
-                }
-
-                _sb2.Clear();
-                _sb2_flag = false;
-
-                _sb2.Append(msg);
-                return;
-            }
-
-            if (_sb2_flag && delimiter != null)
-                _sb2.Append(delimiter);
-            else if (delimiter != null)
-                _sb2_flag = true;
-
-            _sb2.Append(msg);
+            Scope.Logger.LogException(ex);
         }
 
         public static void ShowMessageBox(string messageText, Action onYes = null, int waitTime = 0, string yesLabel = null, string noLabel = null)
@@ -510,7 +468,7 @@ namespace CodexLib
             PreserveReferencesHandling = PreserveReferencesHandling.None
         };
 
-        public static string Serialize(object value, bool indent = true, bool type = true, string path = null, bool append = false)
+        public static string Serialize(this object value, bool indent = true, bool type = true, string path = null, bool append = false)
         {
             _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
             string result = JsonConvert.SerializeObject(value, _jsetting);
@@ -527,7 +485,7 @@ namespace CodexLib
             return result;
         }
 
-        public static string Serialize<T>(T value, bool indent = true, bool type = true, string path = null, bool append = false)
+        public static string Serialize<T>(this T value, bool indent = true, bool type = true, string path = null, bool append = false)
         {
             _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
             _jsetting.TypeNameHandling = type ? TypeNameHandling.Auto : TypeNameHandling.None;
@@ -575,14 +533,26 @@ namespace CodexLib
             return default;
         }
 
-        public static T TryDeserialize<T>(string path = null, string value = null)
+        public static string TrySerialize<T>(this T value, bool indent = true, bool type = true, string path = null, bool append = false)
         {
             try
             {
-                return Deserialize<T>(path, value);
+                return Serialize<T>(value: value, indent: indent, type: type, path: path, append: append);
             }
             catch (Exception e) { PrintException(e); }
-            return default;
+            return null;
+        }
+
+        public static bool TryDeserialize<T>(out T result, string path = null, string value = null)
+        {
+            try
+            {
+                result = Deserialize<T>(path, value);
+                return true;
+            }
+            catch (Exception e) { PrintException(e); }
+            result = default;
+            return false;
         }
 
         public static void TryPrintFile(string path, string content, bool append = true)
@@ -630,7 +600,94 @@ namespace CodexLib
 
         #endregion
 
+        #region GUID
+
+        public static bool Allow_Guid_Generation = false;
+        //private static List<string> _guidloaded = new();
+        //private static Dictionary<string, string> _guids = new();
+
+        private static Dictionary<string, Dictionary<string, string>> _mappedGuids = new();
+
+        private static Dictionary<string, string> GetGuidMap()
+        {
+            string modPath = Scope.ModPath;
+
+            if (_mappedGuids.Ensure(modPath, out var map))
+            {
+                load(Path.Combine(modPath, "blueprints.txt"));
+                load(Path.Combine(modPath, "blueprints_dynamic.txt"));
+            }
+            return map;
+
+            void load(string path)
+            {
+                if (File.Exists(path))
+                {
+                    foreach (string line in File.ReadAllLines(path))
+                    {
+                        string[] items = line.Split('\t');
+                        if (items.Length >= 2)
+                            map[items[0]] = items[1];
+                    }
+                }
+            }
+        }
+
+        public static string GetGuid(string key)
+        {
+            var map = GetGuidMap();
+
+            map.TryGetValue(key, out string result);
+            if (result != null)
+                return result;
+
+            if (!Allow_Guid_Generation)
+                throw new Exception("Tried to generate a new GUID while not allowed! " + key);
+
+            Print("Warning: Generating new GUID for " + key);
+            map[key] = result = Guid.NewGuid().ToString("N");
+            using StreamWriter sw = new(Path.Combine(Scope.ModPath, "blueprints.txt"), append: true);
+            sw.WriteLine(key + '\t' + result);
+
+            return result;
+        }
+
+        public static string RegGuid(string key, string guid)
+        {
+            var map = GetGuidMap();
+
+            if (!map.ContainsKey(key))
+            {
+                map.Add(key, guid);
+                using StreamWriter sw = new(Path.Combine(Scope.ModPath, "blueprints_dynamic.txt"), append: true);
+                sw.WriteLine(key + '\t' + guid);
+            }
+
+            return guid;
+        }
+
+        public static void DumpLoadedBlueprints()
+        {
+            using StreamWriter sw = new(Path.Combine(Scope.ModPath, "dump.txt"), append: true);
+            foreach (var (_, cache) in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints)
+            {
+                if (cache.Offset == 0 && cache.Blueprint is SimpleBlueprint bp)
+                {
+                    sw.WriteLine($"{bp.name}\t{bp.AssetGuid}\t{bp.GetType().FullName}");
+                }
+            }
+        }
+
+        public static void SanityCheckGuid()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Strings
+
+        private static LocalizedString _empty = new() { Key = "" };
 
         public static LocalizedString GetString(string key)
         {
@@ -652,8 +709,34 @@ namespace CodexLib
 
         private static SHA1 _SHA = SHA1.Create();
         private static StringBuilder _sb1 = new();
-        private static Locale _lastLocale = Locale.enGB;
-        private static Dictionary<string, string> _mappedStrings;
+        private static Dictionary<string, Dictionary<string, string>> _mappedStrings = new();
+
+        private static Dictionary<string, string> GetStringMap()
+        {
+            string modPath = Scope.ModPath;
+
+            if (_mappedStrings.Ensure(modPath, out var map) && LocalizationManager.CurrentPack.Locale != Locale.enGB)
+            {
+                load(Path.Combine(modPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
+            }
+            return map;
+
+            void load(string path)
+            {
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        map = Deserialize<Dictionary<string, string>>(path: path);
+                        var pack = LocalizationManager.CurrentPack;
+                        foreach (var entry in map)
+                            pack.PutString(entry.Key, entry.Value);
+                    }
+                }
+                catch (Exception e) { Print($"Could not read lanaguage file for {LocalizationManager.CurrentPack.Locale}: {e.Message}"); }
+            }
+        }
+
         public static LocalizedString CreateString(this string value, string key = null)
         {
             if (value == null || value == "")
@@ -668,69 +751,26 @@ namespace CodexLib
                 _sb1.Clear();
             }
 
-            var pack = LocalizationManager.CurrentPack;
-            if (LocalizationManager.CurrentPack.Locale != _lastLocale)
+            var map = GetStringMap();
+            if (!map.ContainsKey(key))
             {
-                _lastLocale = LocalizationManager.CurrentPack.Locale;
-                try
-                {
-                    string path = LocalizationManager.CurrentPack.Locale.ToString() + "enGB.json";
-                    path = Path.Combine(Main.ModPath, path);
-                    _mappedStrings = Deserialize<Dictionary<string, string>>(path: path);
-                    foreach (var entry in _mappedStrings)
-                        pack.PutString(entry.Key, entry.Value);
-                    _mappedStrings = null;
-                }
-                catch (Exception e)
-                {
-                    Print($"Could not read lanaguage file for {LocalizationManager.CurrentPack.Locale}: {e.Message}");
-                }
-            }
-
-            if (!pack.m_Strings.ContainsKey(key))
-            {
-                pack.PutString(key, value);
-                _saveString(key, value);
+                map.Add(key, value);
+                LocalizationManager.CurrentPack.PutString(key, value);
             }
 
             return new LocalizedString { Key = key };
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        private static void _saveString(string key, string value)
-        {
-            if (_mappedStrings == null)
-                _mappedStrings = new Dictionary<string, string>();
-            _mappedStrings[key] = value;
-        }
-
-        [System.Diagnostics.Conditional("DEBUG")]
         public static void ExportStrings()
         {
-            if (_mappedStrings == null)
-                return;
-
-            Dictionary<string, string> oldmap = null;
+            var map = GetStringMap();
 
             try
             {
-                oldmap = Deserialize<Dictionary<string, string>>(path: Path.Combine(Main.ModPath, "enGB.json"));
-
-                foreach (var entry in _mappedStrings)
-                    if (!oldmap.ContainsKey(entry.Key))
-                        oldmap.Add(entry.Key, entry.Value);
+                Serialize(map, path: Path.Combine(Scope.ModPath, "enGB.json"));
             }
-            catch (Exception) { }
-
-            try
-            {
-                Serialize(oldmap ?? _mappedStrings, path: Path.Combine(Main.ModPath, "enGB.json"));
-                _mappedStrings = null;
-            }
-            catch (Exception e)
-            {
-                Print($"Failed export lanaguage file: {e.Message}");
-            }
+            catch (Exception e) { Print($"Failed export lanaguage file: {e.Message}"); }
         }
 
         /// <summary>Returns substring. Always excludes char 'c'. Returns null, if index is out of range or char not found.</summary>
@@ -996,14 +1036,11 @@ namespace CodexLib
         /// <returns></returns>
         public static T Clone<T>(this T obj, string name, string guid2 = null) where T : SimpleBlueprint
         {
-            string guid = null;
+            string guid;
             if (guid2 != null)
                 guid = MergeIds(name, obj.AssetGuid.ToString(), guid2);
-
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
             else
-                GuidManager.i.Reg(guid);
+                guid = GetGuid(name);
 
             var result = (T)_memberwiseClone.Invoke(obj, null);
             result.name = name;
@@ -1061,7 +1098,7 @@ namespace CodexLib
 
             var result = high.ToString("x16") + low.ToString("x16");
             PrintDebug($"MergeIds {guid1} + {guid2} + {guid3} = {result}");
-            GuidManager.i.AddDynamic(name, result);
+            RegGuid(name, result);
             return result;
         }
 
@@ -1497,7 +1534,7 @@ namespace CodexLib
         public static AbilityDeliverTouch CreateAbilityDeliverTouch()
         {
             var result = new AbilityDeliverTouch();
-            result.m_TouchWeapon = Resource.Cache.WeaponTouch;
+            result.m_TouchWeapon = ToRef<BlueprintItemWeaponReference>("bb337517547de1a4189518d404ec49d4");
             return result;
         }
 
@@ -2091,12 +2128,9 @@ namespace CodexLib
             //return result;
         }
 
-        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, string guid = null, Sprite icon = null, PrefabLink fxOnStart = null)
+        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, Sprite icon = null, PrefabLink fxOnStart = null)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintBuff();
             result.name = name;
@@ -2111,12 +2145,9 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintFeature CreateBlueprintFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0)
+        public static BlueprintFeature CreateBlueprintFeature(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintFeature();
             result.IsClassFeature = true;
@@ -2130,12 +2161,9 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, string guid, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, LocalizedString duration = null, LocalizedString savingThrow = null)
+        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, LocalizedString duration = null, LocalizedString savingThrow = null)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintAbility();
             result.name = name;
@@ -2146,19 +2174,16 @@ namespace CodexLib
             result.Type = type;
             result.ActionType = actionType;
             result.Range = range;
-            result.LocalizedDuration = duration ?? Resource.Strings.Empty;
-            result.LocalizedSavingThrow = savingThrow ?? Resource.Strings.Empty;
+            result.LocalizedDuration = duration ?? _empty;
+            result.LocalizedSavingThrow = savingThrow ?? _empty;
 
             AddAsset(result, guid);
             return result;
         }
 
-        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.OnlyNew)
+        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.OnlyNew)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintFeatureSelection();
             result.IsClassFeature = true;
@@ -2173,12 +2198,9 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, AnyBlueprintReference[] blueprints = null)
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, AnyBlueprintReference[] blueprints = null)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintParametrizedFeature();
             result.IsClassFeature = true;
@@ -2194,12 +2216,9 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, string guid = null, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
+        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintActivatableAbility();
             result.name = name;
@@ -2235,7 +2254,7 @@ namespace CodexLib
             buff.name = name + "_Buff";
             buff.m_DisplayName = result.m_DisplayName;
             buff.m_Description = result.m_Description;
-            buff.AssetGuid = BlueprintGuid.Parse(GuidManager.i.Get(buff.name));
+            buff.AssetGuid = BlueprintGuid.Parse(GetGuid(buff.name));
             buff.m_Icon = icon;
             buff.FxOnStart = new PrefabLink();
             buff.FxOnRemove = new PrefabLink();
@@ -2246,15 +2265,12 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintAbilityAreaEffect CreateBlueprintAbilityAreaEffect(string name, string guid = null, bool applyEnemy = false, bool applyAlly = false, AreaEffectShape shape = AreaEffectShape.Cylinder, Feet size = default, PrefabLink sfx = null, BlueprintBuffReference buffWhileInside = null, ActionList unitEnter = null, ActionList unitExit = null, ActionList unitMove = null, ActionList unitRound = null)
+        public static BlueprintAbilityAreaEffect CreateBlueprintAbilityAreaEffect(string name, bool applyEnemy = false, bool applyAlly = false, AreaEffectShape shape = AreaEffectShape.Cylinder, Feet size = default, PrefabLink sfx = null, BlueprintBuffReference buffWhileInside = null, ActionList unitEnter = null, ActionList unitExit = null, ActionList unitMove = null, ActionList unitRound = null)
         {
             if (!applyAlly && !applyEnemy)
                 throw new ArgumentException("area must effect either allies or enemies");
 
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintAbilityAreaEffect();
             result.name = name;
@@ -2294,12 +2310,9 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintWeaponEnchantment CreateBlueprintWeaponEnchantment(string name, string enchantName = null, string description = null, string prefix = null, string suffix = null, string guid = null, int enchantValue = 0)
+        public static BlueprintWeaponEnchantment CreateBlueprintWeaponEnchantment(string name, string enchantName = null, string description = null, string prefix = null, string suffix = null, int enchantValue = 0)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintWeaponEnchantment();
             result.name = name;
@@ -2315,7 +2328,7 @@ namespace CodexLib
 
         public static BlueprintUnitProperty CreateBlueprintUnitProperty(string name)
         {
-            var guid = GuidManager.i.Get(name);
+            var guid = GetGuid(name);
             var result = new BlueprintUnitProperty();
             result.name = name;
 
@@ -2323,13 +2336,10 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintWeaponType CreateBlueprintWeaponType(string name, string displayName, string cloneFromWeaponType, Feet range = default, DiceFormula damage = default, PhysicalDamageForm form = PhysicalDamageForm.Bludgeoning, int critRange = 20, DamageCriticalModifierType critMod = DamageCriticalModifierType.X2, WeaponFighterGroupFlags? fighterGroup = null, WeaponCategory? category = null, float? weight = null, string guid = null)
+        public static BlueprintWeaponType CreateBlueprintWeaponType(string name, string displayName, string cloneFromWeaponType, Feet range = default, DiceFormula damage = default, PhysicalDamageForm form = PhysicalDamageForm.Bludgeoning, int critRange = 20, DamageCriticalModifierType critMod = DamageCriticalModifierType.X2, WeaponFighterGroupFlags? fighterGroup = null, WeaponCategory? category = null, float? weight = null)
         {
             // note: take care to not mutate m_VisualParameters!
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
             var clone = ResourcesLibrary.TryGetBlueprint<BlueprintWeaponType>(cloneFromWeaponType);
             if (range == default)
                 range = 5.Feet();
@@ -2372,12 +2382,9 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName, string description, BlueprintWeaponTypeReference weaponType, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, string guid = null, int price = 1000)
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName, string description, BlueprintWeaponTypeReference weaponType, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, int price = 1000)
         {
-            if (guid == null)
-                guid = GuidManager.i.Get(name);
-            else
-                GuidManager.i.Reg(guid);
+            string guid = GetGuid(name);
 
             var result = new BlueprintItemWeapon();
             result.name = name;

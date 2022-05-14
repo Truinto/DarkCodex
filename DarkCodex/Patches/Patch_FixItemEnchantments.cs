@@ -18,14 +18,14 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix1(EntityFact fact) // todo figure out why temporary entchantments from Magic Weapon get lost when saving
         {
-            Helper.PrintDebug($"ItemEnchantment remove fact: {fact.Name}\n{Environment.StackTrace}");
+            Main.PrintDebug($"ItemEnchantment remove fact: {fact.Name}\n{Environment.StackTrace}");
         }
 
         [HarmonyPatch(typeof(EntityFactsProcessor<ItemEnchantment>), nameof(EntityFactsProcessor<ItemEnchantment>.RemoveFact), typeof(BlueprintFact))]
         [HarmonyPostfix]
         public static void Postfix2(BlueprintFact blueprint)
         {
-            Helper.PrintDebug($"ItemEnchantment remove fact 2: {blueprint.name}\n{Environment.StackTrace}");
+            Main.PrintDebug($"ItemEnchantment remove fact 2: {blueprint.name}\n{Environment.StackTrace}");
         }
     }
 }

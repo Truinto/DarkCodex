@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -42,7 +43,6 @@ namespace DarkCodex
                 "AccursedStrikeAbility",
                 "Accursed Strike",
                 "Any prepared spell or hex with the curse descriptor can be delivered using the spellstrike ability, even if the spells are not touch attack spells.",
-                null,
                 accursed_strike_variants[0].m_Icon,
                 AbilityType.Supernatural,
                 CommandType.Standard,
@@ -55,7 +55,6 @@ namespace DarkCodex
                 "AccursedStrikeFeature",
                 "Accursed Strike",
                 "Any prepared spell or hex with the curse descriptor can be delivered using the spellstrike ability, even if the spells are not touch attack spells.",
-                null,
                 accursed_strike_variants[0].m_Icon,
                 FeatureGroup.WitchHex
                 ).SetComponents(

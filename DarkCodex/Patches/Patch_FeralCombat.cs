@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -41,7 +42,7 @@ namespace DarkCodex
             int label = index - 1;
 
             //for (int i = 64; i <= 70; i++) Helper.PrintInstruction(list[i], i.ToString());
-            Helper.Print("Patching at " + index);
+            Main.Print("Patching at " + index);
 
             list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
             list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_1));

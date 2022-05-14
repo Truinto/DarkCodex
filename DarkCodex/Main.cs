@@ -9,8 +9,6 @@ using System.Linq;
 using UnityEngine;
 using UnityModManagerNet;
 using HarmonyLib;
-using Guid = DarkCodex.GuidManager;
-using DarkCodex.Components;
 using Kingmaker.Modding;
 using Kingmaker.Achievements;
 using Kingmaker;
@@ -263,7 +261,7 @@ namespace Shared
                 }
                 catch (Exception)
                 {
-                    Helper.Print($"Error while parsing number '{entry.Value}' for '{entry.Key}'");
+                    Print($"Error while parsing number '{entry.Value}' for '{entry.Key}'");
                 }
             }
 
@@ -371,7 +369,7 @@ namespace Shared
 
         #region Load
 
-        static partial void OnLoad()
+        static partial void OnLoad(UnityModManager.ModEntry modEntry)
         {
             Patch(typeof(Patch_LoadBlueprints));
             //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
@@ -419,10 +417,10 @@ namespace Shared
                 LoadSafe(General.CreateBardStopSong);
 
                 // Cache
-                LoadSafe(PropertyAttributeMax.CreatePropertyMaxMentalAttribute);
-                LoadSafe(PropertyGetterSneakAttack.CreatePropertyGetterSneakAttack);
-                LoadSafe(PropertyMythicLevel.CreateMythicDispelProperty);
-                LoadSafe(ContextActionIncreaseBleed.CreateBleedBuff);
+                LoadSafe(General.CreatePropertyMaxMentalAttribute);
+                LoadSafe(General.CreatePropertyGetterSneakAttack);
+                LoadSafe(General.CreateMythicDispelProperty);
+                LoadSafe(General.CreateBleedBuff);
 
                 // Harmony Patches
                 PatchUnique(typeof(Patch_AllowAchievements));
@@ -548,7 +546,7 @@ namespace Shared
                 LoadSafe(Mythic.CreateSwiftHex); // keep last
 
                 // Event subscriptions
-                SubscribeSafe(typeof(RestoreEndOfCombat));
+                SubscribeSafe(typeof(Event_RestoreEndOfCombat));
                 SubscribeSafe(typeof(Event_AreaEffects));
                 SubscribeSafe(typeof(Patch_AbilityGroups));
 
@@ -559,7 +557,6 @@ namespace Shared
 #if DEBUG
                 PrintDebug("Running in debug. " + Main.IsInGame);
                 Helper.ExportStrings();
-                Guid.i.WriteAll();
 #endif
             }
             catch (Exception ex)

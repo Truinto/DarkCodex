@@ -1,5 +1,4 @@
-﻿using DarkCodex.Components;
-using HarmonyLib;
+﻿using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
@@ -34,6 +33,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using System.IO;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -187,7 +187,7 @@ namespace DarkCodex
                 }
                 catch (Exception)
                 {
-                    Helper.Print(" error: couldn't load " + guid);
+                    Main.Print(" error: couldn't load " + guid);
                 }
             }
         }
@@ -259,11 +259,10 @@ namespace DarkCodex
                 "StopActivatables",
                 "Stop Activatables",
                 "Immediately stop all disabled activatables. Useful for bardic performance.",
-                null,
                 icon: Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "StopSong.png")),
-                AbilityType.Special,
-                UnitCommand.CommandType.Free,
-                AbilityRange.Personal
+                type: AbilityType.Special,
+                actionType: UnitCommand.CommandType.Free,
+                range: AbilityRange.Personal
                 ).TargetSelf(
                 ).SetComponents(
                 Helper.CreateAbilityExecuteActionOnCast(new ContextActionStopActivatables())
@@ -290,5 +289,57 @@ namespace DarkCodex
 
             Helper.AddCombatFeat(feat);
         }
+
+        #region General Resources and Stuff
+
+        public static void CreatePropertyMaxMentalAttribute()
+        {
+            var prop = Helper.CreateBlueprintUnitProperty(
+                "MaxMentalAttributePropertyGetter"
+                ).SetComponents(new PropertyAttributeMax() { PhysicalStat = false, MentalStat = true });
+
+            Resource.Cache.PropertyMaxMentalAttribute.SetReference(prop);
+        }
+
+        public static void CreatePropertyGetterSneakAttack()
+        {
+            var prop = Helper.CreateBlueprintUnitProperty(
+                "SneakAttackPropertyGetter"
+                ).SetComponents(new PropertyGetterSneakAttack());
+
+            Resource.Cache.PropertySneakAttackDice.SetReference(prop);
+        }
+
+        public static void CreateMythicDispelProperty()
+        {
+            var prop = Helper.CreateBlueprintUnitProperty(
+                "MythicDispelPropertyGetter"
+                ).SetComponents(new PropertyMythicLevel()
+                {
+                    Fact = Helper.ToRef<BlueprintUnitFactReference>("51b6b22ff184eef46a675449e837365d"),   //SpellPenetrationMythicFeat
+                    Greater = Helper.ToRef<BlueprintUnitFactReference>("1978c3f91cfbbc24b9c9b0d017f4beec") //GreaterSpellPenetration
+                });
+
+            Resource.Cache.PropertyMythicDispel.SetReference(prop);
+        }
+
+        public static void CreateBleedBuff()
+        {
+            var buff = Helper.CreateBlueprintBuff(
+                "BleedVariableBuff",
+                "Bleed",
+                "This creature takes hit point damage each turn. Bleeding can be stopped through the application of any spell that cures hit point damage.",
+                Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
+                ).SetComponents(
+                new BleedBuff(),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed)
+                );
+
+            Resource.Cache.BuffBleed.SetReference(buff);
+            ContextActionIncreaseBleed.BuffBleed.SetReference(buff);
+        }
+
+        #endregion
+
     }
 }

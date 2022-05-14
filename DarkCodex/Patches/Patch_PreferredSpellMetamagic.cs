@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Shared;
+using CodexLib;
 
 namespace DarkCodex
 {
@@ -68,7 +69,7 @@ namespace DarkCodex
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                Main.PrintException(e);
             }
 
             __result = list;
