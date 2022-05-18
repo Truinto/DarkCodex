@@ -126,6 +126,7 @@
     <Compile Include="Rogue.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Spells.cs" />
     <Compile Include="Unlock.cs" />
     <Compile Include="Witch.cs" />
     <None Include="..\.editorconfig" Link=".editorconfig" />

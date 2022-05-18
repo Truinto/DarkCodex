@@ -72,7 +72,6 @@ namespace DarkCodex
                 if (path == "party")
                 {
                     __result = rx.Replace(__result, "\"CodexLib.${1}, CodexLib\"");
-                    Main.Print(__result);
                 }
             }
         }
