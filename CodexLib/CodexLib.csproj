@@ -79,9 +79,17 @@
     <Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="strong-name-key.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\ActionBarConvertedVMAny.cs" />
+    <Compile Include="Classes\ActionBarSlotVMChild.cs" />
+    <Compile Include="Classes\DefGroup.cs" />
+    <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />
+    <Compile Include="Classes\MechanicActionBarSlotPlaceholder.cs" />
+    <Compile Include="Classes\MechanicActionBarSlotSpellGroup.cs" />
+    <Compile Include="Classes\SpellSlotLevel.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
     <Compile Include="Components\AbilityDeliverChainAttack.cs" />
     <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
@@ -124,10 +132,11 @@
     <Compile Include="Components\UIData.cs" />
     <Compile Include="Components\UnitConditionExceptionsFromBuff.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="Interfaces\IMechanicGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scope.cs" />
-    <Compile Include="Test.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -48,8 +48,6 @@ namespace Shared
             return true;
         }
 
-        internal static IEnumerable<string> patchInfoSaved;
-
         internal static bool restart;
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
@@ -79,13 +77,9 @@ namespace Shared
 
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
             Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
-            Checkbox(ref Patch_AbilityGroups.Unlocked, "Show all Ability Groups", b => Patch_AbilityGroups.Refresh());
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
-
-            if (GUILayout.Button("Reload Ability Groups 'DefGroups.json'", GUILayout.ExpandWidth(false)))
-                Patch_AbilityGroups.Reload();
 
 #if DEBUG
             if (Main.IsInGame)
@@ -267,19 +261,6 @@ namespace Shared
             Settings.State.TrySave();
         }
 
-        private static void Checkbox(ref bool value, string label, Action<bool> action = null)
-        {
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
-            {
-                value = !value;
-                action?.Invoke(value);
-            }
-            GUILayout.Space(5);
-            GUILayout.Label(label, GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
-        }
-
         private static string lastEnum;
         private static void Checkbox<T>(ref T value, string label, Action<T> action = null) where T : Enum
         {
@@ -370,6 +351,11 @@ namespace Shared
 
         static partial void OnLoad(UnityModManager.ModEntry modEntry)
         {
+            modEntry.OnToggle = OnToggle;
+            modEntry.OnGUI = OnGUI;
+            modEntry.OnSaveGUI = OnSaveGUI;
+            modEntry.OnHideGUI = OnHideGUI;
+
             Patch(typeof(Patch_LoadBlueprints));
             //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
 
@@ -409,6 +395,7 @@ namespace Shared
 #endif
             PatchSafe(typeof(Patch_FixLoadCrash1));
             LoadSafe(General.CreateBardStopSong);
+            PatchSafe(typeof(DEBUG.Patch_UpdateSave130)); // TODO: remove update
 
             // Cache
             LoadSafe(General.CreatePropertyMaxMentalAttribute);
@@ -438,7 +425,6 @@ namespace Shared
             PatchSafe(typeof(Patch_FixAreaDoubleDamage));
             PatchSafe(typeof(Patch_FixAreaEndOfTurn));
             PatchSafe(typeof(Patch_Polymorph));
-            PatchSafe(typeof(Patch_AbilityGroups));
             PatchSafe(typeof(Patch_EnduringSpells));
             PatchSafe(typeof(Patch_UnlockClassLevels));
             PatchSafe(typeof(Patch_AbilityAtWill));
@@ -542,7 +528,6 @@ namespace Shared
             // Event subscriptions
             SubscribeSafe(typeof(Event_RestoreEndOfCombat));
             SubscribeSafe(typeof(Event_AreaEffects));
-            SubscribeSafe(typeof(Patch_AbilityGroups));
 
             patchInfos.Sort(); // sort info list for GUI
             patchInfos.Update();

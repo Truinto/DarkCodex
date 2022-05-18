@@ -64,13 +64,10 @@ namespace DarkCodex
         public static ActionBarVM RootVM => RootUIContext.Instance.InGameVM.StaticPartVM.ActionBarVM;
         public static ActionBarPCView RootPCView => (RootUIContext.Instance.m_UIView as InGamePCView)?.m_StaticPartPCView?.m_ActionBarPCView;
 
-        public static bool Unlocked = false;
-
-        public static HashSet<DefGroup> Groups;
-
         static Patch_AbilityGroups()
         {
             Reload();
+            DefGroup.GroupBorder = Resource.Cache.BorderFancy3;
         }
 
         public static void Reload()
@@ -97,20 +94,20 @@ namespace DarkCodex
                 //CollectFromResource("1633025edc9d53f4691481b48248edd7", "Alchemist Bombs", "", null);
                 //Helper.Serialize(Groups, path: Path.Combine(Main.ModPath, "DefGroups.json"));
 
-                Groups = Helper.Deserialize<HashSet<DefGroup>>(path: Path.Combine(Main.ModPath, "DefGroups.json"));
+                DefGroup.Groups = Helper.Deserialize<HashSet<DefGroup>>(path: Path.Combine(Main.ModPath, "DefGroups.json"));
             }
             catch (Exception e1)
             {
                 Main.PrintException(e1);
                 try
                 {
-                    Groups = Helper.Deserialize<HashSet<DefGroup>>(value: DefaultDef);
+                    DefGroup.Groups = Helper.Deserialize<HashSet<DefGroup>>(value: DefaultDef);
                     Save();
                 }
                 catch (Exception e2)
                 {
                     Main.PrintException(e2);
-                    Groups = new();
+                    DefGroup.Groups = new();
                 }
             }
         }
@@ -123,7 +120,7 @@ namespace DarkCodex
                 group.Guids.Add(ab.AssetGuid);
             foreach (var ab in Resource.Cache.Activatable.Where(w => w.GetComponent<ActivatableAbilityResourceLogic>()?.m_RequiredResource?.Guid == resource))
                 group.Guids.Add(ab.AssetGuid);
-            Groups.Add(group);
+            DefGroup.Groups.Add(group);
         }
 
         public static void AddGroup(string title, string description, string icon, params string[] guids)
@@ -131,9 +128,9 @@ namespace DarkCodex
             if (title == null)
                 return;
 
-            var group = Groups.FindOrDefault(f => f.Title == title);
+            var group = DefGroup.Groups.FindOrDefault(f => f.Title == title);
             if (group == null)
-                Groups.Add(group = new(title, description ?? "", icon));
+                DefGroup.Groups.Add(group = new(title, description ?? "", icon));
 
             foreach (var guid in guids)
             {
@@ -141,12 +138,14 @@ namespace DarkCodex
                 if (!group.Guids.Contains(bguid))
                     group.Guids.Add(bguid);
             }
+            DefGroup.RefreshUI();
             Save();
         }
 
         public static void RemoveGroup(string title)
         {
-            Groups.RemoveWhere(w => w.Title == title);
+            DefGroup.Groups.RemoveWhere(w => w.Title == title);
+            DefGroup.RefreshUI();
             Save();
         }
 
@@ -154,59 +153,15 @@ namespace DarkCodex
         {
             try
             {
-                Helper.Serialize(Groups, path: Path.Combine(Main.ModPath, "DefGroups.json"));
-                Refresh();
+                Helper.Serialize(DefGroup.Groups, path: Path.Combine(Main.ModPath, "DefGroups.json"));
             }
-            catch (Exception e)
-            {
-                Main.PrintException(e);
-            }
-        }
-
-        public static void Refresh()
-        {
-            var actionbar = RootVM;
-            if (actionbar == null)
-                return;
-            actionbar.m_NeedReset = true;
-            actionbar.OnUpdateHandler();
+            catch (Exception e) { Main.PrintException(e); }
         }
 
         public static void ToggleLocked()
         {
-            Unlocked = !Unlocked;
-            Refresh();
-        }
-
-        public static BlueprintUnitFact GetBlueprint(MechanicActionBarSlot slot)
-        {
-            if (slot is MechanicActionBarSlotActivableAbility act)
-                return act.ActivatableAbility.Blueprint;
-            else if (slot is MechanicActionBarSlotAbility ab)
-                return ab.Ability.Blueprint;
-            else if (slot is MechanicActionBarSlotPlaceholder place)
-                return place.Blueprint.Get();
-            return null;
-        }
-
-        public static BlueprintGuid GetGuid(MechanicActionBarSlot slot)
-        {
-            return GetBlueprint(slot)?.AssetGuid ?? BlueprintGuid.Empty;
-        }
-
-        public static bool IsValidSpellGroup(MechanicActionBarSlot mechanic)
-        {
-            if (mechanic is MechanicActionBarSlotSpellGroup)
-                return false;
-
-            if (mechanic is MechanicActionBarSlotSpell spell && !spell.Spell.IsVariable)
-                return true;
-            if (mechanic is MechanicActionBarSlotAbility ability && !ability.Ability.IsVariable)
-                return true;
-            if (mechanic is MechanicActionBarSlotSpontaneusConvertedSpell convert && !convert.Spell.IsVariable)
-                return true;
-
-            return false;
+            DefGroup.Unlocked = !DefGroup.Unlocked;
+            DefGroup.RefreshUI();
         }
 
         [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.SetMechanicSlot))]
@@ -222,7 +177,10 @@ namespace DarkCodex
         [HarmonyPostfix]
         private static void CollectAbilities(UnitEntityData unit, ActionBarVM __instance)
         {
-            foreach (var group in Groups)
+            if (DefGroup.Groups == null)
+                return;
+
+            foreach (var group in DefGroup.Groups)
             {
                 int hash = group.GetHashCode();
 
@@ -231,7 +189,7 @@ namespace DarkCodex
                 for (int i = __instance.GroupAbilities.Count - 1; i >= 0; i--)
                 {
                     var slot = __instance.GroupAbilities[i].MechanicActionBarSlot;
-                    BlueprintGuid guid = GetGuid(slot);
+                    BlueprintGuid guid = DefGroup.GetGuid(slot);
                     if (guid == BlueprintGuid.Empty)
                         continue;
 
@@ -245,7 +203,7 @@ namespace DarkCodex
                 }
 
                 // fill unavailable abilities with placeholders
-                if (Unlocked)
+                if (DefGroup.Unlocked)
                 {
                     for (int i = 0; i < group.Guids.Count; i++)
                         if (!dic.ContainsKey(i))
@@ -254,7 +212,7 @@ namespace DarkCodex
 
                 // add group to actionbar
                 var list = dic.OrderBy(o => o.Key).Select(s => s.Value).ToList(); // keep list in order of guids in the settings
-                if (list.Count > 0 || Unlocked)
+                if (list.Count > 0 || DefGroup.Unlocked)
                     __instance.GroupAbilities.Add(new ActionBarSlotVM(new MechanicActionBarSlotGroup(unit, hash, list)));
 
                 // update existing toolbar slots
@@ -410,6 +368,8 @@ namespace DarkCodex
 #endif
             if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
                 return true;
+            if (DefGroup.Groups == null)
+                return true;
 
             // clear drop indicator
             var dragslot = RootPCView?.m_DragSlot;
@@ -425,8 +385,8 @@ namespace DarkCodex
             IMechanicGroup targetParent = targetSlot is ActionBarSlotVMChild vm2 ? vm2.Parent.MechanicActionBarSlot as IMechanicGroup : null;
             MechanicActionBarSlot sourceMechanic = sourceSlot.MechanicActionBarSlot;
             MechanicActionBarSlot targetMechanic = targetSlot?.MechanicActionBarSlot;
-            var a1 = GetBlueprint(sourceMechanic);
-            var a2 = GetBlueprint(targetMechanic);
+            var a1 = DefGroup.GetBlueprint(sourceMechanic);
+            var a2 = DefGroup.GetBlueprint(targetMechanic);
 
             Main.PrintDebug($"DragSlot sourceSlot={sourceSlot.Index} targetSlot={targetSlot?.Index} sourceParent={sourceParent} targetParent={targetParent} sourceMechanic={sourceMechanic} targetMechanic={targetMechanic} a1={a1} a2={a2}");
 
@@ -446,11 +406,15 @@ namespace DarkCodex
                 bool placeRight = localPosition.x >= 0;
                 Main.PrintDebug($"position right={placeRight} hit={hit} local={localPosition} normalized={normalizedPosition} rect={rect?.rect} mouse-x={eventData.position.x}");
                 targetParent.AddToGroup(sourceMechanic, targetMechanic, placeRight);
+                if (targetParent is MechanicActionBarSlotGroup)
+                    Save();
             }
 
             else if (targetMechanic is IMechanicGroup m2) // add to group
             {
                 m2.AddToGroup(sourceMechanic);
+                if (targetParent is MechanicActionBarSlotGroup)
+                    Save();
             }
 
             else if (a1 && a2) // add new group
@@ -458,7 +422,7 @@ namespace DarkCodex
                 Helper.ShowInputBox("Create new group: ", onOK: a => AddGroup(a, "", null, a1.AssetGuid.ToString(), a2.AssetGuid.ToString()));
             }
 
-            else if (IsValidSpellGroup(sourceMechanic) && IsValidSpellGroup(targetMechanic)) // add new spell group
+            else if (DefGroup.IsValidSpellGroup(sourceMechanic) && DefGroup.IsValidSpellGroup(targetMechanic)) // add new spell group
             {
                 SetSlot(targetSlot, new MechanicActionBarSlotSpellGroup(targetMechanic.Unit, new List<MechanicActionBarSlot> { sourceMechanic, targetMechanic }));
             }
@@ -494,337 +458,14 @@ namespace DarkCodex
             if (command is UnitUseAbility useAbility)
             {
                 var unit = command.Executor;
-                if (unit != null && unit.IsPlayerFaction && unit.Brain.IsAutoUseAbility(useAbility.Ability))
+                if (unit != null && unit.IsPlayerFaction && unit.Brain.IsAutoUseAbility(useAbility.Ability) && unit.UISettings.m_Slots != null)
                 {
-                    foreach (var slot in unit.UISettings.m_Slots ?? Array.Empty<MechanicActionBarSlot>())
+                    foreach (var slot in unit.UISettings.m_Slots)
                     {
                         if (slot is MechanicActionBarSlotSpellGroup group && group.UpdateAutoUse())
                             break;
                     }
                 }
-            }
-        }
-
-        #endregion
-
-        #region Classes
-
-        public class MechanicActionBarSlotGroup : MechanicActionBarSlot, IMechanicGroup // logic for ability groups
-        {
-            [JsonProperty]
-            private int hash;
-            [JsonProperty]
-            public List<MechanicActionBarSlot> Slots;
-
-            [JsonConstructor]
-            public MechanicActionBarSlotGroup(EntityRef<UnitEntityData> m_UnitRef, int hash, List<MechanicActionBarSlot> slots)
-            {
-                this.m_UnitRef = m_UnitRef;
-                this.hash = hash;
-                this.Slots = slots;
-
-                if (this.hash != 0)
-                    return;
-
-                // find and set Index
-                var slot = this.Slots.FirstOrDefault();
-                var guid = GetGuid(slot);
-                if (guid != BlueprintGuid.Empty)
-                    this.hash = Groups.FindOrDefault(f => f.Guids.Contains(guid))?.GetHashCode() ?? 0;
-            }
-
-            public MechanicActionBarSlotGroup(UnitEntityData unit, int hash, List<MechanicActionBarSlot> slots)
-            {
-                this.Unit = unit;
-                this.hash = hash;
-                this.Slots = slots ?? new();
-            }
-
-            List<MechanicActionBarSlot> IMechanicGroup.Slots => Slots;
-            public void AddToGroup(MechanicActionBarSlot mechanic, MechanicActionBarSlot target = null, bool placeRight = true)
-            {
-                if (mechanic == null)
-                    return;
-
-                var guid = GetGuid(mechanic);
-                if (guid == BlueprintGuid.Empty)
-                    return;
-
-                Group.Guids.Remove(guid);
-
-                int placeAt = Slots.Count;
-                if (target != null)
-                {
-                    int index = Group.Guids.IndexOf(GetGuid(target));
-                    if (index >= 0)
-                        placeAt = index + (placeRight ? 1 : 0);
-                }
-
-                Group.Guids.Insert(placeAt, guid);
-                if (!Slots.Contains(mechanic))
-                    Slots.Add(mechanic);
-                Save();
-            }
-            public void RemoveFromGroup(MechanicActionBarSlot mechanic)
-            {
-                if (mechanic == null)
-                    return;
-                var guid = GetGuid(mechanic);
-                if (guid == BlueprintGuid.Empty)
-                    return;
-
-                Group.Guids.Remove(guid);
-                Slots.Remove(mechanic);
-                Save();
-            }
-            public void Sort()
-            {
-                throw new NotImplementedException();
-            }
-            public bool CanAddGroup(BlueprintGuid guid)
-            {
-                return Group.Guids?.Contains(guid) == false;
-            }
-
-            public override int GetHashCode()
-            {
-                return hash;
-            }
-
-            public DefGroup Group => Groups.FindOrDefault(w => w.GetHashCode() == this.hash) ?? new();
-
-            public override bool CanUseIfTurnBasedInternal() => true;
-            public override object GetContentData() => this;
-            public override Color GetDecorationColor() => Color.black;
-            public override Sprite GetDecorationSprite() => Resource.Cache.BorderFancy3;
-            public override string GetTitle()
-            {
-                return Group.Title;
-            }
-
-            public override string GetDescription()
-            {
-                return Group.Description;
-            }
-
-            public override Sprite GetIcon()
-            {
-                return Group.GetIcon()
-                    ?? Slots.FirstOrDefault(f => f.IsActive())?.GetIcon()
-                    ?? Slots.FirstOrDefault()?.GetIcon();
-            }
-
-            public override int GetResource()
-            {
-                if (Slots == null)
-                    return -1;
-
-                int count = 0;
-                foreach (var slot in Slots)
-                    if (slot.IsActive())
-                        count++;
-                if (count == 0)
-                    return -1;
-                return count;
-            }
-            public override bool IsCasting() => false;
-
-            public override string KeyName => GetTitle();
-
-            public override bool IsActive() => Slots.Any(a => a.IsActive()); // active border
-            public override bool IsDisabled(int resourceCount) => false;
-            public override bool IsPossibleActive(int? resource = null) => true;
-            public override void UpdateSlotInternal(ActionBarSlot slot)
-            {
-                if (slot.ActiveMark != null && IsActive())
-                {
-                    slot.ActiveMark.color = slot.RunningColor;
-                    slot.ActiveMark.gameObject.SetActive(true);
-                }
-            }
-            public override bool IsBad() => hash == 0 || Group.Title == null; // use this to remove invalid entries
-
-            public override TooltipBaseTemplate GetTooltipTemplate()
-            {
-                string title = "";
-                string description = "";
-                Sprite icon = null;
-
-                var group = Group;
-                if (group != null)
-                {
-                    title = group.Title ?? "MISSING TITLE";
-                    description = group.Description;
-                    icon = group.GetIcon();
-                }
-
-                return new TooltipTemplateDataProvider(new UIData(title, description, icon));
-            }
-        }
-
-        public class MechanicActionBarSlotSpellGroup : MechanicActionBarSlotAbility, IMechanicGroup // logic for spell groups
-        {
-            [JsonProperty]
-            public List<MechanicActionBarSlot> Slots;
-
-            [JsonConstructor]
-            public MechanicActionBarSlotSpellGroup(EntityRef<UnitEntityData> m_UnitRef, List<MechanicActionBarSlot> slots, AbilityData ability)
-            {
-                this.m_UnitRef = m_UnitRef;
-                this.Slots = slots;
-                this.Ability = ability;
-            }
-            public MechanicActionBarSlotSpellGroup(UnitEntityData unit, List<MechanicActionBarSlot> slots)
-            {
-                this.Unit = unit;
-                this.Slots = slots;
-                this.Ability = slots[0].GetContentData() as AbilityData;
-                UpdateResourceCount();
-            }
-
-            List<MechanicActionBarSlot> IMechanicGroup.Slots => Slots;
-            public void AddToGroup(MechanicActionBarSlot mechanic, MechanicActionBarSlot target = null, bool placeRight = true)
-            {
-                if (!IsValidSpellGroup(mechanic))
-                    return;
-
-                Slots.Remove(f => f == mechanic || f.GetContentData() == mechanic.GetContentData());
-
-                int placeAt = Slots.Count;
-                if (target != null)
-                {
-                    int index = Slots.IndexOf(target);
-                    if (index >= 0)
-                        placeAt = index + (placeRight ? 1 : 0);
-                }
-
-                Slots.Insert(placeAt, mechanic);
-                Refresh();
-            }
-            public void RemoveFromGroup(MechanicActionBarSlot mechanic)
-            {
-                Slots.Remove(mechanic);
-                Refresh();
-            }
-
-            public override Color GetDecorationColor() => Color.gray;
-            public override Sprite GetDecorationSprite() => Resource.Cache.BorderFancy3;
-            public override bool IsBad() => Ability == null || Slots.Count == 0;
-            public override void OnClick()
-            {
-                base.OnClick();
-            }
-            public override void OnRightClick()
-            {
-                base.OnRightClick();
-            }
-            public override int GetResource()
-            {
-                int count = 0;
-                bool flag = true;
-                foreach (var slot in Slots)
-                {
-                    slot.UpdateResourceCount();
-                    if (slot.ResourceCount != 0)
-                    {
-                        var abilityData = slot.GetContentData() as AbilityData;
-                        if (abilityData == null)
-                            continue;
-
-                        // update master and AutoUse, if necessary
-                        if (flag)
-                        {
-                            flag = false;
-                            if (!ReferenceEquals(this.Ability, abilityData))
-                            {
-                                if (Unit.Brain.IsAutoUseAbility(this.Ability) && abilityData.IsSuitableForAutoUse)
-                                    Unit.Brain.AutoUseAbility = abilityData;
-                                this.Ability = abilityData;
-                            }
-                        }
-
-                        // sum resources other than infinites
-                        if (slot.ResourceCount > 0)
-                        {
-                            var spell = new SpellSlotLevel(abilityData);
-                            if (!cacheSpellSlots.Contains(spell))
-                            {
-                                cacheSpellSlots.Add(spell);
-                                count += slot.ResourceCount;
-                            }
-                        }
-                    }
-                }
-                cacheSpellSlots.Clear();
-                return count;
-            }
-
-            /// <returns>true if AutoUse is managed by this group</returns>
-            public bool UpdateAutoUse()
-            {
-                if (!ReferenceEquals(this.Ability, Unit.Brain.m_AutoUseAbility)) 
-                    return false;
-
-                UpdateResourceCount();
-                return true;
-            }
-
-            private static List<SpellSlotLevel> cacheSpellSlots = new();
-        }
-
-        public class MechanicActionBarSlotPlaceholder : MechanicActionBarSlot // logic to display not available ability
-        {
-            [JsonProperty]
-            public BlueprintUnitFactReference Blueprint;
-
-            [JsonConstructor]
-            public MechanicActionBarSlotPlaceholder(EntityRef<UnitEntityData> m_UnitRef, BlueprintUnitFactReference blueprint)
-            {
-                this.m_UnitRef = m_UnitRef;
-                this.Blueprint = blueprint;
-            }
-
-            public MechanicActionBarSlotPlaceholder(UnitEntityData unit, BlueprintUnitFactReference blueprint)
-            {
-                this.Unit = unit;
-                this.Blueprint = blueprint ?? new();
-            }
-
-            public override bool CanUseIfTurnBasedInternal() => false;
-            public override object GetContentData() => null;
-            public override Color GetDecorationColor() => Color.white;
-            public override Sprite GetDecorationSprite() => null;
-            public override string GetTitle() => Blueprint.Get()?.Name;
-            public override string GetDescription() => Blueprint.Get()?.Description;
-            public override Sprite GetIcon() => Blueprint.Get()?.Icon;
-            public override int GetResource() => -1;
-            public override bool IsCasting() => false;
-            public override bool IsDisabled(int resourceCount) => true;
-            public override bool IsBad() => !Unlocked;
-        }
-
-        public class ActionBarConvertedVMAny : ActionBarConvertedVM // overwrites logic to use any MechanicActionBarSlot
-        {
-            public ActionBarConvertedVMAny(ActionBarSlotVM parent, List<MechanicActionBarSlot> list, Action onClose) : base(new(), onClose)
-            {
-                foreach (var item in list)
-                    this.Slots.Add(new ActionBarSlotVMChild(parent, item));
-            }
-        }
-
-        public class ActionBarSlotVMChild : ActionBarSlotVM // remembers parent ActionBarSlotVM
-        {
-            public ActionBarSlotVM Parent;
-
-            public ActionBarSlotVMChild(ActionBarSlotVM parent, MechanicActionBarSlot abs, int index = -1, int spellLevel = -1) : base(abs, index, spellLevel)
-            {
-                this.Parent = parent;
-            }
-
-            public override void DisposeImplementation()
-            {
-                Parent = null;
-                base.DisposeImplementation();
             }
         }
 

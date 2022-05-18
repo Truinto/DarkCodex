@@ -53,11 +53,30 @@ using UnityEngine;
 using UnityModManagerNet;
 using Shared;
 using CodexLib;
+using Kingmaker.EntitySystem.Persistence;
+using System.Text.RegularExpressions;
 
 namespace DarkCodex
 {
     public class DEBUG
     {
+        [HarmonyPatch]
+        public class Patch_UpdateSave130
+        {
+            private static Regex rx = new("\\\"DarkCodex\\.Patch_AbilityGroups\\+(.*?), DarkCodex\\\"");
+
+            [HarmonyPatch(typeof(ThreadedGameLoader), nameof(ThreadedGameLoader.LoadJson))]
+            [HarmonyPostfix]
+            public static void Postfix(ISaver saver, string path, ref string __result)
+            {
+                if (path == "party")
+                {
+                    __result = rx.Replace(__result, "\"CodexLib.${1}, CodexLib\"");
+                    Main.Print(__result);
+                }
+            }
+        }
+
         public static void ExportAllIconTextures()
         {
             foreach (var bp in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints.Values)

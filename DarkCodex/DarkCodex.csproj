@@ -74,11 +74,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\AbilityRegister.cs" />
-    <Compile Include="Classes\DefGroup.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
-    <Compile Include="Classes\SpellSlotLevel.cs" />
     <Compile Include="DEBUG.cs" />
-    <Compile Include="Interfaces\IMechanicGroup.cs" />
     <Compile Include="Patches\Event_AreaEffects.cs" />
     <Compile Include="General.cs" />
     <Compile Include="Hexcrafter.cs" />
@@ -102,7 +99,6 @@
     <Compile Include="Patches\Patch_LoadBlueprints.cs" />
     <Compile Include="Patches\Patch_Prebuilds.cs" />
     <Compile Include="Patches\Patch_AllowAchievements.cs" />
-    <Compile Include="Patches\Patch_AbilityGroups.cs" />
     <Compile Include="Patches\Patch_ActivatableAbilityGroup.cs" />
     <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
     <Compile Include="Patches\Patch_DebugReport.cs" />
@@ -144,6 +140,9 @@
       <Name>CodexLib</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="..\CodexShared\CodexShared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

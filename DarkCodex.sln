@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueprintLoader", "BlueprintLoader\BlueprintLoader.csproj", "{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueprintPurge", "BlueprintPurge\BlueprintPurge.csproj", "{46CAC75F-E1FB-4A2E-BDF0-2DA178ABBB25}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CodexShared", "CodexShared\CodexShared.shproj", "{D8B84699-BAA2-4037-A5EF-C41119C3988C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodexLib", "CodexLib\CodexLib.csproj", "{C518E346-DDBD-498A-BEF9-D50FF314AD38}"
@@ -36,10 +34,6 @@ Global
 		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DE5144B-3769-4BCD-9312-A26F8EB6CF78}.Release|Any CPU.Build.0 = Release|Any CPU
-		{46CAC75F-E1FB-4A2E-BDF0-2DA178ABBB25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46CAC75F-E1FB-4A2E-BDF0-2DA178ABBB25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{46CAC75F-E1FB-4A2E-BDF0-2DA178ABBB25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{46CAC75F-E1FB-4A2E-BDF0-2DA178ABBB25}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C518E346-DDBD-498A-BEF9-D50FF314AD38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C518E346-DDBD-498A-BEF9-D50FF314AD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C518E346-DDBD-498A-BEF9-D50FF314AD38}.Release|Any CPU.ActiveCfg = Release|Any CPU

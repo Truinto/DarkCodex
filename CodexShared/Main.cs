@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using UnityEngine;
 using UnityModManagerNet;
 
 #pragma warning disable 649
@@ -33,6 +34,7 @@ namespace Shared
         public static bool Enabled;
         public static string ModPath;
         internal static PatchInfoCollection patchInfos;
+        internal static readonly List<string> appliedPatches = new();
         private static UnityModManager.ModEntry.ModLogger logger;
         private static bool applyNullFinalizer;
 
@@ -54,10 +56,6 @@ namespace Shared
             /// <returns>Returns true, if no error occurred.</returns>
             ModPath = modEntry.Path;
             logger = modEntry.Logger;
-            modEntry.OnToggle = OnToggle;
-            modEntry.OnGUI = OnGUI;
-            modEntry.OnSaveGUI = OnSaveGUI;
-            modEntry.OnHideGUI = OnHideGUI;
             modEntry.OnUnload = Unload;
 
             try
@@ -348,7 +346,12 @@ namespace Shared
 
         private static bool CheckSetting(string name)
         {
-            return patchInfos?.IsDisenabled(name) ?? false;
+            bool skip = patchInfos?.IsDisenabled(name) ?? false;
+
+            if (!skip && !appliedPatches.Contains(name))
+                appliedPatches.Add(name);
+
+            return skip;
         }
 
         private static void ProcessInfo(MemberInfo info)
@@ -369,6 +372,23 @@ namespace Shared
         {
             PrintException(__exception);
             return null;
+        }
+
+        #endregion
+
+        #region GUI
+
+        private static void Checkbox(ref bool value, string label, Action<bool> action = null)
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
+            {
+                value = !value;
+                action?.Invoke(value);
+            }
+            GUILayout.Space(5);
+            GUILayout.Label(label, GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
         }
 
         #endregion

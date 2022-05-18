@@ -3,6 +3,10 @@
 
 ## [1.3.0]
 - changed project framework
+- removed ability/spell groups
+Update Instructions:
+On request, Ability/Spell Groups have been made into its own mod here: https://github.com/Truinto/SpellPouch/releases/tag/v1.0.0
+If you have used any Groups in DarkCodex, you need to install SpellPouch to keep using this feature.
 
 ## [1.2.8]
 - added limitless azata songs

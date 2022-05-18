@@ -19,50 +19,18 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_SaveExtension
     {
-        public const string SaveKey = "DarkCodex-Patches";
-
-        //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.SaveRoutine))]
-        //[HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> TranspilerSave(IEnumerable<CodeInstruction> instr)
-        {
-            var line = instr.ToList();
-            var original = AccessTools.Method(typeof(ISaver), nameof(ISaver.SaveJson));
-
-            for (int i = 0; i < line.Count; i++)
-            {
-                Main.PrintDebug($"i={i} {line[i]}");
-
-                if (line[i].Calls(original))
-                {
-                    //line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
-                    //line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnSave2)));
-                    //Helper.PrintDebug("Patched SaveRoutine at " + i);
-                    //return line;
-                }
-            }
-
-            Main.PrintError("Did not patch TranspilerSave");
-            return instr;
-        }
-
+        public const string SaveKey = "DarkCodex-Patches"; // do not use .json extension! CreateStateData will cause an exception
 
         [HarmonyPatch(typeof(SaveManager), nameof(SaveManager.SerializeAndSaveThread))]
         [HarmonyPrefix]
-        public static void OnSave2(SaveInfo saveInfo)
+        public static void OnSave(SaveInfo saveInfo)
         {
             try
             {
-                if (!Settings.State.saveMetadata || Main.patchInfos == null)
+                if (!Settings.State.saveMetadata || Main.appliedPatches == null || Main.appliedPatches.Count == 0)
                     return;
 
-                Main.patchInfos.Update();
-                if (!Main.restart)
-                    Main.patchInfoSaved = Main.patchInfos.GetCriticalPatches();
-
-                if (Main.patchInfoSaved == null)
-                    return;
-
-                string json = Helper.Serialize(Main.patchInfoSaved, indent: false, type: false);
+                string json = Helper.Serialize(Main.appliedPatches, indent: false, type: false);
                 if (json == null || json == "")
                     return;
 
@@ -75,28 +43,9 @@ namespace DarkCodex
             }
         }
 
-        //[HarmonyPatch(typeof(SaveManager), nameof(SaveManager.LoadRoutine))]
-        //[HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> TranspilerLoad(IEnumerable<CodeInstruction> instr)
-        {
-            var line = instr.ToList();
-            var original = AccessTools.Method(typeof(ISaver), nameof(ISaver.ReadJson));
-
-            for (int i = 0; i < line.Count; i++)
-            {
-                if (line[i].Calls(original))
-                {
-                    line.Insert(++i, new CodeInstruction(OpCodes.Ldarg_0));
-                    line.Insert(++i, CodeInstruction.Call(typeof(Patch_SaveExtension), nameof(Patch_SaveExtension.OnLoad2)));
-                    Main.PrintDebug("Patched LoadRoutine at " + i);
-                    return line;
-                }
-            }
-
-            Main.PrintError("Did not patch TranspilerSave");
-            return instr;
-        }
-        public static void OnLoad2(SaveInfo saveInfo)
+        [HarmonyPatch(typeof(ThreadedGameLoader), nameof(ThreadedGameLoader.DoLoad))]
+        [HarmonyPrefix]
+        public static void OnLoad(ThreadedGameLoader __instance)
         {
             // no use
         }
@@ -104,33 +53,22 @@ namespace DarkCodex
         [HarmonyPatch(typeof(SaveSlot), nameof(SaveSlot.OnButtonSaveLoad))]
         [HarmonyPriority(Priority.HigherThanNormal)]
         [HarmonyPrefix]
-        public static bool BeforeLoad2(SaveSlot __instance)
+        public static bool BeforeLoad(SaveSlot __instance)
         {
             try
             {
                 if (!Settings.State.saveMetadata)
-                {
-                    Main.patchInfoSaved = null;
                     return true;
-                }
 
                 if (Main.restart)
                 {
-                    Helper.ShowMessageBox("Settings were changed recently. Restart game to apply new patches.", yesLabel: "Ignore this time", noLabel: "I understand",
+                    Helper.ShowMessageBox("Patch settings were changed recently. Restart game to apply new patches.", yesLabel: "Ignore this time", noLabel: "I understand",
                         onYes: () =>
                         {
                             Main.restart = false;
                         });
                     return false;
                 }
-
-                Main.patchInfoSaved = null;
-
-                if (Main.patchInfos == null)
-                    return true;
-
-                //(__instance.SaveInfo?.Saver as ZipSaver)?.ZipFile?.UpdateEntry(SaveKey, "");
-                //var json2 = (__instance.SaveInfo?.Saver as ZipSaver)?.ZipFile?[SaveKey];
 
                 var bytes = __instance.SaveInfo?.Saver?.ReadBytes(SaveKey);
                 if (bytes == null)
@@ -140,18 +78,19 @@ namespace DarkCodex
                 if (json == null || json == "")
                     return true;
 
-                var saveData = Helper.Deserialize<IEnumerable<string>>(value: json);
+                var saveData = Helper.Deserialize<List<string>>(value: json);
                 if (saveData == null)
                     return true;
 
-                Main.patchInfoSaved = saveData;
-                var mustEnable = Main.patchInfos.IsEnabledAll(saveData);
-                if (mustEnable.Count() > 0)
+                foreach (string patch in Main.appliedPatches)
+                    saveData.Remove(patch);
+
+                if (saveData.Count > 0)
                 {
-                    Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + mustEnable.Join(), yesLabel: "Quit Game & Enable",
+                    Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable' to close the game and enable: " + saveData.Join(), yesLabel: "Quit Game & Enable",
                         onYes: () =>
                         {
-                            foreach (var info in mustEnable)
+                            foreach (var info in saveData)
                                 Main.patchInfos.SetEnable(true, info, force: true);
                             Main.OnSaveGUI(null);
                             //SystemUtil.ApplicationQuit();

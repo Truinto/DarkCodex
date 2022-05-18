@@ -658,6 +658,7 @@ namespace CodexLib
 
             if (!map.ContainsKey(key))
             {
+                Print("Warning: Merged new GUID for " + key);
                 map.Add(key, guid);
                 using StreamWriter sw = new(Path.Combine(Scope.ModPath, "blueprints_dynamic.txt"), append: true);
                 sw.WriteLine(key + '\t' + guid);
@@ -768,9 +769,11 @@ namespace CodexLib
 
             try
             {
-                Serialize(map, path: Path.Combine(Scope.ModPath, "enGB.json"));
+                string path = Path.Combine(Scope.ModPath, "enGB.json");
+                Serialize(map, path: path);
+                PrintDebug("Exported language file to " + path);
             }
-            catch (Exception e) { Print($"Failed export lanaguage file: {e.Message}"); }
+            catch (Exception e) { PrintException(e); }
         }
 
         /// <summary>Returns substring. Always excludes char 'c'. Returns null, if index is out of range or char not found.</summary>

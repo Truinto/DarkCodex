@@ -246,15 +246,15 @@ namespace Shared
             return list.Where(w => w.IsDangerous && !w.Disabled && !w.DisabledAll).Select(s => s.FullName);
         }
 
-        public IEnumerable<string> IsEnabledAll(IEnumerable<string> source)
+        public List<string> IsEnabledAll(List<string> source)
         {
-            var list = source.ToList();
-            for (int i = list.Count - 1; i >= 0; i--)
+            for (int i = source.Count - 1; i >= 0; i--)
             {
-                if (IsEnabled(list[i]))
-                    list.RemoveAt(i);
+                //bool critical = this.list.Find(f => f.FullName == source[i])?.IsDangerous ?? false;
+                if (IsEnabled(source[i]))
+                    source.RemoveAt(i);
             }
-            return list;
+            return source;
         }
 
         private static string TrySubstring(string str, char c, int start = 0, bool tail = false)
