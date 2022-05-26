@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Container to compare Spell Slots. Equal when itself, converted from itself, or same level of the same spontaneous spellbook.
+    /// </summary>
     public readonly struct SpellSlotLevel : IEquatable<SpellSlotLevel>
     {
         public readonly AbilityData AbilityData;

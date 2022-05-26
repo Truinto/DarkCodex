@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Interface for Ability/Spell Group
+    /// </summary>
     public interface IMechanicGroup
     {
         public List<MechanicActionBarSlot> Slots { get; }

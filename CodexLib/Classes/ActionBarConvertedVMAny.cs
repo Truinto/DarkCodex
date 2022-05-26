@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class ActionBarConvertedVMAny : ActionBarConvertedVM // overwrites logic to use any MechanicActionBarSlot
+    /// <summary>
+    /// overwrites logic to use any MechanicActionBarSlot
+    /// </summary>
+    public class ActionBarConvertedVMAny : ActionBarConvertedVM
     {
         public ActionBarConvertedVMAny(ActionBarSlotVM parent, List<MechanicActionBarSlot> list, Action onClose) : base(new(), onClose)
         {

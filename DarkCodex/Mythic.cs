@@ -422,6 +422,7 @@ namespace DarkCodex
         {
             var witch_selection = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
             var shaman_selection = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
+            var trickster_selection = Helper.Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452"); //SylvanTricksterTalentSelection
             var grant_hex = BlueprintGuid.Parse("d24c2467804ce0e4497d9978bafec1f9"); //WitchGrandHex
 
             var abilities = new List<BlueprintAbilityReference>();
@@ -444,7 +445,8 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreateAutoMetamagic(Metamagic.Quicken, abilities),
                 Helper.CreatePrerequisiteFeature(witch_selection.ToRef(), true),
-                Helper.CreatePrerequisiteFeature(shaman_selection.ToRef(), true)
+                Helper.CreatePrerequisiteFeature(shaman_selection.ToRef(), true),
+                Helper.CreatePrerequisiteFeature(trickster_selection.ToRef(), true)
                 );
 
             Helper.AddMythicTalent(feat);
@@ -628,6 +630,51 @@ namespace DarkCodex
             });
         }
 
+        [PatchInfo(Severity.Extend, "Boundless Injury", "Boundless Healing also applies to inflict wound spells and grants those to spellbooks", true)]
+        public static void PatchBoundlessInjury()
+        {
+            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
+
+            var addKnownSpells = new AddKnownSpellsAnyClass()
+            {
+                Spells = new BlueprintAbilityReference[] {
+                    Helper.ToRef<BlueprintAbilityReference>("e5af3674bb241f14b9a9f6b0c7dc3d27"), //1: InflictLightWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("65f0b63c45ea82a4f8b8325768a3832d"), //2: InflictModerateWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("651110ed4f117a948b41c05c5c7624c0"), //3: InflictCriticalWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("bd5da98859cf2b3418f6d68ea66cabbe"), //4: InflictSeriousWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("9da37873d79ef0a468f969e4e5116ad2"), //5: InflictLightWoundsMass
+                    Helper.ToRef<BlueprintAbilityReference>("03944622fbe04824684ec29ff2cec6a7"), //6: InflictModerateWoundsMass
+                    Helper.ToRef<BlueprintAbilityReference>("820170444d4d2a14abc480fcbdb49535"), //7: InflictSeriousWoundsMass
+                    Helper.ToRef<BlueprintAbilityReference>("5ee395a2423808c4baf342a4f8395b19"), //8: InflictCriticalWoundsMass
+                    Helper.ToRef<BlueprintAbilityReference>("cc09224ecc9af79449816c45bc5be218"), //6: HarmCast
+                    //Helper.ToRef<BlueprintAbilityReference>("867524328b54f25488d371214eea0d90"), //9: HealMass
+                    //Helper.ToRef<BlueprintAbilityReference>("d5847cad0b0e54c4d82d6c59a3cda6b0"), //5: BreathOfLifeCast
+                    //Helper.ToRef<BlueprintAbilityReference>("e84fc922ccf952943b5240293669b171"), //2: RestorationLesser
+                    //Helper.ToRef<BlueprintAbilityReference>("f2115ac1148256b4ba20788f7e966830"), //3: Restoration
+                    //Helper.ToRef<BlueprintAbilityReference>("fafd77c6bfa85c04ba31fdc1c962c914"), //4: RestorationGreater
+                },
+                Levels = new int[] {
+                    1, //1: CureLightWoundsCast
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    6, //6: HarmCast
+                    //9, //9: HealMass
+                    //5, //5: BreathOfLifeCast
+                    //2, //2: RestorationLesser
+                    //3,
+                    //4,
+                }
+            };
+            feat.AddComponents(addKnownSpells);
+            feat.GetComponent<AutoMetamagic>().Abilities.AddRange(addKnownSpells.Spells);
+            Helper.AppendAndReplace(ref feat.GetComponent<AddUnlimitedSpell>().m_Abilities, addKnownSpells.Spells);
+        }
+
         [PatchInfo(Severity.Create, "Resourceful Caster", "mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws", true, Requirement: typeof(Patch_ResourcefulCaster))]
         public static void CreateResourcefulCaster()
         {
@@ -668,6 +715,25 @@ namespace DarkCodex
             var fact = Helper.ToRef<BlueprintUnitFactReference>("4a6dc772c9a7fe742a65820007107f03"); //EverlastingJudgement
 
             ability.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(fact);
+        }
+
+        [PatchInfo(Severity.Extend, "Ascendant Summons", "buffed Ascendant Summons by +4 stats and DR 10", true)]
+        public static void PatchAscendantSummons()
+        {
+            var feat = Helper.Get<BlueprintFeature>("fcdd46e2ead3d904cb9311c56112ce5f");
+            var buff = Helper.Get<BlueprintBuff>("3db4a1f9ffa46e7469f817bced1a0df2");
+
+            string text = "The creatures you summon gain a piece of your mythic power.\nBenefit: Creatures summoned by you gain a {g|Encyclopedia:Bonus}bonus{/g} to all its ability scores equal to half your mythic rank plus 5. Their {g|Encyclopedia:Attack}attacks{/g} now ignore {g|Encyclopedia:Damage_Reduction}damage reduction{/g} except N/-. Their {g|Encyclopedia:Damage_Reduction}damage reduction{/g} becomes N/- and it increases to at least 10/-.";
+            feat.m_DisplayName = text.CreateString();
+
+            var rank = buff.GetComponent<ContextRankConfig>();
+            rank.m_Progression = ContextRankProgression.Div2PlusStep;
+            rank.m_StepLevel = 5;
+
+            buff.AddComponents(
+                Helper.CreateAddContextStatBonus(StatType.Intelligence),
+                new AddDamageResistancePhysicalImproved() { Value = 10 }
+                );
         }
 
         [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport", true)]

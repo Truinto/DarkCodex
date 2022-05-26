@@ -16,7 +16,10 @@ using UnityEngine;
 
 namespace CodexLib
 {
-    public class MechanicActionBarSlotGroup : MechanicActionBarSlot, IMechanicGroup // logic for ability groups
+    /// <summary>
+    /// Logic for Ability Group
+    /// </summary>
+    public class MechanicActionBarSlotGroup : MechanicActionBarSlot, IMechanicGroup
     {
         [JsonProperty]
         private int hash;

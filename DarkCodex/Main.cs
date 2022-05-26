@@ -377,13 +377,13 @@ namespace Shared
         static partial void OnBlueprintsLoaded()
         {
             using var scope = new Scope(Main.ModPath, Main.logger);
+            MasterPatch.Run();
             Print("Loading Dark Codex");
             patchInfos = new(Settings.State);
 
             // Debug
-            LoadSafe(DEBUG.Enchantments.NameAll);
-            PatchSafe(typeof(DEBUG.Enchantments));
 #if DEBUG
+            Helper.Allow_Guid_Generation = true;
             PatchSafe(typeof(DEBUG.WatchCalculateParams));
             PatchSafe(typeof(DEBUG.Settlement1));
             PatchSafe(typeof(DEBUG.Settlement2));
@@ -393,6 +393,8 @@ namespace Shared
             //PatchSafe(typeof(Patch_SaveExtension));
             //PatchSafe(typeof(Patch_FactSelectionParameterized));
 #endif
+            LoadSafe(DEBUG.Enchantments.NameAll);
+            PatchSafe(typeof(DEBUG.Enchantments));
             PatchSafe(typeof(Patch_FixLoadCrash1));
             LoadSafe(General.CreateBardStopSong);
             PatchSafe(typeof(DEBUG.Patch_UpdateSave130)); // TODO: remove update
@@ -441,6 +443,9 @@ namespace Shared
             LoadSafe(General.PatchHideBuffs);
             LoadSafe(General.PatchVarious);
 
+            // Spells
+            LoadSafe(Spells.CreateBladedDash);
+
             // Items
             LoadSafe(Items.PatchArrows);
             LoadSafe(Items.PatchTerendelevScale);
@@ -468,9 +473,11 @@ namespace Shared
             LoadSafe(Mythic.PatchLimitlessDemonRage);
             LoadSafe(Mythic.PatchUnstoppable);
             LoadSafe(Mythic.PatchBoundlessHealing);
+            LoadSafe(Mythic.PatchBoundlessInjury);
             LoadSafe(Mythic.PatchRangingShots);
             LoadSafe(Mythic.PatchWanderingHex);
             LoadSafe(Mythic.PatchJudgementAura);
+            LoadSafe(Mythic.PatchAscendantSummons);
             LoadSafe(Mythic.PatchVarious);
 
             // Kineticist

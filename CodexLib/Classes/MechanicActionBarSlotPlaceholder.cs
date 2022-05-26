@@ -12,7 +12,10 @@ using UnityEngine;
 
 namespace CodexLib
 {
-    public class MechanicActionBarSlotPlaceholder : MechanicActionBarSlot // logic to display not available ability
+    /// <summary>
+    /// Logic to display not available ability
+    /// </summary>
+    public class MechanicActionBarSlotPlaceholder : MechanicActionBarSlot
     {
         [JsonProperty]
         public BlueprintUnitFactReference Blueprint;

@@ -13,8 +13,10 @@ using Kingmaker.Utility;
 
 namespace CodexLib
 {
-
-    public class MechanicActionBarSlotSpellGroup : MechanicActionBarSlotAbility, IMechanicGroup // logic for spell groups
+    /// <summary>
+    /// Logic for Spell Group
+    /// </summary>
+    public class MechanicActionBarSlotSpellGroup : MechanicActionBarSlotAbility, IMechanicGroup
     {
         [JsonProperty]
         public List<MechanicActionBarSlot> Slots;

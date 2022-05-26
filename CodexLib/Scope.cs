@@ -7,6 +7,10 @@ using UnityModManagerNet;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Override logger and path for blueprint resolution. Helper calls that generate guids must be called in your scope, otherwise guids will be dumped outside your project.
+    /// using var scope = new Scope(Main.ModPath, Main.logger);
+    /// </summary>
     public class Scope : IDisposable
     {
         public string modPath;

@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class ActionBarSlotVMChild : ActionBarSlotVM // remembers parent ActionBarSlotVM
+    /// <summary>
+    /// remembers parent ActionBarSlotVM
+    /// </summary>
+    public class ActionBarSlotVMChild : ActionBarSlotVM
     {
         public ActionBarSlotVM Parent;
 

@@ -1,6 +1,15 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.1]
+- added Boundless Injury: Boundless Healing also applies to inflict wound spells and grants those to spellbooks
+- added spell Bladed Dash and Greater Bladed Dash !! target not working
+- fixed hexes not being available to sylvan trickster
+- fixed rogue talents not being available to sylvan trickster
+- fixed Cursing Gaze not being available to sylvan trickster
+- added Ascendant Summons: buffed Ascendant Summons by +4 stats and DR 10
+- fixed metal and blue flame blasts selectable before having their prerequisites
+
 ## [1.3.0]
 - changed project framework
 - removed ability/spell groups

@@ -208,7 +208,7 @@ namespace DarkCodex
                     //Helper.CreateContextActionMeleeAttack(true)
                     ),
                 //demoncharge.GetComponent<AbilityCustomTeleportation>(),
-                flashstep.GetComponent<AbilityCustomFlashStep>(),
+                flashstep.GetComponent<AbilityCustomFlashStep>(),   // bug: m_FlashShot would trigger two attacks (impossible rare)
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
@@ -393,8 +393,8 @@ namespace DarkCodex
             };
 
             // make sure metal and blueflame cannot be taken early
-            t.Composite_Metal.Progession.AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession.ToRef()));
-            t.Composite_BlueFlame.Progession.AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession.ToRef()));
+            t.Composite_Metal.BlastFeature.AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession.ToRef()));
+            t.Composite_BlueFlame.BlastFeature.AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession.ToRef()));
 
             // add to feats
             Helper.AddFeats(t.ExpandedElement.ToRef());

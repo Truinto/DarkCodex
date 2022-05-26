@@ -13,6 +13,9 @@ using UnityEngine;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Container for Ability Group
+    /// </summary>
     public class DefGroup : IEquatable<DefGroup>, IEquatable<string>
     {
         [JsonProperty]

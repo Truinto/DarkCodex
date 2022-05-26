@@ -11,6 +11,7 @@ using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.Loot;
 using Kingmaker.Blueprints.Root.Strings.GameLog;
+using Kingmaker.Craft;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.Designers.Mechanics.EquipmentEnchants;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -35,6 +36,7 @@ using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
+using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.ActivatableAbilities;
@@ -978,6 +980,16 @@ namespace CodexLib
 
         #region Context Values
 
+        public static ContextStatValue CreateContextStatValue(StatType stat, ModifierDescriptor specificModifier = ModifierDescriptor.None, bool raw = false)
+        {
+            return new ContextStatValue
+            {
+                Stat = stat,
+                SpecificModifier = specificModifier,
+                GetRawValue = raw
+            };
+        }
+
         public static ContextValue CreateContextValue(int value)
         {
             return (ContextValue)value;
@@ -1167,15 +1179,17 @@ namespace CodexLib
         public static void AddRogueFeat(BlueprintFeature feat)
         {
             if (_roguefeats == null)
-                _roguefeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
+                _roguefeats = Get<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
             if (_slayerfeats1 == null)
-                _slayerfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("04430ad24988baa4daa0bcd4f1c7d118");
+                _slayerfeats1 = Get<BlueprintFeatureSelection>("04430ad24988baa4daa0bcd4f1c7d118");
             if (_slayerfeats2 == null)
-                _slayerfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("43d1b15873e926848be2abf0ea3ad9a8");
+                _slayerfeats2 = Get<BlueprintFeatureSelection>("43d1b15873e926848be2abf0ea3ad9a8");
             if (_slayerfeats3 == null)
-                _slayerfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("913b9cf25c9536949b43a2651b7ffb66");
+                _slayerfeats3 = Get<BlueprintFeatureSelection>("913b9cf25c9536949b43a2651b7ffb66");
             if (_vivsectionistfeats == null)
-                _vivsectionistfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
+                _vivsectionistfeats = Get<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
+            if (_tricksterhexes == null)
+                _tricksterhexes = Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452");
 
             var reference = feat.ToRef();
 
@@ -1184,11 +1198,13 @@ namespace CodexLib
             AppendAndReplace(ref _slayerfeats2.m_AllFeatures, reference);
             AppendAndReplace(ref _slayerfeats3.m_AllFeatures, reference);
             AppendAndReplace(ref _vivsectionistfeats.m_AllFeatures, reference);
+            AppendAndReplace(ref _tricksterhexes.m_AllFeatures, reference);
         }
 
         private static BlueprintFeatureSelection _witchhexes;
         private static BlueprintFeatureSelection _shamanhexes;
         private static BlueprintFeatureSelection _hexcrafterhexes;
+        private static BlueprintFeatureSelection _tricksterhexes;
         public static void AddHex(BlueprintFeature hex, bool allowShaman = true)
         {
             if (_witchhexes == null)
@@ -1197,6 +1213,8 @@ namespace CodexLib
                 _shamanhexes = Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7");
             if (_hexcrafterhexes == null)
                 _hexcrafterhexes = Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf");
+            if (_tricksterhexes == null)
+                _tricksterhexes = Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452");
 
             var reference = hex.ToRef();
 
@@ -1204,6 +1222,7 @@ namespace CodexLib
             if (allowShaman)
                 AppendAndReplace(ref _shamanhexes.m_AllFeatures, reference);
             AppendAndReplace(ref _hexcrafterhexes.m_AllFeatures, reference);
+            AppendAndReplace(ref _tricksterhexes.m_AllFeatures, reference);
         }
 
         public static BlueprintAbility AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
@@ -1335,34 +1354,34 @@ namespace CodexLib
             ability.Animation = animation;
             return ability;
         }
-        public static BlueprintAbility TargetEnemy(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional)
+        public static BlueprintAbility TargetEnemy(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool point = false)
         {
             ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
             ability.EffectOnAlly = AbilityEffectOnUnit.None;
             ability.CanTargetEnemies = true;
-            ability.CanTargetPoint = false;
+            ability.CanTargetPoint = point;
             ability.CanTargetFriends = false;
             ability.CanTargetSelf = false;
             ability.Animation = animation;
             return ability;
         }
-        public static BlueprintAbility TargetAlly(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true)
+        public static BlueprintAbility TargetAlly(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true, bool point = false)
         {
             ability.EffectOnEnemy = AbilityEffectOnUnit.None;
             ability.EffectOnAlly = AbilityEffectOnUnit.Helpful;
             ability.CanTargetEnemies = false;
-            ability.CanTargetPoint = false;
+            ability.CanTargetPoint = point;
             ability.CanTargetFriends = true;
             ability.CanTargetSelf = self;
             ability.Animation = animation;
             return ability;
         }
-        public static BlueprintAbility TargetAny(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true)
+        public static BlueprintAbility TargetAny(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true, bool point = false, bool harmful = true)
         {
-            ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
-            ability.EffectOnAlly = AbilityEffectOnUnit.Harmful;
+            ability.EffectOnEnemy = harmful ? AbilityEffectOnUnit.Harmful : AbilityEffectOnUnit.Helpful;
+            ability.EffectOnAlly = harmful ? AbilityEffectOnUnit.Harmful : AbilityEffectOnUnit.Helpful;
             ability.CanTargetEnemies = true;
-            ability.CanTargetPoint = false;
+            ability.CanTargetPoint = point;
             ability.CanTargetFriends = true;
             ability.CanTargetSelf = self;
             ability.Animation = animation;
@@ -1515,6 +1534,49 @@ namespace CodexLib
 
         #endregion
 
+        #region Spells
+
+        public static void Add(this BlueprintSpellList spellList, BlueprintAbility spell, int level)
+        {
+            if (level < 0 || level > 10)
+                throw new ArgumentOutOfRangeException();
+
+            if (spellList.SpellsByLevel.Length <= level)
+            {
+                var spells = new SpellLevelList[11];
+                for (int i = 0; i < spells.Length; i++)
+                    spells[i] = spellList.SpellsByLevel.ElementAtOrDefault(i) ?? new SpellLevelList(i);
+                spellList.SpellsByLevel = spells;
+            }
+
+            spellList.SpellsByLevel[level].m_Spells.Add(spell.ToRef());
+
+            spell.AddComponents(
+                CreateSpellListComponent(spellList.ToReference<BlueprintSpellListReference>(), level)
+                );
+
+            var specializationFirst = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35");  //SpellSpecializationFirst
+            AppendAndReplace(ref specializationFirst.BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
+
+            var spellSelection = Helper.Get<BlueprintFeatureSelection>("fe67bc3b04f1cd542b4df6e28b6e0ff5"); // SpellSpecializationSelection
+            foreach (var feature in spellSelection.m_AllFeatures)
+            {
+                if (feature.Get() is not BlueprintParametrizedFeature specialization)
+                    continue;
+                AppendAndReplace(ref specialization.BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
+            }
+        }
+
+        public static void Add(this BlueprintAbility spell, int level, params AnyRef[] blueprintSpellList)
+        {
+            foreach (var spellList in blueprintSpellList.Get<BlueprintSpellList>())
+            {
+                spellList.Add(spell, level);
+            }
+        }
+
+        #endregion
+
         #region Create
 
         public static void AddAsset(this SimpleBlueprint bp, string guid) => AddAsset(bp, BlueprintGuid.Parse(guid));
@@ -1525,6 +1587,48 @@ namespace CodexLib
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static ContextConditionIsAlly CreateContextConditionIsAlly()
+        {
+            return new ContextConditionIsAlly() { Not = false };
+        }
+
+        public static ContextConditionIsAlly CreateContextConditionIsEnemy()
+        {
+            return new ContextConditionIsAlly() { Not = true };
+        }
+
+        public static AddContextStatBonus CreateAddContextStatBonus(StatType statType, ModifierDescriptor descriptor = ModifierDescriptor.None, ContextValue value = null, int multiplier = 1)
+        {
+            var result = new AddContextStatBonus();
+            result.Stat = statType;
+            result.Descriptor = descriptor;
+            result.Value = value ?? CreateContextValue();
+            result.Multiplier = multiplier;
+            return result;
+        }
+
+        public static AbilitySpawnFx CreateAbilitySpawnFx(string asset, AbilitySpawnFxTime time = AbilitySpawnFxTime.OnApplyEffect, AbilitySpawnFxAnchor anchor = AbilitySpawnFxAnchor.SelectedTarget)
+        {
+            var result = new AbilitySpawnFx();
+            result.PrefabLink = GetPrefabLink(asset);
+            result.Time = time;
+            result.Anchor = anchor;
+            result.WeaponTarget = AbilitySpawnFxWeaponTarget.None;
+            result.DestroyOnCast = false;
+            result.Delay = 0f;
+            result.PositionAnchor = anchor;
+            result.OrientationAnchor = AbilitySpawnFxAnchor.None;
+            result.OrientationMode = AbilitySpawnFxOrientation.Copy;
+            return result;
+        }
+
+        public static AbilityRequirementHasItemInHands CreateAbilityRequirementHasItemInHands(bool checkMelee = true)
+        {
+            var result = new AbilityRequirementHasItemInHands();
+            result.m_Type = checkMelee ? AbilityRequirementHasItemInHands.RequirementType.HasMeleeWeapon : AbilityRequirementHasItemInHands.RequirementType.HasShield;
+            return result;
         }
 
         public static AbilityEffectStickyTouch CreateAbilityEffectStickyTouch(BlueprintAbilityReference ability)
@@ -1814,6 +1918,30 @@ namespace CodexLib
             return c;
         }
 
+        public static SpellComponent CreateSpellComponent(SpellSchool school)
+        {
+            var result = new SpellComponent();
+            result.School = school;
+            return result;
+        }
+
+        public static CraftInfoComponent CreateCraftInfoComponent()
+        {
+            var result = new CraftInfoComponent();
+            result.SpellType = CraftSpellType.Other;
+            result.SavingThrow = CraftSavingThrow.None;
+            result.AOEType = CraftAOE.None;
+            return result;
+        }
+
+        public static SpellListComponent CreateSpellListComponent(BlueprintSpellListReference spellList, int spellLevel)
+        {
+            var result = new SpellListComponent();
+            result.m_SpellList = spellList;
+            result.SpellLevel = spellLevel;
+            return result;
+        }
+
         public static AbilityCasterHasFacts CreateAbilityCasterHasFacts(bool NeedsAll = false, params BlueprintUnitFactReference[] Facts)
         {
             var result = new AbilityCasterHasFacts();
@@ -1831,7 +1959,7 @@ namespace CodexLib
             result.m_LineWidth = width;
             result.m_Weapon = weapon;
             result.Type = AbilityProjectileType.Line;
-            result.NeedAttackRoll = true;
+            result.NeedAttackRoll = weapon != null;
             return result;
         }
 
@@ -1860,6 +1988,20 @@ namespace CodexLib
                 result.Actions = CreateActionList(actions);
             else
                 result.Actions = CreateActionList(CreateContextActionConditionalSaved(failed: actions));
+            return result;
+        }
+
+        public static AbilityEffectRunAction CreateAbilityEffectRunAction(SavingThrowType save = SavingThrowType.Unknown, Condition[] condition = null, GameAction[] ifTrue = null, GameAction[] ifFalse = null)
+        {
+            var result = new AbilityEffectRunAction();
+            result.SavingThrowType = save;
+            if (condition != null)
+                result.Actions = CreateActionList(CreateConditional(condition, ifTrue, ifFalse));
+            else if (save != SavingThrowType.Unknown)
+                result.Actions = CreateActionList(CreateContextActionConditionalSaved(succeed: ifTrue, failed: ifFalse));
+            else
+                throw new ArgumentNullException();
+
             return result;
         }
 
@@ -2507,14 +2649,29 @@ namespace CodexLib
         {
             reference.Cached = bp;
             reference.deserializedGuid = bp.AssetGuid;
-            reference.guid = bp.AssetGuid.ToString();
         }
 
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
         {
-            T tref = Activator.CreateInstance<T>();
+            T tref = new T();
             tref.ReadGuidFromJson(guid);
             return tref;
+        }
+
+        public static T[] To<T>(this AnyRef[] bpRef) where T : BlueprintReferenceBase, new()
+        {
+            T[] array = new T[bpRef.Length];
+
+            for (int i = 0; i < bpRef.Length; i++)
+                array[i] = bpRef[i].To<T>();
+
+            return array;
+        }
+
+        public static IEnumerable<T> Get<T>(this AnyRef[] bpRef) where T : SimpleBlueprint
+        {
+            foreach (var reference in bpRef)
+                yield return reference.Get<T>();
         }
 
 
@@ -2879,6 +3036,24 @@ namespace CodexLib
             catch (Exception e)
             {
                 PrintException(e);
+                return null;
+            }
+        }
+
+        public static SpriteLink GetSprite(string guid)
+        {
+            return new SpriteLink { AssetId = guid };
+        }
+
+        public static Sprite LoadSprite(string guid)
+        {
+            try
+            {
+                return new SpriteLink { AssetId = guid }.Load();
+            }
+            catch (Exception e)
+            {
+                Helper.PrintDebug($"Could not load '{guid}' {e.Message}");
                 return null;
             }
         }
