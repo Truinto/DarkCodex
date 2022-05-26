@@ -54,8 +54,13 @@ namespace CodexLib
             
             if (ApplyBladedBonus)
             {
-                int bonus = Math.Max(caster.Descriptor.Stats.Intelligence.ModifiedValue, caster.Descriptor.Stats.Charisma.ModifiedValue);
-                attackRoll.AddModifier(bonus, ModifierDescriptor.UntypedStackable);
+                int intelligence = caster.Descriptor.Stats.Intelligence.Bonus;
+                int charisma = caster.Descriptor.Stats.Charisma.Bonus;
+
+                if (intelligence > charisma)
+                    attackRoll.AddModifier(intelligence, Const.Intelligence);
+                else
+                    attackRoll.AddModifier(charisma, Const.Charisma);
             }
 
             if (!ShareD20 || this.AbilityContext.AttackRoll == null)

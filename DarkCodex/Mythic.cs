@@ -598,8 +598,8 @@ namespace DarkCodex
                 Spells = new BlueprintAbilityReference[] {
                     Helper.ToRef<BlueprintAbilityReference>("5590652e1c2225c4ca30c4a699ab3649"), //1: CureLightWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("6b90c773a6543dc49b2505858ce33db5"), //2: CureModerateWoundsCast
-                    Helper.ToRef<BlueprintAbilityReference>("41c9016596fe1de4faf67425ed691203"), //3: CureCriticalWoundsCast
-                    Helper.ToRef<BlueprintAbilityReference>("3361c5df793b4c8448756146a88026ad"), //4: CureSeriousWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("3361c5df793b4c8448756146a88026ad"), //3: CureSeriousWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("41c9016596fe1de4faf67425ed691203"), //4: CureCriticalWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("5d3d689392e4ff740a761ef346815074"), //5: CureLightWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("571221cc141bc21449ae96b3944652aa"), //6: CureModerateWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("0cea35de4d553cc439ae80b3a8724397"), //7: CureSeriousWoundsMass
@@ -640,8 +640,8 @@ namespace DarkCodex
                 Spells = new BlueprintAbilityReference[] {
                     Helper.ToRef<BlueprintAbilityReference>("e5af3674bb241f14b9a9f6b0c7dc3d27"), //1: InflictLightWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("65f0b63c45ea82a4f8b8325768a3832d"), //2: InflictModerateWoundsCast
-                    Helper.ToRef<BlueprintAbilityReference>("651110ed4f117a948b41c05c5c7624c0"), //3: InflictCriticalWoundsCast
-                    Helper.ToRef<BlueprintAbilityReference>("bd5da98859cf2b3418f6d68ea66cabbe"), //4: InflictSeriousWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("bd5da98859cf2b3418f6d68ea66cabbe"), //3: InflictSeriousWoundsCast
+                    Helper.ToRef<BlueprintAbilityReference>("651110ed4f117a948b41c05c5c7624c0"), //4: InflictCriticalWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("9da37873d79ef0a468f969e4e5116ad2"), //5: InflictLightWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("03944622fbe04824684ec29ff2cec6a7"), //6: InflictModerateWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("820170444d4d2a14abc480fcbdb49535"), //7: InflictSeriousWoundsMass
@@ -724,7 +724,7 @@ namespace DarkCodex
             var buff = Helper.Get<BlueprintBuff>("3db4a1f9ffa46e7469f817bced1a0df2");
 
             string text = "The creatures you summon gain a piece of your mythic power.\nBenefit: Creatures summoned by you gain a {g|Encyclopedia:Bonus}bonus{/g} to all its ability scores equal to half your mythic rank plus 5. Their {g|Encyclopedia:Attack}attacks{/g} now ignore {g|Encyclopedia:Damage_Reduction}damage reduction{/g} except N/-. Their {g|Encyclopedia:Damage_Reduction}damage reduction{/g} becomes N/- and it increases to at least 10/-.";
-            feat.m_DisplayName = text.CreateString();
+            feat.m_Description = text.CreateString();
 
             var rank = buff.GetComponent<ContextRankConfig>();
             rank.m_Progression = ContextRankProgression.Div2PlusStep;

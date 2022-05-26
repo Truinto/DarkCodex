@@ -2,6 +2,7 @@
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.PubSubSystem;
+using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Mechanics.Components;
@@ -11,51 +12,18 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static Kingmaker.RuleSystem.RulebookEvent;
 
 namespace CodexLib
 {
-    //[HarmonyPatch]
-    public class XXPatch
+    [HarmonyPatch]
+    public class Patch_RulebookEventBusPriority
     {
-        public IEnumerable<MethodBase> TargetMethods()
+        [HarmonyPatch(typeof(RulebookSubscribersList<RulebookEvent>), "Kingmaker.PubSubSystem.IRulebookSubscribersList.AddSubscriber")]
+        [HarmonyPrefix]
+        public static void Prefix(object subscriber)
         {
-            yield return AccessTools.Method(typeof(BlueprintExtenstions),
-                nameof(BlueprintExtenstions.GetComponent),
-                new Type[] { typeof(BlueprintScriptableObject) },
-                new Type[] { typeof(SpellDescriptorComponent) }
-                );
-
-            yield return AccessTools.Method(typeof(BlueprintExtenstions),
-                nameof(BlueprintExtenstions.GetComponents),
-                new Type[] { typeof(BlueprintScriptableObject) },
-                new Type[] { typeof(SpellDescriptorComponent) }
-                );
-        }
-
-        public static bool Prefix(BlueprintScriptableObject blueprint, ref object __result, MethodBase __originalMethod)
-        {
-            var list = new List<SpellDescriptorComponent>();
-            var change = default(ChangeSpellElementalDamage);
-            var overwrite = default(SpellDescriptorComponent);
-            if (blueprint != null)
-            {
-                for (int i = 0; i < blueprint.ComponentsArray.Length; i++)
-                    if (blueprint.ComponentsArray[i] is SpellDescriptorComponent comp)
-                        list.Add(comp);
-            }
-
-            if (__originalMethod.Name == "GetComponents")
-            {
-                __result = (IEnumerable<SpellDescriptorComponent>)list;
-            }
-            else if (list.Count > 0)
-            {
-                __result = (SpellDescriptorComponent)list[0];
-                if (list.Count > 1)
-                    Helper.PrintDebug($"{blueprint.name}:{blueprint.AssetGuid} has too many SpellDescriptorComponent");
-            }
-
-            return false;
+            Helper.PrintDebug($"SubscribersList adding {subscriber.GetType()}");
         }
     }
 
@@ -66,6 +34,9 @@ namespace CodexLib
 
         public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
         {
+            var caster = evt.Initiator;
+            evt.SetCustomData(new CustomDataKey("ChangeElement"), SpellDescriptor.Fire);
+            evt.m_CustomData.FirstOrDefault(f => f.Key.m_Name == "ChangeElement");
         }
 
         public void OnEventDidTrigger(RuleCalculateAbilityParams evt)

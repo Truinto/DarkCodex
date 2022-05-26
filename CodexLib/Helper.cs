@@ -10,6 +10,7 @@ using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.Loot;
+using Kingmaker.Blueprints.Root.Strings;
 using Kingmaker.Blueprints.Root.Strings.GameLog;
 using Kingmaker.Craft;
 using Kingmaker.Designers.EventConditionActionSystem.Actions;
@@ -2321,7 +2322,8 @@ namespace CodexLib
             result.Range = range;
             result.LocalizedDuration = duration ?? _empty;
             result.LocalizedSavingThrow = savingThrow ?? _empty;
-
+            result.AvailableMetamagic = Metamagic.Empower | Metamagic.Maximize | Metamagic.Quicken | Metamagic.Extend | Metamagic.Heighten | Metamagic.Reach
+                                      | Metamagic.CompletelyNormal | Metamagic.Persistent | Metamagic.Selective | Metamagic.Bolstered;
             AddAsset(result, guid);
             return result;
         }
@@ -2639,6 +2641,26 @@ namespace CodexLib
                         ((ActionList)field.GetValue(thisActions))?.Actions.Get<T>(ref list);
                 }
             }
+        }
+
+        #endregion
+
+        #region Enums
+
+        public static void EnumCreateModifierDescriptor(ModifierDescriptor num, string name, string description)
+        {
+            var root = Game.Instance.BlueprintRoot.LocalizedTexts.AbilityModifiers;
+            if (root.Entries.FindOrDefault(f => f.Key == num) != null)
+                PrintError($"Enum ModifierDescriptor {num} already occupied!");
+
+            var entry = new AbilityModifierEntry()
+            {
+                Key = num,
+                Name = name.CreateString(),
+                Description = description.CreateString()
+            };
+
+            AppendAndReplace(ref root.Entries, entry);
         }
 
         #endregion

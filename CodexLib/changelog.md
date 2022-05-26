@@ -8,3 +8,4 @@
 - added AddAttackBonus
 - added AddDamageResistancePhysicalImproved
 - added Patch_GetTargetProjectileFix
+- added Const: common constants

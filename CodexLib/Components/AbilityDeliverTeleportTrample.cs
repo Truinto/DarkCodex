@@ -44,6 +44,7 @@ namespace CodexLib
         public PrefabLink DisappearFx;
         public float DisappearDuration;
         public PrefabLink AppearFx;
+        public int TargetLimit = int.MaxValue;
 
         public AbilityDeliverTeleportTrample()
         {
@@ -55,6 +56,7 @@ namespace CodexLib
         {
             yield return null;
 
+            int targetLimit = TargetLimit;
             var caster = context.Caster;
             var units = new List<UnitEntityData>();
             units.Add(caster);
@@ -75,7 +77,10 @@ namespace CodexLib
             var startTime = Game.Instance.TimeController.GameTime;
             while (routine.MoveNext())
             {
-                yield return routine.Current;
+                if (routine.Current is not null && targetLimit-- > 0)
+                    yield return routine.Current;
+                else 
+                    yield return null;
                 if (Game.Instance.TimeController.GameTime - startTime > AbilityCustomDimensionDoor.MaxTeleportationDuration)
                     break;
             }

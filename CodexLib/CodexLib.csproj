@@ -138,6 +138,7 @@
     <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
     <Compile Include="Components\UIData.cs" />
     <Compile Include="Components\UnitConditionExceptionsFromBuff.cs" />
+    <Compile Include="Const.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Interfaces\IMechanicGroup.cs" />
     <Compile Include="Interfaces\IRulePriority.cs" />

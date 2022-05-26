@@ -1,9 +1,18 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.2]
+- fixed Boundless Healing spell levels
+- fixed Greater Bladed Dash not dealing damage
+- fixed Bladed Dash attack bonus too high
+- fixed Bladed Dash not working with Spell Combat
+- fixed Bladed Dash not working with reach metamagic
+- fixed Ascendant Summons description
+- changed Bladed Dash modifier being less ambiguous
+
 ## [1.3.1]
 - added Boundless Injury: Boundless Healing also applies to inflict wound spells and grants those to spellbooks
-- added spell Bladed Dash and Greater Bladed Dash !! target not working
+- added spell Bladed Dash and Greater Bladed Dash
 - fixed hexes not being available to sylvan trickster
 - fixed rogue talents not being available to sylvan trickster
 - fixed Cursing Gaze not being available to sylvan trickster

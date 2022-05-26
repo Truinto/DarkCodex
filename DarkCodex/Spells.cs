@@ -7,6 +7,7 @@ using Kingmaker.Enums;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Commands.Base;
+using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.Utility;
 using Shared;
 using System;
@@ -39,19 +40,22 @@ namespace DarkCodex
                 icon: icon,
                 AbilityType.Spell,
                 UnitCommand.CommandType.Standard,
-                AbilityRange.Projectile
+                AbilityRange.Close
                 ).SetComponents(
-                new AbilityDeliverTeleportTrample()
-                {
+                new AbilityDeliverTeleportTrample() {
                     Projectile = "4990cdb96ea77b5439afbc804f12d922".ToRef<BlueprintProjectileReference>(),
-                    //DisappearFx = Helper.GetPrefabLink("b2c32c1999a42d547a8a0e3e7e958fc6"),
-                    //AppearFx = Helper.GetPrefabLink("b2c32c1999a42d547a8a0e3e7e958fc6"),
-                    m_Length = 30.Feet()
+                    m_Length = 30.Feet(),
+                    m_LineWidth = 10.Feet()
                 },
                 Helper.CreateAbilitySpawnFx("503b78b507366cc4da0f462cb40131f6"),
-                Helper.CreateAbilityEffectRunAction(SavingThrowType.Unknown, Helper.CreateConditional(new Condition[] {
-                    //Helper.CreateContextConditionIsEnemy(),
-                    new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true }})),
+                Helper.CreateAbilityEffectRunAction(
+                    condition: new Condition[] {
+                        Helper.CreateContextConditionIsEnemy(),
+                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true
+                    }},
+                    ifTrue: new GameAction[] {
+                        new ContextActionDealWeaponDamage()
+                    }),
                 checkWeapon,
                 school,
                 craft
@@ -63,18 +67,29 @@ namespace DarkCodex
             var normal = Helper.CreateBlueprintAbility(
                 "BladedDash",
                 "Bladed Dash",
-                "When you cast this spell, you immediately move up to 30 feet in a straight line any direction, momentarily leaving a multi-hued cascade of images behind you. This movement does not provoke attacks of opportunity. You may make a single melee attack at your highest base attack bonus against any one creature you are adjacent to at the end of your movement. You gain a circumstance bonus on your attack roll equal to your Intelligence or Charisma modifier, whichever is higher. You must end the bonus movement granted by this spell in an unoccupied space. Despite the name, the spell works with any melee weapon.",
+                "When you cast this spell, you immediately move up to 30 feet in a straight line any direction, momentarily leaving a multi-hued cascade of images behind you. This movement does not provoke attacks of opportunity. You may make a single melee attack at your highest base attack bonus against any one creature you are adjacent to at any point along this 30 feet. You gain a circumstance bonus on your attack roll equal to your Intelligence or Charisma modifier, whichever is higher. You must end the bonus movement granted by this spell in an unoccupied space. Despite the name, the spell works with any melee weapon.",
                 icon: icon,
                 AbilityType.Spell,
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close
                 ).SetComponents(
-                new AddAttackBonus(ModifierDescriptor.UntypedStackable, StatType.Intelligence, StatType.Charisma),
-                flashstep.GetComponent<AbilityCustomFlashStep>(),
-                checkWeapon,
+                new AbilityDeliverTeleportTrample() {
+                    Projectile = "4990cdb96ea77b5439afbc804f12d922".ToRef<BlueprintProjectileReference>(),
+                    m_Length = 30.Feet(),
+                    m_LineWidth = 10.Feet(),
+                    TargetLimit = 1
+                },
+                Helper.CreateAbilitySpawnFx("503b78b507366cc4da0f462cb40131f6"),
+                Helper.CreateAbilityEffectRunAction(
+                    condition: new Condition[] {
+                        Helper.CreateContextConditionIsEnemy(),
+                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true
+                    }},
+                    ifTrue: new GameAction[] {
+                        new ContextActionDealWeaponDamage()
+                    }),
                 school,
-                craft,
-                Helper.CreateSpellListComponent("4d72e1e7bd6bc4f4caaea7aa43a14639".ToRef<BlueprintSpellListReference>(), 2)
+                craft
                 ).TargetEnemy(point: true);
 
             normal.Add(2, "4d72e1e7bd6bc4f4caaea7aa43a14639", "25a5013493bdcf74bb2424532214d0c8"); // Magus, Bard

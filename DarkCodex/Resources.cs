@@ -30,6 +30,7 @@ using UnityEngine;
 using Shared;
 using CodexLib;
 using Kingmaker.Utility;
+using Kingmaker.Enums;
 
 namespace DarkCodex
 {
