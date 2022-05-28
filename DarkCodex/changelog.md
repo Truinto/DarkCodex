@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.4]
+- increased Bladed Dash reach a bit, which should fix not hitting some enemies
+- fixed Fix Spell Element Change :P
+
 ## [1.3.3]
 - fixed more Boundless Healing spell levels
 - fixed Bladed Dash being too short, will use caster's reach

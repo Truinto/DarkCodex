@@ -73,7 +73,7 @@ namespace CodexLib
             for (int i = 0; i < units.Count; i++)
                 targetPoints[i] = units[i].Position - caster.Position + targetPoint;
 
-            var routine = CreateTeleportationRoutine(context, units, caster.Position, targetPoints);
+            var routine = CreateTeleportationRoutine(context, units, caster.EyePosition, targetPoints);
             var startTime = Game.Instance.TimeController.GameTime;
             while (routine.MoveNext())
             {
@@ -168,8 +168,8 @@ namespace CodexLib
         public override bool WouldTargetUnit(AbilityData ability, Vector3 targetPos, UnitEntityData unit)
         {
             var caster = ability.Caster.Unit;
-            Vector3 normalized = (targetPos - caster.Position).normalized;
-            Vector3 launchPos = caster.Position + normalized * caster.Corpulence;
+            Vector3 normalized = (targetPos - caster.EyePosition).normalized;
+            Vector3 launchPos = caster.EyePosition + normalized * caster.Corpulence;
             float meters = ability.Blueprint.GetRange(ability.HasMetamagic(Metamagic.Reach), ability).Meters;
             return WouldTargetUnitLine(ability, unit, launchPos, normalized.To2D(), meters);
         }
@@ -181,10 +181,10 @@ namespace CodexLib
                 return false;
             }
 
-            float reach = this.UseReach ? ability.Caster.Unit.GetThreatHandMelee()?.Weapon?.AttackRange.Meters ?? 5f : 0;
+            float reach = this.UseReach ? ability.Caster.Unit.GetThreatHandMelee()?.Weapon?.AttackRange.Meters ?? 3f : 0;
             float width = this.UseReach ? reach * 2f : this.LineWidth.Meters * 0.5f + unit.Corpulence;
             float a = Vector2.Dot((unit.Position - launchPos).To2D(), castDir);
-            if (a <= 0f || a >= distance + unit.Corpulence + reach) // area will extend forward by reach as well
+            if (a <= 0f || a >= distance + unit.Corpulence + reach + 2f) // area will extend forward by reach as well
             {
                 return false;
             }

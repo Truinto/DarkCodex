@@ -13,6 +13,8 @@ using Kingmaker.Visual.Particles;
 using System.Collections.Generic;
 using Shared;
 using CodexLib;
+using Kingmaker.ElementsSystem;
+using Kingmaker.EntitySystem;
 
 namespace DarkCodex
 {
@@ -83,7 +85,22 @@ namespace DarkCodex
                 return;
 
             Continue(force: true);
+#if DEBUG
+            var contextPool = ContextData<EntityFactComponentDelegate<UnitEntityData, AddAreaEffectData>.ComponentEventContext>.Pool;
+            foreach (var runtime in contextPool)
+            {
+                var data = runtime.m_Runtime?.MaybeData;
+                if (data is null || runtime.m_Runtime.IsDisposed  || runtime.m_Runtime.Fact.IsDisposed)
+                    continue;
 
+                if (data.AreaEffectInstance != null || !runtime.m_Runtime.Owner.IsPlayerFaction)
+                    continue;
+
+                Main.PrintDebug($"found empty AreaEffectInstance for {runtime.m_Runtime.SourceBlueprintComponent.OwnerBlueprint.name}");
+            }
+#endif
+#if false
+            // data context is always missing!
             foreach (var unit in Game.Instance.Player.PartyAndPets)
             {
                 foreach (var buff in unit.Buffs)
@@ -107,6 +124,7 @@ namespace DarkCodex
                     }
                 }
             }
+#endif
         }
 
         public void HandleDialogVisible(bool state)

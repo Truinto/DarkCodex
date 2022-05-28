@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Kingmaker.RuleSystem.RulebookEvent;
 
 namespace CodexLib
 {
@@ -11,5 +12,7 @@ namespace CodexLib
     {
         public const ModifierDescriptor Intelligence = (ModifierDescriptor)5380;
         public const ModifierDescriptor Charisma = (ModifierDescriptor)5381;
+
+        public static CustomDataKey KeyChangeElement = new("ChangeElement");
     }
 }

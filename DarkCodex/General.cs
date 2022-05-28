@@ -299,7 +299,11 @@ namespace DarkCodex
             {
                 var changeElement = buff.GetComponent<ChangeSpellElementalDamage>();
                 if (changeElement != null)
-                    buff.AddComponents(new ChangeSpellElementalDamageFix(changeElement.Element));
+                {
+                    var fix = new ChangeSpellElementalDamageFix(changeElement.Element);
+                    buff.AddComponents(fix);
+                    Main.PrintDebug($"FixSpellElementChange {buff.name} {fix.Descriptor}");
+                }
             }
         }
 

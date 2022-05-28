@@ -24,8 +24,6 @@ namespace CodexLib
     {
         public SpellDescriptor Descriptor;
 
-        public const SpellDescriptor AnyElement = SpellDescriptor.Fire | SpellDescriptor.Acid | SpellDescriptor.Cold | SpellDescriptor.Electricity | SpellDescriptor.Sonic;
-
         public ChangeSpellElementalDamageFix(DamageEnergyType element)
         {
             Descriptor = ChangeSpellElementalDamage.ElementToSpellDescriptor(element);
@@ -33,39 +31,7 @@ namespace CodexLib
 
         public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
         {
-            var context = this.Context;
-            context.SpellDescriptor |= evt.Spell.SpellDescriptor;
-
-            if (this.Context.SpellDescriptor.HasAnyFlag(AnyElement))
-            {
-                this.Context.RemoveSpellDescriptor(AnyElement);
-                this.Context.AddSpellDescriptor(Descriptor);
-            }
-
-            //var caster = evt.Initiator;
-            //evt.SetCustomData(new CustomDataKey("ChangeElement"), SpellDescriptor.Fire);
-            //evt.m_CustomData.FirstOrDefault(f => f.Key.m_Name == "ChangeElement");
-
-            //var spellDescriptor = evt.Spell.GetComponent<SpellDescriptorComponent>().Descriptor;
-            //if (spellDescriptor.HasAnyFlag(AnyElement) && !spellDescriptor.HasAnyFlag(Descriptor))
-            //{
-            //    if (FakeSpell == null)
-            //        FakeSpell = new BlueprintAbility() { name = "FakeSpell" };
-            //    ((SpellDescriptorComponent)FakeSpell.Components[0]).Descriptor = Descriptor;
-            //
-            //    var ruleParams = new RuleCalculateAbilityParams(this.Context.MaybeCaster, FakeSpell, evt.Spellbook);
-            //    this.Context.TriggerRule(ruleParams);
-            //
-            //    var param = ruleParams.Result;
-            //}
-
-            //var changeElement = Helper.GetISubscriber<ChangeSpellElementalDamage, RuleCastSpell>(evt.Initiator);
-            //if (changeElement != null)
-            //{
-            //    ChangeSpellElementalDamage.ElementToSpellDescriptor(changeElement.Element);
-            //}
-
-            //Helper.PrintDebug(Helper.GetIInitiator<RuleCalculateAbilityParams>(evt.Initiator).Join(f => f.name));
+            evt.SetCustomData(Const.KeyChangeElement, this.Descriptor);
         }
 
         public void OnEventDidTrigger(RuleCalculateAbilityParams evt)
