@@ -28,7 +28,7 @@ namespace CodexLib
 
             PatchSafe(typeof(Patch_ContextStatValue));
             PatchSafe(typeof(Patch_GetTargetProjectileFix));
-            //PatchSafe(typeof(Patch_RulebookEventBusPriority));
+            PatchSafe(typeof(Patch_RulebookEventBusPriority));
 
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");

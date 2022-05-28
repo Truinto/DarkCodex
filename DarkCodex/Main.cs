@@ -435,6 +435,7 @@ namespace Shared
             PatchSafe(typeof(Patch_ConditionExemption));
             PatchSafe(typeof(Patch_FixQuickenMetamagic));
             PatchSafe(typeof(Patch_HexcrafterSpellStrike));
+            PatchSafe(typeof(Patch_FixAbilityTargets));
 
             // General
             LoadSafe(General.CreateMadMagic);
@@ -522,6 +523,7 @@ namespace Shared
             LoadSafe(Unlock.UnlockKineticist); // keep late
 
             // Extra Features - keep last
+            LoadSafe(General.FixSpellElementChange); // keep last
             LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
             LoadSafe(General.CreatePreferredSpell); // keep last
             LoadSafe(General.CreateAbilityFocus); // keep last

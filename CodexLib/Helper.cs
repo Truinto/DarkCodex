@@ -18,6 +18,8 @@ using Kingmaker.Designers.Mechanics.EquipmentEnchants;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.Designers.Mechanics.Prerequisites;
 using Kingmaker.ElementsSystem;
+using Kingmaker.EntitySystem;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.Enums.Damage;
@@ -129,6 +131,11 @@ namespace CodexLib
             }
         }
 
+        public static bool HasInterface(this Type type, Type @interface)
+        {
+            return type != @interface && @interface.IsAssignableFrom(type);
+        }
+
         #endregion
 
         #region Patching/Harmony
@@ -139,8 +146,12 @@ namespace CodexLib
 
         public static void Patch(this Harmony harmony, Type patch)
         {
-            Print("Patching " + patch.Name);
-            harmony.CreateClassProcessor(patch).Patch();
+            try
+            {
+                Print("Patching " + patch.Name);
+                harmony.CreateClassProcessor(patch).Patch();
+            }
+            catch (Exception e) { PrintException(e); }
         }
 
         //private static void PatchManual(this Harmony harmony, Type patch)
@@ -975,6 +986,169 @@ namespace CodexLib
             if (rank == null)
                 return ifEmpty;
             return rank.Rank >= min && rank.Rank <= max;
+        }
+
+
+        /// <summary>
+        /// Get components that are subscribed for a unit.
+        /// </summary>
+        public static IEnumerable<BlueprintComponent> GetIInitiator<TEvent>(UnitEntityData unit) where TEvent : RulebookEvent
+        {
+            RulebookEventBus.InitiatorRulebookSubscribers.Get(unit).m_Listeners.TryGetValue(typeof(TEvent), out var iSubscriber);
+            if (iSubscriber == null || iSubscriber is not RulebookSubscribersList<TEvent> subscribers)
+                yield break;
+
+            foreach (var subscriber in subscribers.List)
+            {
+                if (subscriber is EntityFactComponent runtimeComp)
+                    yield return runtimeComp.SourceBlueprintComponent;
+            }
+        }
+
+        /// <summary>
+        /// Get components that are subscribed for a unit.
+        /// </summary>
+        public static IEnumerable<BlueprintComponent> GetITarget<TEvent>(UnitEntityData unit) where TEvent : RulebookEvent
+        {
+            RulebookEventBus.TargetRulebookSubscribers.Get(unit).m_Listeners.TryGetValue(typeof(TEvent), out var iSubscriber);
+            if (iSubscriber == null || iSubscriber is not RulebookSubscribersList<TEvent> subscribers)
+                yield break;
+
+            foreach (var subscriber in subscribers.List)
+            {
+                if (subscriber is EntityFactComponent runtimeComp)
+                    yield return runtimeComp.SourceBlueprintComponent;
+            }
+        }
+
+        /// <summary>
+        /// Get components that are subscribed.
+        /// </summary>
+        public static IEnumerable<BlueprintComponent> GetIGlobal<TEvent>(UnitEntityData unit = null) where TEvent : RulebookEvent
+        {
+            RulebookEventBus.GlobalRulebookSubscribers.m_Listeners.TryGetValue(typeof(TEvent), out var iSubscriber);
+            if (iSubscriber == null || iSubscriber is not RulebookSubscribersList<TEvent> subscribers)
+                yield break;
+
+            foreach (var subscriber in subscribers.List)
+            {
+                if (subscriber is EntityFactComponent runtimeComp && (unit == null || runtimeComp.GetSubscribingUnit() == unit))
+                    yield return runtimeComp.SourceBlueprintComponent;
+            }
+        }
+
+        /// <summary>
+        /// Get components that are subscribed for a unit. Slow.
+        /// </summary>
+        public static IEnumerable<TComponent> GetISubscribers<TComponent>(UnitEntityData unit) where TComponent : BlueprintComponent, ISubscriber
+        {
+            int num;
+            Type iHandler;
+
+            // resolve which interfaces are used
+            if (typeof(IInitiatorRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                iHandler = typeof(IInitiatorRulebookHandler<>);
+                num = 0;
+            }
+            else if (typeof(ITargetRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                iHandler = typeof(ITargetRulebookHandler<>);
+                num = 1;
+            }
+            else if (typeof(IGlobalRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                iHandler = typeof(IGlobalRulebookHandler<>);
+                num = 2;
+            }
+            else yield break;
+
+            // resolve any one RulebookEvent
+            Type iRulebookEvent = null;
+            foreach (Type t1 in typeof(TComponent).GetInterfaces())
+            {
+                if (t1.IsGenericType && t1.GetGenericTypeDefinition() == iHandler)
+                {
+                    iRulebookEvent = t1.GenericTypeArguments[0];
+                    break;
+                }
+            }
+            if (iRulebookEvent == null) yield break;
+
+            // get subscriber list
+            List<object> list = null;
+            if (num == 0)
+            {
+                RulebookEventBus.InitiatorRulebookSubscribers.Get(unit).m_Listeners.TryGetValue(iRulebookEvent, out var list1);
+                list = list1?.GetType().GetField("List").GetValue(list1) as List<object>;
+            }
+            else if (num == 1)
+            {
+                RulebookEventBus.TargetRulebookSubscribers.Get(unit).m_Listeners.TryGetValue(iRulebookEvent, out var list1);
+                list = list1?.GetType().GetField("List").GetValue(list1) as List<object>;
+            }
+            else if (num == 2)
+            {
+                RulebookEventBus.GlobalRulebookSubscribers.m_Listeners.TryGetValue(iRulebookEvent, out var list1);
+                list = list1?.GetType().GetField("List").GetValue(list1) as List<object>;
+            }
+            if (list == null) yield break;
+
+            // return components
+            foreach (var c1 in list)
+                if (c1 is EntityFactComponent c2 && c2.SourceBlueprintComponent is TComponent c3 && (unit == null || c2.GetSubscribingUnit() == unit))
+                    yield return c3;
+        }
+
+        /// <summary>
+        /// Get components that are subscribed for a unit.
+        /// </summary>
+        public static IEnumerable<TComponent> GetISubscribers<TComponent, TEvent>(UnitEntityData unit) where TComponent : BlueprintComponent, ISubscriber where TEvent : RulebookEvent
+        {
+            if (typeof(IInitiatorRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                foreach (var t1 in GetIInitiator<TEvent>(unit))
+                    if (t1 is TComponent t2)
+                        yield return t2;
+            }
+            else if (typeof(ITargetRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                foreach (var t1 in GetITarget<TEvent>(unit))
+                    if (t1 is TComponent t2)
+                        yield return t2;
+            }
+            else if (typeof(IGlobalRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                foreach (var t1 in GetIGlobal<TEvent>(unit))
+                    if (t1 is TComponent t2)
+                        yield return t2;
+            }
+        }
+
+        /// <summary>
+        /// Get last component that is subscribed for a unit.
+        /// </summary>
+        public static TComponent GetISubscriber<TComponent, TEvent>(UnitEntityData unit) where TComponent : BlueprintComponent, ISubscriber where TEvent : RulebookEvent
+        {
+            if (typeof(IInitiatorRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                RulebookEventBus.InitiatorRulebookSubscribers.Get(unit).m_Listeners.TryGetValue(typeof(TEvent), out var iSubscriber);
+                if (iSubscriber != null && iSubscriber is RulebookSubscribersList<TEvent> subscribers)
+                    return subscribers.List.LastOrDefault(f => f is TComponent) as TComponent;
+            }
+            else if (typeof(ITargetRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                RulebookEventBus.TargetRulebookSubscribers.Get(unit).m_Listeners.TryGetValue(typeof(TEvent), out var iSubscriber);
+                if (iSubscriber != null && iSubscriber is RulebookSubscribersList<TEvent> subscribers)
+                    return subscribers.List.LastOrDefault(f => f is TComponent) as TComponent;
+            }
+            else if (typeof(IGlobalRulebookSubscriber).IsAssignableFrom(typeof(TComponent)))
+            {
+                RulebookEventBus.GlobalRulebookSubscribers.m_Listeners.TryGetValue(typeof(TEvent), out var iSubscriber);
+                if (iSubscriber != null && iSubscriber is RulebookSubscribersList<TEvent> subscribers)
+                    return subscribers.List.LastOrDefault(f => f is TComponent) as TComponent;
+            }
+            return null;
         }
 
         #endregion

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using CodexLib;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 
 namespace DarkCodex
 {
@@ -28,6 +29,8 @@ namespace DarkCodex
             {
                 if (bp is BlueprintAbility ability && !Resource.Cache.Ability.Contains(ability))
                     Resource.Cache.Ability.Add(ability);
+                else if (bp is BlueprintBuff buff && !Resource.Cache.Buff.Contains(buff))
+                    Resource.Cache.Buff.Add(buff);
                 else if (bp is BlueprintFeature feature && !Resource.Cache.Feature.Contains(feature))
                     Resource.Cache.Feature.Add(feature);
                 else if (bp is BlueprintActivatableAbility activatable && !Resource.Cache.Activatable.Contains(activatable))

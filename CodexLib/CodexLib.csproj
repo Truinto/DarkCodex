@@ -126,6 +126,7 @@
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\LevelUpAddSelectionHasFact.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
+    <Compile Include="Patches\Patch_RulebookEventBusPriority.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyAttributeMax.cs" />
     <Compile Include="Components\PropertyGetterSneakAttack.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="Const.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Interfaces\IMechanicGroup.cs" />
-    <Compile Include="Interfaces\IRulePriority.cs" />
+    <Compile Include="Interfaces\IBeforeRule.cs" />
     <Compile Include="MasterPatch.cs" />
     <Compile Include="Patches\Patch_ContextStatValue.cs" />
     <Compile Include="Patches\Patch_GetTargetProjectileFix.cs" />

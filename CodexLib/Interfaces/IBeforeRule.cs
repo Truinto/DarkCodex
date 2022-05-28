@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public interface IRulePriority
+    public interface IBeforeRule
     {
-        public int Priority { get; }
     }
 }

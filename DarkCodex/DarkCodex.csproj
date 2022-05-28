@@ -84,6 +84,7 @@
     <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
     <Compile Include="Patches\Event_RestoreEndOfCombat.cs" />
+    <Compile Include="Patches\Patch_ChangeSpellElement.cs" />
     <Compile Include="Patches\Patch_ConditionExemption.cs" />
     <Compile Include="Patches\Patch_DismissAnything.cs" />
     <Compile Include="Patches\Patch_AbilityAtWill.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
     <Compile Include="Patches\Patch_FactSelectionParameterized.cs" />
+    <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
     <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
     <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />
     <Compile Include="Patches\Patch_HexcrafterSpellStrike.cs" />

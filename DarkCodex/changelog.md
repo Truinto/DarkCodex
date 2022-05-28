@@ -1,6 +1,13 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.3]
+- fixed more Boundless Healing spell levels
+- fixed Bladed Dash being too short, will use caster's reach
+- fixed Bladed Dash showing the line indicator
+- fixed ability tooltip always claiming to target all
+- added Fix Spell Element Change: fixes Elemental Bloodline and Spell Focus interaction
+
 ## [1.3.2]
 - fixed Boundless Healing spell levels
 - fixed Greater Bladed Dash not dealing damage

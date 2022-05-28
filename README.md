@@ -33,6 +33,8 @@ Content
 -----------
 | Option | Description | HB | Status |
 |--------|-------------|----|--------|
+|DEBUG.Enchantments|makes enchantments visible for items that don't usually display them|:book:|:construction:|
+|Enchantments.NameAll|gives all enchantments a name and description|:book:|:construction:|
 |General.CreateAbilityFocus|basic feat: Ability Focus, increase DC of one ability by +2|:book:|:x:|
 |General.CreateBardStopSong|adds ability to stop any activatable immediately|:book:|:heavy_check_mark:|
 |General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
@@ -41,6 +43,8 @@ Content
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
 |General.PatchHideBuffs|unclogs UI by hiding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
+|General.FixSpellElementChange|fixes Elemental Bloodline and Spell Focus interaction|:book:|:heavy_check_mark:|
+|Hexcrafter.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
 |Hexcrafter.FixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:heavy_check_mark:|
 |Items.CreateImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|
@@ -84,7 +88,9 @@ Content
 |Mythic.CreateResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
+|Mythic.PatchAscendantSummons|buffed Ascendant Summons by +4 stats and DR 10|:house:|:heavy_check_mark:|
 |Mythic.PatchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:house:|:heavy_check_mark:|
+|Mythic.PatchBoundlessInjury|Boundless Healing also applies to inflict wound spells and grants those to spellbooks|:house:|:heavy_check_mark:|
 |Mythic.PatchJudgementAura|Everlasting Judgement also applies to Judgement Aura|:house:|:heavy_check_mark:|
 |Mythic.PatchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:house:|:heavy_check_mark:|
 |Mythic.PatchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:house:|:heavy_check_mark:|
@@ -95,14 +101,15 @@ Content
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
+|Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
 |Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:construction:|
 |Witch.CreateCackleActivatable|Cackle/Chant can be toggled to use move action passively|:house:|:heavy_check_mark:|
 |Witch.CreateExtraHex|basic feat: Extra Hex|:book:|:heavy_check_mark:|
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
+|Witch.CreateSplitHex|basic feat: Split Hex|:book:|:x:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
 |Patch.Patch_AbilityAtWill|provides logic for at will spells|:house:|:heavy_check_mark:|
-|Patch.Patch_AbilityGroups|merges similar abilities into foldable categories|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableActionBar|adds logic for automatic-only activatable|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableHandleUnitRunCommand|fixes move actions disabling the activatable (since we have 2 of them)|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnNewRound|uses up move action when triggered; deactivates activatable if no action left|:book:|:heavy_check_mark:|
@@ -121,6 +128,8 @@ Content
 |Patch.Patch_FixAreaDoubleDamage|fixes area effects triggering twice when cast|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaEndOfTurn|in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round|:book:|:heavy_check_mark:|
 |Patch.Patch_FixPolymorphGather|makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade|:book:|:heavy_check_mark:|
+|Patch.Patch_FixQuickenMetamagic|fixed quickened abilities taking more time than normal, if you already have used your swift action|:book:|:heavy_check_mark:|
+|Patch.Patch_HexcrafterSpellStrike|hexes with touch range can be used with Spell Strike|:house:|:heavy_check_mark:|
 |Patch.Patch_KineticistAllowOpportunityAttack|allows Attack of Opportunities with anything but standard Kinetic Blade; so that Kinetic Whip works; also allows natural attacks to be used, if Whip isn't available|:book:|:heavy_check_mark:|
 |Patch.Patch_MagicItemAdept|patches for Magic Item Adept|:house:|:heavy_check_mark:|
 |Patch.Patch_Polymorph|allows debug flags to keep inventory or model during polymorph|:book:|:heavy_check_mark:|

@@ -45,10 +45,10 @@ namespace CodexLib
         public float DisappearDuration;
         public PrefabLink AppearFx;
         public int TargetLimit = int.MaxValue;
+        public bool UseReach;
 
         public AbilityDeliverTeleportTrample()
         {
-            Type = AbilityProjectileType.Line;
             //m_ControlledProjectileHolderBuff = BlueprintRoot.Instance.SystemMechanics.m_PetrifiedBuff;
         }
 
@@ -73,13 +73,13 @@ namespace CodexLib
             for (int i = 0; i < units.Count; i++)
                 targetPoints[i] = units[i].Position - caster.Position + targetPoint;
 
-            var routine = CreateTeleportationRoutine(context, units, caster.EyePosition, targetPoints);
+            var routine = CreateTeleportationRoutine(context, units, caster.Position, targetPoints);
             var startTime = Game.Instance.TimeController.GameTime;
             while (routine.MoveNext())
             {
                 if (routine.Current is not null && targetLimit-- > 0)
                     yield return routine.Current;
-                else 
+                else
                     yield return null;
                 if (Game.Instance.TimeController.GameTime - startTime > AbilityCustomDimensionDoor.MaxTeleportationDuration)
                     break;
@@ -169,25 +169,27 @@ namespace CodexLib
         {
             var caster = ability.Caster.Unit;
             Vector3 normalized = (targetPos - caster.Position).normalized;
-            Vector3 launchPos = caster.EyePosition + normalized * caster.Corpulence;
+            Vector3 launchPos = caster.Position + normalized * caster.Corpulence;
             float meters = ability.Blueprint.GetRange(ability.HasMetamagic(Metamagic.Reach), ability).Meters;
             return WouldTargetUnitLine(ability, unit, launchPos, normalized.To2D(), meters);
         }
 
         public bool WouldTargetUnitLine(AbilityData ability, UnitEntityData unit, Vector3 launchPos, Vector2 castDir, float distance)
         {
-            if (!this.CanTargetUnit(ability, unit))
+            if (!CanTargetUnit(ability, unit))
             {
                 return false;
             }
-            float num = 5.Feet().Meters * 0.5f + unit.Corpulence;
-            float num2 = Vector2.Dot((unit.EyePosition - launchPos).To2D(), castDir);
-            if (num2 <= 0f || num2 >= distance + unit.Corpulence)
+
+            float reach = this.UseReach ? ability.Caster.Unit.GetThreatHandMelee()?.Weapon?.AttackRange.Meters ?? 5f : 0;
+            float width = this.UseReach ? reach * 2f : this.LineWidth.Meters * 0.5f + unit.Corpulence;
+            float a = Vector2.Dot((unit.Position - launchPos).To2D(), castDir);
+            if (a <= 0f || a >= distance + unit.Corpulence + reach) // area will extend forward by reach as well
             {
                 return false;
             }
-            Vector2 b = castDir * num2;
-            return ((unit.EyePosition - launchPos).To2D() - b).sqrMagnitude <= num * num;
+            Vector2 b = castDir * a;
+            return ((unit.Position - launchPos).To2D() - b).sqrMagnitude <= width * width;
         }
 
         public bool CanTargetUnit(AbilityData ability, UnitEntityData unit)

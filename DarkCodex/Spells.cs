@@ -42,17 +42,20 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close
                 ).SetComponents(
-                new AbilityDeliverTeleportTrample() {
+                new AbilityDeliverTeleportTrample()
+                {
                     Projectile = "4990cdb96ea77b5439afbc804f12d922".ToRef<BlueprintProjectileReference>(),
+                    Type = AbilityProjectileType.Line,
                     m_Length = 30.Feet(),
-                    m_LineWidth = 10.Feet()
+                    m_LineWidth = 10.Feet(),
+                    UseReach = true
                 },
                 Helper.CreateAbilitySpawnFx("503b78b507366cc4da0f462cb40131f6"),
                 Helper.CreateAbilityEffectRunAction(
                     condition: new Condition[] {
                         Helper.CreateContextConditionIsEnemy(),
-                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true
-                    }},
+                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true }
+                    },
                     ifTrue: new GameAction[] {
                         new ContextActionDealWeaponDamage()
                     }),
@@ -73,18 +76,21 @@ namespace DarkCodex
                 UnitCommand.CommandType.Standard,
                 AbilityRange.Close
                 ).SetComponents(
-                new AbilityDeliverTeleportTrample() {
+                new AbilityDeliverTeleportTrample()
+                {
                     Projectile = "4990cdb96ea77b5439afbc804f12d922".ToRef<BlueprintProjectileReference>(),
+                    Type = AbilityProjectileType.Simple,
                     m_Length = 30.Feet(),
-                    m_LineWidth = 10.Feet(),
-                    TargetLimit = 1
+                    m_LineWidth = 1.Feet(),
+                    TargetLimit = 1,
+                    UseReach = true
                 },
                 Helper.CreateAbilitySpawnFx("503b78b507366cc4da0f462cb40131f6"),
                 Helper.CreateAbilityEffectRunAction(
                     condition: new Condition[] {
                         Helper.CreateContextConditionIsEnemy(),
-                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true
-                    }},
+                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true }
+                    },
                     ifTrue: new GameAction[] {
                         new ContextActionDealWeaponDamage()
                     }),

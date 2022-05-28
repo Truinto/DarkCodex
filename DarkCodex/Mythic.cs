@@ -608,8 +608,8 @@ namespace DarkCodex
                     Helper.ToRef<BlueprintAbilityReference>("867524328b54f25488d371214eea0d90"), //9: HealMass
                     Helper.ToRef<BlueprintAbilityReference>("d5847cad0b0e54c4d82d6c59a3cda6b0"), //5: BreathOfLifeCast
                     Helper.ToRef<BlueprintAbilityReference>("e84fc922ccf952943b5240293669b171"), //2: RestorationLesser
-                    Helper.ToRef<BlueprintAbilityReference>("f2115ac1148256b4ba20788f7e966830"), //3: Restoration
-                    Helper.ToRef<BlueprintAbilityReference>("fafd77c6bfa85c04ba31fdc1c962c914"), //4: RestorationGreater
+                    Helper.ToRef<BlueprintAbilityReference>("f2115ac1148256b4ba20788f7e966830"), //4: Restoration
+                    Helper.ToRef<BlueprintAbilityReference>("fafd77c6bfa85c04ba31fdc1c962c914"), //7: RestorationGreater
                 },
                 Levels = new int[] {
                     1, //1: CureLightWoundsCast
@@ -624,8 +624,8 @@ namespace DarkCodex
                     9, //9: HealMass
                     5, //5: BreathOfLifeCast
                     2, //2: RestorationLesser
-                    3,
                     4,
+                    7,
                 }
             });
         }
@@ -648,13 +648,9 @@ namespace DarkCodex
                     Helper.ToRef<BlueprintAbilityReference>("5ee395a2423808c4baf342a4f8395b19"), //8: InflictCriticalWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("cc09224ecc9af79449816c45bc5be218"), //6: HarmCast
                     //Helper.ToRef<BlueprintAbilityReference>("867524328b54f25488d371214eea0d90"), //9: HealMass
-                    //Helper.ToRef<BlueprintAbilityReference>("d5847cad0b0e54c4d82d6c59a3cda6b0"), //5: BreathOfLifeCast
-                    //Helper.ToRef<BlueprintAbilityReference>("e84fc922ccf952943b5240293669b171"), //2: RestorationLesser
-                    //Helper.ToRef<BlueprintAbilityReference>("f2115ac1148256b4ba20788f7e966830"), //3: Restoration
-                    //Helper.ToRef<BlueprintAbilityReference>("fafd77c6bfa85c04ba31fdc1c962c914"), //4: RestorationGreater
                 },
                 Levels = new int[] {
-                    1, //1: CureLightWoundsCast
+                    1, //1: InflictLightWoundsCast
                     2,
                     3,
                     4,
@@ -664,10 +660,6 @@ namespace DarkCodex
                     8,
                     6, //6: HarmCast
                     //9, //9: HealMass
-                    //5, //5: BreathOfLifeCast
-                    //2, //2: RestorationLesser
-                    //3,
-                    //4,
                 }
             };
             feat.AddComponents(addKnownSpells);

@@ -290,6 +290,19 @@ namespace DarkCodex
             Helper.AddCombatFeat(feat);
         }
 
+        [PatchInfo(Severity.Fix, "Fix Spell Element Change", "fixes Elemental Bloodline and Spell Focus interaction", false)]
+        public static void FixSpellElementChange()
+        {
+            Main.Patch(typeof(Patch_ChangeSpellElement));
+
+            foreach (var buff in Resource.Cache.Buff)
+            {
+                var changeElement = buff.GetComponent<ChangeSpellElementalDamage>();
+                if (changeElement != null)
+                    buff.AddComponents(new ChangeSpellElementalDamageFix(changeElement.Element));
+            }
+        }
+
         #region General Resources and Stuff
 
         public static void CreatePropertyMaxMentalAttribute()

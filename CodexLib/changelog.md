@@ -9,3 +9,4 @@
 - added AddDamageResistancePhysicalImproved
 - added Patch_GetTargetProjectileFix
 - added Const: common constants
+- added Patch_RulebookEventBusPriority and IBeforeRule
