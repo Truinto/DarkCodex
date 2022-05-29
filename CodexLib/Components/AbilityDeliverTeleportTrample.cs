@@ -56,6 +56,7 @@ namespace CodexLib
         {
             yield return null;
 
+            bool hasMainTarget = false;
             int targetLimit = TargetLimit;
             var caster = context.Caster;
             var units = new List<UnitEntityData>();
@@ -65,25 +66,34 @@ namespace CodexLib
             var targetPoint = spellTarget.Point;
             Helper.PrintDebug($"AbilityDeliverTeleportTrample unit={spellTarget.Unit} point={spellTarget.m_Point} orientation={spellTarget.Orientation}");
             if (spellTarget.Unit != null) // move target, if would land on a unit
+            {
                 targetPoint += Quaternion.Euler(0f, spellTarget.Unit.Orientation, 0f)
                     * Vector3.forward
                     * (caster.View.Corpulence + spellTarget.Unit.View.Corpulence + GameConsts.MinWeaponRange.Meters);
+                hasMainTarget = true;
+                targetLimit--;
+            }
 
             var targetPoints = new Vector3[units.Count];
             for (int i = 0; i < units.Count; i++)
                 targetPoints[i] = units[i].Position - caster.Position + targetPoint;
 
-            var routine = CreateTeleportationRoutine(context, units, caster.EyePosition, targetPoints);
-            var startTime = Game.Instance.TimeController.GameTime;
+            var routine = CreateTeleportationRoutine(context, units, caster.Position, targetPoints);
             while (routine.MoveNext())
             {
                 if (routine.Current is not null && targetLimit-- > 0)
+                {
                     yield return routine.Current;
+                    if (hasMainTarget && routine.Current.Target.Unit == spellTarget.Unit)
+                        hasMainTarget = false;
+                }
                 else
                     yield return null;
-                if (Game.Instance.TimeController.GameTime - startTime > AbilityCustomDimensionDoor.MaxTeleportationDuration)
-                    break;
             }
+
+            if (hasMainTarget)
+                yield return new AbilityDeliveryTarget(spellTarget.Unit);
+
             yield break;
         }
 
@@ -92,6 +102,7 @@ namespace CodexLib
             var sfxDisappear = this.DisappearFx?.Load();
             var sfxAppear = this.AppearFx?.Load();
             var projTeleportation = this.Projectile?.Get();
+            var startTime = Game.Instance.TimeController.GameTime;
 
             // disappear
             foreach (var unit in units)
@@ -106,7 +117,11 @@ namespace CodexLib
             {
                 var projectileRoutine = CreateProjectileRoutine(context, projTeleportation, units, sourcePosition, targetPosition[0]);
                 while (projectileRoutine.MoveNext())
+                {
                     yield return projectileRoutine.Current;
+                    if (Game.Instance.TimeController.GameTime - startTime > AbilityCustomDimensionDoor.MaxTeleportationDuration)
+                        break;
+                }
             }
 
             // appear
@@ -168,8 +183,8 @@ namespace CodexLib
         public override bool WouldTargetUnit(AbilityData ability, Vector3 targetPos, UnitEntityData unit)
         {
             var caster = ability.Caster.Unit;
-            Vector3 normalized = (targetPos - caster.EyePosition).normalized;
-            Vector3 launchPos = caster.EyePosition + normalized * caster.Corpulence;
+            Vector3 normalized = (targetPos - caster.Position).normalized;
+            Vector3 launchPos = caster.Position + normalized * caster.Corpulence;
             float meters = ability.Blueprint.GetRange(ability.HasMetamagic(Metamagic.Reach), ability).Meters;
             return WouldTargetUnitLine(ability, unit, launchPos, normalized.To2D(), meters);
         }
@@ -184,7 +199,7 @@ namespace CodexLib
             float reach = this.UseReach ? ability.Caster.Unit.GetThreatHandMelee()?.Weapon?.AttackRange.Meters ?? 3f : 0;
             float width = this.UseReach ? reach * 2f : this.LineWidth.Meters * 0.5f + unit.Corpulence;
             float a = Vector2.Dot((unit.Position - launchPos).To2D(), castDir);
-            if (a <= 0f || a >= distance + unit.Corpulence + reach + 2f) // area will extend forward by reach as well
+            if (a <= 0f || a >= distance + unit.Corpulence + reach) // area will extend forward by reach as well
             {
                 return false;
             }
@@ -205,7 +220,7 @@ namespace CodexLib
 
         public bool IsTargetRestrictionPassed(UnitEntityData caster, TargetWrapper target)
         {
-            return !AbilityCustomDimensionDoor.CheckTargetIsOnDisabledIsland(target) && ObstacleAnalyzer.IsPointInsideNavMesh(target.Point) && !FogOfWarController.IsInFogOfWar(target.Point);
+            return !AbilityCustomDimensionDoor.CheckTargetIsOnDisabledIsland(target) && ObstacleAnalyzer.IsPointInsideNavMesh(target.Point);// && !FogOfWarController.IsInFogOfWar(target.Point);
         }
 
         public string GetAbilityTargetRestrictionUIText(UnitEntityData caster, TargetWrapper target)

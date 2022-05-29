@@ -27,7 +27,7 @@ namespace DarkCodex
             if (__instance.SpellsOnly && evt.Spellbook == null)
                 return false;
 
-            if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
+            if (evt.Spell == null || !evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
                 return false;
 
             if (evt.TryGetCustomData<SpellDescriptor>(Const.KeyChangeElement, out var descriptor))

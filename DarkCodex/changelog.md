@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.5]
+- changed Bladed Dash, so if the spells target is a unit, it will always be hit; reduced reach again
+- fixed null exception in Patch_ChangeSpellElement
+
 ## [1.3.4]
 - increased Bladed Dash reach a bit, which should fix not hitting some enemies
 - fixed Fix Spell Element Change :P
