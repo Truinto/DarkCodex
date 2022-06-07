@@ -84,17 +84,15 @@
     <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
     <Compile Include="Patches\Event_RestoreEndOfCombat.cs" />
+    <Compile Include="Patches\Patch_BackgroundChecks.cs" />
     <Compile Include="Patches\Patch_ChangeSpellElement.cs" />
-    <Compile Include="Patches\Patch_ConditionExemption.cs" />
     <Compile Include="Patches\Patch_DismissAnything.cs" />
-    <Compile Include="Patches\Patch_AbilityAtWill.cs" />
     <Compile Include="Patches\Patch_ActivatableHandleUnitRunCommand.cs" />
     <Compile Include="Patches\Patch_ActivatableOnNewRound.cs" />
     <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
     <Compile Include="Patches\Patch_FactSelectionParameterized.cs" />
-    <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
     <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
     <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />
     <Compile Include="Patches\Patch_HexcrafterSpellStrike.cs" />
@@ -102,8 +100,6 @@
     <Compile Include="Patches\Patch_Prebuilds.cs" />
     <Compile Include="Patches\Patch_AllowAchievements.cs" />
     <Compile Include="Patches\Patch_ActivatableAbilityGroup.cs" />
-    <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
-    <Compile Include="Patches\Patch_DebugReport.cs" />
     <Compile Include="Patches\Patch_EnduringSpells.cs" />
     <Compile Include="Patches\Patch_FixAreaDoubleDamage.cs" />
     <Compile Include="Patches\Patch_FixAreaEndOfTurn.cs" />
@@ -111,13 +107,11 @@
     <Compile Include="Patches\Patch_FixLoadCrash1.cs" />
     <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
     <Compile Include="Patches\Patch_SaveExtension.cs" />
-    <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
     <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
     <Compile Include="Patches\Patch_AlwaysAChance.cs" />
     <Compile Include="Patches\Patch_MagicItemAdept.cs" />
     <Compile Include="Patches\Patch_ResourcefulCaster.cs" />
     <Compile Include="Patches\Patch_FeralCombat.cs" />
-    <Compile Include="Patches\Patch_AOEAttackRolls.cs" />
     <Compile Include="Patches\Patch_EnvelopingWindsCap.cs" />
     <Compile Include="Patches\Patch_FixPolymorphGather.cs" />
     <Compile Include="Patches\Patch_KineticistAllowOpportunityAttack.cs" />
@@ -128,6 +122,7 @@
     <Compile Include="Rogue.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Spellcasters.cs" />
     <Compile Include="Spells.cs" />
     <Compile Include="Unlock.cs" />
     <Compile Include="Witch.cs" />
@@ -152,8 +147,8 @@
 xcopy /i /e /y /f /d "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
 
 if "$(Configuration)"=="Release" (
-   cd /d "$(ModFolder)\$(TargetName)\"
-   "C:\Program Files\7-Zip\7z.exe" u "-x!*.zip" "$(TargetName).zip" @"filelist.txt" &gt;NUL
+   cd /d "$(ModFolder)\"
+   "C:\Program Files\7-Zip\7z.exe" u "-x!*.zip" "$(TargetName)\$(TargetName).zip" @"$(TargetName)\filelist.txt" &gt;NUL
    echo Updated $(TargetName).zip
 )</PostBuildEvent>
   </PropertyGroup>

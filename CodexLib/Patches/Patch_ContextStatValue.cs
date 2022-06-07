@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 namespace CodexLib.Patches
 {
     /// <summary>
-    /// Override of ContextValue by ContextStatValue.
+    /// Override of ContextValue by ContextStatValue.<br/>
+    /// This patch makes ContextValue.Calculate quasi virtual.
     /// </summary>
     [HarmonyPatch]
     public class Patch_ContextStatValue

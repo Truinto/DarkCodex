@@ -78,9 +78,9 @@ namespace DarkCodex
             var feature = Helper.CreateBlueprintFeature(
                 "BackgroundElementalist",
                 "Elemental Plane Outsider",
-                "Elemental Plane Outsider count as 1 Kineticist level higher for determining prerequisites for wild talents.",
-                null,
-                0
+                "You were exposed to an elemental saturation as a young child. Attuning you to the elements.\nBenefit: Your Kineticist level count as 1 level higher for determining prerequisites for wild talents.",
+                icon: null,
+                group: FeatureGroup.BackgroundSelection
                 ).SetComponents(Helper.CreateClassLevelsForPrerequisites(kineticist_class, 1));
 
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());

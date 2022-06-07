@@ -46,20 +46,21 @@ namespace DarkCodex
                 "AbilityFocusCustom",
                 "Ability Focus",
                 "Choose one special attack. Add +2 to the DC for all saving throws against the special attack on which you focus.",
-                blueprints: null
+                blueprints: null,
+                requireKnown: true
                 ).SetComponents(
                 new AbilityFocusParametrized()
                 );
-            feat.Ranks = 10;
+            feat.RequireProficiency = true;
 
             Resource.Cache.Ensure();
             var list = new List<AnyBlueprintReference>();
 
             foreach (var ab in Resource.Cache.Ability)
             {
-                if (ab.Type == AbilityType.Spell 
+                if (ab.Type == AbilityType.Spell
                     || ab.m_DisplayName == null
-                    || ab.m_DisplayName.IsEmpty() 
+                    || ab.m_DisplayName.IsEmpty()
                     || ab.HasVariants)
                     continue;
                 var run = ab.GetComponent<AbilityEffectRunAction>();
@@ -156,7 +157,8 @@ namespace DarkCodex
                 "Choose one spell which you have the ability to cast. You can cast that spell spontaneously by sacrificing a prepared spell or spell slot of equal or higher level. You can apply any metamagic feats you possess to this spell when you cast it. This increases the minimum level of the prepared spell or spell slot you must sacrifice in order to cast it but does not affect the casting time.\nSpecial: You can gain this feat multiple times.Its effects do not stack. Each time you take the feat, it applies to a different spell.",
                 icon: null,
                 parameterType: FeatureParameterType.SpellSpecialization,
-                blueprints: specialization.BlueprintParameterVariants
+                blueprints: specialization.BlueprintParameterVariants,
+                requireKnown: true
                 ).SetComponents(
                 new PreferredSpell(),
                 Helper.CreatePrerequisiteFullStatValue(StatType.SkillKnowledgeArcana, 5),
@@ -269,7 +271,7 @@ namespace DarkCodex
                 );
         }
 
-        [PatchInfo(Severity.Create, "Mad Magic", "combat feat: allows spell casting during a rage", false, Requirement: typeof(Patch_ConditionExemption))]
+        [PatchInfo(Severity.Create, "Mad Magic", "combat feat: allows spell casting during a rage", false)]
         public static void CreateMadMagic()
         {
             var feat = Helper.CreateBlueprintFeature(
@@ -305,6 +307,86 @@ namespace DarkCodex
                     Main.PrintDebug($"FixSpellElementChange {buff.name} {fix.Descriptor}");
                 }
             }
+        }
+
+        [PatchInfo(Severity.Fix, "Fix Master Shapeshifter", "ensures spells with the Polymorph descriptor get the benefit of Master Shapeshifter", false)]
+        public static void FixMasterShapeshifter()
+        {
+            var feat = Helper.Get<BlueprintFeature>("934670ef88b281b4da5596db8b00df2f"); //MasterShapeshifter
+            feat.AddComponents(new MasterShapeshifterFix());
+        }
+
+        [PatchInfo(Severity.Create, "Backgrounds", "basic feat: Additional Traits\ntraits: Magical Lineage, Metamagic Master", false)]
+        public static void CreateBackgrounds()
+        {
+            /*
+
+            Magical Knack: Magic Traits
+            You were raised, either wholly or in part, by a magical creature, either after it found you abandoned in the woods or because your parents often left you in the care of a magical minion. This constant exposure to magic has made its mysteries easy for you to understand, even when you turn your mind to other devotions and tasks.
+            Benefit: Pick a class when you gain this trait—your caster level in that class gains a +2 trait bonus as long as this bonus doesn’t raise your caster level above your current Hit Dice.
+
+            Magical Lineage: Magic Traits
+            One of your parents was a gifted spellcaster who not only used metamagic often, but also developed many magical items and perhaps even a new spell or two—and you have inherited a fragment of this greatness.
+            Benefit: Pick one spell when you choose this trait. When you apply metamagic feats to this spell that add at least 1 level to the spell, treat its actual level as 1 lower for determining the spell’s final adjusted level.
+
+            Metamagic Master: Regional Traits
+            Your ability to alter your spell of choice is greater than expected.
+            Choose: A spell of 3rd level or below.
+            Benefit: When you use the chosen spell with a metamagic feat, it uses up a spell slot one level lower than it normally would.
+
+            Reluctant Apprentice
+            Your early training grants you knowledge of the arcane.
+            Benefits: You gain a +1 trait bonus on Knowledge (arcana) checks, and are considered trained in that skill even if you have no ranks in it.
+
+            Inspired by Greatness: Campaign Trait
+            Choose one spell you can cast. From now on, you always cast this spell at +1 caster level.
+
+            */
+
+            var scholarMetamagic = Helper.CreateBlueprintParametrizedFeature(
+                "BackgroundScholarMagicalLineage",
+                "Magical Lineage",
+                "One of your parents was a gifted spellcaster who not only used metamagic often, but also developed many magical items and perhaps even a new spell or two — and you have inherited a fragment of this greatness.\nBenefit: Pick one spell when you choose this trait. When you apply metamagic feats to this spell that add at least 1 level to the spell, treat its actual level as 1 lower for determining the spell's final adjusted level. Additionally your caster level gains a +2 trait bonus as long as this bonus doesn’t raise your caster level above your current Hit Dice.",
+                icon: null,
+                group: FeatureGroup.Trait,
+                parameterType: FeatureParameterType.SpellSpecialization,
+                requireKnown: true
+                ).SetComponents(
+                new MetamagicReduceCostParametrized(),
+                new AddCasterLevelLimit() { Bonus = 2 }
+                );
+
+            var scholarMetamagic2 = Helper.CreateBlueprintParametrizedFeature(
+                "BackgroundScholarMetamagicMaster",
+                "Metamagic Master",
+                "You have mastered a particular spell. Whenever you apply metamagic feats to it, you can reduce its final adjusted level by up to 2, but not below the spell's original cost.",
+                icon: null,
+                group: FeatureGroup.Trait,
+                parameterType: FeatureParameterType.SpellSpecialization,
+                requireKnown: true
+                ).SetComponents(
+                new MetamagicReduceCostParametrized() { Reduction = 2 }
+                );
+
+            var scholar = Helper.Get<BlueprintFeatureSelection>("273fab44409035f42a7e2af0858a463d"); //BackgroundsScholarSelection
+            scholar.Add(scholarMetamagic, scholarMetamagic2);
+
+            var backgroundSelection = Helper.Get<BlueprintFeatureSelection>("f926dabeee7f8a54db8f2010b323383c");    //BackgroundsBaseSelection
+            foreach (var feat in backgroundSelection.m_AllFeatures)
+            {
+                if (feat.Get() is BlueprintFeatureSelection selection)
+                    selection.AddComponents(Helper.CreatePrerequisiteFeature(feat));
+            }
+
+            var extra = Helper.CreateBlueprintFeatureSelection(
+                "AdditionalTraits",
+                "Additional Traits",
+                "You have more traits than normal.\nBenefit: You gain another character background of your choice. This background must be chosen from a different list, and cannot be chosen from lists from which you have already selected a character background.",
+                icon: null,
+                group: FeatureGroup.Feat
+                ).Add(backgroundSelection.m_AllFeatures);
+
+            Helper.AddFeats(extra);
         }
 
         #region General Resources and Stuff

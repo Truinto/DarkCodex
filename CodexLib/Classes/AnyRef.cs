@@ -25,14 +25,14 @@ namespace CodexLib
             return bp as T;
         }
 
-        public T To<T>() where T : BlueprintReferenceBase
+        public T To<T>() where T : BlueprintReferenceBase, new()
         {
-            var reference = this as T;
+            return new T() { deserializedGuid = this.deserializedGuid };
+        }
 
-            if (reference is null)
-                Helper.PrintError($"AnyRef could not be cast to {typeof(T)}");
-
-            return reference;
+        public static AnyRef Get(BlueprintReferenceBase baseRef)
+        {
+            return new AnyRef() { deserializedGuid = baseRef.deserializedGuid };
         }
 
         public static implicit operator AnyRef(string guid) => new() { deserializedGuid = BlueprintGuid.Parse(guid) };

@@ -16,7 +16,7 @@ using UnityEngine;
 namespace CodexLib.Patches
 {
     /// <summary>
-    /// Fixes AbilityDeliverTeleportTrample not returning woldPosition.
+    /// Fixes AbilityDeliverTeleportTrample not returning worldPosition.
     /// </summary>
     [HarmonyPatch]
     public class Patch_GetTargetProjectileFix

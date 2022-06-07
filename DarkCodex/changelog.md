@@ -1,6 +1,15 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.6]
+- added Butchering Axe weapon proficiency, which is now required to use it
+- fixed Elemental Focus not applying to spell-like abilities
+- added Additional Traits, metamagic traits
+- added fix for Master Shapeshifter: ensures polymorph buffs grant boni
+- added freebooter to swift hunter's bond
+- fixed AC malus of Flensing Strike not updating
+- changed installation path, so files should extract correctly for everybody
+
 ## [1.3.5]
 - changed Bladed Dash, so if the spells target is a unit, it will always be hit; reduced reach again
 - fixed null exception in Patch_ChangeSpellElement

@@ -10,6 +10,7 @@ using Kingmaker.Blueprints.Items;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.Loot;
+using Kingmaker.Blueprints.Root;
 using Kingmaker.Blueprints.Root.Strings;
 using Kingmaker.Blueprints.Root.Strings.GameLog;
 using Kingmaker.Craft;
@@ -63,6 +64,7 @@ using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -72,12 +74,12 @@ using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCas
 
 namespace CodexLib
 {
-    /* 
-     * Notes:
-     * BlueprintComponent has a field OwnerBlueprint. When components are shared between blueprints, these may cause weird bugs.
-     * 
-     */
-
+    /// <summary>
+    /// Extensions for Blueprint handling and other conveniences.
+    /// </summary>
+    /// <remarks>
+    /// BlueprintComponent has a field OwnerBlueprint. When components are shared between blueprints, these may cause weird bugs.
+    /// </remarks>
     public static class Helper
     {
         #region Other
@@ -368,6 +370,9 @@ namespace CodexLib
         //    val = pair.Value;
         //}
 
+        /// <summary>
+        /// Get dictionary by key and create new value with standard constructor, if it did not exist.
+        /// </summary>
         /// <returns>true if new value was created</returns>
         public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value) where TValue : new()
         {
@@ -375,6 +380,16 @@ namespace CodexLib
                 return false;
             dic[key] = value = new();
             return true;
+        }
+
+        public static IEnumerable<TResult> SelectNotNull<T, TResult>(this IEnumerable<T> array, Func<T, TResult> func) where TResult : class
+        {
+            if (array is null)
+                yield break;
+
+            foreach (var result in array.Select(func))
+                if (result is not null)
+                    yield return result;
         }
 
         #endregion
@@ -774,6 +789,14 @@ namespace CodexLib
             }
 
             return new LocalizedString { Key = key };
+        }
+
+        /// <summary>
+        /// Overwrite existing LocalizedString with new value.
+        /// </summary>
+        public static void CreateString(this LocalizedString localizedString, string newString)
+        {
+            CreateString(newString, localizedString.m_Key);
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
@@ -1707,6 +1730,13 @@ namespace CodexLib
             return selection;
         }
 
+        public static BlueprintFeatureSelection Add(this BlueprintFeatureSelection selection, params AnyRef[] features)
+        {
+            AppendAndReplace(ref selection.m_AllFeatures, features.To<BlueprintFeatureReference>());
+
+            return selection;
+        }
+
         #endregion
 
         #region Spells
@@ -1762,6 +1792,31 @@ namespace CodexLib
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static AddProficiencies CreateAddProficiencies(params WeaponCategory[] weaponCategory)
+        {
+            var result = new AddProficiencies();
+            result.WeaponProficiencies = weaponCategory;
+            return result;
+        }
+
+        public static PrerequisiteNotProficient CreatePrerequisiteNotProficient(WeaponCategory weaponCategory, bool hideInUI = true)
+        {
+            var result = new PrerequisiteNotProficient();
+            result.WeaponProficiencies = weaponCategory.ObjToArray();
+            result.Group = Prerequisite.GroupType.All;
+            result.CheckInProgression = false;
+            result.HideInUI = hideInUI;
+            return result;
+        }
+
+        public static AddStartingEquipment CreateAddStartingEquipment(params BlueprintItemReference[] items)
+        {
+            var result = new AddStartingEquipment();
+            result.CategoryItems = new WeaponCategory[0];
+            result.m_BasicItems = items;
+            return result;
         }
 
         public static ContextConditionIsAlly CreateContextConditionIsAlly()
@@ -2371,6 +2426,14 @@ namespace CodexLib
             return result;
         }
 
+        public static PrerequisiteNoFeature CreatePrerequisiteNoFeature(this BlueprintFeatureReference feat, bool any = false)
+        {
+            var result = new PrerequisiteNoFeature();
+            result.m_Feature = feat;
+            result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
+            return result;
+        }
+
         public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(BlueprintCharacterClassReference @class, int level, bool any = false)
         {
             var result = new PrerequisiteClassLevel();
@@ -2502,7 +2565,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.OnlyNew)
+        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.Default)
         {
             string guid = GetGuid(name);
 
@@ -2519,7 +2582,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, AnyBlueprintReference[] blueprints = null)
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool requireKnown = false, bool requireUnknown = false, AnyBlueprintReference[] blueprints = null)
         {
             string guid = GetGuid(name);
 
@@ -2532,6 +2595,9 @@ namespace CodexLib
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.ParameterType = parameterType; //FeatureParameterType.FeatureSelection
             result.BlueprintParameterVariants = blueprints;
+
+            result.RequireProficiency = requireKnown; // use this to require the spell to be known?
+            result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unkonwn?
 
             AddAsset(result, guid);
             return result;
@@ -2837,6 +2903,34 @@ namespace CodexLib
             AppendAndReplace(ref root.Entries, entry);
         }
 
+        public static void EnumCreateWeaponCategory(WeaponCategory num, string name, Sprite icon = null)
+        {
+            //var assembly = Assembly.GetExecutingAssembly();
+            //var name = assembly.GetName();
+            //var ab = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndSave);
+            //var mb = ab.DefineDynamicModule(name.Name, name.Name + ".dll");
+            //var eb = mb.DefineEnum("WeaponCategory", TypeAttributes.Public, typeof(int));
+            //eb.DefineLiteral("ButcheringAxe", 5480);
+            //var type = eb.CreateType();
+
+            LocalizedString localized = name.CreateString();
+            Patches.Patch_WeaponCategory.Extention.Add((num, localized, icon));
+
+            var stats = LocalizedTexts.Instance.Stats;
+            if (stats.m_WeaponCache == null && stats.WeaponEntries != null)
+            {
+                stats.m_WeaponCache = new();
+                foreach (var entry in stats.WeaponEntries)
+                    stats.m_WeaponCache[entry.Proficiency] = entry.Text;
+            }
+            else if (stats.m_WeaponCache == null)
+            {
+                PrintError("m_WeaponCache is null");
+                return;
+            }
+            stats.m_WeaponCache[num] = localized;
+        }
+
         #endregion
 
         #region ToReference
@@ -2860,6 +2954,16 @@ namespace CodexLib
 
             for (int i = 0; i < bpRef.Length; i++)
                 array[i] = bpRef[i].To<T>();
+
+            return array;
+        }
+
+        public static AnyRef[] ToAny(this BlueprintReferenceBase[] bpRef)
+        {
+            AnyRef[] array = new AnyRef[bpRef.Length];
+
+            for (int i = 0; i < bpRef.Length; i++)
+                array[i] = AnyRef.Get(bpRef[i]);
 
             return array;
         }

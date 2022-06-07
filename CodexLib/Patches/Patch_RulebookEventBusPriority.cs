@@ -7,7 +7,8 @@ using System.Collections.Generic;
 namespace CodexLib.Patches
 {
     /// <summary>
-    /// Ensure IBeforeRule comes first.
+    /// Use the IBeforeRule interface to place your component before any other.<br/>
+    /// This patch ensures IBeforeRule comes first.
     /// </summary>
     [HarmonyPatch]
     public class Patch_RulebookEventBusPriority

@@ -14,9 +14,12 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
+    /// <summary>
+    /// Global event, end of combat. Restores charges for items with this component.
+    /// </summary>
     [AllowedOn(typeof(BlueprintItemEquipmentUsable), false)]
     [PatchInfo(Severity.Event, "Event: Restore End Of Combat", "enables logic used by patchArrows")]
-    public class Event_RestoreEndOfCombat : BlueprintComponent, IPartyCombatHandler, IGlobalSubscriber, ISubscriber
+    public class Event_RestoreEndOfCombat : BlueprintComponent, IPartyCombatHandler, IGlobalSubscriber
     {
         public void HandlePartyCombatStateChanged(bool inCombat)
         {

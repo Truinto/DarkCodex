@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shared;
-using CodexLib;
 
-namespace DarkCodex
+namespace CodexLib.Patches
 {
-    [PatchInfo(Severity.Harmony, "Patch: Status Effect Exemptions", "Adds logic to ignore status effects under certain conditions.", false)]
+    /// <summary>
+    /// Adds logic to ignore status effects under certain conditions.<br/>
+    /// Used by AddConditionExceptions.
+    /// </summary>
     [HarmonyPatch]
     public class Patch_ConditionExemption
     {
@@ -27,7 +28,7 @@ namespace DarkCodex
             {
                 if (exception is UnitConditionExceptionsFromBuff buffException && buffException.IsException(source))
                 {
-                    Main.PrintDebug($"ConditionExemption {condition} from {source}");
+                    Helper.PrintDebug($"ConditionExemption {condition} from {source}");
                     __instance.m_Conditions[(int)condition]--;
                     source = null;
                     break;

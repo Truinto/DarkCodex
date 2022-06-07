@@ -8,12 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shared;
-using CodexLib;
 
-namespace DarkCodex
+namespace CodexLib.Patches
 {
-    [PatchInfo(Severity.Harmony, "Patch: Ability At Will", "provides logic for at will spells")]
+    /// <summary>
+    /// Provides logic for at will spells.
+    /// </summary>
     [HarmonyPatch]
     public class Patch_AbilityAtWill
     {

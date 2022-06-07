@@ -12,9 +12,9 @@ using Shared;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony, "Patch: Fact Selection Parametrized", "what does this do?", false)]
+    [PatchInfo(Severity.Harmony, "Patch: Fact Selection Parametrized", "what does this do? hide abilities unit doesn't have?", false)]
     [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.CanSelect))]
-    public class Patch_FactSelectionParameterized
+    public class Patch_FactSelectionParameterized // TODO: check what this does
     {
         public static bool Prefix(BlueprintParametrizedFeature __instance, ref bool __result, UnitDescriptor unit, LevelUpState state, FeatureSelectionState selectionState, IFeatureSelectionItem item)
         {
@@ -23,14 +23,14 @@ namespace DarkCodex
 
             if (item.Param == null)
                 __result = false;
-            //else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
-            //    __result = false;
+            else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
+                __result = false;
             else if (unit.GetFeature(__instance, item.Param) != null)
                 __result = false;
             else if (item.Param.Blueprint is BlueprintFact fact && !unit.HasFact(fact))
-                __result = __instance.HasNoSuchFeature;
+                __result = !__instance.RequireProficiency;
             else
-                __result = true;
+                __result = !__instance.HasNoSuchFeature;
 
             return false;
         }

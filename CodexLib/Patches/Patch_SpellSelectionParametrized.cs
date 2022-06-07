@@ -4,11 +4,13 @@ using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using System.Collections.Generic;
-using Shared;
 
-namespace DarkCodex
+namespace CodexLib.Patches
 {
-    [PatchInfo(Severity.Harmony, "Patch: Spell Selection Parametrized", "fix spell selection for Preferred Spell", false)]
+    /// <summary>
+    /// BlueprintParametrizedFeature of type SpellSpecialization won't work if no prerequisite is required.<br/>
+    /// This patch fixes that.
+    /// </summary>
     [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.ExtractItemsFromSpellbooks))]
     public class Patch_SpellSelectionParametrized
     {

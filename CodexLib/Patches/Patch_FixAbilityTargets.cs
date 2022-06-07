@@ -4,19 +4,23 @@ using Kingmaker.Designers;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
-using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DarkCodex
+namespace CodexLib.Patches
 {
+    /// <summary>
+    /// If no AoERadiusProvider component is present, it will always default to TargetType.Any.
+    /// This patch checks the blueprint's settings CanTargetFriends and CanTargetEnemies instead.
+    /// </summary>
     [HarmonyPatch]
     public class Patch_FixAbilityTargets
     {
         [HarmonyPatch(typeof(BlueprintAbility), nameof(BlueprintAbility.AoETargets), MethodType.Getter)]
+        [HarmonyPriority(Priority.LowerThanNormal)]
         [HarmonyPrefix]
         public static bool Prefix(BlueprintAbility __instance, ref TargetType __result)
         {
@@ -24,7 +28,7 @@ namespace DarkCodex
             if (provider != null)
             {
                 __result = provider.Targets;
-                //Main.PrintDebug($"AoETargets {provider.Targets}");
+                //Helper.PrintDebug($"AoETargets {provider.Targets}");
                 return false;
             }
 
@@ -35,7 +39,7 @@ namespace DarkCodex
             else
                 __result = TargetType.Any;
 
-            //Main.PrintDebug($"AoETargets override {provider.Targets}");
+            //Helper.PrintDebug($"AoETargets override {provider.Targets}");
             return false;
         }
     }

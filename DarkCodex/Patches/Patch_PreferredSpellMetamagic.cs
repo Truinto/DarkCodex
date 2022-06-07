@@ -13,7 +13,7 @@ using CodexLib;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony, "Patch: Preferred Spell Metamagic", "necessary patches for Preferred Spell", false, Requirement: typeof(Patch_SpellSelectionParametrized))]
+    [PatchInfo(Severity.Harmony, "Patch: Preferred Spell Metamagic", "necessary patches for Preferred Spell", false)]
     [HarmonyPatch]
     public class Patch_PreferredSpellMetamagic
     {
@@ -24,7 +24,7 @@ namespace DarkCodex
             if (__instance.Spellbook == null)
                 return;
 
-            var list = __result.ToList();
+            var list = __result as List<AbilityData> ?? __result.ToList();
 
             try
             {

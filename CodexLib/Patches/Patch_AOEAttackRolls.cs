@@ -3,11 +3,12 @@ using System.Linq;
 using CodexLib;
 using HarmonyLib;
 using Kingmaker.RuleSystem.Rules;
-using Shared;
 
-namespace DarkCodex
+namespace CodexLib.Patches
 {
-    [PatchInfo(Severity.Harmony, "Patch: AOE Attack Rolls", "allows Impale Infusion and other AOE attacks to roll once for all", false)]
+    /// <summary>
+    /// Logic for ContextConditionAttackRoll to make AOE attack rolls.
+    /// </summary>
     [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
     public class Patch_AOEAttackRolls
     {

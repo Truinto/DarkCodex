@@ -19,6 +19,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using CodexLib;
+using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 
 namespace DarkCodex
 {
@@ -106,6 +109,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Butchering Axe", "new weapon type Butchering Axe", false)]
         public static void CreateButcheringAxe()
         {
+            Helper.EnumCreateWeaponCategory(Const.ButcheringAxe, "Butchering Axe");
+
             var butchering = Helper.CreateBlueprintWeaponEnchantment(
                 "ButcheringAxeEnchantment",
                 "Butchering",
@@ -117,6 +122,7 @@ namespace DarkCodex
                 "ButcheringAxeType",
                 "Butchering Axe",
                 "e8059a8eac62cd74f9171d748a5ae428",
+                category: Const.ButcheringAxe,
                 damage: new DiceFormula(3, DiceType.D6),
                 form: PhysicalDamageForm.Slashing,
                 critMod: DamageCriticalModifierType.X3);
@@ -167,6 +173,21 @@ namespace DarkCodex
             Helper.AddExoticVendorItem(plus3.ToReference<BlueprintItemReference>(), 3);
             Helper.AddExoticVendorItem(plus4.ToReference<BlueprintItemReference>(), 3);
             Helper.AddExoticVendorItem(plus5.ToReference<BlueprintItemReference>(), 3);
+
+            var prof = Helper.CreateBlueprintFeature(
+                "ButcheringAxeProficiency",
+                "Weapon Proficiency (Butchering Axe)",
+                "You become proficient with butchering axes and can use them as a weapon.",
+                group: FeatureGroup.ExoticWeaponProficiency
+                ).SetComponents(
+                Helper.CreateAddProficiencies(Const.ButcheringAxe),
+                Helper.CreatePrerequisiteNotProficient(Const.ButcheringAxe),
+                Helper.CreateAddStartingEquipment(standard.ToReference<BlueprintItemReference>())
+                );
+
+            var profselect = Helper.Get<BlueprintFeatureSelection>("9a01b6815d6c3684cb25f30b8bf20932"); //ExoticWeaponProficiencySelection
+            Helper.AppendAndReplace(ref profselect.m_AllFeatures, prof.ToRef());
+            Helper.AppendAndReplace(ref profselect.GetComponent<PrerequisiteNotProficient>().WeaponProficiencies, Const.ButcheringAxe);
         }
 
         [PatchInfo(Severity.Create, "Impact Enchantment", "new enchantment Impact", false)]

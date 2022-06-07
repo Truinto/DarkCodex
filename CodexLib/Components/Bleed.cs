@@ -140,6 +140,7 @@ namespace CodexLib
                     else
                     {
                         modifier.ModValue -= malus;
+                        ac.UpdateValue();
                     }
                 }
             }

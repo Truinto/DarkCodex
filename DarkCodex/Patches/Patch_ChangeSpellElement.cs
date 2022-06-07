@@ -4,6 +4,7 @@ using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Shared;
 using System;
@@ -24,10 +25,13 @@ namespace DarkCodex
         [HarmonyPrefix]
         public static bool Prefix1(RuleCalculateAbilityParams evt, IncreaseSpellDescriptorDC __instance)
         {
-            if (__instance.SpellsOnly && evt.Spellbook == null)
+            if (evt.Spell == null)
                 return false;
 
-            if (evt.Spell == null || !evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
+            if (__instance.SpellsOnly && evt.Spellbook == null && evt.Spell.Type != AbilityType.Spell && evt.Spell.Type != AbilityType.SpellLike)
+                return false;
+
+            if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
                 return false;
 
             if (evt.TryGetCustomData<SpellDescriptor>(Const.KeyChangeElement, out var descriptor))
@@ -46,7 +50,10 @@ namespace DarkCodex
         [HarmonyPrefix]
         public static bool Prefix2(RuleCalculateAbilityParams evt, IncreaseSpellContextDescriptorDC __instance)
         {
-            if (__instance.SpellsOnly && evt.Spellbook == null)
+            if (evt.Spell == null)
+                return false;
+
+            if (__instance.SpellsOnly && evt.Spellbook == null && evt.Spell.Type != AbilityType.Spell && evt.Spell.Type != AbilityType.SpellLike)
                 return false;
 
             if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))

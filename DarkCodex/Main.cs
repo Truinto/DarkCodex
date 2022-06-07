@@ -397,7 +397,6 @@ namespace Shared
             PatchSafe(typeof(DEBUG.Enchantments));
             PatchSafe(typeof(Patch_FixLoadCrash1));
             LoadSafe(General.CreateBardStopSong);
-            PatchSafe(typeof(DEBUG.Patch_UpdateSave130)); // TODO: remove update
 
             // Cache
             LoadSafe(General.CreatePropertyMaxMentalAttribute);
@@ -407,37 +406,31 @@ namespace Shared
 
             // Harmony Patches
             PatchUnique(typeof(Patch_AllowAchievements));
-            PatchUnique(typeof(Patch_DebugReport));
             PatchSafe(typeof(Patch_FixPolymorphGather));
             PatchSafe(typeof(Patch_TrueGatherPowerLevel));
             PatchSafe(typeof(Patch_KineticistAllowOpportunityAttack));
             PatchSafe(typeof(Patch_EnvelopingWindsCap));
-            PatchSafe(typeof(Patch_AOEAttackRolls));
             PatchSafe(typeof(Patch_MagicItemAdept));
             PatchSafe(typeof(Patch_ActivatableOnNewRound));
-            PatchSafe(typeof(Patch_ActivatableActionBar));
             PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
             PatchSafe(typeof(Patch_ActivatableOnTurnOn));
             PatchSafe(typeof(Patch_ActivatableTryStart));
             PatchSafe(typeof(Patch_ResourcefulCaster));
             PatchSafe(typeof(Patch_FeralCombat));
-            PatchSafe(typeof(Patch_SpellSelectionParametrized));
             PatchSafe(typeof(Patch_PreferredSpellMetamagic));
-            PatchSafe(typeof(Patch_AlwaysAChance));
             PatchSafe(typeof(Patch_FixAreaDoubleDamage));
             PatchSafe(typeof(Patch_FixAreaEndOfTurn));
             PatchSafe(typeof(Patch_Polymorph));
             PatchSafe(typeof(Patch_EnduringSpells));
             PatchSafe(typeof(Patch_UnlockClassLevels));
-            PatchSafe(typeof(Patch_AbilityAtWill));
             PatchSafe(typeof(Patch_DarkElementalistBurn));
             PatchSafe(typeof(Patch_DismissAnything));
-            PatchSafe(typeof(Patch_ConditionExemption));
             PatchSafe(typeof(Patch_FixQuickenMetamagic));
             PatchSafe(typeof(Patch_HexcrafterSpellStrike));
-            PatchSafe(typeof(Patch_FixAbilityTargets));
+            PatchSafe(typeof(Patch_BackgroundChecks));
 
             // General
+            LoadSafe(General.FixMasterShapeshifter);
             LoadSafe(General.CreateMadMagic);
             LoadSafe(General.PatchAngelsLight);
             LoadSafe(General.PatchBasicFreebieFeats);
@@ -446,6 +439,9 @@ namespace Shared
 
             // Spells
             LoadSafe(Spells.CreateBladedDash);
+
+            // Spellcasters
+            LoadSafe(Spellcasters.FixBloodlineArcane);
 
             // Items
             LoadSafe(Items.PatchArrows);
@@ -523,6 +519,7 @@ namespace Shared
             LoadSafe(Unlock.UnlockKineticist); // keep late
 
             // Extra Features - keep last
+            LoadSafe(General.CreateBackgrounds); // keep last
             LoadSafe(General.FixSpellElementChange); // keep last
             LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
             LoadSafe(General.CreatePreferredSpell); // keep last

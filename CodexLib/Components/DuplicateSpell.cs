@@ -28,7 +28,7 @@ namespace CodexLib
 
         public void OnEventDidTrigger(RuleCastSpell evt)
         {
-            if (evt.IsDuplicateSpellApplied || !evt.Success || AbilityCheck != null && AbilityCheck(evt.Spell))
+            if (evt.IsDuplicateSpellApplied || !evt.Success || AbilityCheck != null && !AbilityCheck(evt.Spell))
                 return;
 
             AbilityData spell = evt.Spell;

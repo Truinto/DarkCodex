@@ -6,21 +6,11 @@ using Shared;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony, "Patch: Always A Chance", "Always A Chance succeeds on a natural one and applies to most d20 rolls", true)]
     [HarmonyPatch]
     public class Patch_AlwaysAChance
     {
         // OvertipViewPartCombatText.OnCombatMessage
         // UICombatTexts.GetTbmCombatText
-
-        [HarmonyPatch(typeof(RuleDispelMagic), nameof(RuleDispelMagic.IsSuccessRoll))]
-        [HarmonyPrepare]
-        public static void Prepare()
-        {
-            var bp = Helper.Get<BlueprintFeature>("d57301613ad6a5140b2fdac40fa368e3"); //AlwaysAChance
-            if (bp != null)
-                bp.m_Description = Helper.CreateString("You automatically succeed when you roll a natural 1.");
-        }
 
         [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.IsSuccessRoll))]
         [HarmonyPostfix]

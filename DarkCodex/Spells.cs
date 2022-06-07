@@ -64,9 +64,6 @@ namespace DarkCodex
                 craft
                 ).TargetEnemy(point: true);
 
-            // TODO: apply attack bonus; AddAttackBonus
-            var applyBuff = Helper.CreateAbilityExecuteActionOnCast();
-
             var normal = Helper.CreateBlueprintAbility(
                 "BladedDash",
                 "Bladed Dash",

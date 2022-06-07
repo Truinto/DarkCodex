@@ -1,5 +1,21 @@
 ﻿# Changelog
 
+## [1.0.2]
+- !signature change: CreateBlueprintParametrizedFeature
+- added EnumCreateWeaponCategory and Patch_WeaponCategory
+- added FlagArray
+- added PartCustomData
+- added MetamagicReduceCostParametrized
+- added MasterShapeshifterFix
+- added Patch_AbilityAtWill
+- added Patch_ActivatableActionBar
+- added Patch_AOEAttackRolls
+- added Patch_ConditionExemption
+- added Patch_DebugReport
+- added Patch_FixAbilityTargets
+- added Patch_SpellSelectionParametrized
+- added Patch_MetamagicFullRound and MechanicFeature.SpontaneousMetamagicNoFullRound
+
 ## [1.0.1]
 - !signature change: TargetEnemy, TargetAlly, TargetAny
 - added AnyRef

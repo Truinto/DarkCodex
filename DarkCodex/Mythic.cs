@@ -403,6 +403,9 @@ namespace DarkCodex
             var hunterfeat = Helper.ToRef<BlueprintFeatureReference>("6dddf5ba2291f41498df2df7f8fa2b35"); //HuntersBondFeature
             var huntersab = Helper.ToRef<BlueprintAbilityReference>("cd80ea8a7a07a9d4cb1a54e67a9390a5"); //HuntersBondAbility
 
+            var freebooterfeat = Helper.ToRef<BlueprintFeatureReference>("13954cd0f95cb4f4eaa9e9cdabbc2bbb"); //FreebootersBondFeature
+            var freebooterab = Helper.ToRef<BlueprintAbilityReference>("f9f94fdcb4a3e314ea19e5398ab81251"); //FreebootersBondAbility
+
             //huntersab.Get().AvailableMetamagic |= Metamagic.Quicken;
 
             var feat = Helper.CreateBlueprintFeature(
@@ -410,8 +413,9 @@ namespace DarkCodex
                 "Swift Hunters Bond",
                 "Benefit: You can use Hunter's Bond as a swift action."
                 ).SetComponents(
-                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { huntersab }),
-                Helper.CreatePrerequisiteFeature(hunterfeat)
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { huntersab, freebooterab }),
+                Helper.CreatePrerequisiteFeature(hunterfeat, true),
+                Helper.CreatePrerequisiteFeature(freebooterfeat, true)
                 );
 
             Helper.AddMythicTalent(feat);
@@ -726,6 +730,16 @@ namespace DarkCodex
                 Helper.CreateAddContextStatBonus(StatType.Intelligence),
                 new AddDamageResistancePhysicalImproved() { Value = 10 }
                 );
+        }
+
+        [PatchInfo(Severity.Harmony, "Always A Chance", "'Always A Chance' succeeds on a natural one and applies to most d20 rolls", true)]
+        public static void PatchAlwaysAChance()
+        {
+            var bp = Helper.Get<BlueprintFeature>("d57301613ad6a5140b2fdac40fa368e3"); //AlwaysAChance
+            if (bp != null)
+                bp.m_Description = Helper.CreateString("You automatically succeed when you roll a natural 1.");
+
+            Main.Patch(typeof(Patch_AlwaysAChance));
         }
 
         [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport", true)]
