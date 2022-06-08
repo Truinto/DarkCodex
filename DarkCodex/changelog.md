@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.7]
+- added Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity
+- fixed bug that made metamagic traits unselectable
+
 ## [1.3.6]
 - added Butchering Axe weapon proficiency, which is now required to use it
 - fixed Elemental Focus not applying to spell-like abilities

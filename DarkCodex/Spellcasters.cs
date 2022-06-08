@@ -25,6 +25,13 @@ namespace DarkCodex
                 out var buff
                 );
 #endif
+
+            Helper.CreateBlueprintActivatableAbility(
+                "MetamagicAdeptActivatable",
+                "Metamagic Adept",
+                "At 3rd level, you can apply any one metamagic feat you know to a spell you are about to cast without increasing the casting time. You must still expend a higher-level spell slot to cast this spell. You can use this ability once per day at 3rd level and one additional time per day for every four sorcerer levels you possess beyond 3rd, up to five times per day at 19th level. At 20th level, this ability is replaced by arcane apotheosis.",
+                out var buff
+                );
         }
     }
 }

@@ -132,6 +132,7 @@
     <Compile Include="Components\KineticMastery.cs" />
     <Compile Include="Components\LevelUpAddSelectionHasFact.cs" />
     <Compile Include="Components\MasterShapeshifterFix.cs" />
+    <Compile Include="Components\MetamagicAdeptFix.cs" />
     <Compile Include="Components\MetamagicReduceCostParametrized.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\SpellDescriptorExt.cs" />

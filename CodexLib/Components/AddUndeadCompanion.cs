@@ -24,7 +24,7 @@ using UnityEngine;
 namespace CodexLib
 {
     /// <summary>
-    /// unfinished
+    /// TODO: AddUndeadCompanion
     /// </summary>
     public class AddUndeadCompanion : UnitFactComponentDelegate<AddUndeadCompanion.RuntimeData>, IAreaHandler, IUpdatePet
     {

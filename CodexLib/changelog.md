@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## [1.0.3]
+- added CreateRemoveFeatureOnApply
+- added Helper AddCondition and RemoveMethods
+
 ## [1.0.2]
 - !signature change: CreateBlueprintParametrizedFeature
 - added EnumCreateWeaponCategory and Patch_WeaponCategory

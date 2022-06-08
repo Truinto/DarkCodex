@@ -34,6 +34,7 @@ using System.Threading.Tasks;
 using Shared;
 using System.IO;
 using CodexLib;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 
 namespace DarkCodex
 {
@@ -342,6 +343,7 @@ namespace DarkCodex
             Choose one spell you can cast. From now on, you always cast this spell at +1 caster level.
 
             */
+            var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
 
             var scholarMetamagic = Helper.CreateBlueprintParametrizedFeature(
                 "BackgroundScholarMagicalLineage",
@@ -350,7 +352,7 @@ namespace DarkCodex
                 icon: null,
                 group: FeatureGroup.Trait,
                 parameterType: FeatureParameterType.SpellSpecialization,
-                requireKnown: true
+                blueprints: specialization.BlueprintParameterVariants
                 ).SetComponents(
                 new MetamagicReduceCostParametrized(),
                 new AddCasterLevelLimit() { Bonus = 2 }
@@ -363,7 +365,7 @@ namespace DarkCodex
                 icon: null,
                 group: FeatureGroup.Trait,
                 parameterType: FeatureParameterType.SpellSpecialization,
-                requireKnown: true
+                blueprints: specialization.BlueprintParameterVariants
                 ).SetComponents(
                 new MetamagicReduceCostParametrized() { Reduction = 2 }
                 );
@@ -375,7 +377,7 @@ namespace DarkCodex
             foreach (var feat in backgroundSelection.m_AllFeatures)
             {
                 if (feat.Get() is BlueprintFeatureSelection selection)
-                    selection.AddComponents(Helper.CreatePrerequisiteFeature(feat));
+                    selection.AddComponents(Helper.CreatePrerequisiteNoFeature(feat));
             }
 
             var extra = Helper.CreateBlueprintFeatureSelection(
@@ -387,6 +389,78 @@ namespace DarkCodex
                 ).Add(backgroundSelection.m_AllFeatures);
 
             Helper.AddFeats(extra);
+        }
+
+        [PatchInfo(Severity.Create, "Heritages", "adds Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity", true)]
+        public static void CreateHeritage()
+        {
+            var orc = Helper.Get<BlueprintFeatureSelection>("8c3244440e0b4d1d9d9b182685cbacbd"); //HalfOrcHeritageSelection
+            var mythic = Helper.ToRef<BlueprintUnitFactReference>("325f078c584318849bfe3da9ea245b9d").ObjToArray(); //DestinyBeyondBirthMythicFeat
+            var mythicRaces = mythic[0].Get().GetComponent<PrerequisiteFeaturesFromList>();
+
+            var minusInt = Helper.CreateBlueprintFeature(
+                "MinusIntelligence",
+                "Intelligence Malus",
+                "You take a -2 penalty to Intelligence.",
+                group: FeatureGroup.Racial
+                ).SetComponents(
+                new AddStatBonusIfHasFact
+                {
+                    Descriptor = ModifierDescriptor.Racial,
+                    Stat = StatType.Intelligence,
+                    Value = -2,
+                    InvertCondition = true,
+                    m_CheckedFacts = mythic
+                });
+
+            var minusWis = Helper.CreateBlueprintFeature(
+                "MinusWisdom",
+                "Wisdom Malus",
+                "You take a -2 penalty to Wisdom.",
+                group: FeatureGroup.Racial
+                ).SetComponents(
+                new AddStatBonusIfHasFact
+                {
+                    Descriptor = ModifierDescriptor.Racial,
+                    Stat = StatType.Wisdom,
+                    Value = -2,
+                    InvertCondition = true,
+                    m_CheckedFacts = mythic
+                });
+
+            var minusCha = Helper.CreateBlueprintFeature(
+                "MinusCharisma",
+                "Charisma Malus",
+                "You take a -2 penalty to Charisma.",
+                group: FeatureGroup.Racial
+                ).SetComponents(
+                new AddStatBonusIfHasFact
+                {
+                    Descriptor = ModifierDescriptor.Racial,
+                    Stat = StatType.Charisma,
+                    Value = -2,
+                    InvertCondition = true,
+                    m_CheckedFacts = mythic
+                });
+
+
+            var kindred = Helper.Get<BlueprintFeature>("5609d6e6cbd5422c8d6a1e7ee0b31a87"); //KindredRaisedHalfElf
+            kindred.RemoveComponents(r => r is RemoveFeatureOnApply remove && remove.m_Feature.deserializedGuid == "2483a523984f44944a7cf157b21bf79c");
+            kindred.m_Description.CreateString("Kindred-Raised loses keen senses and adaptability, but gains a +2 racial {g|Encyclopedia:Bonus}bonus{/g} to {g|Encyclopedia:Charisma}Charisma{/g}.");
+
+            var atavism = Helper.CreateBlueprintFeatureSelection(
+                "AtavismOrc",
+                "Orc Atavism",
+                "Some half-orcs have much stronger orc blood than human blood. Such half-orcs count as only half-orcs and orcs (not also humans) for any effect related to race. They gain a +2 bonus to Strength, a +2 bonus to one ability score of their choice, and a –2 penalty to one mental ability score of their choice. Finally, they gain the ferocity universal monster ability. This racial trait replaces the half-orc’s usual racial ability score modifiers, as well as intimidating, orc blood, and orc ferocity.",
+                group: FeatureGroup.Racial
+                ).SetComponents(
+                Helper.CreateAddStatBonus(2, StatType.Strength, ModifierDescriptor.Racial),
+                new AddMechanicsFeature { m_Feature = AddMechanicsFeature.MechanicsFeatureType.Ferocity },
+                Helper.CreateRemoveFeatureOnApply("885f478dff2e39442a0f64ceea6339c9"), //Intimidating
+                Helper.CreateRemoveFeatureOnApply("c99f3405d1ef79049bd90678a666e1d7") //HalfOrcFerocity
+                ).Add(minusInt, minusWis, minusCha);
+            orc.Add(atavism);
+            Helper.AppendAndReplace(ref mythicRaces.m_Features, atavism.ToRef());
         }
 
         #region General Resources and Stuff

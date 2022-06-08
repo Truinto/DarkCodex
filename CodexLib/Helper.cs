@@ -59,6 +59,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -241,6 +242,47 @@ namespace CodexLib
             var repl = CodeInstruction.Call(type, name, parameters, generics);
             code.opcode = repl.opcode;
             code.operand = repl.operand;
+        }
+
+        /// <summary>
+        /// Inserts a check and return block. Method returns, if func returns false (like HarmonyPrefix).
+        /// </summary>
+        /// <param name="func">object is __instance</param>
+        /// <remarks>
+        /// End result:
+        /// <code>
+        /// if (!func(__instance))
+        ///     return;
+        /// </code>
+        /// </remarks>
+        public static void AddCondition(this List<CodeInstruction> code, ref int index, Func<object, bool> func, ILGenerator generator)
+        {
+            PrintDebug($"Transpiler AddCondition @{index}");
+
+            Label label;
+            code.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
+            code.Insert(index++, new CodeInstruction(OpCodes.Call, func.GetMethodInfo()));
+            code.Insert(index++, new CodeInstruction(OpCodes.Brtrue_S, label = generator.DefineLabel()));
+            code.Insert(index++, new CodeInstruction(OpCodes.Ret));
+            code[index++].labels.Add(label);
+        }
+
+        public static void RemoveMethods(this List<CodeInstruction> code, Type type, string name, Type[] parameters = null, Type[] generics = null)
+        {
+            var mi = AccessTools.Method(type, name, parameters, generics);
+            int count = mi.GetParameters().Length;
+
+            for (int i = 0; i < code.Count; i++)
+            {
+                if (code[i].Calls(mi))
+                {
+                    PrintDebug($"Transpiler RemoveMethods {mi.Name} @{i}");
+
+                    code[i++].opcode = OpCodes.Nop;
+                    for (int j = 0; j < count; j++)
+                        code.Insert(i++, new CodeInstruction(OpCodes.Pop));
+                }
+            }
         }
 
         #endregion
@@ -1794,6 +1836,13 @@ namespace CodexLib
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
         }
 
+        public static RemoveFeatureOnApply CreateRemoveFeatureOnApply(AnyRef blueprintUnitFact)
+        {
+            var result = new RemoveFeatureOnApply();
+            result.m_Feature = blueprintUnitFact;
+            return result;
+        }
+
         public static AddProficiencies CreateAddProficiencies(params WeaponCategory[] weaponCategory)
         {
             var result = new AddProficiencies();
@@ -2594,7 +2643,7 @@ namespace CodexLib
             result.m_Icon = icon;
             result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
             result.ParameterType = parameterType; //FeatureParameterType.FeatureSelection
-            result.BlueprintParameterVariants = blueprints;
+            result.BlueprintParameterVariants = blueprints ?? Array.Empty<AnyBlueprintReference>();
 
             result.RequireProficiency = requireKnown; // use this to require the spell to be known?
             result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unkonwn?

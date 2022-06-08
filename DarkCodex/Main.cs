@@ -430,8 +430,9 @@ namespace Shared
             PatchSafe(typeof(Patch_BackgroundChecks));
 
             // General
-            LoadSafe(General.FixMasterShapeshifter);
+            LoadSafe(General.CreateHeritage);
             LoadSafe(General.CreateMadMagic);
+            LoadSafe(General.FixMasterShapeshifter);
             LoadSafe(General.PatchAngelsLight);
             LoadSafe(General.PatchBasicFreebieFeats);
             LoadSafe(General.PatchHideBuffs);
