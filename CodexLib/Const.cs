@@ -23,6 +23,8 @@ namespace CodexLib
         public const int NoManualOff = 788704820;
         public const int NoManualAny = 788704821;
 
+        public const PetType PetUndead = (PetType)5580;
+
         public static CustomDataKey KeyChangeElement = new("ChangeElement");
     }
 }

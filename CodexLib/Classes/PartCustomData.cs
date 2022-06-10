@@ -14,10 +14,10 @@ namespace CodexLib
         [JsonProperty]
         private Dictionary<string, object> data;
         [JsonProperty]
-        private FlagArray flags;
+        private CountableFlagArray flags;
 
         public Dictionary<string, object> Data { get => data ??= new(); }
-        public FlagArray Flags { get => flags ??= new(); }
+        public CountableFlagArray Flags { get => flags ??= new(); }
 
         public bool IsEmpty()
         {
@@ -57,44 +57,28 @@ namespace CodexLib
                 unit.Parts.Remove(data);
         }
 
-        public static T GetFlags<T>(this UnitEntityData unit) where T : Enum
-        {
-            var data = unit.Get<PartCustomData>();
-            if (data == null)
-                return default;
-            return data.Flags.GetFlags<T>();
-        }
-
-        public static void AddFlags<T>(this UnitEntityData unit, T flags) where T : Enum
+        public static void Retain<T>(this UnitEntityData unit, T key) where T : Enum
         {
             var data = unit.Ensure<PartCustomData>();
-            data.Flags.AddFlags<T>(flags);
+            data.Flags.Retain<T>(key);
         }
 
-        public static void RemoveFlags<T>(this UnitEntityData unit, T flags) where T : Enum
+        public static void Release<T>(this UnitEntityData unit, T key) where T : Enum
         {
             var data = unit.Get<PartCustomData>();
             if (data == null)
                 return;
-            data.Flags.RemoveFlags<T>(flags);
+            data.Flags.Release<T>(key);
             if (data.IsEmpty())
                 unit.Parts.Remove(data);
         }
 
-        public static bool HasAnyFlags<T>(this UnitEntityData unit, T flags) where T : Enum
+        public static bool HasFlag<T>(this UnitEntityData unit, T key) where T : Enum
         {
             var data = unit.Get<PartCustomData>();
             if (data == null)
                 return false;
-            return data.Flags.HasAnyFlags<T>(flags);
-        }
-
-        public static bool HasAllFlags<T>(this UnitEntityData unit, T flags) where T : Enum
-        {
-            var data = unit.Get<PartCustomData>();
-            if (data == null)
-                return false;
-            return data.Flags.HasAllFlags<T>(flags);
+            return data.Flags.HasFlag<T>(key);
         }
     }
 

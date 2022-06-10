@@ -70,7 +70,7 @@ namespace CodexLib
             }
         }
 
-        [OnSerializing]
+        //[OnSerializing]
         private void OnSerializing()
         {
             foreach (var key in this.Data.Keys.ToArray())
@@ -80,13 +80,13 @@ namespace CodexLib
             }
         }
 
-        [OnDeserialized]
+        //[OnDeserialized]
         private void OnDeserialized() 
         {
             Helper.PrintDebug("OnDeserialized FlagArray");
         }
 
-        [OnError]
+        //[OnError]
         private void OnError(StreamingContext context, ErrorContext errorContext)
         {
             Helper.PrintException(errorContext.Error);

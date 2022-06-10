@@ -22,21 +22,23 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr) // TODO: upgrade to Helper.RemoveMethods()
         {
-            List<CodeInstruction> list = instr.ToList();
+            List<CodeInstruction> code = instr.ToList();
             var original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
 
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].Calls(original))
-                {
-                    Main.PrintDebug("Patched at " + i);
-                    list[i] = CodeInstruction.Call(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
-                }
-            }
+            code.RemoveMethods(typeof(UnitState), nameof(UnitState.AddCondition));
 
-            return list;
+            //for (int i = 0; i < code.Count; i++)
+            //{
+            //    if (code[i].Calls(original))
+            //    {
+            //        Main.PrintDebug("Patched at " + i);
+            //        code[i] = CodeInstruction.Call(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
+            //    }
+            //}
+
+            return code;
         }
         public static void NullReplacement(UnitState state, UnitCondition condition, Buff sourceBuff, UnitConditionExceptions exceptions)
         {
@@ -66,17 +68,4 @@ namespace DarkCodex
         }
 
     }
-
-    //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]
-    //public class Patch_KineticistWhipReach
-    //{
-    //    public static void Postfix(UnitPartKineticist kineticist, UnitCommand cmd, bool __result)
-    //    {
-    //        if (!__result)
-    //            return;
-    //        if (kineticist.Owner.Buffs.GetBuff(Patch_KineticistAllowOpportunityAttack2.whip_buff) == null) 
-    //            return;
-    //        cmd.ApproachRadius += 5f * 0.3048f;
-    //    }
-    //}
 }

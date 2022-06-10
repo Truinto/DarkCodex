@@ -40,7 +40,8 @@ namespace CodexLib
             PatchSafe(typeof(Patch_RulebookEventBusPriority));
             PatchSafe(typeof(Patch_SpellSelectionParametrized));
             PatchSafe(typeof(Patch_WeaponCategory));
-            PatchSafe(typeof(Patch_MetamagicFullRound));
+            PatchSafe(typeof(Patch_AbilityIsFullRound));
+            PatchSafe(typeof(Patch_RuleSpendCharge));
 
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");

@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public enum MechanicFeature
-    {
-        None,
-        SpontaneousMetamagicNoFullRound,
-        SummoningNoFullRound,
-    }
+    public delegate bool ILFunction(object instance);
+    public delegate bool ILFunctionRet(object instance, ref object result);
 }

@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.UnitLogic.Abilities;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace CodexLib.Patches
 {
     [HarmonyPatch]
-    public class Patch_MetamagicFullRound
+    public class Patch_AbilityIsFullRound
     {
         [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.RequireFullRoundAction), MethodType.Getter)]
         public static void Postfix(AbilityData __instance, ref bool __result)
@@ -20,7 +21,13 @@ namespace CodexLib.Patches
             if (__instance.IsSpontaneous 
                 && __instance.MetamagicData?.NotEmpty == true 
                 && !__instance.Blueprint.IsFullRoundAction 
-                && __instance.Caster?.Unit.HasAnyFlags(MechanicFeature.SpontaneousMetamagicNoFullRound) == true)
+                && __instance.Caster?.Unit.HasFlag(MechanicFeature.SpontaneousMetamagicNoFullRound) == true)
+            {
+                __result = false;
+            }
+
+            if (__instance.Blueprint.SpellDescriptor.HasAnyFlag(SpellDescriptor.Summoning)
+                && __instance.Caster?.Unit.HasFlag(MechanicFeature.SummoningNoFullRound) == true)
             {
                 __result = false;
             }

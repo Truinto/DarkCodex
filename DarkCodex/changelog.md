@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.8]
+- added fix for Arcane bloodline; Metamagic Adept and Arcane Apotheosis
+- fixed crash during save, if a character has Arcane Apotheosis
+
 ## [1.3.7]
 - added Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity
 - fixed bug that made metamagic traits unselectable

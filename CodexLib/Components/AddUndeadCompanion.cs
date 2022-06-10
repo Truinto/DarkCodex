@@ -25,12 +25,14 @@ namespace CodexLib
 {
     /// <summary>
     /// TODO: AddUndeadCompanion
+    /// fix: need to save data in UnitPart instead of RuntimeData? or new interface?
     /// </summary>
-    public class AddUndeadCompanion : UnitFactComponentDelegate<AddUndeadCompanion.RuntimeData>, IAreaHandler, IUpdatePet
+    public class AddUndeadCompanion : UnitFactComponentDelegate<AddUndeadCompanion.RuntimeData>, IAreaHandler, IUpdatePet, IUpdateCompanion
     {
         public bool DestroyPetOnDeactivate;
         public bool ForceAutoLevelup;
-        public PetType Type = (PetType)5580;
+
+        public List<UnitReference> Companions { get => this.Data.UnitRef; }
 
         public void AddCompanion(BlueprintUnit blueprintUnit)
         {
@@ -41,6 +43,17 @@ namespace CodexLib
 
         public void RemoveCompanion(UnitReference unitReference)
         {
+            for (int i = 0; i < this.Data.UnitRef.Count; i++)
+            {
+                if (this.Data.UnitRef[i] == unitReference)
+                {
+                    this.Data.UnitBlueprint.RemoveAt(i);
+                    this.Data.UnitRef.RemoveAt(i);
+
+                    break;
+                }
+            }
+
             var pet = unitReference.Value;
             if (pet == null)
                 return;
@@ -56,17 +69,6 @@ namespace CodexLib
 
             if (this.DestroyPetOnDeactivate)
                 pet.MarkForDestroy();
-
-            for (int i = 0; i < this.Data.UnitRef.Count; i++)
-            {
-                if (this.Data.UnitRef[i] == unitReference)
-                {
-                    this.Data.UnitBlueprint.RemoveAt(i);
-                    this.Data.UnitRef.RemoveAt(i);
-
-                    break;
-                }
-            }
         }
 
         public override void OnActivate()
@@ -130,7 +132,7 @@ namespace CodexLib
                 var spawnedPet = this.Data.UnitRef[i].Value;
                 bool flag = spawnedPet != null;
 
-                if (spawnedPet == null && !unitPartPetMaster.IsExPet(this.Type))
+                if (spawnedPet == null && !unitPartPetMaster.IsExPet(Const.PetUndead))
                 {
                     Vector3 position = this.Owner.Position;
                     if (this.Owner.IsInGame) //AstarPath.active
@@ -156,7 +158,7 @@ namespace CodexLib
                 {
                     if (!unitPartPetMaster.IsExPet(spawnedPet.UniqueId) && spawnedPet.Master == null)
                     {
-                        spawnedPet.SetMaster(this.Owner, this.Type);
+                        spawnedPet.SetMaster(this.Owner, Const.PetUndead);
                         spawnedPet.IsInGame = this.Owner.IsInGame;
                     }
                     this.TryLevelUpPet();

@@ -18,12 +18,12 @@ namespace CodexLib
 
         public override void OnActivate()
         {
-            this.Owner.AddFlags(Feature);
+            this.Owner.Retain(Feature);
         }
 
         public override void OnDeactivate()
         {
-            this.Owner.RemoveFlags(Feature);
+            this.Owner.Release(Feature);
         }
     }
 }

@@ -2,6 +2,8 @@
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Components;
 using System;
@@ -15,15 +17,21 @@ namespace CodexLib
     [AllowedOn(typeof(BlueprintBuff), true)]
     public class MetamagicAdeptFix : UnitBuffComponentDelegate, IInitiatorRulebookHandler<RuleCastSpell>
     {
-        public override void OnActivate() // TODO: Metamagic Adept
+        public BlueprintAbilityResourceReference Resource;
+
+        public MetamagicAdeptFix(BlueprintAbilityResourceReference resource)
         {
-            //https://www.d20pfsrd.com/classes/core-classes/sorcerer/bloodlines/bloodlines-from-paizo/arcane-bloodline/
-            this.Owner.AddFlags(MechanicFeature.SpontaneousMetamagicNoFullRound);
+            this.Resource = resource;
+        }
+
+        public override void OnActivate()
+        {
+            this.Owner.Retain(MechanicFeature.SpontaneousMetamagicNoFullRound);
         }
 
         public override void OnDeactivate()
         {
-            this.Owner.RemoveFlags(MechanicFeature.SpontaneousMetamagicNoFullRound);
+            this.Owner.Release(MechanicFeature.SpontaneousMetamagicNoFullRound);
         }
 
         public void OnEventAboutToTrigger(RuleCastSpell evt)
@@ -32,7 +40,18 @@ namespace CodexLib
 
         public void OnEventDidTrigger(RuleCastSpell evt)
         {
-            this.Buff.Remove();
+            var spell = evt.Spell;
+            if (spell.IsSpontaneous
+                && spell.MetamagicData?.NotEmpty == true
+                && !spell.Blueprint.IsFullRoundAction
+                && !spell.HasMetamagic(Metamagic.Quicken))
+            {
+                int num = this.Owner.Resources.GetResourceAmount(this.Resource);
+                if (num > 0)
+                    this.Owner.Resources.Spend(this.Resource, 1);
+                if (num <= 1)
+                    this.Buff.Remove();
+            }
         }
     }
 }

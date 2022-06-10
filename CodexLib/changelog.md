@@ -1,8 +1,12 @@
 ﻿# Changelog
 
 ## [1.0.3]
+- !signature change: AddFeature
 - added CreateRemoveFeatureOnApply
 - added Helper AddCondition and RemoveMethods
+- changed PartCustomData.Flags to type CountableFlagArray
+- added Patch_RuleSpendCharge, ConvertSpellSlots
+- renamed Patch_MetamagicFullRound to Patch_AbilityIsFullRound
 
 ## [1.0.2]
 - !signature change: CreateBlueprintParametrizedFeature

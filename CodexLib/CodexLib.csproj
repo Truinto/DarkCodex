@@ -87,6 +87,7 @@
     <Compile Include="Classes\ActionBarConvertedVMAny.cs" />
     <Compile Include="Classes\ActionBarSlotVMChild.cs" />
     <Compile Include="Classes\AnyRef.cs" />
+    <Compile Include="Classes\CountableFlagArray.cs" />
     <Compile Include="Classes\DefGroup.cs" />
     <Compile Include="Classes\FlagArray.cs" />
     <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="Components\ContextConditionMoreHitDice.cs" />
     <Compile Include="Components\ContextStatValue.cs" />
     <Compile Include="Classes\DiceValue.cs" />
+    <Compile Include="Components\ConvertSpellSlots.cs" />
     <Compile Include="Components\DuplicateSpell.cs" />
     <Compile Include="Classes\FeatureRank.cs" />
     <Compile Include="Components\KineticBlastEnhancement.cs" />
@@ -136,14 +138,17 @@
     <Compile Include="Components\MetamagicReduceCostParametrized.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\SpellDescriptorExt.cs" />
+    <Compile Include="Delegates.cs" />
+    <Compile Include="Enums\EnumPlaceholder.cs" />
     <Compile Include="Enums\MechanicFeature.cs" />
+    <Compile Include="Interfaces\IUpdateCompanion.cs" />
     <Compile Include="Patches\Patch_AbilityAtWill.cs" />
     <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
     <Compile Include="Patches\Patch_AOEAttackRolls.cs" />
     <Compile Include="Patches\Patch_ConditionExemption.cs" />
     <Compile Include="Patches\Patch_DebugReport.cs" />
     <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
-    <Compile Include="Patches\Patch_MetamagicFullRound.cs" />
+    <Compile Include="Patches\Patch_AbilityIsFullRound.cs" />
     <Compile Include="Patches\Patch_RulebookEventBusPriority.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyAttributeMax.cs" />
@@ -164,6 +169,7 @@
     <Compile Include="MasterPatch.cs" />
     <Compile Include="Patches\Patch_ContextStatValue.cs" />
     <Compile Include="Patches\Patch_GetTargetProjectileFix.cs" />
+    <Compile Include="Patches\Patch_RuleSpendCharge.cs" />
     <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
     <Compile Include="Patches\Patch_WeaponCategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

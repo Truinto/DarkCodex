@@ -8,6 +8,9 @@ using Kingmaker.UnitLogic.Class.Kineticist.ActivatableAbility;
 using Kingmaker.Items;
 using Kingmaker.Blueprints.Items.Armors;
 using Shared;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
 
 namespace DarkCodex
 {
@@ -16,7 +19,32 @@ namespace DarkCodex
     public class Patch_FixPolymorphGather
     {
         [HarmonyPatch(typeof(RestrictionCanGatherPower), nameof(RestrictionCanGatherPower.IsAvailable))]
-        [HarmonyPrefix]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions)
+        {
+            var code = instructions as List<CodeInstruction> ?? instructions.ToList();
+            var m_isPolymorphed = AccessTools.PropertyGetter(typeof(UnitBody), nameof(UnitBody.IsPolymorphed));
+            //var m_ = AccessTools.Method(typeof(), nameof());
+
+            for (int i = 0; i < code.Count; i++)
+            {
+                if (code[i].Calls(m_isPolymorphed)) // replace with true value after call
+                {
+                    code.Insert(++i, new CodeInstruction(OpCodes.Pop));
+                    code.Insert(++i, new CodeInstruction(OpCodes.Ldc_I4_0));
+                }
+            }
+
+            //Main.PrintDebug(code.Join(null, "\n"));
+            return code;
+        }
+
+        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[0])]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions) => Transpiler1(instructions);
+
+        //[HarmonyPatch(typeof(RestrictionCanGatherPower), nameof(RestrictionCanGatherPower.IsAvailable))]
+        //[HarmonyPrefix]
         public static bool Prefix1(RestrictionCanGatherPower __instance, ref bool __result)
         {
             UnitPartKineticist unitPartKineticist = __instance.Owner.Get<UnitPartKineticist>();
@@ -52,8 +80,8 @@ namespace DarkCodex
             return false;
         }
 
-        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[0])]
-        [HarmonyPrefix]
+        //[HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[0])]
+        //[HarmonyPrefix]
         public static bool Prefix2(RestrictionCanUseKineticBlade __instance, ref bool __result)
         {
             var unit = __instance.Owner;
@@ -98,17 +126,4 @@ namespace DarkCodex
             return false;
         }
     }
-
-    //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]
-    //public class Patch_KineticistWhipReach
-    //{
-    //    public static void Postfix(UnitPartKineticist kineticist, UnitCommand cmd, bool __result)
-    //    {
-    //        if (!__result)
-    //            return;
-    //        if (kineticist.Owner.Buffs.GetBuff(Patch_KineticistAllowOpportunityAttack2.whip_buff) == null) 
-    //            return;
-    //        cmd.ApproachRadius += 5f * 0.3048f;
-    //    }
-    //}
 }

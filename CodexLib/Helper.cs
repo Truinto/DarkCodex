@@ -245,9 +245,8 @@ namespace CodexLib
         }
 
         /// <summary>
-        /// Inserts a check and return block. Method returns, if func returns false (like HarmonyPrefix).
+        /// Inserts a check and return block. Method returns, if func returns false (like HarmonyPrefix). Original method must return void!
         /// </summary>
-        /// <param name="func">object is __instance</param>
         /// <remarks>
         /// End result:
         /// <code>
@@ -255,22 +254,55 @@ namespace CodexLib
         ///     return;
         /// </code>
         /// </remarks>
-        public static void AddCondition(this List<CodeInstruction> code, ref int index, Func<object, bool> func, ILGenerator generator)
+        public static void AddCondition(this List<CodeInstruction> code, ref int index, ILFunction func, ILGenerator generator)
         {
             PrintDebug($"Transpiler AddCondition @{index}");
 
-            Label label;
+            Label label1 = generator.DefineLabel();
+
             code.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
             code.Insert(index++, new CodeInstruction(OpCodes.Call, func.GetMethodInfo()));
-            code.Insert(index++, new CodeInstruction(OpCodes.Brtrue_S, label = generator.DefineLabel()));
+            code.Insert(index++, new CodeInstruction(OpCodes.Brtrue, label1));
             code.Insert(index++, new CodeInstruction(OpCodes.Ret));
-            code[index++].labels.Add(label);
+            code[index++].labels.Add(label1);
         }
 
+        /// <summary>
+        /// Original method must return a value. Use unbox, if it's a value type.
+        /// </summary>
+        /// <param name="unbox">Type of original return type.</param>
+        /// <remarks>
+        /// End result:
+        /// <code>
+        /// if (!func(__instance))
+        ///     return result;
+        /// </code>
+        /// </remarks>
+        public static void AddCondition(this List<CodeInstruction> code, ref int index, ILFunctionRet func, ILGenerator generator, Type unbox = null)
+        {
+            PrintDebug($"Transpiler AddCondition @{index}");
+
+            var local1 = generator.DeclareLocal(typeof(object));
+            Label label1 = generator.DefineLabel();
+
+            code.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
+            code.Insert(index++, new CodeInstruction(OpCodes.Ldloca, local1));
+            code.Insert(index++, new CodeInstruction(OpCodes.Call, func.GetMethodInfo()));
+            code.Insert(index++, new CodeInstruction(OpCodes.Brtrue, label1));
+            code.Insert(index++, new CodeInstruction(OpCodes.Ldloc, local1));
+            if (unbox != null) code.Insert(index++, new CodeInstruction(OpCodes.Unbox_Any, unbox));
+            code.Insert(index++, new CodeInstruction(OpCodes.Ret));
+            code[index++].labels.Add(label1);
+        }
+
+        /// <summary>
+        /// Subject to change! Expect signature changes. May not work with ref/out keywords. May not work if return value isn't void.
+        /// </summary>
         public static void RemoveMethods(this List<CodeInstruction> code, Type type, string name, Type[] parameters = null, Type[] generics = null)
         {
             var mi = AccessTools.Method(type, name, parameters, generics);
             int count = mi.GetParameters().Length;
+            if (!mi.IsStatic) count++;
 
             for (int i = 0; i < code.Count; i++)
             {
@@ -278,11 +310,36 @@ namespace CodexLib
                 {
                     PrintDebug($"Transpiler RemoveMethods {mi.Name} @{i}");
 
-                    code[i++].opcode = OpCodes.Nop;
+                    code[i].opcode = OpCodes.Nop;
+                    code[i++].operand = null;
+
                     for (int j = 0; j < count; j++)
                         code.Insert(i++, new CodeInstruction(OpCodes.Pop));
+
+                    if (mi.ReturnType == typeof(void))
+                    {
+                    }
+                    else if (mi.ReturnType.IsValueType)
+                    {
+                        code.Insert(i++, new CodeInstruction(OpCodes.Ldc_I4_0));
+                        if (mi.ReturnType == typeof(long))
+                            code.Insert(i++, new CodeInstruction(OpCodes.Conv_I8));
+                    }
+                    else
+                    {
+                        code.Insert(i++, new CodeInstruction(OpCodes.Ldnull));
+                    }
                 }
             }
+
+            /*
+             * Notes:
+             * - out and ref behave identical
+             * - an out/ref caller loads an address instead of the value with 'ldloca.s V_X' where X depends on the address
+             * - if a method has a return value, it will load it on the stack; unused return values are discarded with 'pop'
+             * - 'box : Type' boxes the valuetype on the stack
+             * - 'box.any : Type' unboxes the valuetype and puts in on the stack
+             */
         }
 
         #endregion
@@ -838,7 +895,7 @@ namespace CodexLib
         /// </summary>
         public static void CreateString(this LocalizedString localizedString, string newString)
         {
-            CreateString(newString, localizedString.m_Key);
+            CreateString(newString, localizedString?.m_Key ?? localizedString?.Shared?.String?.m_Key);
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
@@ -1721,27 +1778,38 @@ namespace CodexLib
         }
         public static void AddEntries(this BlueprintProgression progression, params LevelEntry[] entries) => AddEntries(progression, entries.ToList());
 
-        public static void AddFeature(this BlueprintProgression progression, int level, BlueprintFeature feature, string pairWithGuid = null)
+        public static void AddFeature(this BlueprintProgression progression, int level, AnyRef blueprintFeature, AnyRef pairWithGuid = null)
         {
             var levelentry = progression.LevelEntries.FirstOrDefault(f => f.Level == level);
             if (levelentry != null)
-                levelentry.m_Features.Add(feature.ToReference<BlueprintFeatureBaseReference>());
+                levelentry.m_Features.Add(blueprintFeature.To<BlueprintFeatureBaseReference>());
             else
-                AppendAndReplace(ref progression.LevelEntries, CreateLevelEntry(level, feature));
+                AppendAndReplace(ref progression.LevelEntries, CreateLevelEntry(level, (BlueprintFeatureBaseReference)blueprintFeature));
 
             if (pairWithGuid != null)
             {
-                var pairGuid = BlueprintGuid.Parse(pairWithGuid);
+                var pairGuid = pairWithGuid.deserializedGuid;
                 foreach (var ui in progression.UIGroups)
                 {
                     if (ui.m_Features.Any(a => a.deserializedGuid == pairGuid))
                     {
-                        ui.m_Features.Add(feature.ToReference<BlueprintFeatureBaseReference>());
+                        ui.m_Features.Add(blueprintFeature.To<BlueprintFeatureBaseReference>());
                         break;
                     }
                 }
             }
 
+        }
+
+        public static void RemoveFeature(this BlueprintProgression progression, AnyRef blueprintFeature)
+        {
+            foreach (var levelentry in progression.LevelEntries)
+            {
+                if (levelentry.m_Features == null)
+                    continue;
+                if (levelentry.m_Features.Remove(blueprintFeature))
+                    return;
+            }
         }
 
         public static void ClearEntries(this BlueprintProgression progression, int level)
@@ -1822,6 +1890,16 @@ namespace CodexLib
             }
         }
 
+        public static void PrintSpellDescriptor(SpellDescriptor descriptor)
+        {
+            string[] names = Enum.GetNames(typeof(SpellDescriptor));
+            for (int i = 1; i < names.Length; i++)
+            {
+                if (((long)descriptor & (1L << i - 1)) != 0)
+                    Console.WriteLine(names[i]);
+            }
+        }
+
         #endregion
 
         #region Create
@@ -1834,6 +1912,17 @@ namespace CodexLib
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static AddAbilityResources CreateAddAbilityResources(AnyRef BlueprintAbilityResource)
+        {
+            var result = new AddAbilityResources();
+            result.UseThisAsResource = false;
+            result.m_Resource = BlueprintAbilityResource;
+            result.Amount = 0;
+            result.RestoreAmount = true;
+            result.RestoreOnLevelUp = false;
+            return result;
         }
 
         public static RemoveFeatureOnApply CreateRemoveFeatureOnApply(AnyRef blueprintUnitFact)
@@ -2517,6 +2606,13 @@ namespace CodexLib
             return result;
         }
 
+        public static AddFacts CreateAddFacts(params AnyRef[] facts)
+        {
+            var result = new AddFacts();
+            result.m_Facts = facts.To<BlueprintUnitFactReference>();
+            return result;
+        }
+
         public static DuplicateSpell CreateDuplicateSpell(Func<AbilityData, bool> abilityCheck, int radius = 30)
         {
             return new DuplicateSpell
@@ -2861,6 +2957,56 @@ namespace CodexLib
             result.OnEnableWithLibrary();
             result.m_VisualParameters.m_Projectiles = Array.Empty<BlueprintProjectileReference>();
             result.m_VisualParameters.m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>();
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static ActivatableAbilityResourceLogic CreateActivatableAbilityResourceLogic(this BlueprintAbilityResource resource, ActivatableAbilityResourceLogic.ResourceSpendType spendType = ActivatableAbilityResourceLogic.ResourceSpendType.None, AnyRef free_BlueprintUnitFact = null)
+        {
+            var result = new ActivatableAbilityResourceLogic();
+            result.SpendType = spendType;
+            result.m_FreeBlueprint = free_BlueprintUnitFact;
+            result.m_RequiredResource = resource.ToReference<BlueprintAbilityResourceReference>();
+
+            return result;
+        }
+
+        public static BlueprintAbilityResource CreateBlueprintAbilityResource(string name, string displayName = null, string description = null, Sprite icon = null, int min = 1, int max = 0,
+            int baseValue = 0, int startLevel = -1, int levelMult = 1, int levelDiv = 1, float otherClasses = 0f,
+            StatType stat = StatType.Unknown, int altResourcePerLevel = 0, BlueprintCharacterClassReference[] classes = null, BlueprintArchetypeReference[] archetypes = null)
+        {
+            string guid = GetGuid(name);
+
+            var result = new BlueprintAbilityResource();
+            result.name = name;
+
+            result.LocalizedName = displayName.CreateString();
+            result.LocalizedDescription = description.CreateString();
+            result.m_Icon = icon;
+            result.m_UseMax = max > 0;
+            result.m_Max = max;
+            result.m_Min = min;
+
+            result.m_MaxAmount.BaseValue = baseValue;
+
+            result.m_MaxAmount.IncreasedByLevel = altResourcePerLevel > 0;
+            result.m_MaxAmount.m_Class = classes;
+            result.m_MaxAmount.m_Archetypes = archetypes;
+            result.m_MaxAmount.LevelIncrease = altResourcePerLevel; // simple flat bonus resource per level
+
+            result.m_MaxAmount.IncreasedByLevelStartPlusDivStep = startLevel >= 0;
+            result.m_MaxAmount.StartingLevel = startLevel;   // level the increase starts at
+            result.m_MaxAmount.StartingIncrease = 0; // base value; redundant with BaseValue
+            result.m_MaxAmount.LevelStep = levelDiv; // divisor
+            result.m_MaxAmount.PerStepIncrease = levelMult; // level multiplicator
+            result.m_MaxAmount.MinClassLevelIncrease = 0; // redundant with m_Min
+            result.m_MaxAmount.m_ClassDiv = classes;
+            result.m_MaxAmount.m_ArchetypesDiv = archetypes;
+            result.m_MaxAmount.OtherClassesModifier = otherClasses; // amount granted from non-listed classes
+
+            result.m_MaxAmount.IncreasedByStat = stat != StatType.Unknown;
+            result.m_MaxAmount.ResourceBonusStat = stat;
 
             AddAsset(result, guid);
             return result;
