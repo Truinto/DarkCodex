@@ -368,7 +368,7 @@ namespace Shared
             patchInfos?.Add(attr, info);
         }
 
-        private static Exception NullFinalizer(Exception __exception)
+        public static Exception NullFinalizer(Exception __exception)
         {
             PrintException(__exception);
             return null;

@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.0.4]
+- small bugfixes
+
 ## [1.0.3]
 - !signature change: AddFeature
 - added CreateRemoveFeatureOnApply

@@ -33,15 +33,17 @@ namespace CodexLib
             if (buff.Blueprint == null || buff.Blueprint.GetComponent<Polymorph>() != null)
                 return;
 
-            if (buff.SourceAbility == null || !buff.SourceAbility.SpellDescriptor.HasAnyFlag(SpellDescriptor.Polymorph))
+            if (!buff.m_Context.SpellDescriptor.HasAnyFlag(SpellDescriptor.Polymorph))
                 return;
 
             this.Data.Clear();
             this.Data.SourceBuff = buff;
-            this.Data.AppliedModifiers = new();
-            this.Data.AppliedModifiers.Add(this.Owner.Stats.GetStat(StatType.Strength).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable));
-            this.Data.AppliedModifiers.Add(this.Owner.Stats.GetStat(StatType.Dexterity).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable));
-            this.Data.AppliedModifiers.Add(this.Owner.Stats.GetStat(StatType.Constitution).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable));
+            this.Data.AppliedModifiers = new()
+            {
+                this.Owner.Stats.GetStat(StatType.Strength).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable),
+                this.Owner.Stats.GetStat(StatType.Dexterity).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable),
+                this.Owner.Stats.GetStat(StatType.Constitution).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable)
+            };
         }
 
         public void HandleBuffDidRemoved(Buff buff)

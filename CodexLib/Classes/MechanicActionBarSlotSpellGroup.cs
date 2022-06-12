@@ -116,28 +116,32 @@ namespace CodexLib
             cacheSpellSlots.Clear();
             return sum;
 #endif
-            if (cacheCountIndex == null)
-                CalculateCache();
-            foreach (int index in cacheCountIndex)
+            try
             {
-                var slot = Slots[index];
-                int count = slot.GetResource();
-                if (count > 0)
-                    sum += count;
-
-                // update master and AutoUse, if necessary
-                if (flag && count != 0)
+                if (cacheCountIndex == null)
+                    CalculateCache();
+                foreach (int index in cacheCountIndex)
                 {
-                    flag = false;
-                    var abilityData = slot.GetContentData() as AbilityData;
-                    if (!ReferenceEquals(this.Ability, abilityData))
+                    var slot = Slots[index];
+                    int count = slot.GetResource();
+                    if (count > 0)
+                        sum += count;
+
+                    // update master and AutoUse, if necessary
+                    if (flag && count != 0)
                     {
-                        if (Unit.Brain.IsAutoUseAbility(this.Ability) && abilityData.IsSuitableForAutoUse)
-                            Unit.Brain.AutoUseAbility = abilityData;
-                        this.Ability = abilityData;
+                        flag = false;
+                        var abilityData = slot.GetContentData() as AbilityData;
+                        if (!ReferenceEquals(this.Ability, abilityData))
+                        {
+                            if (Unit.Brain.IsAutoUseAbility(this.Ability) && abilityData.IsSuitableForAutoUse)
+                                Unit.Brain.AutoUseAbility = abilityData;
+                            this.Ability = abilityData;
+                        }
                     }
                 }
             }
+            catch (Exception e) { Helper.PrintException(e); }
 
             return sum;
         }

@@ -24,12 +24,12 @@ namespace CodexLib
             this.Resource = resource;
         }
 
-        public override void OnActivate()
+        public override void OnTurnOn()
         {
             this.Owner.Retain(MechanicFeature.SpontaneousMetamagicNoFullRound);
         }
 
-        public override void OnDeactivate()
+        public override void OnTurnOff()
         {
             this.Owner.Release(MechanicFeature.SpontaneousMetamagicNoFullRound);
         }

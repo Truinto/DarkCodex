@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.9]
+- fixed Metamagic Adept to retaining through saves
+- fixed fix of Master Shapeshifter ;)
+
 ## [1.3.8]
 - added fix for Arcane bloodline; Metamagic Adept and Arcane Apotheosis
 - fixed crash during save, if a character has Arcane Apotheosis
