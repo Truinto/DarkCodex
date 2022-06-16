@@ -7,6 +7,7 @@ using Kingmaker.UI.Common;
 using Kingmaker.UnitLogic;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -159,13 +160,81 @@ namespace Shared
         [System.Diagnostics.Conditional("DEBUG")]
         internal static void PrintDebug(string msg) => logger?.Log(msg);
 
-        internal static void PrintException(Exception ex) => logger?.LogException(ex);
+        private static int _exceptionCount;
+        internal static void PrintException(Exception ex)
+        {
+            if (_exceptionCount > 1000)
+                return;
+
+            logger?.LogException(ex);
+
+            _exceptionCount++;
+            if (_exceptionCount > 1000)
+                logger?.Log("-- too many exceptions, future exceptions are suppressed");
+        }
+
         internal static void PrintError(string msg) => logger?.Log("[Error/Exception] " + msg);
 
         public static void Patch(Type patch)
         {
             Print("Patching " + patch.Name);
-            harmony.CreateClassProcessor(patch).Patch();
+            var processor = harmony.CreateClassProcessor(patch);
+            processor.Patch();
+#if DEBUG
+            var patches = GetConflictPatches(processor);
+            if (patches != null && patches.Count > 0)
+                PrintDebug("warning: potential conflict\n\t" + patches.Join(s => $"{s.owner}, {s.PatchMethod.Name}", "\n\t"));
+#endif
+        }
+
+        /// <summary>
+        /// Only works if all harmony attributes are on the class. Does not support bulk patches.
+        /// </summary>
+        public static bool IsPatched(Type patch)
+        {
+            try
+            {
+                if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
+                    throw new ArgumentException("Type must have HarmonyPatch attribute");
+
+                MethodBase orignal = attr.info.GetOriginalMethod();
+                if (orignal == null)
+                    throw new Exception($"GetOriginalMethod returned null {attr.info}");
+                var info = Harmony.GetPatchInfo(orignal);
+                return info != null && (info.Prefixes.Any() || info.Postfixes.Any() || info.Transpilers.Any());
+            }
+            catch (Exception e) { PrintException(e); }
+            return true;
+        }
+
+        public static List<Patch> GetConflictPatches(PatchClassProcessor processor)
+        {
+            var list = new List<Patch>();
+
+            try
+            {
+                foreach (var patch in processor.patchMethods)
+                {
+                    var orignal = patch.info.GetOriginalMethod();
+                    if (orignal == null)
+                        throw new Exception($"GetOriginalMethod returned null {patch.info}");
+
+                    // if unpatched, no conflict
+                    var info = Harmony.GetPatchInfo(orignal);
+                    if (info == null)
+                        continue;
+
+                    // if foreign transpilers, warn conflict
+                    list.AddRange(info.Transpilers.Where(a => a.owner != harmony.Id));
+
+                    // if foreign prefixes with return type and identical priority as own prefix, warn conflict
+                    var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
+                    list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
+                }
+            }
+            catch (Exception e) { PrintException(e); }
+
+            return list;
         }
 
         public static bool LoadSafe(Action action)
@@ -291,21 +360,6 @@ namespace Shared
             }
         }
 
-        public static bool IsPatched(Type patch)
-        {
-            try
-            {
-                if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
-                    throw new ArgumentException("Type must have HarmonyPatch attribute");
-
-                MethodBase orignal = attr.info.GetOriginalMethod();
-                var info = Harmony.GetPatchInfo(orignal);
-                return info != null && (info.Prefixes.Any() || info.Postfixes.Any() || info.Transpilers.Any());
-            }
-            catch (Exception e) { PrintException(e); }
-            return true;
-        }
-
         public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
         {
             try
@@ -370,7 +424,15 @@ namespace Shared
 
         public static Exception NullFinalizer(Exception __exception)
         {
-            PrintException(__exception);
+            if (__exception == null)
+                return null;
+#if DEBUG
+            try
+            {
+                PrintException(__exception);
+            }
+            catch (Exception) { }
+#endif
             return null;
         }
 

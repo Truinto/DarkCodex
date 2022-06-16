@@ -1,6 +1,12 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.10]
+- added PatchArcanistBrownFur: allows Share Transmutation to affect any spell
+- fixed Metamagic Adept still increasing caster time to standard action, if the original casting time was shorter
+- added Mythic Metamagic Adept feat: allow spontaneous spellcasters to apply metamagic without casting time penalty
+- added Sacred Summons, basic feat: requires Channel Energy, summons act immediately
+
 ## [1.3.9]
 - fixed Metamagic Adept to retaining through saves
 - fixed fix of Master Shapeshifter ;)

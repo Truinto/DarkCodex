@@ -141,7 +141,11 @@ namespace CodexLib
                     }
                 }
             }
+#if DEBUG
             catch (Exception e) { Helper.PrintException(e); }
+#else
+            catch (Exception) { }
+#endif
 
             return sum;
         }
@@ -160,6 +164,7 @@ namespace CodexLib
 
         private void CalculateCache()
         {
+            Helper.PrintDebug("CalculateCache for " + this.Ability?.Name);
             var list = new List<int>();
             var spells = new List<SpellSlotLevel>();
 

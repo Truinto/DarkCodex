@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## [1.1.0]
+- added limit to exception count
+- added GetConflictPatches
+
+## [1.0.5]
+- added PrerequisiteSpontaneousCaster
+
 ## [1.0.4]
 - small bugfixes
 

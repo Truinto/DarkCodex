@@ -37,9 +37,11 @@ namespace CodexLib
 
         public bool HasFlag<T>(T key) where T : Enum
         {
-            if (Data.TryGetValue(key, out var flag))
-                return flag.Value;
-            return false;
+            return Data.ContainsKey(key);
+
+            //if (Data.TryGetValue(key, out var flag))
+            //    return flag.Value;
+            //return false;
         }
 
         public int GetCount<T>(T key) where T : Enum

@@ -34,7 +34,7 @@ namespace CodexLib
 
         public static T GetData<T>(this UnitEntityData unit, string key) where T : class
         {
-            var data = unit.Get<PartCustomData>();
+            var data = unit?.Get<PartCustomData>();
             if (data == null)
                 return default;
             data.Data.TryGetValue(key, out object value);
@@ -43,13 +43,13 @@ namespace CodexLib
 
         public static void AddData(this UnitEntityData unit, string key, object value)
         {
-            var data = unit.Ensure<PartCustomData>();
+            var data = unit?.Ensure<PartCustomData>();
             data.Data[key] = value;
         }
 
         public static void RemoveData(this UnitEntityData unit, string key)
         {
-            var data = unit.Get<PartCustomData>();
+            var data = unit?.Get<PartCustomData>();
             if (data == null)
                 return;
             data.Data.Remove(key);
@@ -59,13 +59,13 @@ namespace CodexLib
 
         public static void Retain<T>(this UnitEntityData unit, T key) where T : Enum
         {
-            var data = unit.Ensure<PartCustomData>();
+            var data = unit?.Ensure<PartCustomData>();
             data.Flags.Retain<T>(key);
         }
 
         public static void Release<T>(this UnitEntityData unit, T key) where T : Enum
         {
-            var data = unit.Get<PartCustomData>();
+            var data = unit?.Get<PartCustomData>();
             if (data == null)
                 return;
             data.Flags.Release<T>(key);
@@ -75,7 +75,7 @@ namespace CodexLib
 
         public static bool HasFlag<T>(this UnitEntityData unit, T key) where T : Enum
         {
-            var data = unit.Get<PartCustomData>();
+            var data = unit?.Get<PartCustomData>();
             if (data == null)
                 return false;
             return data.Flags.HasFlag<T>(key);

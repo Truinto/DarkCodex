@@ -5,6 +5,7 @@ using Shared;
 namespace DarkCodex
 {
     [PatchInfo(Severity.Harmony, "Patch: Polymorph", "allows debug flags to keep inventory or model during polymorph", false)]
+    [HarmonyPatch]
     public class Patch_Polymorph
     {
         [HarmonyPatch(typeof(Polymorph), nameof(Polymorph.OnActivate))]

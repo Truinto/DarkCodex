@@ -55,6 +55,7 @@ using Shared;
 using CodexLib;
 using Kingmaker.EntitySystem.Persistence;
 using System.Text.RegularExpressions;
+using Kingmaker.Blueprints.Root;
 
 namespace DarkCodex
 {
@@ -417,27 +418,9 @@ namespace DarkCodex
             }
         }
 
-        public class TestEventBus
+        public static void SetSpellDescriptor()
         {
-            //RulebookEventBus.Subscribe([CanBeNull] IInitiatorRulebookSubscriber subscriber, [CanBeNull] ISubscriptionProxy proxy)
-            public static void Postfix(IInitiatorRulebookSubscriber subscriber, ISubscriptionProxy proxy, RulebookEventBus __instance)
-            {
-                if (subscriber == null)
-                    return;
-                var unitEntityData = (proxy?.GetSubscribingUnit()) ?? subscriber.GetSubscribingUnit();
-                if (unitEntityData == null)
-                    return;
-
-                var types = InterfaceFinder<IInitiatorRulebookSubscriber>.GetSubscribedRulebookTypes(subscriber);
-                var listeners = RulebookEventBus.InitiatorRulebookSubscribers.Sure(unitEntityData).m_Listeners;
-                foreach (var (type, listener) in listeners)
-                {
-                    if (listener.GetType().GetField("List", Helper.BindingInstance)?.GetValue(listener) is List<object> list)
-                    {
-                        list.Sort(); //list[i] is IRulebookHandler<RuleCastSpell>                        
-                    }
-                }
-            }
+            Main.PrintDebug("Spell Descriptors: " + BlueprintRoot.Instance.LocalizedTexts.SpellDescriptorNames.Entries.Select(s => s.Descriptor + ":" + s.Text).Join());
         }
     }
 }

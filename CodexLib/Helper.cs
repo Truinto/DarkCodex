@@ -56,6 +56,7 @@ using Kingmaker.Utility;
 using Kingmaker.View.Equipment;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -152,7 +153,13 @@ namespace CodexLib
             try
             {
                 Print("Patching " + patch.Name);
-                harmony.CreateClassProcessor(patch).Patch();
+                var processor = harmony.CreateClassProcessor(patch);
+                processor.Patch();
+#if DEBUG
+                var patches = GetConflictPatches(harmony, processor);
+                if (patches != null && patches.Count > 0)
+                    PrintDebug("warning: potential conflict\n\t" + patches.Join(s => $"{s.owner}, {s.PatchMethod.Name}", "\n\t"));
+#endif
             }
             catch (Exception e) { PrintException(e); }
         }
@@ -184,6 +191,9 @@ namespace CodexLib
             harmony.Unpatch(orignal, patchType, harmony.Id);
         }
 
+        /// <summary>
+        /// Only works if all harmony attributes are on the class. Does not support bulk patches.
+        /// </summary>
         public static bool IsPatched(Type patch)
         {
             try
@@ -192,11 +202,43 @@ namespace CodexLib
                     throw new ArgumentException("Type must have HarmonyPatch attribute");
 
                 MethodBase orignal = attr.info.GetOriginalMethod();
+                if (orignal == null)
+                    throw new Exception($"GetOriginalMethod returned null {attr.info}");
                 var info = Harmony.GetPatchInfo(orignal);
                 return info != null && (info.Prefixes.Any() || info.Postfixes.Any() || info.Transpilers.Any());
             }
             catch (Exception e) { PrintException(e); }
             return true;
+        }
+
+        public static List<Patch> GetConflictPatches(this Harmony harmony, PatchClassProcessor processor)
+        {
+            var list = new List<Patch>();
+
+            try
+            {
+                foreach (var patch in processor.patchMethods)
+                {
+                    var orignal = patch.info.GetOriginalMethod();
+                    if (orignal == null)
+                        throw new Exception($"GetOriginalMethod returned null {patch.info}");
+
+                    // if unpatched, no conflict
+                    var info = Harmony.GetPatchInfo(orignal);
+                    if (info == null)
+                        continue;
+
+                    // if foreign transpilers, warn conflict
+                    list.AddRange(info.Transpilers.Where(a => a.owner != harmony.Id));
+
+                    // if foreign prefixes with return type and identical priority as own prefix, warn conflict
+                    var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
+                    list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
+                }
+            }
+            catch (Exception e) { PrintException(e); }
+
+            return list;
         }
 
         public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
@@ -512,9 +554,17 @@ namespace CodexLib
             Scope.Logger.Log("[Exception/Error] " + msg);
         }
 
+        private static int _exceptionCount;
         internal static void PrintException(Exception ex)
         {
+            if (_exceptionCount > 1000)
+                return;
+
             Scope.Logger.LogException(ex);
+
+            _exceptionCount++;
+            if (_exceptionCount > 1000)
+                Scope.Logger.Log("-- too many exceptions, future exceptions are suppressed");
         }
 
         public static void ShowMessageBox(string messageText, Action onYes = null, int waitTime = 0, string yesLabel = null, string noLabel = null)
@@ -844,7 +894,7 @@ namespace CodexLib
         {
             string modPath = Scope.ModPath;
 
-            if (_mappedStrings.Ensure(modPath, out var map) && LocalizationManager.CurrentPack.Locale != Locale.enGB)
+            if (_mappedStrings.Ensure(modPath, out var map) && !Allow_Guid_Generation)
             {
                 load(Path.Combine(modPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
             }
@@ -982,13 +1032,32 @@ namespace CodexLib
 
         #region Components
 
+        public static IEnumerable<T> GetComponents<T>(this BlueprintScriptableObject blueprint, Func<T, bool> pred) where T : BlueprintComponent
+        {
+            if (blueprint == null)
+                yield break;
+
+            foreach (var comp in blueprint.ComponentsArray)
+            {
+                if (comp is T t && pred(t))
+                    yield return t;
+            }
+        }
+
         public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
             obj.Components = Append(obj.Components, components);
 
             for (int i = 0; i < obj.Components.Length; i++)
-                if (obj.Components[i].name == null)
-                    obj.Components[i].name = $"${obj.Components[i].GetType().Name}${obj.AssetGuid}${i}";
+            {
+                var comp = obj.Components[i];
+                if (comp.name == null)
+                    comp.name = $"${comp.GetType().Name}${obj.AssetGuid}${i}";
+                if (comp.OwnerBlueprint == null)
+                    comp.OwnerBlueprint = obj;
+                else if (comp.OwnerBlueprint != obj)
+                    PrintDebug("Warning: reused BlueprintComponent " + comp.name);
+            }
 
             return obj;
         }
@@ -996,7 +1065,14 @@ namespace CodexLib
         public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
             for (int i = 0; i < components.Length; i++)
-                components[i].name = $"${components[i].GetType().Name}${obj.AssetGuid}${i}";
+            {
+                var comp = components[i];
+                comp.name = $"${comp.GetType().Name}${obj.AssetGuid}${i}";
+                if (comp.OwnerBlueprint == null)
+                    comp.OwnerBlueprint = obj;
+                else if (comp.OwnerBlueprint != obj)
+                    PrintDebug("Warning: reused BlueprintComponent " + comp.name);
+            }
 
             obj.Components = components;
             return obj;
@@ -1010,6 +1086,10 @@ namespace CodexLib
                 {
                     obj.Components[i] = replacement;
                     replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}${i}";
+                    if (replacement.OwnerBlueprint == null)
+                        replacement.OwnerBlueprint = obj;
+                    else if (replacement.OwnerBlueprint != obj)
+                        PrintDebug("Warning: reused BlueprintComponent " + replacement.name);
                     break;
                 }
             }
@@ -1377,16 +1457,19 @@ namespace CodexLib
             //return result;
         }
 
-        public static T Clone<T>(this T obj, BlueprintScriptableObject parent) where T : BlueprintComponent
-        {
-            var result = (T)_memberwiseClone.Invoke(obj, null);
-            obj.OwnerBlueprint = parent;
-            return result;
-        }
-
         public static T Clone<T>(this T obj, Action<T> action = null) where T : class
         {
+            //if (obj is IEnumerable<BlueprintComponent>)
+            //{
+            //}
+
             var result = (T)_memberwiseClone.Invoke(obj, null);
+            if (result is BlueprintComponent comp)
+            {
+                comp.name = null;
+                comp.OwnerBlueprint = null;
+            }
+
             action?.Invoke(result);
             return result;
         }

@@ -432,6 +432,7 @@ namespace Shared
             // General
             LoadSafe(General.CreateHeritage);
             LoadSafe(General.CreateMadMagic);
+            LoadSafe(General.CreateSacredSummons);
             LoadSafe(General.FixMasterShapeshifter);
             LoadSafe(General.PatchAngelsLight);
             LoadSafe(General.PatchBasicFreebieFeats);
@@ -443,6 +444,7 @@ namespace Shared
 
             // Spellcasters
             LoadSafe(Spellcasters.FixBloodlineArcane);
+            LoadSafe(Spellcasters.PatchArcanistBrownFur);
 
             // Items
             LoadSafe(Items.PatchArrows);
@@ -467,6 +469,7 @@ namespace Shared
             LoadSafe(Mythic.CreateSwiftHuntersBond);
             LoadSafe(Mythic.CreateDemonMastery);
             LoadSafe(Mythic.CreateDemonLord);
+            LoadSafe(Mythic.CreateMetamagicAdept);
             LoadSafe(Mythic.PatchKineticOvercharge);
             LoadSafe(Mythic.PatchLimitlessDemonRage);
             LoadSafe(Mythic.PatchUnstoppable);

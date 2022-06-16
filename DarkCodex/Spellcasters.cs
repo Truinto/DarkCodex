@@ -1,7 +1,11 @@
 ﻿using CodexLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.FactLogic;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -64,6 +68,33 @@ namespace DarkCodex
             bloodline.RemoveFeature("3d7b19c8a1d03464aafeb306342be000"); //BloodlineArcaneCombatCastingAdeptFeatureAddLevel2
             sage.RemoveFeature("3d7b19c8a1d03464aafeb306342be000");
             seeker.RemoveFeature("9cb584629d604325a1141c72ad751e17"); //SeekerBloodlineArcaneCombatCastingAdeptFeatureAddLevel15
+        }
+
+        public static void FixArcanistSpellbook()
+        {
+            // patch AbilityData.GetConversions to return all metamagic spells of the original spell's level, if that metamagic spell isn't already prepared
+            //  check IsArcanist on Spellbook
+            //  apply flag that signifies this must increase casting time? cannot attach on AbilityData?
+
+            // add new condition to Patch_AbilityIsFullRound
+            //  IsArcanist & metamagic (except quicken) & not prepared (check for variants!)
+        }
+
+        [PatchInfo(Severity.Extend, "Arcanist Brown-Fur", "allows Share Transmutation to affect any spell", true)]
+        public static void PatchArcanistBrownFur()
+        {
+            Main.Patch(typeof(Patch_ArcanistBrownFur));
+
+            var trigger1 = Helper.Get<BlueprintBuff>("2231eb5d1a5a48d499a20fa5bde7a4e2").GetComponent<AddAbilityUseTrigger>(); //ShareTransmutationBuff
+            var trigger2 = Helper.Get<BlueprintBuff>("e0d4e42a41a0a24459a1bfc4f0a3ae4c").GetComponent<AddAbilityUseTrigger>(); //ShareTransmutationBuffGreater
+
+            trigger1.FromSpellbook = false;
+            trigger1.CheckRange = true;
+            trigger1.Range = AbilityRange.Personal;
+
+            trigger2.FromSpellbook = false;
+            trigger2.CheckRange = true;
+            trigger2.Range = AbilityRange.Personal;
         }
     }
 }

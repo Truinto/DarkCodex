@@ -490,6 +490,8 @@ namespace DarkCodex
             // todo add dominate demon to progression
 
             // todo auto revive once per year
+            // AngelPhoenixGiftBuff_9988e25ec217c0249a28213e7dc0017c.json
+            // AddImmortality
 
             // teleport at will
             var teleport = Helper.Get<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10");
@@ -683,6 +685,21 @@ namespace DarkCodex
             Resource.Cache.FeatureResourcefulCaster.SetReference(feature);
 
             Helper.AddMythicTalent(Resource.Cache.FeatureResourcefulCaster);
+        }
+
+        [PatchInfo(Severity.Create, "Mythic Metamagic Adept", "mythic feat: allow spontaneous spellcasters to apply metamagic without casting time penalty", true)]
+        public static void CreateMetamagicAdept()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "MythicMetamagicAdept",
+                "Mythic Metamagic Adept",
+                "Whenever you apply metamagic feats to spells of spontaneous classes, you can do so without increasing the casting time."
+                ).SetComponents(
+                new PrerequisiteSpontaneousCaster(),
+                new AddMechanicFeatureCustom(MechanicFeature.SpontaneousMetamagicNoFullRound)
+                );
+
+            Helper.AddMythicFeat(feat);
         }
 
         [PatchInfo(Severity.Extend | Severity.WIP, "Ranging Shots", "doesn't get weaker when hitting", true)]

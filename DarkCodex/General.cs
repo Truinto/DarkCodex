@@ -315,6 +315,9 @@ namespace DarkCodex
         {
             var feat = Helper.Get<BlueprintFeature>("934670ef88b281b4da5596db8b00df2f"); //MasterShapeshifter
             feat.AddComponents(new MasterShapeshifterFix());
+
+            var fright = Helper.Get<BlueprintAbility>("e788b02f8d21014488067bdd3ba7b325"); //FrightfulAspect
+            fright.AddComponents(Helper.CreateSpellDescriptorComponent(SpellDescriptor.Polymorph));
         }
 
         [PatchInfo(Severity.Create, "Backgrounds", "basic feat: Additional Traits\ntraits: Magical Lineage, Metamagic Master", false)]
@@ -461,6 +464,21 @@ namespace DarkCodex
                 ).Add(minusInt, minusWis, minusCha);
             orc.Add(atavism);
             Helper.AppendAndReplace(ref mythicRaces.m_Features, atavism.ToRef());
+        }
+
+        [PatchInfo(Severity.Create, "Sacred Summons", "basic feat: requires Channel Energy, summons act immediately", false)]
+        public static void CreateSacredSummons()
+        {
+            var selective = Helper.Get<BlueprintFeature>("fd30c69417b434d47b6b03b9c1f568ff"); //SelectiveChannel
+            var preq = selective.GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any).Clone(); // TODO: fix clone for arrays
+
+            var feat = Helper.CreateBlueprintFeature(
+                "SacredSummons",
+                "Sacred Summons",
+                "When using summon monster to summon creatures whose alignment subtype or subtypes exactly match your aura, you may cast the spell as a standard action instead of with a casting time of 1 round."
+                ).SetComponents(preq.ToArray<BlueprintComponent>());
+            feat.AddComponents(new AddMechanicFeatureCustom(MechanicFeature.SummoningNoFullRound));
+
         }
 
         #region General Resources and Stuff

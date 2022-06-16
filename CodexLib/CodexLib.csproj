@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
-    <Reference Include="0Harmony" HintPath="$(WrathManaged)\UnityModManager\0Harmony.dll" />
+    <Reference Include="0Harmony_publicized" HintPath="$(WrathManaged)\0Harmony_publicized.dll" />
     <Reference Include="Assembly-CSharp_publicized" HintPath="$(WrathManaged)\Assembly-CSharp_publicized.dll" />
     <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
     <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
@@ -137,6 +137,7 @@
     <Compile Include="Components\MetamagicAdeptFix.cs" />
     <Compile Include="Components\MetamagicReduceCostParametrized.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
+    <Compile Include="Components\PrerequisiteSpontaneousCaster.cs" />
     <Compile Include="Components\SpellDescriptorExt.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Enums\EnumPlaceholder.cs" />
