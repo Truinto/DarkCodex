@@ -78,7 +78,7 @@
     <Compile Include="DEBUG.cs" />
     <Compile Include="Patches\Event_AreaEffects.cs" />
     <Compile Include="General.cs" />
-    <Compile Include="Hexcrafter.cs" />
+    <Compile Include="Magus.cs" />
     <Compile Include="Items.cs" />
     <Compile Include="Kineticist.cs" />
     <Compile Include="Monk.cs" />

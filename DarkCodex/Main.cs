@@ -508,9 +508,10 @@ namespace Shared
             LoadSafe(Witch.CreateSplitHex);
             LoadSafe(Witch.FixBoundlessHealing);
 
-            // Hexcrafter
-            LoadSafe(Hexcrafter.CreateAccursedStrike);
-            LoadSafe(Hexcrafter.FixProgression);
+            // Magus
+            LoadSafe(Magus.CreateAccursedStrike);
+            LoadSafe(Magus.FixHexcrafterProgression);
+            LoadSafe(Magus.PatchSwordSaint);
 
             // Rogue
             LoadSafe(Rogue.CreateBleedingAttack);

@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using Shared;
 using CodexLib;
+using Kingmaker.Enums;
 
 namespace DarkCodex
 {
-    public class Hexcrafter
+    public class Magus
     {
         [PatchInfo(Severity.Create | Severity.Faulty, "Accursed Strike", "hexcrafter arcana: Accursed Strike", false)]
         public static void CreateAccursedStrike()
@@ -70,7 +71,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Fix, "Fix Hexcrafter", "allows hex selection with any arcana, add missing spell recall at level 11", false)]
-        public static void FixProgression()
+        public static void FixHexcrafterProgression()
         {
             var HexcrafterArchetype = Helper.Get<BlueprintArchetype>("79ccf7a306a5d5547bebd97299f6fc89");
             var MagusArcanaSelection = Helper.Get<BlueprintFeatureSelection>("e9dc4dfc73eaaf94aae27e0ed6cc9ada");
@@ -80,6 +81,13 @@ namespace DarkCodex
             HexcrafterArchetype.RemoveFeature(3, MagusArcanaSelection);
             HexcrafterArchetype.AddFeature(3, HexcrafterMagusHexArcanaSelection);
             HexcrafterArchetype.AddFeature(11, MagusSpellRecallFeature);
+        }
+
+        [PatchInfo(Severity.Fix | Severity.DefaultOff, "Sword Saint Any Weapon", "allow Sword Saint to pick any weapon focus", true)]
+        public static void PatchSwordSaint()
+        {
+            var chosenweapon = Helper.Get<BlueprintParametrizedFeature>("c0b4ec0175e3ff940a45fc21f318a39a"); //SwordSaintChosenWeaponFeature
+            chosenweapon.WeaponSubCategory = WeaponSubCategory.None;
         }
     }
 }

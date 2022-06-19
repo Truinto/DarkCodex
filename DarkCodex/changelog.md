@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.11]
+- renamed Hexcrafter to Magus category
+- added Sword Saint Any Weapon: allow Sword Saint to pick any weapon focus; default off
+
 ## [1.3.10]
 - added PatchArcanistBrownFur: allows Share Transmutation to affect any spell
 - fixed Metamagic Adept still increasing caster time to standard action, if the original casting time was shorter
