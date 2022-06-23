@@ -1419,13 +1419,12 @@ namespace CodexLib
 
         private static MethodInfo _memberwiseClone = AccessTools.Method(typeof(object), "MemberwiseClone");
         /// <summary>
-        /// This creates a shallow copy. This means BlueprintComponents are shared and morphing can happen.<br/><br/>
+        /// This creates a deep copy of ComponentsArray, but other references might still be shared and morphing can happen.<br/><br/>
         /// Watch out for these fields:<br/>
         /// BlueprintFeature: IsPrerequisiteFor
         /// BlueprintAbility: m_Parent
         /// </summary>
         /// <param name="guid2">guid to merge with, use for dynamic blueprints (unknown list of blueprints), otherwise empty</param>
-        /// <returns></returns>
         public static T Clone<T>(this T obj, string name, string guid2 = null) where T : SimpleBlueprint
         {
             string guid;
@@ -1437,6 +1436,16 @@ namespace CodexLib
             var result = (T)_memberwiseClone.Invoke(obj, null);
             result.name = name;
             AddAsset(result, guid);
+
+            if (result is BlueprintScriptableObject bp)
+            {
+                for (int i = 0; i < bp.ComponentsArray.Length; i++)
+                {
+                    var comp = bp.ComponentsArray[i] = bp.ComponentsArray[i].Clone();
+                    comp.name = $"${comp.GetType().Name}${obj.AssetGuid}${i}";
+                    comp.OwnerBlueprint = bp;
+                }
+            }
 
             // prevent some morphing
             if (result is BlueprintFeature feature)
@@ -1457,11 +1466,13 @@ namespace CodexLib
             //return result;
         }
 
+        /// <summary>
+        /// Creates deep copy of BlueprintComponent, but shallow copy of anything else.
+        /// </summary>
         public static T Clone<T>(this T obj, Action<T> action = null) where T : class
         {
-            //if (obj is IEnumerable<BlueprintComponent>)
-            //{
-            //}
+            //if (typeof(T).IsGenericType && typeof(List<>) == typeof(T).GetGenericTypeDefinition())
+            //    return Activator.CreateInstance(typeof(T), new object[] { (IEnumerable<object>)obj }) as T;
 
             var result = (T)_memberwiseClone.Invoke(obj, null);
             if (result is BlueprintComponent comp)
@@ -1471,6 +1482,25 @@ namespace CodexLib
             }
 
             action?.Invoke(result);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates deep copy of IEnumerable<BlueprintComponent>.
+        /// </summary>
+        public static List<T> Clone<T>(this IEnumerable<T> obj, Action<T> action = null) where T : BlueprintComponent
+        {
+            var result = obj.ToList();
+
+            for (int i = 0; i < result.Count; i++)
+            {
+                result[i] = result[i].Clone();
+                result[i].name = null;
+                result[i].OwnerBlueprint = null;
+
+                action?.Invoke(result[i]);
+            }
+
             return result;
         }
 

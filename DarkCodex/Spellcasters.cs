@@ -70,16 +70,6 @@ namespace DarkCodex
             seeker.RemoveFeature("9cb584629d604325a1141c72ad751e17"); //SeekerBloodlineArcaneCombatCastingAdeptFeatureAddLevel15
         }
 
-        public static void FixArcanistSpellbook()
-        {
-            // patch AbilityData.GetConversions to return all metamagic spells of the original spell's level, if that metamagic spell isn't already prepared
-            //  check IsArcanist on Spellbook
-            //  apply flag that signifies this must increase casting time? cannot attach on AbilityData?
-
-            // add new condition to Patch_AbilityIsFullRound
-            //  IsArcanist & metamagic (except quicken) & not prepared (check for variants!)
-        }
-
         [PatchInfo(Severity.Extend, "Arcanist Brown-Fur", "allows Share Transmutation to affect any spell", true)]
         public static void PatchArcanistBrownFur()
         {

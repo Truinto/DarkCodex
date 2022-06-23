@@ -65,6 +65,7 @@
     <Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
     <Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
     <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
+    <Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
     <Reference Include="Owlcat.Runtime.UI_publicized" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_publicized.dll" />
     <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
     <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
@@ -138,6 +139,7 @@
     <Compile Include="Components\MetamagicReduceCostParametrized.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\PrerequisiteSpontaneousCaster.cs" />
+    <Compile Include="Components\SacredSummons.cs" />
     <Compile Include="Components\SpellDescriptorExt.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Enums\EnumPlaceholder.cs" />

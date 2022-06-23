@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.12]
+- added Patch Fix Arcanist Spontaneous Metamagic: allows arcanist to use non memorized metamagic, but increases casting time
+- fixed Sacred Summons not showing up
+
 ## [1.3.11]
 - renamed Hexcrafter to Magus category
 - added Sword Saint Any Weapon: allow Sword Saint to pick any weapon focus; default off

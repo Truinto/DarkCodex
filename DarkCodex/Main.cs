@@ -428,6 +428,7 @@ namespace Shared
             PatchSafe(typeof(Patch_FixQuickenMetamagic));
             PatchSafe(typeof(Patch_HexcrafterSpellStrike));
             PatchSafe(typeof(Patch_BackgroundChecks));
+            PatchSafe(typeof(Patch_ArcanistSpontaneous));
 
             // General
             LoadSafe(General.CreateHeritage);

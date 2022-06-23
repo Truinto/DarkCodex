@@ -58,6 +58,7 @@
     <Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
     <Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
     <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
+    <Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
     <Reference Include="Owlcat.Runtime.UI_publicized" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_publicized.dll" />
     <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
     <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
@@ -85,6 +86,7 @@
     <Compile Include="Mythic.cs" />
     <Compile Include="Patches\Event_RestoreEndOfCombat.cs" />
     <Compile Include="Patches\Patch_ArcanistBrownFur.cs" />
+    <Compile Include="Patches\Patch_ArcanistSpontaneous.cs" />
     <Compile Include="Patches\Patch_BackgroundChecks.cs" />
     <Compile Include="Patches\Patch_ChangeSpellElement.cs" />
     <Compile Include="Patches\Patch_DismissAnything.cs" />

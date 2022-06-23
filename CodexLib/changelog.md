@@ -3,6 +3,7 @@
 ## [1.1.0]
 - added limit to exception count
 - added GetConflictPatches
+- changed Clone<T> will now clear BlueprintComponent.OwnerBlueprint
 
 ## [1.0.5]
 - added PrerequisiteSpontaneousCaster

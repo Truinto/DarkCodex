@@ -470,15 +470,18 @@ namespace DarkCodex
         public static void CreateSacredSummons()
         {
             var selective = Helper.Get<BlueprintFeature>("fd30c69417b434d47b6b03b9c1f568ff"); //SelectiveChannel
-            var preq = selective.GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any).Clone(); // TODO: fix clone for arrays
+            var preq = selective.GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any).Clone();
 
             var feat = Helper.CreateBlueprintFeature(
                 "SacredSummons",
                 "Sacred Summons",
                 "When using summon monster to summon creatures whose alignment subtype or subtypes exactly match your aura, you may cast the spell as a standard action instead of with a casting time of 1 round."
                 ).SetComponents(preq.ToArray<BlueprintComponent>());
-            feat.AddComponents(new AddMechanicFeatureCustom(MechanicFeature.SummoningNoFullRound));
+            feat.AddComponents(
+                new AddMechanicFeatureCustom(MechanicFeature.SummoningNoFullRound), 
+                new SacredSummons());
 
+            Helper.AddFeats(feat);
         }
 
         #region General Resources and Stuff
