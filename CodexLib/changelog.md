@@ -1,9 +1,11 @@
 ﻿# Changelog
 
 ## [1.1.0]
+- !signature change: CreateAddFeatureIfHasFact, CreateContextConditionHasFact, CreatePrerequisiteFeature
 - added limit to exception count
 - added GetConflictPatches
 - changed Clone<T> will now clear BlueprintComponent.OwnerBlueprint
+- updates some helpers to AnyRef
 
 ## [1.0.5]
 - added PrerequisiteSpontaneousCaster

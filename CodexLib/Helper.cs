@@ -2223,7 +2223,7 @@ namespace CodexLib
         }
 
         /// <summary>Adds a fact, but only fact not already granted through other means.</summary>
-        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(BlueprintUnitFactReference feature)
+        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(AnyRef feature)
         {
             var result = new AddFeatureIfHasFact();
             result.m_CheckedFact = feature;
@@ -2552,7 +2552,7 @@ namespace CodexLib
             return hasBuff;
         }
 
-        public static ContextConditionHasFact CreateContextConditionHasFact(BlueprintUnitFactReference fact, bool not = false)
+        public static ContextConditionHasFact CreateContextConditionHasFact(AnyRef fact, bool not = false)
         {
             var result = new ContextConditionHasFact();
             result.m_Fact = fact;
@@ -2698,7 +2698,7 @@ namespace CodexLib
             return result;
         }
 
-        public static PrerequisiteFeature CreatePrerequisiteFeature(this BlueprintFeatureReference feat, bool any = false)
+        public static PrerequisiteFeature CreatePrerequisiteFeature(this AnyRef feat, bool any = false)
         {
             var result = new PrerequisiteFeature();
             result.m_Feature = feat;
@@ -3271,6 +3271,12 @@ namespace CodexLib
         #endregion
 
         #region ToReference
+
+        public static bool NotEmpty(this BlueprintReferenceBase reference)
+        {
+            return reference != null && reference.deserializedGuid != BlueprintGuid.Empty;
+        }
+
 
         public static void SetReference(this BlueprintReferenceBase reference, SimpleBlueprint bp)
         {

@@ -348,8 +348,8 @@ namespace DarkCodex
             var t = Kineticist.Tree;
 
             // make sure progression always grants blast feature (basic only)
-            t.Earth.Progession.AddComponents(Helper.CreateAddFeatureIfHasFact(t.Earth.BlastFeature.ToRef2()));
-            t.Fire.Progession.AddComponents(Helper.CreateAddFeatureIfHasFact(t.Fire.BlastFeature.ToRef2()));
+            t.Earth.Progession.Get().AddComponents(Helper.CreateAddFeatureIfHasFact(t.Earth.BlastFeature));
+            t.Fire.Progession.Get().AddComponents(Helper.CreateAddFeatureIfHasFact(t.Fire.BlastFeature));
 
             // add missing composite cases
             var list = new List<GameAction>();
@@ -360,44 +360,45 @@ namespace DarkCodex
                     list.Add(Helper.CreateConditional(
                         new Condition[]
                         {
-                            Helper.CreateContextConditionHasFact(element.BlastFeature.ToRef2(), true),
-                            Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature.ToRef2()),
-                            Helper.CreateContextConditionHasFact(element.Parent2.BlastFeature.ToRef2())
+                            Helper.CreateContextConditionHasFact(element.BlastFeature, true),
+                            Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature),
+                            Helper.CreateContextConditionHasFact(element.Parent2.BlastFeature)
                         },
-                        ifTrue: Helper.CreateContextActionAddFeature(element.BlastFeature.ToRef()).ObjToArray()));
+                        ifTrue: Helper.CreateContextActionAddFeature(element.BlastFeature).ObjToArray()));
                 }
             }
-            t.CompositeBuff.GetComponent<AddFactContextActions>().Activated.Actions = list.ToArray();
+            t.CompositeBuff.Get().GetComponent<AddFactContextActions>().Activated.Actions = list.ToArray();
 
             // move CompositeBlastBuff to BlastFeature
             foreach (var element in t.GetAll(basic: true))
-                element.BlastFeature.AddComponents(Helper.CreateAddFacts(t.CompositeBuff.ToRef2()));
+                element.BlastFeature.Get().AddComponents(Helper.CreateAddFacts(t.CompositeBuff));
 
             // create new simplified selection
-            t.ExpandedElement = Helper.CreateBlueprintFeatureSelection(
+            var expandedElement = Helper.CreateBlueprintFeatureSelection(
                 "ExpandedElementSelection",
                 "",
                 "A kineticist learns to use another element or expands her understanding of her own element. She can choose any element, including her primary element. She gains one of that element's simple blast wild talents that she does not already possess, if any. She also gains all composite blast wild talents whose prerequisites she meets. She doesn't gain the defensive wild talent of the expanded element unless she later selects it with the expanded defense utility wild talent."
                 ).SetComponents(
-                Helper.CreatePrerequisiteClassLevel(t.Class.ToRef(), 7));
-            t.ExpandedElement.m_DisplayName = t.FocusSecond.m_DisplayName;
-            t.ExpandedElement.m_AllFeatures = new BlueprintFeatureReference[] {
-                t.Air.BlastFeature.ToRef(),
-                t.Electric.BlastFeature.ToRef(),
-                t.Earth.BlastFeature.ToRef(),
-                t.Composite_Metal.BlastFeature.ToRef(),
-                t.Fire.BlastFeature.ToRef(),
-                t.Composite_BlueFlame.BlastFeature.ToRef(),
-                t.Water.BlastFeature.ToRef(),
-                t.Cold.BlastFeature.ToRef()
+                Helper.CreatePrerequisiteClassLevel(t.Class, 7));
+            expandedElement.m_DisplayName = t.FocusSecond.Get().m_DisplayName;
+            expandedElement.m_AllFeatures = new BlueprintFeatureReference[] {
+                t.Air.BlastFeature,
+                t.Electric.BlastFeature,
+                t.Earth.BlastFeature,
+                t.Composite_Metal.BlastFeature,
+                t.Fire.BlastFeature,
+                t.Composite_BlueFlame.BlastFeature,
+                t.Water.BlastFeature,
+                t.Cold.BlastFeature
             };
+            t.ExpandedElement.SetReference(expandedElement);
 
             // make sure metal and blueflame cannot be taken early
-            t.Composite_Metal.BlastFeature.AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession.ToRef()));
-            t.Composite_BlueFlame.BlastFeature.AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession.ToRef()));
+            t.Composite_Metal.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession));
+            t.Composite_BlueFlame.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession));
 
             // add to feats
-            Helper.AddFeats(t.ExpandedElement.ToRef());
+            Helper.AddFeats(t.ExpandedElement);
 
             // change prerequisites of wild talents, check for blasts instead of elemental focus since Expanded Element doesn't grant focus
             foreach (var talent in WildTalents)
@@ -413,17 +414,17 @@ namespace DarkCodex
                 void swap(ref BlueprintFeatureReference original)
                 {
                     var guid = original.Guid;
-                    var focus = t.GetFocus(f => f.Second.AssetGuid == guid);
+                    var focus = t.GetFocus(f => f.Second.deserializedGuid == guid);
                     if (focus != null)
                     {
-                        original = focus.Element1.BlastFeature.ToRef();
+                        original = focus.Element1.BlastFeature;
                         return;
                     }
 
-                    focus = t.GetFocus(f => f.Third.AssetGuid == guid);
+                    focus = t.GetFocus(f => f.Third.deserializedGuid == guid);
                     if (focus != null && focus.Element2 != null)
                     {
-                        original = focus.Element2.BlastFeature.ToRef();
+                        original = focus.Element2.BlastFeature;
                         return;
                     }
                 }
@@ -849,7 +850,7 @@ namespace DarkCodex
             buff.SetComponents(
                 Step4_dc(),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
-                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree },
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree.BaseAll },
                 new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = actions }
                 );
         }

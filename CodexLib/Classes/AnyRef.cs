@@ -44,6 +44,18 @@ namespace CodexLib
             return new AnyRef() { deserializedGuid = bp.deserializedGuid };
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is BlueprintReferenceBase bp)
+                return this.deserializedGuid == bp.deserializedGuid;
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
         public static implicit operator AnyRef(string guid) => guid == null ? null : new() { deserializedGuid = BlueprintGuid.Parse(guid) };
         public static implicit operator AnyRef(SimpleBlueprint bp) => bp == null ? null : new() { deserializedGuid = bp.AssetGuid };
 

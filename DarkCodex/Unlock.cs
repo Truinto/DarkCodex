@@ -61,10 +61,10 @@ namespace DarkCodex
             var t = Kineticist.Tree;
 
             // replace original with simplified
-            if (t.ExpandedElement != null)
+            if (t.ExpandedElement.NotEmpty())
             {
-                t.FocusSecond.m_AllFeatures = t.ExpandedElement.m_AllFeatures;
-                t.FocusThird.m_AllFeatures = t.ExpandedElement.m_AllFeatures;
+                t.FocusSecond.Get().m_AllFeatures = t.ExpandedElement.Get().m_AllFeatures;
+                t.FocusThird.Get().m_AllFeatures = t.ExpandedElement.Get().m_AllFeatures;
             }
 
             // repeat progression
