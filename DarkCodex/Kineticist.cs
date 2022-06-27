@@ -833,6 +833,27 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feature.ToRef());
         }
 
+        public static void CreateVenomInfusion()
+        {
+            var actions = Helper.CreateActionList(
+                Helper.CreateContextActionApplyBuff(
+                    Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1)
+                );
+
+            Helper.CreateBlueprintActivatableAbility(
+                "VenomInfusion",
+                "Venom Infusion",
+                "Element: any\nType: substance infusion\nLevel: 5\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nAll of your blasts are mildly toxic. Creatures that take damage from your blast are sickened for 1 round.",
+                out var buff
+                );
+            buff.SetComponents(
+                Step4_dc(),
+                new RecalculateOnStatChange() { UseKineticistMainStat = true },
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree },
+                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = actions }
+                );
+        }
+
         #region Helper
 
         /// <summary>

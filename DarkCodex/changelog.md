@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+- fixed sticky spells not working with Boundless Injury
+- allowed arcanist to use temporary known spells without preparing them
+
 ## [1.3.12]
 - added Patch Fix Arcanist Spontaneous Metamagic: allows arcanist to use non memorized metamagic, but increases casting time
 - fixed Sacred Summons not showing up

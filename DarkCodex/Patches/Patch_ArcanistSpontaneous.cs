@@ -5,6 +5,8 @@ using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Parts;
+using Kingmaker.Utility;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -22,57 +24,6 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_ArcanistSpontaneous
     {
-        //[HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetConversions))]
-        //[HarmonyPostfix]
-        public static void __Postfix1(AbilityData __instance, ref IEnumerable<AbilityData> __result)
-        {
-            if (!__instance.IsArcanist)
-                return;
-
-            var list = __result as List<AbilityData> ?? __result.ToList();
-            var memorizedSpells = __instance.Spellbook.GetMemorizedSpells(__instance.SpellLevel).Select(s => s.Spell);
-            var memorizedBlueprints = GetAllMemorizedBlueprints(__instance.Spellbook);
-
-            foreach (var metamagicSpell in __instance.Spellbook.GetCustomSpells(__instance.SpellLevel))
-            {
-                // skip if metamagic is already prepared
-                if (memorizedSpells.Contains(metamagicSpell))
-                    continue;
-
-                // skip if basic version is not memorized
-                if (!memorizedBlueprints.Contains(metamagicSpell.Blueprint))
-                    continue;
-
-                // if spell has variants, we need to create one for each because nesting doesn't work
-                var variants = metamagicSpell.AbilityVariants;
-                if (variants == null)
-                {
-                    list.Add(new AbilityData(metamagicSpell.Blueprint, __instance.Caster)
-                    {
-                        m_ConvertedFrom = __instance,
-                        MetamagicData = metamagicSpell.MetamagicData?.Clone(),
-                        DecorationBorderNumber = metamagicSpell.DecorationBorderNumber,
-                        DecorationColorNumber = metamagicSpell.DecorationColorNumber
-                    });
-                }
-                else
-                {
-                    foreach (var variant in variants.Variants)
-                    {
-                        list.Add(new AbilityData(variant, __instance.Caster)
-                        {
-                            m_ConvertedFrom = __instance,
-                            MetamagicData = metamagicSpell.MetamagicData?.Clone(),
-                            DecorationBorderNumber = metamagicSpell.DecorationBorderNumber,
-                            DecorationColorNumber = metamagicSpell.DecorationColorNumber
-                        });
-                    }
-                }
-            }
-
-            __result = list;
-        }
-
         [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.GetMemorizedSpells))]
         [HarmonyPostfix]
         public static void Postfix1(int spellLevel, Spellbook __instance, ref IEnumerable<SpellSlot> __result)
@@ -108,6 +59,27 @@ namespace DarkCodex
                 slot.Available = true;
 
                 list.Add(slot);
+            }
+
+            var temporary = __instance.Owner.Unit.Get<UnitPartTemporarySpellsKnown>();
+            if (temporary != null)
+            {
+                foreach (var entry in temporary.m_Entries)
+                {
+                    foreach (var spell in entry.Spells)
+                    {
+                        if (spell.Spellbook != __instance)
+                            continue;
+                        if (list.Any(a => a.Spell.Blueprint == spell.Blueprint))
+                            continue;
+
+                        var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1);
+                        slot.Spell = spell;
+                        slot.Available = true;
+
+                        list.Add(slot);
+                    }
+                }
             }
 
             __result = list;

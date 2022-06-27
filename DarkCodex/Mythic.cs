@@ -670,7 +670,7 @@ namespace DarkCodex
             };
             feat.AddComponents(addKnownSpells);
             feat.GetComponent<AutoMetamagic>().Abilities.AddRange(addKnownSpells.Spells);
-            Helper.AppendAndReplace(ref feat.GetComponent<AddUnlimitedSpell>().m_Abilities, addKnownSpells.Spells);
+            Helper.AppendAndReplace(ref feat.GetComponent<AddUnlimitedSpell>().m_Abilities, addKnownSpells.Spells.StickyResolve());
         }
 
         [PatchInfo(Severity.Create, "Resourceful Caster", "mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws", true, Requirement: typeof(Patch_ResourcefulCaster))]

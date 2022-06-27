@@ -449,6 +449,19 @@ namespace CodexLib
             orig = result;
         }
 
+        public static void AppendAndReplace<T>(ref T[] orig, IEnumerable<T> objs)
+        {
+            if (orig == null) orig = new T[0];
+
+            T[] result = new T[orig.Length + objs.Count()];
+            int i;
+            for (i = 0; i < orig.Length; i++)
+                result[i] = orig[i];
+            foreach (var obj in objs)
+                result[i++] = obj;
+            orig = result;
+        }
+
         public static void InsertAt<T>(ref T[] orig, T obj, int index = -1)
         {
             if (orig == null) orig = new T[0];
@@ -2011,6 +2024,22 @@ namespace CodexLib
                 if (((long)descriptor & (1L << i - 1)) != 0)
                     Console.WriteLine(names[i]);
             }
+        }
+
+        public static BlueprintAbilityReference GetSticky(this BlueprintAbilityReference spell)
+        {
+            return spell.Get()?.GetComponent<AbilityEffectStickyTouch>()?.m_TouchDeliveryAbility;
+        }
+
+        /// <summary>
+        /// Replace references with their sticky variant.
+        /// </summary>
+        public static BlueprintAbilityReference[] StickyResolve(this BlueprintAbilityReference[] spells)
+        {
+            var result = new BlueprintAbilityReference[spells.Length];
+            for (int i = 0; i < result.Length; i++)
+                result[i] = spells[i].GetSticky() ?? spells[i];
+            return result;
         }
 
         #endregion
