@@ -82,10 +82,14 @@ namespace DarkCodex
             trigger1.FromSpellbook = false;
             trigger1.CheckRange = true;
             trigger1.Range = AbilityRange.Personal;
+            trigger1.CheckAbilityType = true;
+            trigger1.Type = AbilityType.Spell;
 
             trigger2.FromSpellbook = false;
             trigger2.CheckRange = true;
             trigger2.Range = AbilityRange.Personal;
+            trigger2.CheckAbilityType = true;
+            trigger2.Type = AbilityType.Spell;
         }
     }
 }

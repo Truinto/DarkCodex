@@ -458,7 +458,7 @@ namespace DarkCodex
                 group: FeatureGroup.Racial
                 ).SetComponents(
                 Helper.CreateAddStatBonus(2, StatType.Strength, ModifierDescriptor.Racial),
-                new AddMechanicsFeature { m_Feature = AddMechanicsFeature.MechanicsFeatureType.Ferocity },
+                Helper.CreateAddFacts("955e356c813de1743a98ab3485d5bc69"), //Ferocity
                 Helper.CreateRemoveFeatureOnApply("885f478dff2e39442a0f64ceea6339c9"), //Intimidating
                 Helper.CreateRemoveFeatureOnApply("c99f3405d1ef79049bd90678a666e1d7") //HalfOrcFerocity
                 ).Add(minusInt, minusWis, minusCha);

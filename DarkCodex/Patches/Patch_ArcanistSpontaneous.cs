@@ -68,6 +68,8 @@ namespace DarkCodex
                 {
                     foreach (var spell in entry.Spells)
                     {
+                        if (spell.SpellLevel != spellLevel)
+                            continue;
                         if (spell.Spellbook != __instance)
                             continue;
                         if (list.Any(a => a.Spell.Blueprint == spell.Blueprint))
@@ -76,6 +78,7 @@ namespace DarkCodex
                         var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1);
                         slot.Spell = spell;
                         slot.Available = true;
+                        spell.m_CachedName = "Temporary: " + spell.Name;
 
                         list.Add(slot);
                     }
@@ -89,9 +92,13 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix2(AbilityData spell, Spellbook __instance, ref int __result)
         {
-            if (__result == 0 && __instance.Blueprint.IsArcanist && spell.m_CachedName?.StartsWith("Spontaneous: ") == true)
+            if (__result == 0 && __instance.Blueprint.IsArcanist)
             {
-                __result = __instance.GetSpontaneousSlots(__instance.GetSpellLevel(spell));
+                if (spell.m_CachedName?.StartsWith("Spontaneous: ") == true
+                    || spell.m_CachedName?.StartsWith("Temporary: ") == true)
+                {
+                    __result = __instance.GetSpontaneousSlots(__instance.GetSpellLevel(spell));
+                }
             }
         }
 
