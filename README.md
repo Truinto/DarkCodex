@@ -36,16 +36,18 @@ Content
 |DEBUG.Enchantments|makes enchantments visible for items that don't usually display them|:book:|:construction:|
 |Enchantments.NameAll|gives all enchantments a name and description|:book:|:construction:|
 |General.CreateAbilityFocus|basic feat: Ability Focus, increase DC of one ability by +2|:book:|:x:|
+|General.CreateBackgrounds|basic feat: Additional Traits traits: Magical Lineage, Metamagic Master|:book:|:heavy_check_mark:|
 |General.CreateBardStopSong|adds ability to stop any activatable immediately|:book:|:heavy_check_mark:|
+|General.CreateHeritage|adds Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity|:house:|:heavy_check_mark:|
 |General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
+|General.CreateSacredSummons|basic feat: requires Channel Energy, summons act immediately|:book:|:heavy_check_mark:|
 |General.PatchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:house:|:heavy_check_mark:|
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
 |General.PatchHideBuffs|unclogs UI by hiding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
+|General.FixMasterShapeshifter|ensures spells with the Polymorph descriptor get the benefit of Master Shapeshifter|:book:|:heavy_check_mark:|
 |General.FixSpellElementChange|fixes Elemental Bloodline and Spell Focus interaction|:book:|:heavy_check_mark:|
-|Hexcrafter.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
-|Hexcrafter.FixProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:heavy_check_mark:|
 |Items.CreateImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|
 |Items.CreateKineticArtifact|new weapon for Kineticists|:house:|:heavy_check_mark:|
@@ -62,6 +64,7 @@ Content
 |Kineticist.CreateMindShield|Wild Talent: half Psychokineticist's penalties|:house:|:heavy_check_mark:|
 |Kineticist.CreateMobileGatheringFeat|basic feat: Mobile Gathering|:book:|:heavy_check_mark:|
 |Kineticist.CreateSelectiveMetakinesis|gain selective metakinesis at level 7|:house:|:heavy_check_mark:|
+|Kineticist.CreateVenomInfusion|infusion: applies sickened or poisons the target|:book:|:heavy_check_mark:|
 |Kineticist.CreateWhipInfusion|infusion: Kinetic Whip, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Kineticist.PatchDarkElementalist|faster animation and use anywhere, but only out of combat|:house:|:heavy_check_mark:|
 |Kineticist.PatchDemonCharge|Demon Charge also gathers power|:house:|:heavy_check_mark:|
@@ -69,6 +72,9 @@ Content
 |Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting|:house:|:heavy_check_mark:|
 |Kineticist.FixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
 |Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:x:|
+|Magus.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
+|Magus.FixHexcrafterProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
+|Magus.PatchSwordSaint|allow Sword Saint to pick any weapon focus|:house:|:heavy_check_mark:|
 |Monk.CreateFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
 |Mythic.CreateDemonLord|adds features of Demon Lords to the mythic Demon progression: teleport at will, ...|:house:|:construction:|
 |Mythic.CreateDemonMastery|mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect|:house:|:heavy_check_mark:|
@@ -85,6 +91,7 @@ Content
 |Mythic.CreateLimitlessWarpriest|mythic ability: infinite scared weapon uses|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:house:|:heavy_check_mark:|
 |Mythic.CreateMagicItemAdept|mythic feat: trinket items use character level as caster level|:house:|:heavy_check_mark:|
+|Mythic.CreateMetamagicAdept|mythic feat: allow spontaneous spellcasters to apply metamagic without casting time penalty|:house:|:heavy_check_mark:|
 |Mythic.CreateResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
@@ -101,6 +108,8 @@ Content
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
+|Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
+|Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
 |Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:construction:|
@@ -109,18 +118,14 @@ Content
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
 |Witch.CreateSplitHex|basic feat: Split Hex|:book:|:x:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
-|Patch.Patch_AbilityAtWill|provides logic for at will spells|:house:|:heavy_check_mark:|
-|Patch.Patch_ActivatableActionBar|adds logic for automatic-only activatable|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableHandleUnitRunCommand|fixes move actions disabling the activatable (since we have 2 of them)|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnNewRound|uses up move action when triggered; deactivates activatable if no action left|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnTurnOn|fixes activatable not being allowed to be active when they have the same action (like 2 move actions)|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableTryStart|fixes activatable not starting the second time, while being outside of combat|:book:|:heavy_check_mark:|
 |Patch.Patch_AllowAchievements|clears the 'has used mods before' flag and also pretends that no mods are active|:book:|:heavy_check_mark:|
-|Patch.Patch_AlwaysAChance|Always A Chance succeeds on a natural one and applies to most d20 rolls|:house:|:heavy_check_mark:|
-|Patch.Patch_AOEAttackRolls|allows Impale Infusion and other AOE attacks to roll once for all|:book:|:heavy_check_mark:|
-|Patch.Patch_ConditionExemption|Adds logic to ignore status effects under certain conditions.|:book:|:heavy_check_mark:|
+|Patch.Patch_ArcanistSpontaneous|allows arcanist to use non memorized metamagic, but increases casting time|:book:|:heavy_check_mark:|
+|Patch.Patch_BackgroundChecks|prevents identical background skills from causing an error|:book:|:heavy_check_mark:|
 |Patch.Patch_DarkElementalistBurn|for Wild Talents your current amount of burn includes the number of successful Soul Power uses|:house:|:heavy_check_mark:|
-|Patch.Patch_DebugReport|fixes error log crashes due to unnamed components|:book:|:heavy_check_mark:|
 |Patch.Patch_DismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|
 |Patch.Patch_EnduringSpells|allows Enduring Spell to apply to spells from any source; fix for Magic Weapon|:book:|:heavy_check_mark:|
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
@@ -135,7 +140,6 @@ Content
 |Patch.Patch_Polymorph|allows debug flags to keep inventory or model during polymorph|:book:|:heavy_check_mark:|
 |Patch.Patch_PreferredSpellMetamagic|necessary patches for Preferred Spell|:book:|:heavy_check_mark:|
 |Patch.Patch_ResourcefulCaster|patches for Resourceful Caster|:house:|:heavy_check_mark:|
-|Patch.Patch_SpellSelectionParametrized|fix spell selection for Preferred Spell|:book:|:heavy_check_mark:|
 |Patch.Patch_TrueGatherPowerLevel|Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost. Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.|:book:|:heavy_check_mark:|
 
 :heavy_check_mark: works, please report bugs you find \
