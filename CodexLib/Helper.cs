@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using JetBrains.Annotations;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -24,6 +25,7 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.Enums.Damage;
+using Kingmaker.Kingdom.Blueprints;
 using Kingmaker.Localization;
 using Kingmaker.Localization.Shared;
 using Kingmaker.PubSubSystem;
@@ -1648,6 +1650,22 @@ namespace CodexLib
             AppendAndReplace(ref _tricksterhexes.m_AllFeatures, reference);
         }
 
+        private static BlueprintFeatureSelection _infusions;
+        public static void AddInfusion(AnyRef blueprintFeature)
+        {
+            if (_infusions == null)
+                _infusions = Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            AppendAndReplace(ref _infusions.m_AllFeatures, blueprintFeature);
+        }
+
+        private static BlueprintFeatureSelection _wildtalents;
+        public static void AddWildTalent(AnyRef blueprintFeature)
+        {
+            if (_wildtalents == null)
+                _wildtalents = Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
+            AppendAndReplace(ref _wildtalents.m_AllFeatures, blueprintFeature);
+        }
+
         public static BlueprintAbility AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
         {
             var comp = parent.GetComponent<AbilityVariants>();
@@ -1734,7 +1752,7 @@ namespace CodexLib
             return result;
         }
 
-        public static ContextActionSavingThrow MakeContextActionSavingThrow(SavingThrowType savingthrow, GameAction succeed, GameAction failed)
+        public static ContextActionSavingThrow MakeContextActionSavingThrow(SavingThrowType savingthrow, [CanBeNull] GameAction succeed, [CanBeNull] GameAction failed)
         {
             var result = new ContextActionSavingThrow();
             result.Type = savingthrow;
@@ -1744,6 +1762,28 @@ namespace CodexLib
                 Failed = CreateActionList(failed)
             });
             return result;
+        }
+
+        public static ContextActionSavingThrow Add(this ContextActionSavingThrow b, GameAction addition, bool onSucceed = false, bool onFailed = false)
+        {
+            if (onSucceed)
+            {
+                foreach (var action in b.Actions.Actions)
+                    if (action is ContextActionConditionalSaved save)
+                        AppendAndReplace(ref save.Succeed.Actions, addition);
+            }
+            else if (onFailed)
+            {
+                foreach (var action in b.Actions.Actions)
+                    if (action is ContextActionConditionalSaved save)
+                        AppendAndReplace(ref save.Failed.Actions, addition);
+            }
+            else
+            {
+                AppendAndReplace(ref b.Actions.Actions, addition);
+            }
+
+            return b;
         }
 
         public static void MakeStickySpell(BlueprintAbility spell, out BlueprintAbility cast, out BlueprintAbility effect)
@@ -2054,6 +2094,60 @@ namespace CodexLib
                 throw new ArgumentException("GUID must not be empty!");
             bp.AssetGuid = guid;
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
+        }
+
+        public static T SetUIData<T>(this T dataprovider, string displayname = null, string description = null, Sprite icon = null) where T : IUIDataProvider
+        {
+            return SetUIData(dataprovider, displayname?.CreateString(), description?.CreateString(), icon);
+        }
+
+        public static T SetUIData<T>(this T dataprovider, LocalizedString displayname = null, LocalizedString description = null, Sprite icon = null) where T : IUIDataProvider
+        {
+            switch (dataprovider)
+            {
+                case BlueprintUnitFact bp:
+                    bp.m_DisplayName = displayname;
+                    bp.m_Description = description;
+                    bp.m_Icon = icon;
+                    break;
+                case BlueprintAbilityResource bp:
+                    bp.LocalizedName = displayname;
+                    bp.LocalizedDescription = description;
+                    bp.m_Icon = icon;
+                    break;
+                case BlueprintCharacterClass bp:
+                    bp.LocalizedName = displayname;
+                    bp.LocalizedDescription = description;
+                    bp.m_Icon = icon;
+                    break;
+                case BlueprintItem bp:
+                    bp.m_DisplayNameText = displayname;
+                    bp.m_DescriptionText = description;
+                    bp.m_Icon = icon;
+                    break;
+                case BlueprintArchetype bp:
+                    bp.LocalizedName = displayname;
+                    bp.LocalizedDescription = description;
+                    bp.m_Icon = icon;
+                    break;
+                case BlueprintSpellbook bp:
+                    bp.Name = displayname;
+                    break;
+                case BlueprintWeaponType bp:
+                    bp.m_DefaultNameText = displayname;
+                    bp.m_DescriptionText = description;
+                    bp.m_Icon = icon;
+                    break;
+                case BlueprintKingdomBuff bp:
+                    bp.DisplayName = displayname;
+                    bp.Description = description;
+                    bp.Icon = icon;
+                    break;
+                default:
+                    PrintDebug($"unknown DataProvider: {dataprovider.GetType().FullName}");
+                    break;
+            }
+            return dataprovider;
         }
 
         public static AddAbilityResources CreateAddAbilityResources(AnyRef BlueprintAbilityResource)
@@ -2629,6 +2723,20 @@ namespace CodexLib
             result.Compare = Compare;
             result.Buffs = Buffs;
             result.TimeLeft = TimeLeft;
+            return result;
+        }
+
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, float duration, DurationRate rate = DurationRate.Rounds, bool fromSpell = false, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
+        {
+            var result = new ContextActionApplyBuff();
+            result.m_Buff = buff.ToRef();
+            result.UseDurationSeconds = true;
+            result.DurationSeconds = duration;
+            result.IsFromSpell = fromSpell;
+            result.IsNotDispelable = !dispellable;
+            result.ToCaster = toCaster;
+            result.AsChild = asChild;
+            result.Permanent = permanent;
             return result;
         }
 

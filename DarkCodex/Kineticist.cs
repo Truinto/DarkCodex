@@ -50,6 +50,7 @@ using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.JsonSystem;
 using Shared;
 using CodexLib;
+using Kingmaker.Designers.Mechanics.Buffs;
 
 namespace DarkCodex
 {
@@ -834,25 +835,137 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feature.ToRef());
         }
 
+        [PatchInfo(Severity.Create, "Venom Infusion", "infusion: applies sickened or poisons the target", false)]
         public static void CreateVenomInfusion()
         {
-            var actions = Helper.CreateActionList(
-                Helper.CreateContextActionApplyBuff(
-                    Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1)
+            var poison = Helper.CreateBlueprintBuff(
+                "VenomInfusionPoisonBuff",
+                "Venom Blast Poison",
+                "Blast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 damage to the chosen ability score; cure 2 consecutive saves."
+                ).SetComponents(
+                new BuffPoisonStatDamage() { Descriptor = ModifierDescriptor.UntypedStackable, Stat = StatType.Constitution, Value = new DiceFormula(1, DiceType.D2), Ticks = 6, SuccesfullSaves = 2, SaveType = SavingThrowType.Fortitude },
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Poison)
                 );
+            poison.Stacking = StackingType.Poison;
 
-            Helper.CreateBlueprintActivatableAbility(
-                "VenomInfusion",
+            // venom infusion
+            var ab = Helper.CreateBlueprintActivatableAbility(
+                "VenomInfusionActivatable",
                 "Venom Infusion",
                 "Element: any\nType: substance infusion\nLevel: 5\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nAll of your blasts are mildly toxic. Creatures that take damage from your blast are sickened for 1 round.",
-                out var buff
+                out var buff,
+                group: ActivatableAbilityGroup.SubstanceInfusion,
+                icon: Helper.StealIcon("1f788b54e93751d43923596b8e09035d")
                 );
+            var save = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude,
+                    succeed: null,
+                    failed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1));
             buff.SetComponents(
                 Step4_dc(),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
                 new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree.BaseAll },
-                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = actions }
+                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save) }
                 );
+
+            // venom infusion, greater
+            var ab_greater = Helper.CreateBlueprintActivatableAbility(
+                "VenomInfusionGreaterActivatable",
+                "Venom Infusion, Greater",
+                "Element: any\nType: substance infusion\nLevel: 7\nBurn: 4\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nYour plant toxin is more virulent. Each time you use this infusion, choose a physical ability score (only constitution). Creatures that take damage from your blast are exposed to your poison.\n\nBlast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 damage to the chosen ability score (constitution); cure 2 consecutive saves.",
+                out var buff_greater,
+                group: ActivatableAbilityGroup.SubstanceInfusion,
+                icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")
+                );
+            var save_greater = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude,
+                    succeed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1),
+                    failed: Helper.CreateContextActionApplyBuff(poison, permanent: true));
+            buff_greater.SetComponents(
+                Step4_dc(),
+                new RecalculateOnStatChange() { UseKineticistMainStat = true },
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 4, m_AppliableTo = Tree.BaseAll },
+                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save_greater) }
+                );
+
+            // features and adding to lists
+            var feat = Helper.CreateBlueprintFeature(
+                "VenomInfusion",
+                ab.m_DisplayName,
+                ab.m_Description,
+                icon: Helper.StealIcon("1f788b54e93751d43923596b8e09035d")
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(Tree.Class, 5),
+                Helper.CreateAddFacts(ab)
+                );
+
+            var greater = Helper.CreateBlueprintFeature(
+                "VenomInfusionGreater",
+                ab_greater.m_DisplayName,
+                ab_greater.m_Description,
+                icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(Tree.Class, 7),
+                Helper.CreatePrerequisiteFeature(feat),
+                Helper.CreateAddFacts(ab_greater)
+                );
+
+            Helper.AddInfusion(feat);
+            Helper.AddInfusion(greater);
+
+            /*
+            Venom Speaker
+            Source Heroes of Golarion pg. 26
+            Talent Link Link
+            Element universal; Type utility (Su); Level 1; Burn 0
+            You gain the investigator’s poison lore class feature, using your kineticist level as your investigator level, and can use your gather power ability even while holding a dose of poison in one of your hands or appendages as long as you could otherwise use that ability. If you are at least 6th level, you can learn the alchemist’s swift poisoning class feature or one of the following alchemist discoveries in place of a utility wild talent, using your kineticist level as your alchemist level: concentrate poison, poison conversion, or sticky poison.
+
+            Poison Lore (Ex): An investigator has a deep understanding and appreciation for poisons. At 2nd level, he cannot accidentally poison himself when applying poison to a weapon. If the investigator spends 1 minute physically examining the poison, he can attempt a Knowledge (nature) check to identify any natural poison or Knowledge (arcana) check to identify any magical poison (DC = the poison’s saving throw DC). Lastly, once a poison is identified, he can spend 1 minute and attempt a Craft (alchemy) check (DC = the poison’s saving throw DC) to neutralize 1 dose of the poison. Success renders the dose harmless. The investigator has no chance of accidentally poisoning himself when examining or attempting to neutralize a poison.
+
+            Concentrate poison (Advanced Player's Guide pg. 29): The alchemist can combine two doses of the same poison to increase their effects. This requires two doses of the poison and 1 minute of concentration. When completed, the alchemist has one dose of poison. The poison's frequency is extended by 50% and the save DC increases by +2. This poison must be used within 1 hour of its creation or it is ruined.
+            Poison Conversion (Ultimate Combat pg. 24): By spending 1 minute, the alchemist can convert 1 dose of poison from its current type (contact, ingested, inhaled, or injury) to another type. For example, the alchemist can convert a dose of Small centipede poison (an injury poison) to an inhaled poison. This process requires an alchemy lab. An alchemist must be at least 6th level before selecting this discovery.
+            Sticky poison (Advanced Player's Guide pg. 31): Any poison the alchemist creates is sticky—when the alchemist applies it to a weapon, the weapon remains poisoned for a number of strikes equal to the alchemist's Intelligence modifier. An alchemist must be at least 6th level before selecting this discovery.
+            Swift Poison (Ex) Benefit: A rogue with this talent can apply poison to a weapon as a move action, instead of a standard action.
+            Quick Poison (Ex) Prerequisites: Advanced Rogue Talents, Swift Poison; Benefit: A rogue with this talent may apply poison to a weapon as a swift action.
+
+             */
+        }
+
+        public static void CreatePoison()
+        {
+            var poisons = new PoisonType[] {
+                new PoisonType("Deathblade", 20, StatType.Constitution, new DiceFormula(1, DiceType.D3), succesfullSaves: 2),
+                new PoisonType("Wyvern Poison", 17, StatType.Constitution, new DiceFormula(1, DiceType.D4)),
+                new PoisonType("Bluetip Eurypterid Poison", 16, StatType.Constitution, new DiceFormula(1, DiceType.D4), succesfullSaves: 2),
+                new PoisonType("Common Eurypterid Poison", 12, StatType.Constitution, new DiceFormula(1, DiceType.D2), ticks: 4),
+
+                new PoisonType("Giant Wasp Poison", 18, StatType.Dexterity, new DiceFormula(1, DiceType.D2)),
+                new PoisonType("Blood Marsh Spider Venom", 14, StatType.Dexterity, new DiceFormula(1, DiceType.D4), succesfullSaves: 2), // confused
+                new PoisonType("Cockatrice Spit", 12, StatType.Dexterity, new DiceFormula(1, DiceType.D2)), // petrified at 0 dex
+
+                new PoisonType("Dragon bile", 26, StatType.Strength, new DiceFormula(1, DiceType.D3), succesfullSaves: 6),
+                new PoisonType("Purple Worm Poison", 24, StatType.Strength, new DiceFormula(1, DiceType.D3), succesfullSaves: 2),
+                new PoisonType("Large Scorpion Venom", 17, StatType.Strength, new DiceFormula(1, DiceType.D2)),
+
+                new PoisonType("Glass Urchin Venom", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), succesfullSaves: 2),
+                new PoisonType("Hag Spit", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), succesfullSaves: 2), // blindness
+
+                new PoisonType("Tongue Twist", 16, StatType.Intelligence, new DiceFormula(1, DiceType.D2), succesfullSaves: 2),
+            };
+
+            foreach (var poison in poisons)
+            {
+                var ab = Helper.CreateBlueprintAbility(
+                    "PoisonUse_" + poison.Name.Replace(" ", ""),
+                    "Apply Poison: " + poison.Name,
+                    "",
+                    null,
+                    AbilityType.Extraordinary,
+                    UnitCommand.CommandType.Move,
+                    AbilityRange.Personal
+                    ).SetComponents(
+                    
+                    );
+            }
+
         }
 
         #region Helper

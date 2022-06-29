@@ -26,9 +26,8 @@ using UnityEngine.Serialization;
 
 namespace CodexLib
 {
-
     [AllowedOn(typeof(BlueprintUnitFact), false)]
-    public class BleedBuff : UnitBuffComponentDelegate, ITickEachRound, ISubscriber, ITargetRulebookSubscriber, ITargetRulebookHandler<RuleHealDamage>, IRulebookHandler<RuleHealDamage>
+    public class BleedBuff : UnitBuffComponentDelegate, ITickEachRound, ITargetRulebookHandler<RuleHealDamage>
     {
         public override void OnActivate()
         {
@@ -163,6 +162,7 @@ namespace CodexLib
         public ContextDiceValue Value;
         public bool IsFlensing; // reduce natural armor by dice count
         public bool IsStacking; // false = apply higher value; true = add value
-        public static BlueprintBuffReference BuffBleed = Helper.ToRef<BlueprintBuffReference>("e12fafba433448f8b71208b0162061fb");
+        [Obsolete]
+        public static BlueprintBuffReference BuffBleed = Helper.ToRef<BlueprintBuffReference>("e12fafba433448f8b71208b0162061fb"); //TODO: move this to CodexLib
     }
 }

@@ -95,6 +95,7 @@
     <Compile Include="Classes\MechanicActionBarSlotPlaceholder.cs" />
     <Compile Include="Classes\MechanicActionBarSlotSpellGroup.cs" />
     <Compile Include="Classes\PartCustomData.cs" />
+    <Compile Include="Classes\PoisonType.cs" />
     <Compile Include="Classes\SpellSlotLevel.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
     <Compile Include="Components\AbilityDeliverChainAttack.cs" />
@@ -113,8 +114,9 @@
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AddMechanicFeatureCustom.cs" />
     <Compile Include="Components\AddUndeadCompanion.cs" />
+    <Compile Include="Components\PoisonBuff.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
-    <Compile Include="Components\Bleed.cs" />
+    <Compile Include="Components\BleedBuff.cs" />
     <Compile Include="Components\ButcheringAxeLogic.cs" />
     <Compile Include="Components\ChangeSpellElementalDamageFix.cs" />
     <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
