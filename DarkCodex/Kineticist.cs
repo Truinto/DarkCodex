@@ -864,7 +864,7 @@ namespace DarkCodex
                 Step4_dc(),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
                 new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree.BaseAll },
-                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save) }
+                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save), CheckSpellParent = true, m_AbilityList = Tree.BaseAll }
                 );
 
             // venom infusion, greater
@@ -883,7 +883,7 @@ namespace DarkCodex
                 Step4_dc(),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
                 new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 4, m_AppliableTo = Tree.BaseAll },
-                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save_greater) }
+                new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save_greater), CheckSpellParent = true, m_AbilityList = Tree.BaseAll }
                 );
 
             // features and adding to lists
@@ -910,62 +910,6 @@ namespace DarkCodex
 
             Helper.AddInfusion(feat);
             Helper.AddInfusion(greater);
-
-            /*
-            Venom Speaker
-            Source Heroes of Golarion pg. 26
-            Talent Link Link
-            Element universal; Type utility (Su); Level 1; Burn 0
-            You gain the investigator’s poison lore class feature, using your kineticist level as your investigator level, and can use your gather power ability even while holding a dose of poison in one of your hands or appendages as long as you could otherwise use that ability. If you are at least 6th level, you can learn the alchemist’s swift poisoning class feature or one of the following alchemist discoveries in place of a utility wild talent, using your kineticist level as your alchemist level: concentrate poison, poison conversion, or sticky poison.
-
-            Poison Lore (Ex): An investigator has a deep understanding and appreciation for poisons. At 2nd level, he cannot accidentally poison himself when applying poison to a weapon. If the investigator spends 1 minute physically examining the poison, he can attempt a Knowledge (nature) check to identify any natural poison or Knowledge (arcana) check to identify any magical poison (DC = the poison’s saving throw DC). Lastly, once a poison is identified, he can spend 1 minute and attempt a Craft (alchemy) check (DC = the poison’s saving throw DC) to neutralize 1 dose of the poison. Success renders the dose harmless. The investigator has no chance of accidentally poisoning himself when examining or attempting to neutralize a poison.
-
-            Concentrate poison (Advanced Player's Guide pg. 29): The alchemist can combine two doses of the same poison to increase their effects. This requires two doses of the poison and 1 minute of concentration. When completed, the alchemist has one dose of poison. The poison's frequency is extended by 50% and the save DC increases by +2. This poison must be used within 1 hour of its creation or it is ruined.
-            Poison Conversion (Ultimate Combat pg. 24): By spending 1 minute, the alchemist can convert 1 dose of poison from its current type (contact, ingested, inhaled, or injury) to another type. For example, the alchemist can convert a dose of Small centipede poison (an injury poison) to an inhaled poison. This process requires an alchemy lab. An alchemist must be at least 6th level before selecting this discovery.
-            Sticky poison (Advanced Player's Guide pg. 31): Any poison the alchemist creates is sticky—when the alchemist applies it to a weapon, the weapon remains poisoned for a number of strikes equal to the alchemist's Intelligence modifier. An alchemist must be at least 6th level before selecting this discovery.
-            Swift Poison (Ex) Benefit: A rogue with this talent can apply poison to a weapon as a move action, instead of a standard action.
-            Quick Poison (Ex) Prerequisites: Advanced Rogue Talents, Swift Poison; Benefit: A rogue with this talent may apply poison to a weapon as a swift action.
-
-             */
-        }
-
-        public static void CreatePoison()
-        {
-            var poisons = new PoisonType[] {
-                new PoisonType("Deathblade", 20, StatType.Constitution, new DiceFormula(1, DiceType.D3), succesfullSaves: 2),
-                new PoisonType("Wyvern Poison", 17, StatType.Constitution, new DiceFormula(1, DiceType.D4)),
-                new PoisonType("Bluetip Eurypterid Poison", 16, StatType.Constitution, new DiceFormula(1, DiceType.D4), succesfullSaves: 2),
-                new PoisonType("Common Eurypterid Poison", 12, StatType.Constitution, new DiceFormula(1, DiceType.D2), ticks: 4),
-
-                new PoisonType("Giant Wasp Poison", 18, StatType.Dexterity, new DiceFormula(1, DiceType.D2)),
-                new PoisonType("Blood Marsh Spider Venom", 14, StatType.Dexterity, new DiceFormula(1, DiceType.D4), succesfullSaves: 2), // confused
-                new PoisonType("Cockatrice Spit", 12, StatType.Dexterity, new DiceFormula(1, DiceType.D2)), // petrified at 0 dex
-
-                new PoisonType("Dragon bile", 26, StatType.Strength, new DiceFormula(1, DiceType.D3), succesfullSaves: 6),
-                new PoisonType("Purple Worm Poison", 24, StatType.Strength, new DiceFormula(1, DiceType.D3), succesfullSaves: 2),
-                new PoisonType("Large Scorpion Venom", 17, StatType.Strength, new DiceFormula(1, DiceType.D2)),
-
-                new PoisonType("Glass Urchin Venom", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), succesfullSaves: 2),
-                new PoisonType("Hag Spit", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), succesfullSaves: 2), // blindness
-
-                new PoisonType("Tongue Twist", 16, StatType.Intelligence, new DiceFormula(1, DiceType.D2), succesfullSaves: 2),
-            };
-
-            foreach (var poison in poisons)
-            {
-                var ab = Helper.CreateBlueprintAbility(
-                    "PoisonUse_" + poison.Name.Replace(" ", ""),
-                    "Apply Poison: " + poison.Name,
-                    "",
-                    null,
-                    AbilityType.Extraordinary,
-                    UnitCommand.CommandType.Move,
-                    AbilityRange.Personal
-                    ).SetComponents(
-                    
-                    );
-            }
-
         }
 
         #region Helper

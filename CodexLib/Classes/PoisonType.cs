@@ -34,9 +34,11 @@ namespace CodexLib
 
         public bool NoEffectOnFirstTick;
 
+        public int Sticky;
+
         public ActionList Actions;
 
-        public PoisonType(string name, int dc, StatType stat, DiceFormula value, int bonus = 0, int ticks = 6, int succesfullSaves = 1, SavingThrowType saveType = SavingThrowType.Fortitude, ModifierDescriptor descriptor = ModifierDescriptor.UntypedStackable, bool noEffectOnFirstTick = false, ActionList actions = null)
+        public PoisonType(string name, int dc, StatType stat, DiceFormula value, int bonus = 0, int ticks = 6, int succesfullSaves = 1, SavingThrowType saveType = SavingThrowType.Fortitude, ModifierDescriptor descriptor = ModifierDescriptor.UntypedStackable, bool noEffectOnFirstTick = false, int sticky = 0, ActionList actions = null)
         {
             this.Name = name;
             this.DC = dc;
@@ -48,6 +50,7 @@ namespace CodexLib
             this.SaveType = saveType;
             this.Descriptor = descriptor;
             this.NoEffectOnFirstTick = noEffectOnFirstTick;
+            this.Sticky = sticky;
             this.Actions = actions;
         }
     }

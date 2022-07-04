@@ -35,6 +35,7 @@ using Shared;
 using System.IO;
 using CodexLib;
 using Kingmaker.Blueprints.Classes.Prerequisites;
+using Kingmaker.RuleSystem;
 
 namespace DarkCodex
 {
@@ -451,6 +452,15 @@ namespace DarkCodex
             kindred.RemoveComponents(r => r is RemoveFeatureOnApply remove && remove.m_Feature.deserializedGuid == "2483a523984f44944a7cf157b21bf79c");
             kindred.m_Description.CreateString("Kindred-Raised loses keen senses and adaptability, but gains a +2 racial {g|Encyclopedia:Bonus}bonus{/g} to {g|Encyclopedia:Charisma}Charisma{/g}.");
 
+            var ferocity = Helper.CreateBlueprintFeature(
+                "FerocityFeature"
+                ).SetUIData(
+                Helper.GetString("9d01b26c-00ce-403e-a8b8-9b675af90bfb"),
+                Helper.GetString("ad5e639d-6731-47c7-8cd6-db98c22b568c")
+                ).SetComponents(
+                Helper.CreateAddMechanicsFeature(AddMechanicsFeature.MechanicsFeatureType.Ferocity)
+                );
+
             var atavism = Helper.CreateBlueprintFeatureSelection(
                 "AtavismOrc",
                 "Orc Atavism",
@@ -458,7 +468,7 @@ namespace DarkCodex
                 group: FeatureGroup.Racial
                 ).SetComponents(
                 Helper.CreateAddStatBonus(2, StatType.Strength, ModifierDescriptor.Racial),
-                Helper.CreateAddFacts("955e356c813de1743a98ab3485d5bc69"), //Ferocity
+                Helper.CreateAddFacts(ferocity),
                 Helper.CreateRemoveFeatureOnApply("885f478dff2e39442a0f64ceea6339c9"), //Intimidating
                 Helper.CreateRemoveFeatureOnApply("c99f3405d1ef79049bd90678a666e1d7") //HalfOrcFerocity
                 ).Add(minusInt, minusWis, minusCha);
@@ -480,6 +490,140 @@ namespace DarkCodex
             feat.AddComponents(
                 new AddMechanicFeatureCustom(MechanicFeature.SummoningNoFullRound), 
                 new SacredSummons());
+
+            Helper.AddFeats(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Dirty Fighting", "basic feat: Dirty Fighting; you don't suffer an attack of opportunity but incure a -4 penalty if you are not flanking and don't have the right maneuver feat", false)]
+        public static void CreateDirtyFighting()
+        {
+            // TODO: don't allow Greater variants of feats
+            // FeatureForPrerequisite not working!
+
+            var feat = Helper.CreateBlueprintFeature(
+                "DirtyFighting",
+                "Dirty Fighting",
+                "You can take advantage of a distracted foe.\nBenefit(s): When you attempt a combat maneuver check against a foe you are flanking, you can forgo the +2 bonus on your attack roll for flanking to instead have the combat maneuver not provoke an attack of opportunity. If you have a feat or ability that allows you to attempt the combat maneuver without provoking an attack of opportunity, you can instead increase the bonus on your attack roll for flanking to +4 for the combat maneuver check.\nSpecial: This feat counts as having Dex 13, Int 13, Combat Expertise, and Improved Unarmed Strike for the purposes of meeting the prerequisites of the various improved combat maneuver feats, as well as feats that require those improved combat maneuver feats as prerequisites.",
+                group: FeatureGroup.CombatFeat
+                ).SetComponents(
+                new FeatureForPrerequisite { FakeFact = Helper.ToRef<BlueprintUnitFactReference>("4c44724ffa8844f4d9bedb5bb27d144a") }, //CombatExpertiseFeature
+                new FeatureForPrerequisite { FakeFact = Helper.ToRef<BlueprintUnitFactReference>("7812ad3672a4b9a4fb894ea402095167") }, //ImprovedUnarmedStrike
+                new ReplaceStatForPrerequisites { OldStat = StatType.Dexterity, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
+                new ReplaceStatForPrerequisites { OldStat = StatType.Intelligence, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
+                new DirtyFightingBonus(),
+                Helper.CreateAddFacts(DirtyFightingBonus.List.Select(s => s.Value).Distinct())
+                );
+
+            Helper.AddCombatFeat(feat);
+        }
+
+        [PatchInfo(Severity.Create | Severity.WIP, "Poisons", "WIP", true)]
+        public static void CreatePoison()
+        {
+            // Ability "Coat Weapon" -> applies Enchantment with fixed DC, stickiness -> on RuleDealDamage apply poison buff (bonus DC if already poisoned)
+
+            /*
+            Venom Speaker
+            Source Heroes of Golarion pg. 26
+            Talent Link Link
+            Element universal; Type utility (Su); Level 1; Burn 0
+            You gain the investigator’s poison lore class feature, using your kineticist level as your investigator level, and can use your gather power ability even while holding a dose of poison in one of your hands or appendages as long as you could otherwise use that ability. If you are at least 6th level, you can learn the alchemist’s swift poisoning class feature or one of the following alchemist discoveries in place of a utility wild talent, using your kineticist level as your alchemist level: concentrate poison, poison conversion, or sticky poison.
+
+            Poison Lore (Ex): An investigator has a deep understanding and appreciation for poisons. At 2nd level, he cannot accidentally poison himself when applying poison to a weapon. If the investigator spends 1 minute physically examining the poison, he can attempt a Knowledge (nature) check to identify any natural poison or Knowledge (arcana) check to identify any magical poison (DC = the poison’s saving throw DC). Lastly, once a poison is identified, he can spend 1 minute and attempt a Craft (alchemy) check (DC = the poison’s saving throw DC) to neutralize 1 dose of the poison. Success renders the dose harmless. The investigator has no chance of accidentally poisoning himself when examining or attempting to neutralize a poison.
+
+            Concentrate poison (Advanced Player's Guide pg. 29): The alchemist can combine two doses of the same poison to increase their effects. This requires two doses of the poison and 1 minute of concentration. When completed, the alchemist has one dose of poison. The poison's frequency is extended by 50% and the save DC increases by +2. This poison must be used within 1 hour of its creation or it is ruined.
+            Poison Conversion (Ultimate Combat pg. 24): By spending 1 minute, the alchemist can convert 1 dose of poison from its current type (contact, ingested, inhaled, or injury) to another type. For example, the alchemist can convert a dose of Small centipede poison (an injury poison) to an inhaled poison. This process requires an alchemy lab. An alchemist must be at least 6th level before selecting this discovery.
+            Sticky poison (Advanced Player's Guide pg. 31): Any poison the alchemist creates is sticky—when the alchemist applies it to a weapon, the weapon remains poisoned for a number of strikes equal to the alchemist's Intelligence modifier. An alchemist must be at least 6th level before selecting this discovery.
+            Swift Poison (Ex) Benefit: A rogue with this talent can apply poison to a weapon as a move action, instead of a standard action.
+            Quick Poison (Ex) Prerequisites: Advanced Rogue Talents, Swift Poison; Benefit: A rogue with this talent may apply poison to a weapon as a swift action.
+
+             */
+
+            (string displayName, int dc, StatType statType, DiceFormula damage, int ticks, int successfullSaves)[] poisons = {
+                ("Deathblade", 20, StatType.Constitution, new DiceFormula(1, DiceType.D3), 6, 2),
+                ("Wyvern Poison", 17, StatType.Constitution, new DiceFormula(1, DiceType.D4), 6, 1),
+                ("Bluetip Eurypterid Poison", 16, StatType.Constitution, new DiceFormula(1, DiceType.D4), 6, 2),
+                ("Common Eurypterid Poison", 12, StatType.Constitution, new DiceFormula(1, DiceType.D2), 4, 1),
+
+                ("Giant Wasp Poison", 18, StatType.Dexterity, new DiceFormula(1, DiceType.D2), 6, 1),
+                ("Blood Marsh Spider Venom", 14, StatType.Dexterity, new DiceFormula(1, DiceType.D4), 6 ,2), // confused
+                ("Cockatrice Spit", 12, StatType.Dexterity, new DiceFormula(1, DiceType.D2), 6, 1), // petrified at 0 dex
+                
+                ("Dragon Bile", 26, StatType.Strength, new DiceFormula(1, DiceType.D3), 6, 6),
+                ("Purple Worm Poison", 24, StatType.Strength, new DiceFormula(1, DiceType.D3), 6, 2),
+                ("Large Scorpion Venom", 17, StatType.Strength, new DiceFormula(1, DiceType.D2), 6, 1),
+
+                ("Glass Urchin Venom", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), 6, 2),
+                ("Hag Spit", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), 6, 2), // blindness
+
+                ("Tongue Twist", 16, StatType.Intelligence, new DiceFormula(1, DiceType.D2), 6, 2),
+            };
+
+            var sfx = Helper.GetPrefabLink("fbf39991ad3f5ef4cb81868bb9419bff");
+            var list = new List<BlueprintAbility>();
+            foreach (var poison in poisons)
+            {
+                string name = poison.displayName.Replace(" ", "");
+
+                var buff = Helper.CreateBlueprintBuff(
+                    name,
+                    poison.displayName,
+                    $"This creature got poisoned with {poison.displayName}."
+                    ).SetComponents(
+                    new BuffPoisonStatDamage { Descriptor = ModifierDescriptor.UntypedStackable, Stat = poison.statType, Value = poison.damage, Ticks = poison.ticks, SuccesfullSaves = poison.successfullSaves, SaveType = SavingThrowType.Fortitude },
+                    Helper.CreateContextSetAbilityParams(dc: poison.dc, add10toDC: false)
+                    );
+                buff.Stacking = StackingType.Poison;
+                buff.FxOnStart = sfx;
+
+                var ab = Helper.CreateBlueprintAbility(
+                    "PoisonUse_" + name,
+                    "Coat Weapon: " + poison.displayName,
+                    "Apply poison an ally's currently equipped weapons or up to 30 projectiles.",
+                    null,
+                    AbilityType.Extraordinary,
+                    UnitCommand.CommandType.Move,
+                    AbilityRange.Touch
+                    ).SetComponents(
+                    Helper.CreateAbilityEffectRunAction(actions: new ContextActionCoatWeapon(buff))
+                    ).TargetAlly();
+                list.Add(ab);
+            }
+
+            var parent = Helper.CreateBlueprintAbility(
+                   "PoisonUse_Parent",
+                   "Coat weapons with poison",
+                   "Apply poison an ally's currently equipped weapons or up to 30 projectiles.",
+                   null,
+                   AbilityType.Extraordinary,
+                   UnitCommand.CommandType.Move,
+                   AbilityRange.Touch
+                   ).AddToAbilityVariants(list);
+
+            CodexLib.PoisonEnchantment.Create();
+
+        }
+
+        [PatchInfo(Severity.Create, "Spell Perfection", "basic feat: Spell Perfection", false)]
+        public static void CreateSpellPerfection()
+        {
+            var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
+
+            var feat = Helper.CreateBlueprintParametrizedFeature(
+                "SpellPerfection",
+                "Spell Perfection",
+                "You are unequaled at the casting of one particular spell.\nBenefit: Pick one spell which you have the ability to cast. Whenever you cast that spell you may apply any one metamagic feat you have to that spell without affecting its level or casting time, as long as the total modified level of the spell does not use a spell slot above 9th level. In addition, if you have other feats which allow you to apply a set numerical bonus to any aspect of this spell (such as Spell Focus, Spell Penetration, Weapon Focus [ray], and so on), double the bonus granted by that feat when applied to this spell.",
+                parameterType: FeatureParameterType.SpellSpecialization,
+                blueprints: specialization.BlueprintParameterVariants
+                ).SetGroups(
+                FeatureGroup.CombatFeat,
+                FeatureGroup.WizardFeat
+                ).SetComponents(
+                new MetamagicReduceCostParametrized { ReduceByMostExpensive = true },
+                new SpellPerfection(),
+                Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15),
+                Helper.CreatePrerequisiteFeaturesFromList(Resource.Cache.Feature.Where(w => w.GetComponent<AddMetamagicFeat>() && w.IsClassFeature).ToAny(), 3)
+                );
 
             Helper.AddFeats(feat);
         }

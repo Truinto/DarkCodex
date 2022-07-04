@@ -90,12 +90,11 @@
     <Compile Include="Classes\AnyRef.cs" />
     <Compile Include="Classes\CountableFlagArray.cs" />
     <Compile Include="Classes\DefGroup.cs" />
-    <Compile Include="Classes\FlagArray.cs" />
     <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />
     <Compile Include="Classes\MechanicActionBarSlotPlaceholder.cs" />
     <Compile Include="Classes\MechanicActionBarSlotSpellGroup.cs" />
+    <Compile Include="Classes\MetamagicExt.cs" />
     <Compile Include="Classes\PartCustomData.cs" />
-    <Compile Include="Classes\PoisonType.cs" />
     <Compile Include="Classes\SpellSlotLevel.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
     <Compile Include="Components\AbilityDeliverChainAttack.cs" />
@@ -114,9 +113,11 @@
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AddMechanicFeatureCustom.cs" />
     <Compile Include="Components\AddUndeadCompanion.cs" />
-    <Compile Include="Components\PoisonBuff.cs" />
+    <Compile Include="Components\DirtyFightingBonus.cs" />
+    <Compile Include="Components\FeatureForPrerequisite.cs" />
+    <Compile Include="Components\Poison.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
-    <Compile Include="Components\BleedBuff.cs" />
+    <Compile Include="Components\Bleed.cs" />
     <Compile Include="Components\ButcheringAxeLogic.cs" />
     <Compile Include="Components\ChangeSpellElementalDamageFix.cs" />
     <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Components\PrerequisiteSpontaneousCaster.cs" />
     <Compile Include="Components\SacredSummons.cs" />
     <Compile Include="Components\SpellDescriptorExt.cs" />
+    <Compile Include="Components\SpellPerfection.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="Enums\EnumPlaceholder.cs" />
     <Compile Include="Enums\MechanicFeature.cs" />
@@ -154,6 +156,7 @@
     <Compile Include="Patches\Patch_DebugReport.cs" />
     <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
     <Compile Include="Patches\Patch_AbilityIsFullRound.cs" />
+    <Compile Include="Patches\Patch_Prerequisite.cs" />
     <Compile Include="Patches\Patch_RulebookEventBusPriority.cs" />
     <Compile Include="Components\PreferredSpell.cs" />
     <Compile Include="Components\PropertyAttributeMax.cs" />

@@ -1666,6 +1666,8 @@ namespace CodexLib
             AppendAndReplace(ref _wildtalents.m_AllFeatures, blueprintFeature);
         }
 
+        public static BlueprintAbility AddToAbilityVariants(this BlueprintAbility parent, IEnumerable<BlueprintAbility> variants) => AddToAbilityVariants(parent, variants.ToArray());
+
         public static BlueprintAbility AddToAbilityVariants(this BlueprintAbility parent, params BlueprintAbility[] variants)
         {
             var comp = parent.GetComponent<AbilityVariants>();
@@ -1883,6 +1885,30 @@ namespace CodexLib
         {
             InsertAt(ref actionList.Actions, gameAction, index);
             return actionList;
+        }
+
+        #endregion
+
+        #region Metamagic
+
+        public static int GetCost(this Metamagic metamagic, UnitEntityData unit = null)
+        {
+            int cost = metamagic.DefaultCost();
+
+            if (unit != null)
+            {
+                var state = unit.State.Features;
+                if ((metamagic == Metamagic.Empower && state.FavoriteMetamagicEmpower)
+                    || (metamagic == Metamagic.Maximize && state.FavoriteMetamagicMaximize)
+                    || (metamagic == Metamagic.Quicken && state.FavoriteMetamagicQuicken)
+                    || (metamagic == Metamagic.Reach && state.FavoriteMetamagicReach)
+                    || (metamagic == Metamagic.Extend && state.FavoriteMetamagicExtend)
+                    || (metamagic == Metamagic.Selective && state.FavoriteMetamagicSelective)
+                    || (metamagic == Metamagic.Bolstered && state.FavoriteMetamagicBolstered))
+                    cost--;
+            }
+
+            return cost;
         }
 
         #endregion
@@ -2148,6 +2174,38 @@ namespace CodexLib
                     break;
             }
             return dataprovider;
+        }
+
+        public static T SetGroups<T>(this T feature, params FeatureGroup[] groups) where T : BlueprintFeature
+        {
+            feature.Groups = groups;
+            return feature;
+        }
+
+        public static ContextSetAbilityParams CreateContextSetAbilityParams(ContextValue dc = null, ContextValue casterLevel = null, ContextValue spellLevel = null, ContextValue concentration = null, bool add10toDC = true)
+        {
+            var result = new ContextSetAbilityParams();
+            result.Add10ToDC = add10toDC;
+            if (dc != null)
+                result.DC = dc;
+            if (casterLevel != null)
+                result.CasterLevel = casterLevel;
+            if (spellLevel != null)
+                result.SpellLevel = spellLevel;
+            if (concentration != null)
+                result.Concentration = concentration;
+            return result;
+        }
+
+        public static ContextCalculateAbilityParams CreateContextCalculateAbilityParams(ContextValue casterLevel = null, ContextValue spellLevel = null, StatType statType = StatType.Constitution, bool kineticist = false)
+        {
+            var result = new ContextCalculateAbilityParams();
+            result.StatType = statType;
+            result.ReplaceCasterLevel = casterLevel != null;
+            result.CasterLevel = casterLevel;
+            result.ReplaceSpellLevel = spellLevel != null;
+            result.SpellLevel = spellLevel;
+            return result;
         }
 
         public static AddAbilityResources CreateAddAbilityResources(AnyRef BlueprintAbilityResource)
@@ -2806,6 +2864,24 @@ namespace CodexLib
             return result;
         }
 
+        public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(IEnumerable<AnyRef> blueprintFeature, int amount, bool any = false)
+        {
+            var result = new PrerequisiteFeaturesFromList();
+            result.m_Features = blueprintFeature.To<BlueprintFeatureReference>();
+            result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
+            result.Amount = amount;
+            return result;
+        }
+
+        public static PrerequisiteStatValue CreatePrerequisiteStatValue(StatType statType, int value, bool any = false)
+        {
+            var result = new PrerequisiteStatValue();
+            result.Stat = statType;
+            result.Value = value;
+            result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
+            return result;
+        }
+
         public static PrerequisiteFeature CreatePrerequisiteFeature(this AnyRef feat, bool any = false)
         {
             var result = new PrerequisiteFeature();
@@ -2863,6 +2939,8 @@ namespace CodexLib
             return result;
         }
 
+        public static AddFacts CreateAddFacts(IEnumerable<BlueprintUnitFactReference> facts) => CreateAddFacts(facts.ToArray());
+
         public static DuplicateSpell CreateDuplicateSpell(Func<AbilityData, bool> abilityCheck, int radius = 30)
         {
             return new DuplicateSpell
@@ -2906,7 +2984,7 @@ namespace CodexLib
             //return result;
         }
 
-        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName, string description, Sprite icon = null, PrefabLink fxOnStart = null)
+        public static BlueprintBuff CreateBlueprintBuff(string name, string displayName = null, string description = null, Sprite icon = null, PrefabLink fxOnStart = null)
         {
             string guid = GetGuid(name);
 
@@ -2923,7 +3001,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintFeature CreateBlueprintFeature(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0)
+        public static BlueprintFeature CreateBlueprintFeature(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0)
         {
             string guid = GetGuid(name);
 
@@ -2939,7 +3017,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName, string description, Sprite icon, AbilityType type, CommandType actionType, AbilityRange range, LocalizedString duration = null, LocalizedString savingThrow = null)
+        public static BlueprintAbility CreateBlueprintAbility(string name, string displayName = null, string description = null, Sprite icon = null, AbilityType type = AbilityType.Supernatural, CommandType actionType = CommandType.Standard, AbilityRange range = AbilityRange.Close, LocalizedString duration = null, LocalizedString savingThrow = null)
         {
             string guid = GetGuid(name);
 
@@ -2960,7 +3038,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.Default)
+        public static BlueprintFeatureSelection CreateBlueprintFeatureSelection(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0, SelectionMode mode = SelectionMode.Default)
         {
             string guid = GetGuid(name);
 
@@ -2977,7 +3055,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName, string description, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool requireKnown = false, bool requireUnknown = false, AnyBlueprintReference[] blueprints = null)
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool requireKnown = false, bool requireUnknown = false, AnyBlueprintReference[] blueprints = null)
         {
             string guid = GetGuid(name);
 
@@ -2998,7 +3076,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
+        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, out BlueprintBuff buff, string displayName = null, string description = null, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
         {
             string guid = GetGuid(name);
 
@@ -3045,6 +3123,11 @@ namespace CodexLib
 
             result.m_Buff = buff.ToRef();
             return result;
+        }
+
+        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
+        {
+            return CreateBlueprintActivatableAbility(name, out buff, displayName, description, icon, commandType, activationType, group, deactivateImmediately, onByDefault, onlyInCombat, deactivateEndOfCombat, deactivateAfterRound, deactivateWhenStunned, deactivateWhenDead, deactivateOnRest, useWithSpell, groupWeight);
         }
 
         public static BlueprintAbilityAreaEffect CreateBlueprintAbilityAreaEffect(string name, bool applyEnemy = false, bool applyAlly = false, AreaEffectShape shape = AreaEffectShape.Cylinder, Feet size = default, PrefabLink sfx = null, BlueprintBuffReference buffWhileInside = null, ActionList unitEnter = null, ActionList unitExit = null, ActionList unitMove = null, ActionList unitRound = null)
@@ -3164,7 +3247,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName, string description, BlueprintWeaponTypeReference weaponType, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, int price = 1000)
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, BlueprintWeaponTypeReference weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, int price = 1000)
         {
             string guid = GetGuid(name);
 
@@ -3399,22 +3482,24 @@ namespace CodexLib
             return tref;
         }
 
-        public static T[] To<T>(this AnyRef[] bpRef) where T : BlueprintReferenceBase, new()
+        public static T[] To<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
         {
-            T[] array = new T[bpRef.Length];
+            AnyRef[] source = bpRef as AnyRef[] ?? bpRef.ToArray();
+            T[] array = new T[source.Length];
 
-            for (int i = 0; i < bpRef.Length; i++)
-                array[i] = bpRef[i].To<T>();
+            for (int i = 0; i < source.Length; i++)
+                array[i] = source[i].To<T>();
 
             return array;
         }
 
-        public static AnyRef[] ToAny(this BlueprintReferenceBase[] bpRef)
+        public static AnyRef[] ToAny(this IEnumerable<object> bpRef)
         {
-            AnyRef[] array = new AnyRef[bpRef.Length];
+            object[] source = bpRef as object[] ?? bpRef.ToArray();
+            AnyRef[] array = new AnyRef[source.Length];
 
-            for (int i = 0; i < bpRef.Length; i++)
-                array[i] = AnyRef.Get(bpRef[i]);
+            for (int i = 0; i < source.Length; i++)
+                array[i] = AnyRef.Get(source[i]);
 
             return array;
         }

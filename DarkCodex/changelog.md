@@ -1,11 +1,16 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.14]
+- fixed Orc Atavism Ferocity not in UI
+- fixed Venom Infusion applying to all attacks, not just blasts
+- added Dirty Fighting combat feat
+- added Spell Perfection
+
 ## [1.3.13]
 - fixed sticky spells not working with Boundless Injury
 - allowed arcanist to use temporary known spells without preparing them
 - added Venom Infusion; infusion: applies sickened or poisons the target
-- fixed Orc Atavism Ferocity not in UI
 
 ## [1.3.12]
 - added Patch Fix Arcanist Spontaneous Metamagic: allows arcanist to use non memorized metamagic, but increases casting time

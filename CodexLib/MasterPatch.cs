@@ -42,6 +42,7 @@ namespace CodexLib
             PatchSafe(typeof(Patch_WeaponCategory));
             PatchSafe(typeof(Patch_AbilityIsFullRound));
             PatchSafe(typeof(Patch_RuleSpendCharge));
+            PatchSafe(typeof(Patch_Prerequisite));
 
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");

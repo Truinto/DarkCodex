@@ -44,6 +44,18 @@ namespace CodexLib
             return new AnyRef() { deserializedGuid = bp.deserializedGuid };
         }
 
+        public static AnyRef Get(object obj)
+        {
+            if (obj is string str)
+                return new AnyRef() { deserializedGuid = BlueprintGuid.Parse(str) };
+            else if (obj is BlueprintReferenceBase bp)
+                return new AnyRef() { deserializedGuid = bp.deserializedGuid };
+            else if (obj is SimpleBlueprint sb)
+                return new AnyRef() { deserializedGuid = sb.AssetGuid };
+            Helper.PrintError($"AnyRef could not resolve type {obj.GetType()}");
+            return null;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is BlueprintReferenceBase bp)

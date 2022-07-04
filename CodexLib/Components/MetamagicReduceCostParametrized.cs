@@ -18,15 +18,27 @@ namespace CodexLib
     {
         public int Reduction = 1;
         public Metamagic Metamagic;
+        public bool ReduceByMostExpensive;
 
         public void OnEventAboutToTrigger(RuleApplyMetamagic evt)
         {
             var bp = this.Param.Blueprint as BlueprintAbility;
+            if (bp != null && bp != evt.Spell)
+                return;
 
-            if ((bp == null || bp == evt.Spell) && (Metamagic == 0 || evt.AppliedMetamagics.Contains(Metamagic)))
+            if (ReduceByMostExpensive)
             {
-                evt.ReduceCost(Reduction);
+                int max = 0;
+                foreach (var meta in evt.AppliedMetamagics)
+                    max = Math.Max(max, meta.GetCost(evt.Initiator));
+                evt.ReduceCost(max);
+                return;
             }
+
+            if (Metamagic != 0 && !evt.AppliedMetamagics.Contains(Metamagic))
+                return;
+
+            evt.ReduceCost(Reduction);
         }
 
         public void OnEventDidTrigger(RuleApplyMetamagic evt)
@@ -36,23 +48,6 @@ namespace CodexLib
             {
                 evt.Result.SpellLevelCost = 0;
             }
-        }
-
-        private static int GetCost(Metamagic metamagic, UnitEntityData unit, BlueprintAbility spell)
-        {
-            var state = unit.State.Features;
-            int cost = metamagic.DefaultCost();
-
-            if ((metamagic == Metamagic.Empower && state.FavoriteMetamagicEmpower)
-                || (metamagic == Metamagic.Maximize && state.FavoriteMetamagicMaximize)
-                || (metamagic == Metamagic.Quicken && state.FavoriteMetamagicQuicken)
-                || (metamagic == Metamagic.Reach && state.FavoriteMetamagicReach)
-                || (metamagic == Metamagic.Extend && state.FavoriteMetamagicExtend)
-                || (metamagic == Metamagic.Selective && state.FavoriteMetamagicSelective)
-                || (metamagic == Metamagic.Bolstered && state.FavoriteMetamagicBolstered))
-                cost--;
-
-            return cost;
         }
     }
 }

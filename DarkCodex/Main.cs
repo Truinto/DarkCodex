@@ -392,6 +392,7 @@ namespace Shared
             PatchSafe(typeof(Patch_Prebuilds));
             //PatchSafe(typeof(Patch_SaveExtension));
             //PatchSafe(typeof(Patch_FactSelectionParameterized));
+            LoadSafe(General.CreatePoison);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -439,6 +440,7 @@ namespace Shared
             LoadSafe(General.PatchBasicFreebieFeats);
             LoadSafe(General.PatchHideBuffs);
             LoadSafe(General.PatchVarious);
+            LoadSafe(General.CreateDirtyFighting);
 
             // Spells
             LoadSafe(Spells.CreateBladedDash);
@@ -526,6 +528,7 @@ namespace Shared
             LoadSafe(Unlock.UnlockKineticist); // keep late
 
             // Extra Features - keep last
+            LoadSafe(General.CreateSpellPerfection); // keep last
             LoadSafe(General.CreateBackgrounds); // keep last
             LoadSafe(General.FixSpellElementChange); // keep last
             LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
