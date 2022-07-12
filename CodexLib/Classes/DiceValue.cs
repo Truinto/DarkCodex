@@ -28,12 +28,22 @@ namespace CodexLib
             return new DirectDamage(new DiceFormula(Dice, DiceType), Bonus);
         }
 
-        public void Increase(ContextDiceValue value, MechanicsContext context)
+        public DiceValue Increase(ContextDiceValue value, MechanicsContext context)
         {
             this.Dice += value.DiceCountValue.Calculate(context);
             if (this.DiceType < value.DiceType)
                 this.DiceType = value.DiceType;
             this.Bonus += value.BonusValue.Calculate(context);
+            return this;
+        }
+
+        public DiceValue Max(ContextDiceValue value, MechanicsContext context)
+        {
+            this.Dice = Math.Max(this.Dice, value.DiceCountValue.Calculate(context));
+            if (this.DiceType < value.DiceType)
+                this.DiceType = value.DiceType;
+            this.Bonus = Math.Max(this.Bonus, value.BonusValue.Calculate(context));
+            return this;
         }
 
         public static DiceValue Get(ContextDiceValue value, MechanicsContext context)

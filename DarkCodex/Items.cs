@@ -103,13 +103,13 @@ namespace DarkCodex
             weapon.AddAsset(Helper.GetGuid(weapon.name));
             weapon.SetComponents(new WeaponKineticBlade() { m_ActivationAbility = fake_blade_burn.ToRef(), m_Blast = fake_blade_damage.ToRef() });
 
-            //Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
+            Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
         }
 
-        [PatchInfo(Severity.Create, "Butchering Axe", "new weapon type Butchering Axe", false)]
+        [PatchInfo(Severity.Create | Severity.WIP, "Butchering Axe", "new weapon type Butchering Axe", false)]
         public static void CreateButcheringAxe()
         {
-            Helper.EnumCreateWeaponCategory(Const.ButcheringAxe, "Butchering Axe");
+            //Helper.EnumCreateWeaponCategory(Const.ButcheringAxe, "Butchering Axe"); // TODO: fix new weapon category
 
             var butchering = Helper.CreateBlueprintWeaponEnchantment(
                 "ButcheringAxeEnchantment",
@@ -185,9 +185,9 @@ namespace DarkCodex
                 Helper.CreateAddStartingEquipment(standard.ToReference<BlueprintItemReference>())
                 );
 
-            var profselect = Helper.Get<BlueprintFeatureSelection>("9a01b6815d6c3684cb25f30b8bf20932"); //ExoticWeaponProficiencySelection
-            Helper.AppendAndReplace(ref profselect.m_AllFeatures, prof.ToRef());
-            Helper.AppendAndReplace(ref profselect.GetComponent<PrerequisiteNotProficient>().WeaponProficiencies, Const.ButcheringAxe);
+            //var profselect = Helper.Get<BlueprintFeatureSelection>("9a01b6815d6c3684cb25f30b8bf20932"); //ExoticWeaponProficiencySelection
+            //Helper.AppendAndReplace(ref profselect.m_AllFeatures, prof.ToRef());
+            //Helper.AppendAndReplace(ref profselect.GetComponent<PrerequisiteNotProficient>().WeaponProficiencies, Const.ButcheringAxe);
         }
 
         [PatchInfo(Severity.Create, "Impact Enchantment", "new enchantment Impact", false)]

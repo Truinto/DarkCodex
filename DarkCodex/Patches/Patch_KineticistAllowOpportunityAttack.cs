@@ -10,6 +10,8 @@ using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.FactLogic;
 using Shared;
 using CodexLib;
+using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities;
 
 namespace DarkCodex
 {
@@ -65,6 +67,24 @@ namespace DarkCodex
                 __result = true;
 
             return false;
+        }
+
+        [HarmonyPatch(typeof(AbilityRequirementHasItemInHands), nameof(AbilityRequirementHasItemInHands.IsAbilityRestrictionPassed))]
+        [HarmonyPostfix]
+        public static void Postfix3(AbilityData ability, AbilityRequirementHasItemInHands __instance, ref bool __result)
+        {
+            if (__result)
+                return;
+
+            if (__instance.m_Type == AbilityRequirementHasItemInHands.RequirementType.HasMeleeWeapon)
+            {
+                var body = ability.Caster.Unit.Body;
+                var weapon = body.PrimaryHand.MaybeWeapon ?? body.SecondaryHand.MaybeWeapon;
+                if (weapon != null && weapon.Blueprint.Type.AssetGuid == blade_p || weapon.Blueprint.Type.AssetGuid == blade_e)
+                {
+                    __result = true;
+                }
+            }
         }
 
     }

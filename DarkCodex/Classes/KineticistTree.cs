@@ -3,7 +3,9 @@ using JetBrains.Annotations;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,8 @@ namespace DarkCodex
             // Expanded Defense: d741f298dfae8fc40b4615aaf83b6548
 
             @Class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+            KineticBlast = Helper.ToRef<BlueprintFeatureReference>("93efbde2764b5504e98e6824cab3d27c");
+            KineticistMainStatProperty = Helper.ToRef<BlueprintUnitPropertyReference>("f897845bbbc008d4f9c1c4a03e22357a");
 
             FocusFirst = Helper.ToRef<BlueprintFeatureSelectionReference>("1f3a15a3ae8a5524ab8b97f469bf4e3d");
             FocusSecond = Helper.ToRef<BlueprintFeatureSelectionReference>("4204bc10b3d5db440b1f52f0c375848b");
@@ -186,6 +190,41 @@ namespace DarkCodex
                 Parent1 = Fire,
                 Parent2 = Water
             };
+
+            Composite_Blood = new()
+            {
+                Selection = null,
+                Progession = Helper.ToRef<BlueprintProgressionReference>("535a9c4dbe912924396ae50cc7fba8c4"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("79b5d7184efe7034a863ae612c429306"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ba2113cfed0c2c14b93c20e7625a4c74"),
+                Blade = new() // TODO: add other blades as well
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("98f0da4bf25a34a4caffa6b8a2d33ef6"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("92f9a719ffd652947ab37363266cc0a6"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("0a386b1c2b4ae9b4f81ddf4557155810"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("15278f2a9a5eaa441a261ec033b60b57")
+                }
+            };
+
+            // modded
+            Telekinetic = new()
+            {
+                Selection = null,
+                Progession = Helper.ToRef<BlueprintProgressionReference>("6ce72cb2bf0244b0bd0e5e0a552a6a4a"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("e86649f76cba4483bed7f01859c6b425"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ac038f9898ef4ba7b46bfcafdbc77818")
+            };
+
+            Composite_Force = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("c6e4201d7b674cc78a2c95bae61b9d25"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("8dacff62b4a8413bbfb299458cf94839"),
+                Parent1 = Telekinetic,
+                Parent2 = null
+            };
+
             #endregion
 
             #region Focus
@@ -232,8 +271,10 @@ namespace DarkCodex
             BaseAll = GetAll(true, true).Select(s => s.BaseAbility).ToArray();
         }
 
-        public IEnumerable<Element> GetAll(bool basic = false, bool composites = false)
+        public IEnumerable<Element> GetAll(bool basic = false, bool composites = false, bool modded = true)
         {
+            bool mod1 = modded && UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
+
             if (basic)
             {
                 yield return Air;
@@ -242,6 +283,7 @@ namespace DarkCodex
                 yield return Fire;
                 yield return Water;
                 yield return Cold;
+                if (mod1) yield return Telekinetic;
             }
             if (composites)
             {
@@ -256,6 +298,8 @@ namespace DarkCodex
                 yield return Composite_Mud;
                 yield return Composite_ChargedWater;
                 yield return Composite_Steam;
+                yield return Composite_Blood;
+                if (mod1) yield return Composite_Force;
             }
         }
 
@@ -283,6 +327,8 @@ namespace DarkCodex
         }
 
         public BlueprintCharacterClassReference @Class;
+        public BlueprintFeatureReference KineticBlast;
+        public BlueprintUnitPropertyReference KineticistMainStatProperty;
 
         public BlueprintFeatureSelectionReference FocusFirst;
         public BlueprintFeatureSelectionReference FocusSecond;
@@ -318,6 +364,11 @@ namespace DarkCodex
         public Element Composite_Mud;
         public Element Composite_ChargedWater;
         public Element Composite_Steam;
+        public Element Composite_Blood;
+
+        // modded
+        public Element Telekinetic;
+        public Element Composite_Force;
 
         public class Element
         {
@@ -325,6 +376,7 @@ namespace DarkCodex
             [CanBeNull] public BlueprintProgressionReference Progession;     // only on basics
             public BlueprintFeatureReference BlastFeature;
             public BlueprintAbilityReference BaseAbility;
+            public Blade Blade;
 
             [CanBeNull] public Element Parent1; // only on composites
             [CanBeNull] public Element Parent2; // only on composites other than metal and blueFlame
@@ -339,6 +391,14 @@ namespace DarkCodex
 
             public Element Element1;
             [CanBeNull] public Element Element2; // other than earth and fire
+        }
+
+        public class Blade
+        {
+            public BlueprintActivatableAbilityReference Activatable;
+            public BlueprintItemWeaponReference Weapon;
+            public BlueprintAbilityReference Damage;
+            public BlueprintAbilityReference Burn;
         }
     }
 }

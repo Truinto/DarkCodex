@@ -548,6 +548,17 @@ namespace CodexLib
                     yield return result;
         }
 
+        public static SpellSchool Merge(this IEnumerable<SpellSchool> array)
+        {
+            if (array == null)
+                return default;
+
+            SpellSchool result = default;
+            foreach (var value in array)
+                result |= value;
+            return result;
+        }
+
         #endregion
 
         #region Log
@@ -1366,6 +1377,142 @@ namespace CodexLib
                     return subscribers.List.LastOrDefault(f => f is TComponent) as TComponent;
             }
             return null;
+        }
+
+        private static bool FeatureParamEquals(FeatureParam param2, FeatureParam param)
+        {
+            if (param.Blueprint != null)
+                return param.Blueprint == param2;
+            if (param.WeaponCategory != null)
+                return (param.WeaponCategory & param2.WeaponCategory) != 0;
+            if (param.SpellSchool != null)
+                return (param.SpellSchool & param2.SpellSchool) != 0;
+            if (param.StatType != null)
+                return (param.StatType & param2.StatType) != 0;
+            return false;
+        }
+
+        public static bool HasParam<TComp>(this UnitEntityData unit, FeatureParam param) where TComp : UnitFactComponentDelegate
+        {
+            foreach (var feature in unit.Facts.GetAll<Feature>())
+            {
+                foreach (var component in feature.Components)
+                {
+                    if (component.SourceBlueprintComponent is TComp tcomp)
+                    {
+                        using (component.RequestEventContext())
+                        {
+                            if (FeatureParamEquals(tcomp.Param, param))
+                                return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static bool HasParam<TComp, TData>(this UnitEntityData unit, FeatureParam param) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
+        {
+            foreach (var feature in unit.Facts.GetAll<Feature>())
+            {
+                foreach (var component in feature.Components)
+                {
+                    if (component.SourceBlueprintComponent is TComp tcomp)
+                    {
+                        using (component.RequestEventContext())
+                        {
+                            if (FeatureParamEquals(tcomp.Param, param))
+                                return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Only works if Component has EmptyComponentData.
+        /// </summary>
+        public static bool HasParam(this UnitEntityData unit, BlueprintFeature blueprintFeature, FeatureParam param)
+        {
+            foreach (var feature in unit.Facts.GetAll<Feature>())
+            {
+                if (blueprintFeature != null && blueprintFeature != feature?.Blueprint)
+                    continue;
+
+                foreach (var component in feature.Components)
+                {
+                    if (component.SourceBlueprintComponent is UnitFactComponentDelegate tcomp)
+                    {
+                        using (component.RequestEventContext())
+                        {
+                            if (FeatureParamEquals(tcomp.Param, param))
+                                return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static TData GetComponentData<TComp, TData>(this UnitEntityData unit, BlueprintFeature blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
+        {
+            foreach (var feature in unit.Facts.GetAll<Feature>())
+            {
+                if (blueprintFeature != null && blueprintFeature != feature?.Blueprint)
+                    continue;
+
+                foreach (var component in feature.Components)
+                {
+                    if (component.SourceBlueprintComponent is TComp tcomp)
+                    {
+                        using (component.RequestEventContext())
+                        {
+                            return tcomp.Data;
+                        }
+                    }
+                }
+            }
+            return default;
+        }
+
+        public static IEnumerable<TData> GetComponentDataAll<TComp, TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
+        {
+            foreach (var feature in unit.Facts.GetAll<Feature>())
+            {
+                if (blueprintFeature != null && blueprintFeature.deserializedGuid != feature?.Blueprint?.AssetGuid)
+                    continue;
+
+                foreach (var component in feature.Components)
+                {
+                    if (component.SourceBlueprintComponent is TComp tcomp)
+                    {
+                        using (component.RequestEventContext())
+                        {
+                            yield return tcomp.Data;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<TComp> GetComponents<TComp>(this UnitEntityData unit) where TComp : class
+        {
+            //return unit.Progression.Features.SelectFactComponents<TComp>();
+            foreach (var fact in unit.Facts.m_Facts)
+            {
+                foreach (var comp in fact.BlueprintComponents)
+                {
+                    if (comp is TComp t)
+                        yield return t;
+                }
+            }
+        }
+
+        public static IEnumerable<TComp> GetFeatureComponents<TComp>(this UnitEntityData unit) where TComp : class
+        {
+            foreach (var comp in unit.Progression.Features.SelectFactComponents<TComp>())
+                yield return comp;
         }
 
         #endregion
@@ -2492,7 +2639,7 @@ namespace CodexLib
             result.m_CustomProperty = customProperty;
             result.m_Stat = stat;
             result.m_Class = classes ?? Array.Empty<BlueprintCharacterClassReference>();
-            result.Archetype = ToRef<BlueprintArchetypeReference>(null);
+            result.Archetype = ToRef<BlueprintArchetypeReference>("");
             result.m_AdditionalArchetypes = archetypes ?? Array.Empty<BlueprintArchetypeReference>();
             result.m_FeatureList = featureList ?? Array.Empty<BlueprintFeatureReference>();
 
@@ -3011,7 +3158,15 @@ namespace CodexLib
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
             result.m_Icon = icon;
-            result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
+
+            if (group == 0)
+                result.Groups = Array.Empty<FeatureGroup>();
+            else if (group == FeatureGroup.WizardFeat)
+                result.Groups = ToArray(FeatureGroup.WizardFeat, FeatureGroup.Feat);
+            else if (group == FeatureGroup.CombatFeat)
+                result.Groups = ToArray(FeatureGroup.CombatFeat, FeatureGroup.Feat);
+            else
+                result.Groups = ToArray(group);
 
             AddAsset(result, guid);
             return result;
@@ -3482,6 +3637,11 @@ namespace CodexLib
             return tref;
         }
 
+        public static T ToRef<T>(this BlueprintReferenceBase reference) where T : BlueprintReferenceBase, new()
+        {
+            return new T() { deserializedGuid = reference.deserializedGuid };
+        }
+
         public static T[] To<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
         {
             AnyRef[] source = bpRef as AnyRef[] ?? bpRef.ToArray();
@@ -3504,7 +3664,7 @@ namespace CodexLib
             return array;
         }
 
-        public static IEnumerable<T> Get<T>(this AnyRef[] bpRef) where T : SimpleBlueprint
+        public static IEnumerable<T> Get<T>(this IEnumerable<AnyRef> bpRef) where T : SimpleBlueprint
         {
             foreach (var reference in bpRef)
                 yield return reference.Get<T>();
@@ -3836,6 +3996,8 @@ namespace CodexLib
                     return fact.m_Icon;
                 if (bp is BlueprintWeaponType weapontype)
                     return weapontype.m_Icon;
+                if (bp is BlueprintBuff buff)
+                    return buff.Icon;
             }
             catch (Exception)
             {

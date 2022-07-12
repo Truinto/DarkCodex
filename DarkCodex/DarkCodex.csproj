@@ -110,6 +110,7 @@
     <Compile Include="Patches\Patch_FixLoadCrash1.cs" />
     <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
     <Compile Include="Patches\Patch_SaveExtension.cs" />
+    <Compile Include="Patches\Patch_SpellPerfection.cs" />
     <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
     <Compile Include="Patches\Patch_AlwaysAChance.cs" />
     <Compile Include="Patches\Patch_MagicItemAdept.cs" />

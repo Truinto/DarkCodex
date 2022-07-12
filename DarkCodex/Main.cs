@@ -501,6 +501,7 @@ namespace Shared
             LoadSafe(Kineticist.CreateExpandedElement);
             LoadSafe(Kineticist.PatchVarious);
             LoadSafe(Kineticist.FixBlastsAreSpellLike);
+            LoadSafe(Kineticist.FixBloodKineticist);
             LoadSafe(Kineticist.CreateVenomInfusion); // keep late
             LoadSafe(Kineticist.CreateSelectiveMetakinesis); // keep late
 

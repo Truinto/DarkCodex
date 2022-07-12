@@ -27,7 +27,7 @@ using UnityEngine.Serialization;
 namespace CodexLib
 {
     [AllowedOn(typeof(BlueprintUnitFact), false)]
-    public class BleedBuff : UnitBuffComponentDelegate, ITickEachRound, ITargetRulebookHandler<RuleHealDamage>
+    public class BleedBuff : UnitBuffComponentDelegate<BleedBuff.RuntimeData>, ITickEachRound, ITargetRulebookHandler<RuleHealDamage>
     {
         public override void OnActivate()
         {
@@ -39,12 +39,12 @@ namespace CodexLib
 
         public void OnNewRound()
         {
-            if (this.Value == null)
+            var damage = this.Value?.GetDirect();
+            if (damage == null)
                 return;
 
-            var damage = this.Value.GetDirect();
             var ruleDamage = new RuleDealDamage(this.Owner, this.Owner, damage);
-            base.Context.TriggerRule(ruleDamage);
+            this.Context.TriggerRule(ruleDamage);
 
             Helper.PrintDebug($"BleedBuff.OnNewRound {Value.Dice}d{(int)Value.DiceType}+{Value.Bonus} result={ruleDamage.Result}");
 
@@ -62,8 +62,12 @@ namespace CodexLib
                 this.Owner.Buffs.RemoveFact(this.Buff);
         }
 
-        [JsonProperty]
-        public DiceValue Value;
+        public DiceValue Value { get => this.Data.Value; set => this.Data.Value = value; }
+
+        public class RuntimeData
+        {
+            public DiceValue Value;
+        }
     }
 
     public class ContextActionIncreaseBleed : ContextAction
@@ -104,12 +108,15 @@ namespace CodexLib
             int rank = this.Context[AbilityRankType.Default];
             int sneak = caster.Stats.SneakAttack.ModifiedValue;
 
+            DiceValue bleedValue;
             if (bleed.Value == null)
-                bleed.Value = DiceValue.Get(this.Value, this.Context);
+                bleedValue = bleed.Value = DiceValue.Get(this.Value, this.Context);
             else if (this.IsStacking)
-                bleed.Value.Increase(this.Value, this.Context);
+                bleedValue = bleed.Value.Increase(this.Value, this.Context);
+            else
+                bleedValue = bleed.Value.Max(this.Value, this.Context);
 
-            var damage = bleed.Value.GetDirect(); // maybe use physical, if still conflicting with energy attacks
+            var damage = bleedValue.GetDirect(); // maybe use physical, if still conflicting with energy attacks
             var ruleDamage = new RuleDealDamage(caster, target, damage);
             this.Context.TriggerRule(ruleDamage);
 

@@ -1,6 +1,18 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.15]
+- added references to KineticistExpandedElements; will fix interactions with substance infusions
+- fixed Venom Infusion's poison from "2 saves" to "2 consecutive saves"; simplified damage calculation which might fix bugs;
+	it deals dex damage, if target is immune to con damage; target is sickended while poisoned; reduced burn by 1;
+	fixed DC being dex based, instead of main stat
+- added more checks to Spell Perfection
+- fixed Dirty Fighting granting all maneuver feats instead of just the action; this might need a respec, if you already took that feat
+- added Razortusk to Orc Atavism
+- fixed kinetic weapons not registering as melee weapon for some abilities
+- fixed Blood Kineticist Bleed Infusion and some strings
+- reversed some butchering axe changes until bugs are fixed
+
 ## [1.3.14]
 - fixed Orc Atavism Ferocity not in UI
 - fixed Venom Infusion applying to all attacks, not just blasts

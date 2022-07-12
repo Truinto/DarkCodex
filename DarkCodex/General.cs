@@ -468,7 +468,7 @@ namespace DarkCodex
                 group: FeatureGroup.Racial
                 ).SetComponents(
                 Helper.CreateAddStatBonus(2, StatType.Strength, ModifierDescriptor.Racial),
-                Helper.CreateAddFacts(ferocity),
+                Helper.CreateAddFacts(ferocity, "86af486a0d92427280c46127a216c85a"), //FerocityFeature, Razortusk
                 Helper.CreateRemoveFeatureOnApply("885f478dff2e39442a0f64ceea6339c9"), //Intimidating
                 Helper.CreateRemoveFeatureOnApply("c99f3405d1ef79049bd90678a666e1d7") //HalfOrcFerocity
                 ).Add(minusInt, minusWis, minusCha);
@@ -488,7 +488,7 @@ namespace DarkCodex
                 "When using summon monster to summon creatures whose alignment subtype or subtypes exactly match your aura, you may cast the spell as a standard action instead of with a casting time of 1 round."
                 ).SetComponents(preq.ToArray<BlueprintComponent>());
             feat.AddComponents(
-                new AddMechanicFeatureCustom(MechanicFeature.SummoningNoFullRound), 
+                new AddMechanicFeatureCustom(MechanicFeature.SummoningNoFullRound),
                 new SacredSummons());
 
             Helper.AddFeats(feat);
@@ -497,9 +497,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Dirty Fighting", "basic feat: Dirty Fighting; you don't suffer an attack of opportunity but incure a -4 penalty if you are not flanking and don't have the right maneuver feat", false)]
         public static void CreateDirtyFighting()
         {
-            // TODO: don't allow Greater variants of feats
-            // FeatureForPrerequisite not working!
-
             var feat = Helper.CreateBlueprintFeature(
                 "DirtyFighting",
                 "Dirty Fighting",
@@ -511,7 +508,7 @@ namespace DarkCodex
                 new ReplaceStatForPrerequisites { OldStat = StatType.Dexterity, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
                 new ReplaceStatForPrerequisites { OldStat = StatType.Intelligence, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
                 new DirtyFightingBonus(),
-                Helper.CreateAddFacts(DirtyFightingBonus.List.Select(s => s.Value).Distinct())
+                Helper.CreateAddFacts(DirtyFightingBonus.List.Select(s => s.Key.ToRef<BlueprintUnitFactReference>()))
                 );
 
             Helper.AddCombatFeat(feat);
@@ -609,15 +606,33 @@ namespace DarkCodex
         {
             var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
 
+            Main.Patch(typeof(Patch_SpellPerfection));
+            
+            Helper.Get<BlueprintFeature>("16fa59cc9a72a6043b566b49184f53fe").GetComponent<SpellFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //SpellFocus
+            Helper.Get<BlueprintFeature>("5b04b45b228461c43bad768eb0f7c7bf").GetComponent<SpellFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //SpellFocusGreater
+
+            Helper.Get<BlueprintFeature>("1e1f627d26ad36f43bbd26cc2bf8ac7e").GetComponent<WeaponFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //WeaponFocus
+            Helper.Get<BlueprintFeature>("09c9e82965fb4334b984a1e9df3bd088").GetComponent<WeaponFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //WeaponFocusGreater
+
+            Helper.Get<BlueprintFeature>("ee7dc126939e4d9438357fbd5980d459").GetComponent<SpellPenetrationBonus>().Descriptor = ModifierDescriptor.Feat; //SpellPenetration
+            Helper.Get<BlueprintFeature>("1978c3f91cfbbc24b9c9b0d017f4beec").GetComponent<SpellPenetrationBonus>().Descriptor = ModifierDescriptor.Feat; //GreaterSpellPenetration
+
+            Helper.Get<BlueprintFeature>("52135eada006e9045a848cd659749608").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusAcid
+            Helper.Get<BlueprintFeature>("49926dc94aca16145b6a608277b6f31c").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusAcid
+            Helper.Get<BlueprintFeature>("2ed9d8bf76412ba4a8afe38fa9925fca").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusCold
+            Helper.Get<BlueprintFeature>("f37a210a77d769c4ea2b23c22c07b83a").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusCold
+            Helper.Get<BlueprintFeature>("13bdf8d542811ac4ca228a53aa108145").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusFire
+            Helper.Get<BlueprintFeature>("7a722c3e782aa5349a867c3516a2a4cf").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusFire
+            Helper.Get<BlueprintFeature>("d439691f37d17804890bd9c263ae1e80").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusElectricity
+            Helper.Get<BlueprintFeature>("6a3be3df06f555d44a2b9dbfbcc2df23").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusElectricity
+
             var feat = Helper.CreateBlueprintParametrizedFeature(
                 "SpellPerfection",
                 "Spell Perfection",
                 "You are unequaled at the casting of one particular spell.\nBenefit: Pick one spell which you have the ability to cast. Whenever you cast that spell you may apply any one metamagic feat you have to that spell without affecting its level or casting time, as long as the total modified level of the spell does not use a spell slot above 9th level. In addition, if you have other feats which allow you to apply a set numerical bonus to any aspect of this spell (such as Spell Focus, Spell Penetration, Weapon Focus [ray], and so on), double the bonus granted by that feat when applied to this spell.",
                 parameterType: FeatureParameterType.SpellSpecialization,
-                blueprints: specialization.BlueprintParameterVariants
-                ).SetGroups(
-                FeatureGroup.CombatFeat,
-                FeatureGroup.WizardFeat
+                blueprints: specialization.BlueprintParameterVariants,
+                group: FeatureGroup.WizardFeat
                 ).SetComponents(
                 new MetamagicReduceCostParametrized { ReduceByMostExpensive = true },
                 new SpellPerfection(),

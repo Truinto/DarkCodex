@@ -113,6 +113,7 @@
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AddMechanicFeatureCustom.cs" />
     <Compile Include="Components\AddUndeadCompanion.cs" />
+    <Compile Include="Components\BuffPoisonStatDamageFix.cs" />
     <Compile Include="Components\DirtyFightingBonus.cs" />
     <Compile Include="Components\FeatureForPrerequisite.cs" />
     <Compile Include="Components\Poison.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Delegates.cs" />
     <Compile Include="Enums\EnumPlaceholder.cs" />
     <Compile Include="Enums\MechanicFeature.cs" />
+    <Compile Include="Interfaces\IAfterRule.cs" />
     <Compile Include="Interfaces\IUpdateCompanion.cs" />
     <Compile Include="Patches\Patch_AbilityAtWill.cs" />
     <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
@@ -187,7 +189,9 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
+    <PostBuildEvent>if "$(Configuration)"=="Release" (
+xcopy /i /e /y /f /d "$(TargetDir)\CodexLib.dll" "$(SolutionDir)CodexLib\"
+)
     </PostBuildEvent>
   </PropertyGroup>
 </Project>

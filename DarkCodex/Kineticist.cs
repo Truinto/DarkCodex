@@ -372,7 +372,7 @@ namespace DarkCodex
 
             // move CompositeBlastBuff to BlastFeature
             foreach (var element in t.GetAll(basic: true))
-                element.BlastFeature.Get().AddComponents(Helper.CreateAddFacts(t.CompositeBuff));
+                element.BlastFeature.Get()?.AddComponents(Helper.CreateAddFacts(t.CompositeBuff));
 
             // create new simplified selection
             var expandedElement = Helper.CreateBlueprintFeatureSelection(
@@ -841,10 +841,11 @@ namespace DarkCodex
             var poison = Helper.CreateBlueprintBuff(
                 "VenomInfusionPoisonBuff",
                 "Venom Blast Poison",
-                "Blast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 damage to the chosen ability score; cure 2 consecutive saves."
+                "Blast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 constitution damage or dexterity if undead; cure 2 consecutive saves."
                 ).SetComponents(
-                new BuffPoisonStatDamage() { Descriptor = ModifierDescriptor.UntypedStackable, Stat = StatType.Constitution, Value = new DiceFormula(1, DiceType.D2), Ticks = 6, SuccesfullSaves = 2, SaveType = SavingThrowType.Fortitude },
-                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Poison)
+                new BuffPoisonStatDamageFix() { Stat = StatType.Constitution, AltStat = StatType.Dexterity, Value = new DiceFormula(1, DiceType.D2), Ticks = 6, SuccesfullSaves = 2, ConsecutiveSaves = true },
+                Helper.CreateAddCondition(Kingmaker.UnitLogic.UnitCondition.Sickened),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Poison | SpellDescriptor.Sickened)
                 );
             poison.Stacking = StackingType.Poison;
 
@@ -852,7 +853,7 @@ namespace DarkCodex
             var ab = Helper.CreateBlueprintActivatableAbility(
                 "VenomInfusionActivatable",
                 "Venom Infusion",
-                "Element: any\nType: substance infusion\nLevel: 5\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nAll of your blasts are mildly toxic. Creatures that take damage from your blast are sickened for 1 round.",
+                "Element: any\nType: substance infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nAll of your blasts are mildly toxic. Creatures that take damage from your blast are sickened for 1 round.",
                 out var buff,
                 group: ActivatableAbilityGroup.SubstanceInfusion,
                 icon: Helper.StealIcon("1f788b54e93751d43923596b8e09035d")
@@ -861,9 +862,9 @@ namespace DarkCodex
                     succeed: null,
                     failed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1));
             buff.SetComponents(
-                Step4_dc(),
+                Step4_dc(true),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
-                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree.BaseAll },
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 2, m_AppliableTo = Tree.BaseAll },
                 new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save), CheckSpellParent = true, m_AbilityList = Tree.BaseAll }
                 );
 
@@ -871,7 +872,7 @@ namespace DarkCodex
             var ab_greater = Helper.CreateBlueprintActivatableAbility(
                 "VenomInfusionGreaterActivatable",
                 "Venom Infusion, Greater",
-                "Element: any\nType: substance infusion\nLevel: 7\nBurn: 4\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nYour plant toxin is more virulent. Each time you use this infusion, choose a physical ability score (only constitution). Creatures that take damage from your blast are exposed to your poison.\n\nBlast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 damage to the chosen ability score (constitution); cure 2 consecutive saves.",
+                "Element: any\nType: substance infusion\nLevel: 6\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nYour plant toxin is more virulent. Each time you use this infusion, choose a physical ability score (only constitution). Creatures that take damage from your blast are exposed to your poison and are sickended for its duration.\n\nBlast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 damage to the chosen ability score (constitution); cure 2 consecutive saves.",
                 out var buff_greater,
                 group: ActivatableAbilityGroup.SubstanceInfusion,
                 icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")
@@ -880,9 +881,9 @@ namespace DarkCodex
                     succeed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1),
                     failed: Helper.CreateContextActionApplyBuff(poison, permanent: true));
             buff_greater.SetComponents(
-                Step4_dc(),
+                Step4_dc(true),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
-                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 4, m_AppliableTo = Tree.BaseAll },
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 3, m_AppliableTo = Tree.BaseAll },
                 new AddKineticistInfusionDamageTrigger() { TriggerOnDirectDamage = true, Actions = Helper.CreateActionList(save_greater), CheckSpellParent = true, m_AbilityList = Tree.BaseAll }
                 );
 
@@ -893,7 +894,7 @@ namespace DarkCodex
                 ab.m_Description,
                 icon: Helper.StealIcon("1f788b54e93751d43923596b8e09035d")
                 ).SetComponents(
-                Helper.CreatePrerequisiteClassLevel(Tree.Class, 5),
+                Helper.CreatePrerequisiteClassLevel(Tree.Class, 6),
                 Helper.CreateAddFacts(ab)
                 );
 
@@ -903,13 +904,36 @@ namespace DarkCodex
                 ab_greater.m_Description,
                 icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")
                 ).SetComponents(
-                Helper.CreatePrerequisiteClassLevel(Tree.Class, 7),
+                Helper.CreatePrerequisiteClassLevel(Tree.Class, 12),
                 Helper.CreatePrerequisiteFeature(feat),
                 Helper.CreateAddFacts(ab_greater)
                 );
 
             Helper.AddInfusion(feat);
             Helper.AddInfusion(greater);
+        }
+
+        [PatchInfo(Severity.Fix | Severity.WIP, "Fix Blood Kineticist", "seeks to fix bugs in Blood Kineticist", false)]
+        public static void FixBloodKineticist()
+        {
+            var blood = Tree.Composite_Blood;
+            var displayName = blood.BlastFeature.Get().m_DisplayName;
+            var description = blood.BlastFeature.Get().m_Description;
+            var bladeName = "Blood Blast — Kinetic Blade".CreateString();
+
+            blood.BaseAbility.Get().m_DisplayName = displayName;
+            blood.BaseAbility.Get().m_Description = description;
+            blood.Blade.Damage.Get().m_DisplayName = displayName;
+            blood.Blade.Damage.Get().m_Description = description;
+
+            blood.Blade.Activatable.Get().m_DisplayName = bladeName;
+            blood.Blade.Damage.Get().m_DisplayName = bladeName;
+
+            var bleed = Helper.Get<BlueprintBuff>("492a8156ecede6345a8e82475eed85ac"); //BleedingInfusionBuff
+            bleed.AddComponents(
+                Helper.CreateContextRankConfig(ContextRankBaseValueType.FeatureRank, feature: Tree.KineticBlast));
+            bleed.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0] 
+                = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude, null, new ContextActionIncreaseBleed(false));
         }
 
         #region Helper
@@ -953,7 +977,7 @@ namespace DarkCodex
                 type: AbilityRankType.DamageDice,
                 progression: progression,
                 stepLevel: twice ? 2 : 0,
-                feature: "93efbde2764b5504e98e6824cab3d27c".ToRef<BlueprintFeatureReference>()); //KineticBlastFeature
+                feature: Tree.KineticBlast); //KineticBlastFeature
             return rankdice;
         }
 
@@ -967,18 +991,20 @@ namespace DarkCodex
                 progression: half_bonus ? ContextRankProgression.Div2 : ContextRankProgression.AsIs,
                 type: AbilityRankType.DamageBonus,
                 stat: StatType.Constitution,
-                customProperty: "f897845bbbc008d4f9c1c4a03e22357a".ToRef<BlueprintUnitPropertyReference>()); //KineticistMainStatProperty
+                customProperty: Tree.KineticistMainStatProperty); //KineticistMainStatProperty
             return rankdice;
         }
 
         /// <summary>
-        /// Simply makes the DC dex based.
+        /// If useMainStat is false; make DC dex based (form infusion).
+        /// IF useMainStat is true; make DC con based (substance infusion).
         /// </summary>
-        public static ContextCalculateAbilityParamsBasedOnClass Step4_dc()
+        public static ContextCalculateAbilityParamsBasedOnClass Step4_dc(bool useMainStat = false)
         {
             var dc = new ContextCalculateAbilityParamsBasedOnClass();
             dc.StatType = StatType.Dexterity;
-            dc.m_CharacterClass = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
+            dc.UseKineticistMainStat = useMainStat;
+            dc.m_CharacterClass = Tree.Class; //KineticistClass
             return dc;
         }
 

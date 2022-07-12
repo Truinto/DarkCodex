@@ -3,6 +3,7 @@ using Kingmaker.EntitySystem;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using System.Collections.Generic;
+using System;
 
 namespace CodexLib.Patches
 {
@@ -17,30 +18,37 @@ namespace CodexLib.Patches
         [HarmonyPrefix]
         public static bool Prefix(object subscriber, List<object> ___List)
         {
-            //Helper.PrintDebug($"SubscribersList adding {subscriber.GetType()}");
-            if (subscriber is EntityFactComponent c1)
+            try
             {
-                if (typeof(IBeforeRule).IsAssignableFrom(c1.SourceBlueprintComponent.GetType()))
+                //Helper.PrintDebug($"SubscribersList adding {subscriber.GetType()}");
+                if (subscriber is EntityFactComponent c1)
                 {
-                    ___List.Insert(0, c1);
-                    return false;
+                    var source = c1.SourceBlueprintComponent;
+                    if (source is IBeforeRule)
+                    {
+                        ___List.Insert(0, c1);
+                        return false;
+                    }
+                    if (source is IAfterRule)
+                    {
+                        ___List.Add(c1);
+                        return false;
+                    }
                 }
-                //if (typeof(IAfterRule).IsAssignableFrom(c1.SourceBlueprintComponent.GetType()))
-                //{
-                //    ___List.Add(c1);
-                //    return false;
-                //}
-            }
 
-            //int index;
-            //for (index = ___List.Count - 1; index >= 0; index--)
-            //{
-            //    if (___List[index] is not EntityFactComponent c2 || !typeof(IAfterRule).IsAssignableFrom(c2.SourceBlueprintComponent.GetType()))
-            //        break;
-            //}
-            //___List.Insert(index, subscriber);
-            ___List.Add(subscriber);
-            return false;
+                int index;
+                for (index = ___List.Count - 1; index >= 0; index--)
+                {
+                    if (___List[index] is not EntityFactComponent c2 || c2.SourceBlueprintComponent is not IAfterRule)
+                        break;
+                }
+                ___List.Insert(index + 1, subscriber);
+
+                return false;
+            }
+            catch (Exception ex) { Helper.PrintException(ex); }
+
+            return true;
         }
     }
 }
