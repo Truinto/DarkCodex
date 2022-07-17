@@ -430,6 +430,7 @@ namespace Shared
             PatchSafe(typeof(Patch_HexcrafterSpellStrike));
             PatchSafe(typeof(Patch_BackgroundChecks));
             PatchSafe(typeof(Patch_ArcanistSpontaneous));
+            PatchSafe(typeof(Patch_ZippySpellLike));
 
             // General
             LoadSafe(General.CreateHeritage);
@@ -441,6 +442,7 @@ namespace Shared
             LoadSafe(General.PatchHideBuffs);
             LoadSafe(General.PatchVarious);
             LoadSafe(General.CreateDirtyFighting);
+            LoadSafe(General.CreateOpportuneParry);
 
             // Spells
             LoadSafe(Spells.CreateBladedDash);

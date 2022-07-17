@@ -1182,24 +1182,6 @@ namespace CodexLib
             return result;
         }
 
-        public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
-        {
-            var levelentry = obj.AddFeatures.FirstOrDefault(f => f.Level == level);
-            if (levelentry != null)
-                levelentry.m_Features.Add(feature.ToRef());
-            else
-                AppendAndReplace(ref obj.AddFeatures, CreateLevelEntry(level, feature));
-        }
-
-        public static void RemoveFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
-        {
-            var levelentry = obj.RemoveFeatures.FirstOrDefault(f => f.Level == level);
-            if (levelentry != null)
-                levelentry.m_Features.Add(feature.ToRef());
-            else
-                AppendAndReplace(ref obj.RemoveFeatures, CreateLevelEntry(level, feature));
-        }
-
         public static bool IsRank(this AbilityData ability, int min = -1, int max = int.MaxValue, bool ifEmpty = true)
         {
             var rank = ability.Blueprint.GetComponent<FeatureRank>();
@@ -1689,11 +1671,11 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintFeatureSelection _basicfeats1;
-        public static BlueprintFeatureSelection _basicfeats2;
-        public static BlueprintFeatureSelection _combatfeats1;
-        public static BlueprintFeatureSelection _combatfeats2;
-        public static BlueprintFeatureSelection _combatfeats3;
+        private static BlueprintFeatureSelection _basicfeats1;
+        private static BlueprintFeatureSelection _basicfeats2;
+        private static BlueprintFeatureSelection _combatfeats1;
+        private static BlueprintFeatureSelection _combatfeats2;
+        private static BlueprintFeatureSelection _combatfeats3;
         public static void AddFeats(params BlueprintFeature[] feats)
         {
             if (_basicfeats1 == null) //BasicFeatSelection
@@ -2184,6 +2166,33 @@ namespace CodexLib
             AppendAndReplace(ref selection.m_AllFeatures, features.To<BlueprintFeatureReference>());
 
             return selection;
+        }
+
+        #endregion
+
+        #region Blueprint Archetype
+
+        public static BlueprintArchetype SetAddFeatures()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
+        {
+            var levelentry = obj.AddFeatures.FirstOrDefault(f => f.Level == level);
+            if (levelentry != null)
+                levelentry.m_Features.Add(feature.ToRef());
+            else
+                AppendAndReplace(ref obj.AddFeatures, CreateLevelEntry(level, feature));
+        }
+
+        public static void RemoveFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
+        {
+            var levelentry = obj.RemoveFeatures.FirstOrDefault(f => f.Level == level);
+            if (levelentry != null)
+                levelentry.m_Features.Add(feature.ToRef());
+            else
+                AppendAndReplace(ref obj.RemoveFeatures, CreateLevelEntry(level, feature));
         }
 
         #endregion
@@ -3495,6 +3504,48 @@ namespace CodexLib
 
             result.m_MaxAmount.IncreasedByStat = stat != StatType.Unknown;
             result.m_MaxAmount.ResourceBonusStat = stat;
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static BlueprintArchetype CreateBlueprintArchetype(string name, string displayName = null, string description = null, Sprite icon = null, BlueprintSpellbookReference replaceSpellbook = null, bool removeSpellbook = false, bool isArcane = false, bool isDivine = false, int addSkillPoints = 0, BlueprintStatProgressionReference BAB = null, BlueprintStatProgressionReference Fortitute = null, BlueprintStatProgressionReference Reflex = null, BlueprintStatProgressionReference Will = null,
+            StatType[] classSkills = null, StatType[] recommendStat = null, StatType[] notRecommendStat = null, AnyRef[] blueprintItem = null)
+        {
+            string guid = GetGuid(name);
+
+            var result = new BlueprintArchetype();
+            result.name = name;
+
+            result.LocalizedName = displayName.CreateString();
+            result.LocalizedDescription = description.CreateString();
+            result.m_Icon = icon;
+            result.m_ReplaceSpellbook = replaceSpellbook;
+            result.RemoveSpellbook = removeSpellbook;
+            result.BuildChanging = false;
+            result.ChangeCasterType = isArcane || isDivine; //IsDivineCaster //IsArcaneCaster
+            result.IsArcaneCaster = isArcane;
+            result.IsDivineCaster = isDivine;
+            result.AddSkillPoints = addSkillPoints;
+            result.m_BaseAttackBonus = BAB;
+            result.m_FortitudeSave = Fortitute;
+            result.m_ReflexSave = Reflex;
+            result.m_WillSave = Will;
+            result.m_ParentClass = default;
+            result.m_Difficulty = 3;
+
+            result.ReplaceClassSkills = classSkills != null; //ClassSkills
+            if (classSkills != null) result.ClassSkills = classSkills;
+
+            result.ReplaceStartingEquipment = blueprintItem != null; //m_StartingItems //StartingGold
+            result.StartingGold = 500;
+            if (blueprintItem != null) result.m_StartingItems = blueprintItem.To<BlueprintItemReference>();
+
+            result.OverrideAttributeRecommendations = recommendStat != null || notRecommendStat != null; //RecommendedAttributes //NotRecommendedAttributes
+            if (recommendStat != null) result.RecommendedAttributes = recommendStat;
+            if (notRecommendStat != null) result.NotRecommendedAttributes = notRecommendStat;
+
+            //result.m_SignatureAbilities = ;
 
             AddAsset(result, guid);
             return result;

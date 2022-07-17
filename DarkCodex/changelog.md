@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.16]
+- added icon to Venom Infusion Poison
+- added Opportune Parry, combat feat: duelist parry by expending Attack of Opportunities
+- added patch to allow Zippy to work with spell-like abilities
+
 ## [1.3.15]
 - added references to KineticistExpandedElements; will fix interactions with substance infusions
 - fixed Venom Infusion's poison from "2 saves" to "2 consecutive saves"; simplified damage calculation which might fix bugs;

@@ -16,41 +16,57 @@ namespace CodexLib
     /// </summary>
     public static class MasterPatch
     {
-        private static bool IsRun;
-        private static Harmony harmony;
+        public static List<Type> PatchList = new()
+        {
+            typeof(Patch_AbilityAtWill),
+            typeof(Patch_ActivatableActionBar),
+            typeof(Patch_AOEAttackRolls),
+            typeof(Patch_ConditionExemption),
+            typeof(Patch_ContextStatValue),
+            typeof(Patch_DebugReport),
+            typeof(Patch_FixAbilityTargets),
+            typeof(Patch_GetTargetProjectileFix),
+            typeof(Patch_RulebookEventBusPriority),
+            typeof(Patch_SpellSelectionParametrized),
+            typeof(Patch_WeaponCategory),
+            typeof(Patch_AbilityIsFullRound),
+            typeof(Patch_RuleSpendCharge),
+            typeof(Patch_Prerequisite),
+        };
 
         /// <summary>
         /// Call at least once, if you plan to use components.
         /// </summary>
         public static void Run()
         {
-            if (IsRun)
+            if (PatchList == null)
                 return;
-            IsRun = true;
-            harmony = new Harmony("CodexLib");
 
-            PatchSafe(typeof(Patch_AbilityAtWill));
-            PatchSafe(typeof(Patch_ActivatableActionBar));
-            PatchSafe(typeof(Patch_AOEAttackRolls));
-            PatchSafe(typeof(Patch_ConditionExemption));
-            PatchSafe(typeof(Patch_ContextStatValue));
-            PatchSafe(typeof(Patch_DebugReport));
-            PatchSafe(typeof(Patch_FixAbilityTargets));
-            PatchSafe(typeof(Patch_GetTargetProjectileFix));
-            PatchSafe(typeof(Patch_RulebookEventBusPriority));
-            PatchSafe(typeof(Patch_SpellSelectionParametrized));
-            PatchSafe(typeof(Patch_WeaponCategory));
-            PatchSafe(typeof(Patch_AbilityIsFullRound));
-            PatchSafe(typeof(Patch_RuleSpendCharge));
-            PatchSafe(typeof(Patch_Prerequisite));
+            var harmony = new Harmony("CodexLib");
+            foreach (var patch in PatchList)
+                PatchSafe(harmony, patch);
+            PatchList = null;
+            harmony = null;
 
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");
-
-            harmony = null;
         }
 
-        private static void PatchSafe(Type patch)
+        /// <summary>
+        /// Use this if you only want to enable a specific patch. Ensures patch is only used once.
+        /// </summary>
+        public static bool Run(Type type)
+        {
+            if (PatchList == null)
+                return false;
+
+            bool contains = PatchList.Remove(type);
+            if (contains)
+                PatchSafe(new Harmony("CodexLib"), type);
+            return contains;
+        }
+
+        private static void PatchSafe(Harmony harmony, Type patch)
         {
             try
             {

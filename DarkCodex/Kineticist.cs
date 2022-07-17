@@ -841,7 +841,8 @@ namespace DarkCodex
             var poison = Helper.CreateBlueprintBuff(
                 "VenomInfusionPoisonBuff",
                 "Venom Blast Poison",
-                "Blast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 constitution damage or dexterity if undead; cure 2 consecutive saves."
+                "Blast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 constitution damage or dexterity if undead; cure 2 consecutive saves; sickened while poisoned.",
+                icon: Helper.StealIcon("ba1ae42c58e228c4da28328ea6b4ae34")
                 ).SetComponents(
                 new BuffPoisonStatDamageFix() { Stat = StatType.Constitution, AltStat = StatType.Dexterity, Value = new DiceFormula(1, DiceType.D2), Ticks = 6, SuccesfullSaves = 2, ConsecutiveSaves = true },
                 Helper.CreateAddCondition(Kingmaker.UnitLogic.UnitCondition.Sickened),
@@ -872,7 +873,7 @@ namespace DarkCodex
             var ab_greater = Helper.CreateBlueprintActivatableAbility(
                 "VenomInfusionGreaterActivatable",
                 "Venom Infusion, Greater",
-                "Element: any\nType: substance infusion\nLevel: 6\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nYour plant toxin is more virulent. Each time you use this infusion, choose a physical ability score (only constitution). Creatures that take damage from your blast are exposed to your poison and are sickended for its duration.\n\nBlast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 damage to the chosen ability score (constitution); cure 2 consecutive saves.",
+                "Element: any\nType: substance infusion\nLevel: 6\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nYour plant toxin is more virulent. Each time you use this infusion, choose a physical ability score (only constitution). Creatures that take damage from your blast are exposed to your poison and are sickended for its duration.\n\nBlast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 constitution damage or dexterity if undead; cure 2 consecutive saves; sickened while poisoned.",
                 out var buff_greater,
                 group: ActivatableAbilityGroup.SubstanceInfusion,
                 icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")

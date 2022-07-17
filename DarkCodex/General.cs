@@ -464,7 +464,7 @@ namespace DarkCodex
             var atavism = Helper.CreateBlueprintFeatureSelection(
                 "AtavismOrc",
                 "Orc Atavism",
-                "Some half-orcs have much stronger orc blood than human blood. Such half-orcs count as only half-orcs and orcs (not also humans) for any effect related to race. They gain a +2 bonus to Strength, a +2 bonus to one ability score of their choice, and a –2 penalty to one mental ability score of their choice. Finally, they gain the ferocity universal monster ability. This racial trait replaces the half-orc’s usual racial ability score modifiers, as well as intimidating, orc blood, and orc ferocity.",
+                "Some half-orcs have much stronger orc blood than human blood. Such half-orcs count as only half-orcs and orcs (not also humans) for any effect related to race. They gain a +2 bonus to Strength, a +2 bonus to one ability score of their choice, and a –2 penalty to one mental ability score of their choice. They also gain razortusk. Finally, they gain the ferocity universal monster ability. This racial trait replaces the half-orc’s usual racial ability score modifiers, as well as intimidating, orc blood, and orc ferocity.",
                 group: FeatureGroup.Racial
                 ).SetComponents(
                 Helper.CreateAddStatBonus(2, StatType.Strength, ModifierDescriptor.Racial),
@@ -641,6 +641,23 @@ namespace DarkCodex
                 );
 
             Helper.AddFeats(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Opportune Parry", "combat feat: duelist parry by expending Attack of Opportunities", true)]
+        public static void CreateOpportuneParry()
+        {
+            Main.Patch(typeof(Patch_DuelistParry));
+
+            var feat = Helper.CreateBlueprintFeature(
+                "OpportuneParry",
+                "Opportune Parry",
+                "You learn how to forgo the opportunity to strike to instead block attacks against you.\nBenefit: You parry as a free action, but need to expend one of your own potential attacks of opportunity. You cannot parry, if you are unable to do attacks of opportunity."
+                ).SetComponents(
+                new AddMechanicFeatureCustom(MechanicFeature.ParryUseAttackOfOpportunity),
+                Helper.CreatePrerequisiteFeature("47e9ac1bf9c376e44b64cb5844a5e6a6") //DuelistParryFeature
+                );
+
+            Helper.AddCombatFeat(feat);
         }
 
         #region General Resources and Stuff

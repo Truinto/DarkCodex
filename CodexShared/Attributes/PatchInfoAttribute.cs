@@ -192,11 +192,11 @@ namespace Shared
 
             if (state.Whitelist.Contains(name))
                 return false;
-
+#if !DEBUG
             int hash = name.GetHashCode();
             if (list.Find(f => f.Hash == hash)?.IsDefaultOff == true)
                 return true;
-
+#endif
             return !state.NewFeatureDefaultOn;
         }
 
@@ -213,11 +213,11 @@ namespace Shared
 
             if (state.Whitelist.Contains(name)) // check whitelist
                 return false;
-
+#if !DEBUG
             int hash = name.GetHashCode();
             if (list.Find(f => f.Hash == hash)?.IsDefaultOff == true) // check default off flag
-                return true;
-
+                return true;                
+#endif
             return !state.NewFeatureDefaultOn;  // if setting was never set, check for generic default
         }
 

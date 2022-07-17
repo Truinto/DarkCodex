@@ -18,6 +18,13 @@ using Kingmaker.UnitLogic.Parts;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Solution 1: Check every fact and condition of all feats that are doubled.<br/>
+    /// Solution 2: Change the modifier to "Feat", then apply modifiers of type "Feat" in result of OnEventDidTrigger a second time. Only works for RuleCalculateAbilityParams, since other rules have immediate effects.<br/>
+    /// Solution 3: Change the modifier to "Feat". Enforce this component comes last and double "Feat" modifier in OnEventAboutToTrigger.<br/>
+    /// <br/>
+    /// Uses solution 3.
+    /// </summary>
     public class SpellPerfection : UnitFactComponentDelegate, IAfterRule, IInitiatorRulebookHandler<RuleCalculateAbilityParams>, IInitiatorRulebookHandler<RuleSpellResistanceCheck>, IInitiatorRulebookHandler<RuleAttackRoll>
     {
         //public static BlueprintFeatureReference SpellFocus = Helper.ToRef<BlueprintFeatureReference>("16fa59cc9a72a6043b566b49184f53fe");
