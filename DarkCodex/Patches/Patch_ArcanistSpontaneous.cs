@@ -152,13 +152,19 @@ namespace DarkCodex
 
         /// <summary>
         /// Returns dummy SpellSlot.
-        /// This is solely for AbilityData.GetConversions.
+        /// This is solely for AbilityData.GetConversions for ArcanistMagicalSupremacy.
         /// </summary>
         [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.SpellSlot), MethodType.Getter)]
         [HarmonyPrefix]
         public static bool Prefix6(AbilityData __instance, ref SpellSlot __result)
         {
-            if (__result != null || __instance.m_CachedName?.StartsWith("Spontaneous: ") != false)
+            if (__result != null)
+                return true;
+
+            if (__instance.m_CachedName == null)
+                return true;
+
+            if (!__instance.m_CachedName.StartsWith("Spontaneous: ") && !__instance.m_CachedName.StartsWith("Temporary: "))
                 return true;
 
             __result = new SpellSlot(0, SpellSlotType.Common, -1)
