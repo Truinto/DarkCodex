@@ -24,6 +24,11 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_ArcanistSpontaneous
     {
+        /// <summary>
+        /// Returns dummy SpellSlots for spontaneous metamagic. m_CachedName starts with "Spontaneous: "
+        /// Returns dummy SpellSlots for temporary learned spells. m_CachedName starts with "Temporary: "
+        /// This is solely for ActionBarVM.CollectSpells.
+        /// </summary>
         [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.GetMemorizedSpells))]
         [HarmonyPostfix]
         public static void Postfix1(int spellLevel, Spellbook __instance, ref IEnumerable<SpellSlot> __result)
@@ -54,9 +59,11 @@ namespace DarkCodex
                 spell.DecorationColorNumber = meta.DecorationColorNumber;
                 spell.m_CachedName = "Spontaneous: " + spell.Name;
 
-                var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1);
-                slot.Spell = spell;
-                slot.Available = true;
+                var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1)
+                {
+                    Spell = spell,
+                    Available = true
+                };
 
                 list.Add(slot);
             }
@@ -75,10 +82,13 @@ namespace DarkCodex
                         if (list.Any(a => a.Spell.Blueprint == spell.Blueprint))
                             continue;
 
-                        var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1);
-                        slot.Spell = spell;
-                        slot.Available = true;
                         spell.m_CachedName = "Temporary: " + spell.Name;
+
+                        var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1)
+                        {
+                            Spell = spell,
+                            Available = true
+                        };
 
                         list.Add(slot);
                     }
@@ -88,6 +98,9 @@ namespace DarkCodex
             __result = list;
         }
 
+        /// <summary>
+        /// Returns dummy spell count for dummy spells.
+        /// </summary>
         [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.GetAvailableForCastSpellCount))]
         [HarmonyPostfix]
         public static void Postfix2(AbilityData spell, Spellbook __instance, ref int __result)
@@ -112,7 +125,7 @@ namespace DarkCodex
         }
 
         [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetDefaultActionType))]
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         [HarmonyPriority(Priority.HigherThanNormal)]
         public static void Postfix4(AbilityData __instance, ref CommandType __result)
         {
@@ -120,6 +133,42 @@ namespace DarkCodex
                 __result = CommandType.Standard;
         }
 
+        /// <summary>
+        /// Allow arcanist to memorize the same spell any number. Needed because metamagic is ignored and only blueprints are compared. This is a base game issue.
+        /// </summary>
+        [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.Memorize))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instr)
+        {
+            var original = AccessTools.Field(typeof(BlueprintSpellbook), nameof(BlueprintSpellbook.IsArcanist));
+
+            foreach (var line in instr)
+            {
+                if (line.Calls(original))
+                    line.ReplaceCall(Helper.FakeAlwaysFalse);
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        /// Returns dummy SpellSlot.
+        /// This is solely for AbilityData.GetConversions.
+        /// </summary>
+        [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.SpellSlot), MethodType.Getter)]
+        [HarmonyPrefix]
+        public static bool Prefix6(AbilityData __instance, ref SpellSlot __result)
+        {
+            if (__result != null || __instance.m_CachedName?.StartsWith("Spontaneous: ") != false)
+                return true;
+
+            __result = new SpellSlot(0, SpellSlotType.Common, -1)
+            {
+                Spell = __instance,
+                Available = true
+            };
+
+            return false;
+        }
 
 
         public static bool IsForceFullRound(AbilityData __instance)
@@ -158,6 +207,7 @@ namespace DarkCodex
             return false;
         }
 
+        // returns list of all memorized spell-blueprints that have NO metamagic
         public static List<BlueprintAbility> GetAllMemorizedBlueprints(Spellbook spellbook)
         {
             var list = new List<BlueprintAbility>();
@@ -167,7 +217,7 @@ namespace DarkCodex
                 {
                     var memSpell = slot.Spell;
                     if (memSpell != null
-                        && memSpell.MetamagicData?.NotEmpty != true
+                        && memSpell.MetamagicData?.NotEmpty != true     // metamagic has to be empty
                         && slot.Available
                         && !list.Contains(memSpell.Blueprint))
                         list.Add(memSpell.Blueprint);

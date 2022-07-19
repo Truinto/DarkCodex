@@ -110,12 +110,15 @@
     <Compile Include="Components\AddConditionExceptions.cs" />
     <Compile Include="Components\AddDamageResistancePhysicalImproved.cs" />
     <Compile Include="Components\AddFactOnlyParty.cs" />
+    <Compile Include="Components\AddFeatureSelection.cs" />
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AddMechanicFeatureCustom.cs" />
     <Compile Include="Components\AddUndeadCompanion.cs" />
     <Compile Include="Components\BuffPoisonStatDamageFix.cs" />
     <Compile Include="Components\DirtyFightingBonus.cs" />
     <Compile Include="Components\FeatureForPrerequisite.cs" />
+    <Compile Include="Components\KineticBlastDiceIncrease.cs" />
+    <Compile Include="Components\KineticistIncreaseDC.cs" />
     <Compile Include="Components\Poison.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
     <Compile Include="Components\Bleed.cs" />
@@ -185,6 +188,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rules\RuleSpendCharge.cs" />
     <Compile Include="Scope.cs" />
+    <Compile Include="using.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

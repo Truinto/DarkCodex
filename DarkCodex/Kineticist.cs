@@ -90,7 +90,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent", false)]
         public static void CreateExtraWildTalentFeat()
         {
-            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var wildtalent_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
 
@@ -101,13 +100,14 @@ namespace DarkCodex
                 ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("42f96fc8d6c80784194262e51b0a1d25").Icon,
                 FeatureGroup.Feat
                 ).SetComponents(
-                Helper.CreatePrerequisiteClassLevel(kineticist_class, 1, true)
+                Helper.CreatePrerequisiteClassLevel(Tree.Class, 1, true)
                 );
             extra_wild_talent_selection.Ranks = 10;
 
             extra_wild_talent_selection.m_AllFeatures = Helper.Append(infusion_selection.m_AllFeatures,     //InfusionSelection
                                                                     wildtalent_selection.m_AllFeatures);  //+WildTalentSelection
 
+            Tree.ExtraWildTalent.SetReference(extra_wild_talent_selection);
             Helper.AddFeats(extra_wild_talent_selection);
         }
 
@@ -933,8 +933,106 @@ namespace DarkCodex
             var bleed = Helper.Get<BlueprintBuff>("492a8156ecede6345a8e82475eed85ac"); //BleedingInfusionBuff
             bleed.AddComponents(
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.FeatureRank, feature: Tree.KineticBlast));
-            bleed.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0] 
+            bleed.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0]
                 = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude, null, new ContextActionIncreaseBleed(false));
+        }
+
+        [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "", false)]
+        public static void CreateElementalScion()
+        {
+            var comps = new List<BlueprintComponent>();
+
+            /*
+            https://libraryofmetzofitz.fandom.com/wiki/Elemental_Scion
+            
+            Elemental Heart (Su)
+            The devotion of an elemental scion supersedes all others. When an elemental scion selects an element for their elemental focus class feature, they can choose to either gain both associated simple blasts for their element (if it has two different simple blasts) or permanently increase the damage die of their chosen simple blast by one step (1 > d2 > d3 > d4 > d6 > d8 > d10 > d12). They cannot increase the damage die beyond d12 in this way.
+            This alters elemental focus and replaces the 1st-level infusion.
+
+            Focused Element (Su)
+            At 7th level, an elemental scion gains a composite blast that requires the expanded element for their primary element (such as metal blast for earth). An elemental scion is treated as 2 levels higher for the purpose of which infusions and utility wild talents they can select, as well as increasing the DCs of their infusions and wild talents by +1. In addition, they also gain an additional utility wild talent or infusion. If an elemental scion did not increase the damage die of their simple blast at 1st level, they can choose to do so for one of their simple blasts in place of the infusion or utility wild talent gained with this ability.
+            This replaces the 7th-level expanded element.
+
+            Elemental Master (Su)
+            At 15th level, an elemental scion increases the DCs of their infusions and wild talents by an additional +1, as well as increasing the damage of all simple and composite blasts they possess by 1 additional step (to a maximum size of d12). In addition, they also gain an additional utility wild talent or infusion.
+            This replaces the 15th-level expanded element.
+
+            Elemental Embodiment (Su)
+            At 20th level, an elemental scion has reached their peak of power. An elemental scion treats all infusions and wild talents as though they had accepted 1 point of burn or increased the burn cost by 1 for the purpose of their effects. They also gain an additional infusion and an additional utility wild talent.
+            This replaces omnikinesis. 
+            */
+
+            var scion = Helper.CreateBlueprintArchetype(
+                "ElementalScionArchetype",
+                "Elemental Scion",
+                "There are some who, instead of focusing on the powers beyond their own, decide to concentrate on their innate talents to acquire powers far beyond a minor dabbler. All elements are equally likely to embark on such singular focus, confident in their innate gifts."
+                );
+
+            // Elemental Heart
+            var f1_increaseDamage = Helper.CreateBlueprintFeature(
+                "KineticBlastDiceIncrease",
+                "Increase Kinetic Blast Dice",
+                "Permanently increase the damage die of the chosen simple blast by one step (1 > d2 > d3 > d4 > d6 > d8 > d10 > d12)."
+                ).SetComponents(
+                new KineticBlastDiceIncrease(true),
+                new AddFeatureSelection() { Feature = (AnyRef)Tree.ExtraWildTalent }, // TODO: remove debugging code
+                new AddFeatureSelection() { Feature = (AnyRef)Tree.ExtraWildTalent } // TODO: remove debugging code
+                );
+
+            foreach (var focus in Tree.GetFocus().Where(w => w.Element2 != null && w.Element1 != null))
+            {
+                comps.Add(Helper.CreatePrerequisiteFeature(focus.First, true));
+                comps.Add(Helper.CreateAddFeatureIfHasFact(focus.First, focus.Element1.BlastFeature));
+                comps.Add(Helper.CreateAddFeatureIfHasFact(focus.First, focus.Element2.BlastFeature));
+            }
+            var f1_getSecondBlast = Helper.CreateBlueprintFeature(
+                "ElementalScionSecondBlast",
+                "Other Simple Blast",
+                "Gain both associated simple blasts for your element."
+                ).SetComponents(comps.ToArray());
+
+            var f1_selection = Helper.CreateBlueprintFeatureSelection(
+                "ElementalScionElementalHeart",
+                "Elemental Heart",
+                "The devotion of an elemental scion supersedes all others. When an elemental scion selects an element for their elemental focus class feature, they can choose to either gain both associated simple blasts for their element (if it has two different simple blasts) or permanently increase the damage die of their chosen simple blast by one step (1 > d2 > d3 > d4 > d6 > d8 > d10 > d12).\nThis alters elemental focus and replaces the 1st-level infusion."
+                ).SetSelection(f1_increaseDamage, f1_getSecondBlast);
+
+            // Focused Element
+            var f7_focusedElement = Helper.CreateBlueprintFeatureSelection(
+                "ElementalScionFocusedElement",
+                "Focused Element",
+                "At 7th level, an elemental scion gains a composite blast that requires the expanded element for their primary element (such as metal blast for earth). An elemental scion is treated as 2 levels higher for the purpose of which infusions and utility wild talents they can select, as well as increasing the DCs of their infusions and wild talents by +1. In addition, they also gain an additional utility wild talent or infusion. If an elemental scion did not increase the damage die of their simple blast at 1st level, they can choose to do so for one of their simple blasts in place of the infusion or utility wild talent gained with this ability.\nThis replaces the 7th-level expanded element."
+                ).SetComponents(
+                Helper.CreateClassLevelsForPrerequisites(Tree.Class, 2),
+                new KineticistIncreaseDC(1)
+                ).SetSelection(f1_increaseDamage, Tree.ExtraWildTalent);
+
+            // Elemental Master
+            var f15_elementalMaster = Helper.CreateBlueprintFeature(
+                "ElementalScionElementalMaster",
+                "Elemental Master",
+                "At 15th level, an elemental scion increases the DCs of their infusions and wild talents by an additional +1, as well as increasing the damage of all simple and composite blasts they possess by 1 additional step (to a maximum size of d12). In addition, they also gain an additional utility wild talent or infusion.\nThis replaces the 15th-level expanded element."
+                ).SetComponents(
+                new KineticistIncreaseDC(1),
+                new KineticBlastDiceIncrease(false)
+                );
+
+            // Elemental Embodiment
+            // ?
+
+
+            scion.SetAddFeatures(
+                Helper.CreateLevelEntry(1, f1_selection),
+                Helper.CreateLevelEntry(7, f7_focusedElement),
+                Helper.CreateLevelEntry(15, f15_elementalMaster)
+                );
+            scion.SetRemoveFeatures(
+                Helper.CreateLevelEntry(1, "58d6f8e9eea63f6418b107ce64f315ea") // InfusionSelection
+                );
+
+            var reference = scion.ToReference<BlueprintArchetypeReference>();
+            Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, reference); // add to character class selection
+            Tree.ExpandedElement.Get().AddComponents(Helper.CreatePrerequisiteNoArchetype(reference, Tree.Class)); // disallow expanded element for this archetype TODO: move this to expanded element
         }
 
         #region Helper

@@ -1,0 +1,17 @@
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Diagnostics;
+global using System.Linq;
+global using System.Reflection;
+global using Kingmaker;
+global using Kingmaker.Blueprints;
+global using Kingmaker.Blueprints.Facts;
+global using Kingmaker.Enums;
+global using Kingmaker.Utility;
+global using Kingmaker.PubSubSystem;
+global using Kingmaker.UnitLogic;
+global using Kingmaker.UnitLogic.Mechanics;
+global using Kingmaker.RuleSystem.Rules;
+global using UnityEngine;
+global using JetBrains.Annotations;
+global using HarmonyLib;

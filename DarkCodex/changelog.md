@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.17]
+- fixed Arcanist not able to memorize the same spell with different metamagics
+- fixed Arcanist Magical Supremacy not working with spontaneous spells
+
 ## [1.3.16]
 - added icon to Venom Infusion Poison
 - added Opportune Parry, combat feat: duelist parry by expending Attack of Opportunities

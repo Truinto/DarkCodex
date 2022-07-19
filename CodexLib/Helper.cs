@@ -281,11 +281,22 @@ namespace CodexLib
             return null;
         }
 
+        public static bool Calls(this CodeInstruction code, FieldInfo fieldInfo)
+        {
+            return code.opcode == OpCodes.Ldfld && object.Equals(code.operand, fieldInfo);
+        }
+
         public static void ReplaceCall(this CodeInstruction code, Type type, string name, Type[] parameters = null, Type[] generics = null)
         {
             var repl = CodeInstruction.Call(type, name, parameters, generics);
             code.opcode = repl.opcode;
             code.operand = repl.operand;
+        }
+
+        public static void ReplaceCall(this CodeInstruction code, Delegate @delegate)
+        {
+            code.opcode = OpCodes.Call;
+            code.operand = @delegate.Method;
         }
 
         /// <summary>
@@ -385,6 +396,9 @@ namespace CodexLib
              * - 'box.any : Type' unboxes the valuetype and puts in on the stack
              */
         }
+
+        public static bool FakeAlwaysFalse(object obj) => false;
+        public static bool FakeAlwaysTrue(object obj) => true;
 
         #endregion
 
@@ -2157,14 +2171,18 @@ namespace CodexLib
         public static BlueprintFeatureSelection Add(this BlueprintFeatureSelection selection, params BlueprintFeatureReference[] features)
         {
             AppendAndReplace(ref selection.m_AllFeatures, features);
-
             return selection;
         }
 
         public static BlueprintFeatureSelection Add(this BlueprintFeatureSelection selection, params AnyRef[] features)
         {
             AppendAndReplace(ref selection.m_AllFeatures, features.To<BlueprintFeatureReference>());
+            return selection;
+        }
 
+        public static BlueprintFeatureSelection SetSelection(this BlueprintFeatureSelection selection, params AnyRef[] features)
+        {
+            selection.m_AllFeatures = features.To<BlueprintFeatureReference>();
             return selection;
         }
 
@@ -2172,9 +2190,16 @@ namespace CodexLib
 
         #region Blueprint Archetype
 
-        public static BlueprintArchetype SetAddFeatures()
+        public static BlueprintArchetype SetAddFeatures(this BlueprintArchetype archetype, params LevelEntry[] entries)
         {
-            throw new NotImplementedException();
+            archetype.AddFeatures = entries;
+            return archetype;
+        }
+
+        public static BlueprintArchetype SetRemoveFeatures(this BlueprintArchetype archetype, params LevelEntry[] entries)
+        {
+            archetype.RemoveFeatures = entries;
+            return archetype;
         }
 
         public static void AddFeature(this BlueprintArchetype obj, int level, BlueprintFeatureBase feature)
@@ -2540,11 +2565,11 @@ namespace CodexLib
             return result;
         }
 
-        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(BlueprintUnitFactReference checkedFact, BlueprintUnitFactReference feature, bool not = false)
+        public static AddFeatureIfHasFact CreateAddFeatureIfHasFact(AnyRef check_BlueprintUnitFact, AnyRef blueprintUnitFact, bool not = false)
         {
             var result = new AddFeatureIfHasFact();
-            result.m_CheckedFact = checkedFact;
-            result.m_Feature = feature;
+            result.m_CheckedFact = check_BlueprintUnitFact;
+            result.m_Feature = blueprintUnitFact;
             result.Not = not;
             return result;
         }
@@ -2991,6 +3016,14 @@ namespace CodexLib
             var result = new LevelEntry();
             result.Level = level;
             result.m_Features = features.ToRef().ToList();
+            return result;
+        }
+
+        public static LevelEntry CreateLevelEntry(int level, params AnyRef[] blueprintFeatureBase)
+        {
+            var result = new LevelEntry();
+            result.Level = level;
+            result.m_Features = blueprintFeatureBase.To<BlueprintFeatureBaseReference>().ToList();
             return result;
         }
 
@@ -3677,8 +3710,11 @@ namespace CodexLib
 
         public static void SetReference(this BlueprintReferenceBase reference, SimpleBlueprint bp)
         {
-            reference.Cached = bp;
+            if (reference.deserializedGuid != null && reference.deserializedGuid != bp.AssetGuid)
+                throw new Exception("tried to set blueprint reference to a new guid");
+
             reference.deserializedGuid = bp.AssetGuid;
+            reference.Cached = bp;
         }
 
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()

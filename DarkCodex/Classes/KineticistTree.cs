@@ -29,7 +29,8 @@ namespace DarkCodex
             FocusSecond = Helper.ToRef<BlueprintFeatureSelectionReference>("4204bc10b3d5db440b1f52f0c375848b");
             FocusThird = Helper.ToRef<BlueprintFeatureSelectionReference>("e2c1718828fc843479f18ab4d75ded86");
             FocusKnight = Helper.ToRef<BlueprintFeatureSelectionReference>("b1f296f0bd16bc242ae35d0638df82eb");
-            ExpandedElement = new();
+            ExpandedElement = Helper.ToRef<BlueprintFeatureSelectionReference>("acdb730a59e64153964505587b809f93");
+            ExtraWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("bd287f6d1c5247da9b81761cab64021c");
             CompositeBuff = Helper.ToRef<BlueprintBuffReference>("cb30a291c75def84090430fbf2b5c05e");
 
             #region Elements
@@ -335,6 +336,7 @@ namespace DarkCodex
         public BlueprintFeatureSelectionReference FocusThird;
         public BlueprintFeatureSelectionReference FocusKnight;
         public BlueprintFeatureSelectionReference ExpandedElement;
+        public BlueprintFeatureSelectionReference ExtraWildTalent;
         public BlueprintBuffReference CompositeBuff;
 
         public BlueprintAbilityReference[] BaseBasic;

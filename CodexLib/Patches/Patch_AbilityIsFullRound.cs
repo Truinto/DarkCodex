@@ -44,7 +44,7 @@ namespace CodexLib.Patches
         }
 
         [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.GetDefaultActionType))]
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         public static void Postfix2(AbilityData __instance, ref CommandType __result)
         {
             if (__result != CommandType.Standard)

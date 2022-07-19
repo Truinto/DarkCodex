@@ -51,7 +51,7 @@ namespace CodexLib
             {
                 return null;
             }
-            return list.GetRandomElements(1, new Random())[0];
+            return list.GetRandomElements(1, new System.Random())[0];
         }
     }
 }

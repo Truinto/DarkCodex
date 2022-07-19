@@ -1,31 +1,28 @@
-﻿using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.JsonSystem;
-using Kingmaker.UnitLogic.ActivatableAbilities;
-using Kingmaker.Utility;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using UnityEngine;
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Diagnostics;
+global using System.Linq;
+global using System.Reflection;
+global using Kingmaker;
+global using Kingmaker.Blueprints;
+global using Kingmaker.Blueprints.Facts;
+global using Kingmaker.Enums;
+global using Kingmaker.Utility;
+global using Kingmaker.PubSubSystem;
+global using Kingmaker.UnitLogic;
+global using Kingmaker.UnitLogic.Mechanics;
+global using Kingmaker.RuleSystem.Rules;
+global using UnityEngine;
+global using JetBrains.Annotations;
+global using HarmonyLib;
+global using CodexLib;
 using UnityModManagerNet;
-using HarmonyLib;
-using Kingmaker.Modding;
-using Kingmaker.Achievements;
-using Kingmaker;
 using System.IO;
 using Newtonsoft.Json;
-using Kingmaker.PubSubSystem;
-using System.Reflection;
-using System.Linq.Expressions;
 using Kingmaker.UI.Common;
 using Kingmaker.UI;
-using Kingmaker.EntitySystem.Stats;
 using System.Runtime.CompilerServices;
-using Kingmaker.UnitLogic;
-using Kingmaker.EntitySystem;
-using Kingmaker.UI.MVVM;
 using DarkCodex;
-using CodexLib;
 
 namespace Shared
 {
@@ -393,6 +390,8 @@ namespace Shared
             //PatchSafe(typeof(Patch_SaveExtension));
             //PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
+
+            LoadSafe(Kineticist.CreateElementalScion);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
