@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
+    // TODO: add void
     public class KineticistTree
     {
         public KineticistTree()
@@ -22,6 +23,7 @@ namespace DarkCodex
             // Expanded Defense: d741f298dfae8fc40b4615aaf83b6548
 
             @Class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+            ElementalScion = Helper.ToRef<BlueprintArchetypeReference>("180c6e3574aa4c938e73952cb02d1535");
             KineticBlast = Helper.ToRef<BlueprintFeatureReference>("93efbde2764b5504e98e6824cab3d27c");
             KineticistMainStatProperty = Helper.ToRef<BlueprintUnitPropertyReference>("f897845bbbc008d4f9c1c4a03e22357a");
 
@@ -29,6 +31,8 @@ namespace DarkCodex
             FocusSecond = Helper.ToRef<BlueprintFeatureSelectionReference>("4204bc10b3d5db440b1f52f0c375848b");
             FocusThird = Helper.ToRef<BlueprintFeatureSelectionReference>("e2c1718828fc843479f18ab4d75ded86");
             FocusKnight = Helper.ToRef<BlueprintFeatureSelectionReference>("b1f296f0bd16bc242ae35d0638df82eb");
+            SelectionInfusion = Helper.ToRef<BlueprintFeatureSelectionReference>("58d6f8e9eea63f6418b107ce64f315ea");
+            SelectionWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("5c883ae0cd6d7d5448b7a420f51f8459");
             ExpandedElement = Helper.ToRef<BlueprintFeatureSelectionReference>("acdb730a59e64153964505587b809f93");
             ExtraWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("bd287f6d1c5247da9b81761cab64021c");
             CompositeBuff = Helper.ToRef<BlueprintBuffReference>("cb30a291c75def84090430fbf2b5c05e");
@@ -198,6 +202,8 @@ namespace DarkCodex
                 Progession = Helper.ToRef<BlueprintProgressionReference>("535a9c4dbe912924396ae50cc7fba8c4"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("79b5d7184efe7034a863ae612c429306"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ba2113cfed0c2c14b93c20e7625a4c74"),
+                Parent1 = null,
+                Parent2 = null,
                 Blade = new() // TODO: add other blades as well
                 {
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("98f0da4bf25a34a4caffa6b8a2d33ef6"),
@@ -213,7 +219,14 @@ namespace DarkCodex
                 Selection = null,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("6ce72cb2bf0244b0bd0e5e0a552a6a4a"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("e86649f76cba4483bed7f01859c6b425"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ac038f9898ef4ba7b46bfcafdbc77818")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ac038f9898ef4ba7b46bfcafdbc77818"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("d3251ffc4e054f3db2c2260fa9ae4fe2"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("45b1ace89f03422199a394089e3dfc8c"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("4623d7cc61c34d7190cc315695821e61"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("5d81270056d24a2e88df79dfb983cbcd")
+                }
             };
 
             Composite_Force = new()
@@ -223,7 +236,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("c6e4201d7b674cc78a2c95bae61b9d25"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("8dacff62b4a8413bbfb299458cf94839"),
                 Parent1 = Telekinetic,
-                Parent2 = null
+                Parent2 = null,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("2b345c3493964de4affa6cea8327e88a"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("110bb5800599469ebb5f50b400b860d6"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("4e2d7b4eebc348b2bdf4968053c76af9"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("0b8bc0ee998a41508052ca7ff31c14f8")
+                }
             };
 
             #endregion
@@ -264,6 +284,12 @@ namespace DarkCodex
                 Knight = Helper.ToRef<BlueprintProgressionReference>("5e839c743c6da6649a43cdeb70b6018f"),
                 Element1 = Water,
                 Element2 = Cold
+            };
+
+            // modded
+            FocusAether = new()
+            {
+                First = Helper.ToRef<BlueprintProgressionReference>("6AA8A023-FC1D-4DAD-B6C2-7CC01B7BF48D"), // TODO: finish https://github.com/SpencerMycek/KineticistExpandedElements/blob/cd1d1540275e952a2ea968ec1a0e87a12b37e483/ElementAether/Statics.cs#L11
             };
             #endregion
 
@@ -328,6 +354,7 @@ namespace DarkCodex
         }
 
         public BlueprintCharacterClassReference @Class;
+        public BlueprintArchetypeReference ElementalScion;
         public BlueprintFeatureReference KineticBlast;
         public BlueprintUnitPropertyReference KineticistMainStatProperty;
 
@@ -335,6 +362,8 @@ namespace DarkCodex
         public BlueprintFeatureSelectionReference FocusSecond;
         public BlueprintFeatureSelectionReference FocusThird;
         public BlueprintFeatureSelectionReference FocusKnight;
+        public BlueprintFeatureSelectionReference SelectionInfusion;
+        public BlueprintFeatureSelectionReference SelectionWildTalent;
         public BlueprintFeatureSelectionReference ExpandedElement;
         public BlueprintFeatureSelectionReference ExtraWildTalent;
         public BlueprintBuffReference CompositeBuff;
@@ -369,6 +398,7 @@ namespace DarkCodex
         public Element Composite_Blood;
 
         // modded
+        public Focus FocusAether;
         public Element Telekinetic;
         public Element Composite_Force;
 

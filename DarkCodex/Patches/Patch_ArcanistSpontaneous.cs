@@ -18,7 +18,7 @@ using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 namespace DarkCodex
 {
     /// <summary>
-    /// Patches AbilityData.GetConversions to return all metamagic spells of the original spell's level, if that metamagic spell isn't already prepared.
+    /// Patches Spellbook.GetMemorizedSpells to return all metamagic spells of the original spell's level, if that metamagic spell isn't already prepared.
     /// </summary>
     [PatchInfo(Severity.Harmony, "Patch: Fix Arcanist Spontaneous Metamagic", "allows arcanist to use non memorized metamagic, but increases casting time", false)]
     [HarmonyPatch]

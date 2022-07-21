@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.18]
+- added Kineticist archetype Elemental Scion
+
 ## [1.3.17]
 - fixed Arcanist not able to memorize the same spell with different metamagics
 - fixed Arcanist Magical Supremacy not working with spontaneous spells

@@ -1,56 +1,27 @@
-﻿using Kingmaker.Blueprints;
-using Kingmaker.Blueprints.Classes;
+﻿using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HarmonyLib;
-using Kingmaker.UnitLogic.Class.Kineticist;
-using Kingmaker.UnitLogic.Abilities.Blueprints;
-using Kingmaker.UnitLogic.Buffs.Blueprints;
-using Kingmaker.Utility;
-using Kingmaker.UnitLogic.Commands.Base;
-using Kingmaker.Visual.Animation.Kingmaker.Actions;
+using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.ElementsSystem;
-using Kingmaker.UnitLogic.Abilities.Components;
-using Kingmaker.Designers.EventConditionActionSystem.Actions;
-using Kingmaker.UnitLogic.Commands;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums.Damage;
-using Kingmaker.RuleSystem.Rules.Damage;
-using Kingmaker.UnitLogic.Mechanics.Actions;
-using Kingmaker.UnitLogic.Mechanics;
-using Kingmaker.RuleSystem;
-using Kingmaker.Enums;
-using Kingmaker.UnitLogic.Abilities;
-using Kingmaker.UnitLogic.Mechanics.Components;
-using Kingmaker.Blueprints.Classes.Spells;
-using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.ResourceLinks;
-using Kingmaker.Blueprints.Facts;
-using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
-using Newtonsoft.Json;
-using System.IO;
-using Kingmaker;
-using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.RuleSystem;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
-using System.Reflection;
 using Kingmaker.UnitLogic.ActivatableAbilities;
-using UnityEngine;
-using Kingmaker.UnitLogic.Mechanics.Conditions;
-using Kingmaker.Localization;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Class.Kineticist;
+using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
-using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
-using Kingmaker.Blueprints.Root;
-using Kingmaker.RuleSystem.Rules;
-using JetBrains.Annotations;
-using Kingmaker.Blueprints.Classes.Prerequisites;
-using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.UnitLogic.Mechanics.Actions;
+using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Mechanics.Conditions;
+using Kingmaker.UnitLogic.Mechanics.Properties;
 using Shared;
-using CodexLib;
-using Kingmaker.Designers.Mechanics.Buffs;
+using System.IO;
+using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 
 namespace DarkCodex
 {
@@ -73,16 +44,15 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Kineticist Background", "regional background: gain +1 Kineticist level for the purpose of feat prerequisites", true)]
         public static void CreateKineticistBackground()
         {
-            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
-            //var dragon_class = Helper.ToRef<BlueprintCharacterClassReference>("01a754e7c1b7c5946ba895a5ff0faffc");
-
             var feature = Helper.CreateBlueprintFeature(
                 "BackgroundElementalist",
                 "Elemental Plane Outsider",
                 "You were exposed to an elemental saturation as a young child. Attuning you to the elements.\nBenefit: Your Kineticist level count as 1 level higher for determining prerequisites for wild talents.",
                 icon: null,
                 group: FeatureGroup.BackgroundSelection
-                ).SetComponents(Helper.CreateClassLevelsForPrerequisites(kineticist_class, 1));
+                ).SetComponents(
+                Helper.CreateClassLevelsForPrerequisites(Tree.Class, 1)
+                );
 
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
@@ -90,9 +60,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent", false)]
         public static void CreateExtraWildTalentFeat()
         {
-            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
-            var wildtalent_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
-
             var extra_wild_talent_selection = Helper.CreateBlueprintFeatureSelection(
                 "ExtraWildTalentFeat",
                 "Extra Wild Talent",
@@ -103,9 +70,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteClassLevel(Tree.Class, 1, true)
                 );
             extra_wild_talent_selection.Ranks = 10;
-
-            extra_wild_talent_selection.m_AllFeatures = Helper.Append(infusion_selection.m_AllFeatures,     //InfusionSelection
-                                                                    wildtalent_selection.m_AllFeatures);  //+WildTalentSelection
+            extra_wild_talent_selection.m_AllFeatures = Helper.Append(Tree.SelectionInfusion.Get().m_AllFeatures,
+                                                                    Tree.SelectionWildTalent.Get().m_AllFeatures);
 
             Tree.ExtraWildTalent.SetReference(extra_wild_talent_selection);
             Helper.AddFeats(extra_wild_talent_selection);
@@ -361,6 +327,7 @@ namespace DarkCodex
                     list.Add(Helper.CreateConditional(
                         new Condition[]
                         {
+                            new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = 7 },
                             Helper.CreateContextConditionHasFact(element.BlastFeature, true),
                             Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature),
                             Helper.CreateContextConditionHasFact(element.Parent2.BlastFeature)
@@ -380,7 +347,10 @@ namespace DarkCodex
                 "",
                 "A kineticist learns to use another element or expands her understanding of her own element. She can choose any element, including her primary element. She gains one of that element's simple blast wild talents that she does not already possess, if any. She also gains all composite blast wild talents whose prerequisites she meets. She doesn't gain the defensive wild talent of the expanded element unless she later selects it with the expanded defense utility wild talent."
                 ).SetComponents(
-                Helper.CreatePrerequisiteClassLevel(t.Class, 7));
+                Helper.CreatePrerequisiteClassLevel(t.Class, 7)
+                );
+            if (t.ElementalScion.Cached != null)
+                expandedElement.AddComponents(Helper.CreatePrerequisiteNoArchetype(t.ElementalScion, t.Class)); // disallow expanded element for this archetype
             expandedElement.m_DisplayName = t.FocusSecond.Get().m_DisplayName;
             expandedElement.m_AllFeatures = new BlueprintFeatureReference[] {
                 t.Air.BlastFeature,
@@ -399,7 +369,7 @@ namespace DarkCodex
             t.Composite_BlueFlame.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession));
 
             // add to feats
-            Helper.AddFeats(t.ExpandedElement);
+            Helper.AddFeats(expandedElement);
 
             // change prerequisites of wild talents, check for blasts instead of elemental focus since Expanded Element doesn't grant focus
             foreach (var talent in WildTalents)
@@ -937,13 +907,12 @@ namespace DarkCodex
                 = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude, null, new ContextActionIncreaseBleed(false));
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "", false)]
+        [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "new Kineticist archetype", false)]
         public static void CreateElementalScion()
         {
             var comps = new List<BlueprintComponent>();
 
-            /*
-            https://libraryofmetzofitz.fandom.com/wiki/Elemental_Scion
+            /* https://libraryofmetzofitz.fandom.com/wiki/Elemental_Scion
             
             Elemental Heart (Su)
             The devotion of an elemental scion supersedes all others. When an elemental scion selects an element for their elemental focus class feature, they can choose to either gain both associated simple blasts for their element (if it has two different simple blasts) or permanently increase the damage die of their chosen simple blast by one step (1 > d2 > d3 > d4 > d6 > d8 > d10 > d12). They cannot increase the damage die beyond d12 in this way.
@@ -974,9 +943,7 @@ namespace DarkCodex
                 "Increase Kinetic Blast Dice",
                 "Permanently increase the damage die of the chosen simple blast by one step (1 > d2 > d3 > d4 > d6 > d8 > d10 > d12)."
                 ).SetComponents(
-                new KineticBlastDiceIncrease(true),
-                new AddFeatureSelection() { Feature = (AnyRef)Tree.ExtraWildTalent }, // TODO: remove debugging code
-                new AddFeatureSelection() { Feature = (AnyRef)Tree.ExtraWildTalent } // TODO: remove debugging code
+                new KineticBlastDiceIncrease(true)
                 );
 
             foreach (var focus in Tree.GetFocus().Where(w => w.Element2 != null && w.Element1 != null))
@@ -998,14 +965,22 @@ namespace DarkCodex
                 ).SetSelection(f1_increaseDamage, f1_getSecondBlast);
 
             // Focused Element
+            comps.Clear();
+            foreach (var element in Tree.GetAll(composites: true).Where(w => w.Parent2 == null && w.Parent1 != null))
+            {
+                comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent1.BlastFeature, element.BlastFeature));
+            }
+
             var f7_focusedElement = Helper.CreateBlueprintFeatureSelection(
                 "ElementalScionFocusedElement",
                 "Focused Element",
                 "At 7th level, an elemental scion gains a composite blast that requires the expanded element for their primary element (such as metal blast for earth). An elemental scion is treated as 2 levels higher for the purpose of which infusions and utility wild talents they can select, as well as increasing the DCs of their infusions and wild talents by +1. In addition, they also gain an additional utility wild talent or infusion. If an elemental scion did not increase the damage die of their simple blast at 1st level, they can choose to do so for one of their simple blasts in place of the infusion or utility wild talent gained with this ability.\nThis replaces the 7th-level expanded element."
                 ).SetComponents(
                 Helper.CreateClassLevelsForPrerequisites(Tree.Class, 2),
-                new KineticistIncreaseDC(1)
+                new KineticistIncreaseDC(1),
+                Helper.CreateAddFacts(Tree.CompositeBuff)
                 ).SetSelection(f1_increaseDamage, Tree.ExtraWildTalent);
+            f7_focusedElement.AddComponents(comps.ToArray());
 
             // Elemental Master
             var f15_elementalMaster = Helper.CreateBlueprintFeature(
@@ -1018,21 +993,47 @@ namespace DarkCodex
                 );
 
             // Elemental Embodiment
-            // ?
+            var f20_elementalEmbodiment = Helper.CreateBlueprintFeature(
+                "ElementalScionElementalEmbodiment",
+                "Elemental Embodiment",
+                "At 20th level, an elemental scion has reached their peak of power. An elemental scion treats all infusions and wild talents as though they had accepted 1 point of burn or increased the burn cost by 1 for the purpose of their effects. They also gain an additional infusion and an additional utility wild talent.\nThis replaces omnikinesis."
+                ).SetComponents(
+                Helper.CreateAddFacts("bbba1600582cf8446bb515a33bd89af8", "fc083e19a8c961c4890de1a36e2b5c20"), // EnvelopingWindsEffectFeature ShroudOfWaterUpgradeFeature
+                new AddKineticistBurnModifier
+                {
+                    BurnType = KineticistBurnType.WildTalent,
+                    BurnValue = 1,
+                    m_AppliableTo = new BlueprintAbilityReference[]
+                    {
+                        //Helper.ToRef<BlueprintAbilityReference>("3c030a62a0efa1c419ecf315a9d694ef"), //SlickAbility
+                        //Helper.ToRef<BlueprintAbilityReference>("80e7e30cdf96be0418a615ebb38ea4b9"), //Celerity
+                        //Helper.ToRef<BlueprintAbilityReference>("c3a13237b17de5742a2dbf2da46f23d5"), //FlameShieldAbility
+                    }
+                });
+            PropertyKineticistBurn.ElementalEmbodiment = f20_elementalEmbodiment; // this fakes 1 burn more than you actually have; for Adaptation talents
+            Helper.Get<BlueprintUnitProperty>("02c5943c77717974cb7fa1b7c0dc51f8").SetComponents(new PropertyKineticistBurn()); //BurnNumberProperty
 
+            Helper.Get<BlueprintFeature>("a942347023fedb2419f8bdbb4450e528").AddComponents(new ContextSharedBonus(1, AbilitySharedValue.Damage)); //FleshOfStoneEffectFeature
+            Helper.Get<BlueprintFeature>("642bb6097c37b3b4b8be1f46d2d9296e").AddComponents(new ContextSharedBonus(1, AbilitySharedValue.Damage)); //SearingFleshEffectFeature
+            Helper.Get<BlueprintAbility>("41281aa38b6b27f4fa3a05c97cc01783").ReplaceComponent(default(AbilityAcceptBurnOnCast), new AbilityAcceptBurnOnCast2()); //AerialEvasionAbility
 
             scion.SetAddFeatures(
                 Helper.CreateLevelEntry(1, f1_selection),
                 Helper.CreateLevelEntry(7, f7_focusedElement),
-                Helper.CreateLevelEntry(15, f15_elementalMaster)
+                Helper.CreateLevelEntry(15, f15_elementalMaster),
+                Helper.CreateLevelEntry(15, Tree.ExtraWildTalent),
+                Helper.CreateLevelEntry(20, f20_elementalEmbodiment),
+                Helper.CreateLevelEntry(20, Tree.SelectionInfusion),
+                Helper.CreateLevelEntry(20, Tree.SelectionWildTalent)
                 );
             scion.SetRemoveFeatures(
-                Helper.CreateLevelEntry(1, "58d6f8e9eea63f6418b107ce64f315ea") // InfusionSelection
+                Helper.CreateLevelEntry(1, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
+                Helper.CreateLevelEntry(7, "4204bc10b3d5db440b1f52f0c375848b"),  //SecondatyElementalFocusSelection
+                Helper.CreateLevelEntry(15, "e2c1718828fc843479f18ab4d75ded86")  //ThirdElementalFocusSelection
                 );
 
-            var reference = scion.ToReference<BlueprintArchetypeReference>();
-            Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, reference); // add to character class selection
-            Tree.ExpandedElement.Get().AddComponents(Helper.CreatePrerequisiteNoArchetype(reference, Tree.Class)); // disallow expanded element for this archetype TODO: move this to expanded element
+            Tree.ElementalScion.SetReference(scion);
+            Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, Tree.ElementalScion); // add to character class selection
         }
 
         #region Helper

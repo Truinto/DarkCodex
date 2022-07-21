@@ -32,6 +32,7 @@ namespace CodexLib
             typeof(Patch_AbilityIsFullRound),
             typeof(Patch_RuleSpendCharge),
             typeof(Patch_Prerequisite),
+            typeof(Patch_ContextRankBonus),
         };
 
         /// <summary>

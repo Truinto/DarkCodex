@@ -1,28 +1,39 @@
-﻿global using System;
+﻿global using CodexLib;
+global using HarmonyLib;
+global using JetBrains.Annotations;
+global using Kingmaker;
+global using Kingmaker.Blueprints;
+global using Kingmaker.Blueprints.Classes;
+global using Kingmaker.Blueprints.Facts;
+global using Kingmaker.Blueprints.Root;
+global using Kingmaker.EntitySystem;
+global using Kingmaker.EntitySystem.Entities;
+global using Kingmaker.Enums;
+global using Kingmaker.Localization;
+global using Kingmaker.PubSubSystem;
+global using Kingmaker.RuleSystem.Rules;
+global using Kingmaker.UnitLogic;
+global using Kingmaker.UnitLogic.Abilities;
+global using Kingmaker.UnitLogic.Abilities.Components.Base;
+global using Kingmaker.UnitLogic.Mechanics;
+global using Kingmaker.UnitLogic.Mechanics.Actions;
+global using Kingmaker.UnitLogic.Mechanics.Components;
+global using Kingmaker.UnitLogic.Mechanics.Conditions;
+global using Kingmaker.UnitLogic.Mechanics.Properties;
+global using Kingmaker.Utility;
+global using Newtonsoft.Json;
+global using System;
 global using System.Collections.Generic;
 global using System.Diagnostics;
 global using System.Linq;
 global using System.Reflection;
-global using Kingmaker;
-global using Kingmaker.Blueprints;
-global using Kingmaker.Blueprints.Facts;
-global using Kingmaker.Enums;
-global using Kingmaker.Utility;
-global using Kingmaker.PubSubSystem;
-global using Kingmaker.UnitLogic;
-global using Kingmaker.UnitLogic.Mechanics;
-global using Kingmaker.RuleSystem.Rules;
 global using UnityEngine;
-global using JetBrains.Annotations;
-global using HarmonyLib;
-global using CodexLib;
-using UnityModManagerNet;
-using System.IO;
-using Newtonsoft.Json;
-using Kingmaker.UI.Common;
-using Kingmaker.UI;
-using System.Runtime.CompilerServices;
 using DarkCodex;
+using Kingmaker.UI;
+using Kingmaker.UI.Common;
+using System.IO;
+using System.Runtime.CompilerServices;
+using UnityModManagerNet;
 
 namespace Shared
 {
@@ -390,8 +401,6 @@ namespace Shared
             //PatchSafe(typeof(Patch_SaveExtension));
             //PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
-
-            LoadSafe(Kineticist.CreateElementalScion);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -402,7 +411,7 @@ namespace Shared
             LoadSafe(General.CreatePropertyMaxMentalAttribute);
             LoadSafe(General.CreatePropertyGetterSneakAttack);
             LoadSafe(General.CreateMythicDispelProperty);
-            LoadSafe(General.CreateBleedBuff);
+            LoadSafe(BleedBuff.Create);
 
             // Harmony Patches
             PatchUnique(typeof(Patch_AllowAchievements));
@@ -486,6 +495,7 @@ namespace Shared
             LoadSafe(Mythic.PatchVarious);
 
             // Kineticist
+            LoadSafe(Kineticist.CreateElementalScion);
             LoadSafe(Kineticist.FixWallInfusion);
             LoadSafe(Kineticist.CreateKineticistBackground);
             LoadSafe(Kineticist.CreateMobileGatheringFeat);

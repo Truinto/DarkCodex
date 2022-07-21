@@ -24,7 +24,9 @@ namespace CodexLib
 
         public override string GetUITextInternal(UnitDescriptor unit)
         {
-            return "Spontaneous Caster"; // todo: make localized string
+            return TextSpontaneousCaster;
         }
+
+        public static LocalizedString TextSpontaneousCaster = "Spontaneous Caster".CreateString();
     }
 }

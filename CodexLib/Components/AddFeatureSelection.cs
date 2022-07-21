@@ -2,6 +2,7 @@
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Class.LevelUp.Actions;
@@ -16,17 +17,25 @@ namespace CodexLib
     /// <summary>
     /// Adds another feature when gaining a feature. Can be a BlueprintFeatureSelection, in which case a new tab is generated.
     /// </summary>
-    public class AddFeatureSelection : UnitFactComponentDelegate
+    public class AddFeatureSelection : UnitFactComponentDelegate<AddFeatureSelection.RuntimeData>
     {
         public BlueprintFeatureReference Feature;
 
+        public AddFeatureSelection(AnyRef blueprintFeature)
+        {
+            this.Feature = blueprintFeature;
+        }
+
         public override void OnActivate()
         {
+            if (this.Data.AppliedFact != null)
+                return;
+
             var feature = this.Feature.Get();
 
             if (feature is BlueprintProgression progression) // this code is from AddFeatureOnApply
             {
-                this.Owner.Progression.Features.AddFeature(feature, null);
+                this.Data.AppliedFact = this.Owner.Progression.Features.AddFeature(feature, null);
                 var state = (Game.Instance.LevelUpController?.State) ?? new LevelUpState(this.Owner, LevelUpState.CharBuildMode.LevelUp, false);
                 if (progression.ExclusiveProgression && this.Owner.Progression.GetClassData(progression.ExclusiveProgression) != null)
                     state.SelectedClass = progression.ExclusiveProgression;
@@ -46,8 +55,20 @@ namespace CodexLib
             }
             else if (feature is not null)
             {
-                this.Owner.Progression.Features.AddFeature(feature, null);
+                this.Data.AppliedFact = this.Owner.Progression.Features.AddFeature(feature, null);
             }
+        }
+
+        public override void OnDeactivate()
+        {
+            this.Owner.RemoveFact(this.Data.AppliedFact);
+            this.Data.AppliedFact = null;
+        }
+
+        public class RuntimeData
+        {
+            [JsonProperty]
+            public EntityFact AppliedFact;
         }
     }
 }

@@ -96,6 +96,7 @@
     <Compile Include="Classes\MetamagicExt.cs" />
     <Compile Include="Classes\PartCustomData.cs" />
     <Compile Include="Classes\SpellSlotLevel.cs" />
+    <Compile Include="Components\AbilityAcceptBurnOnCast2.cs" />
     <Compile Include="Components\AbilityAtWill.cs" />
     <Compile Include="Components\AbilityDeliverChainAttack.cs" />
     <Compile Include="Components\AbilityDeliverTeleportTrample.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Components\AddMechanicFeatureCustom.cs" />
     <Compile Include="Components\AddUndeadCompanion.cs" />
     <Compile Include="Components\BuffPoisonStatDamageFix.cs" />
+    <Compile Include="Components\ContextSharedBonus.cs" />
     <Compile Include="Components\DirtyFightingBonus.cs" />
     <Compile Include="Components\FeatureForPrerequisite.cs" />
     <Compile Include="Components\KineticBlastDiceIncrease.cs" />
@@ -146,6 +148,7 @@
     <Compile Include="Components\MetamagicReduceCostParametrized.cs" />
     <Compile Include="Components\ModifyWeaponSize.cs" />
     <Compile Include="Components\PrerequisiteSpontaneousCaster.cs" />
+    <Compile Include="Components\PropertyKineticistBurn.cs" />
     <Compile Include="Components\SacredSummons.cs" />
     <Compile Include="Components\SpellDescriptorExt.cs" />
     <Compile Include="Components\SpellPerfection.cs" />
@@ -154,10 +157,13 @@
     <Compile Include="Enums\MechanicFeature.cs" />
     <Compile Include="Interfaces\IAfterRule.cs" />
     <Compile Include="Interfaces\IUpdateCompanion.cs" />
+    <Compile Include="Components\ContextRankBonus.cs" />
+    <Compile Include="Interfaces\IContextBonus.cs" />
     <Compile Include="Patches\Patch_AbilityAtWill.cs" />
     <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
     <Compile Include="Patches\Patch_AOEAttackRolls.cs" />
     <Compile Include="Patches\Patch_ConditionExemption.cs" />
+    <Compile Include="Patches\Patch_ContextRankBonus.cs" />
     <Compile Include="Patches\Patch_DebugReport.cs" />
     <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
     <Compile Include="Patches\Patch_AbilityIsFullRound.cs" />

@@ -78,7 +78,6 @@ namespace DarkCodex
 
             // Mods
             public static readonly BlueprintBuffReference BuffKineticWhip = new();
-            public static readonly BlueprintBuffReference BuffBleed = new();
             public static readonly BlueprintUnitPropertyReference PropertySneakAttackDice = new();
             public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute = new();
             public static readonly BlueprintUnitPropertyReference PropertyMythicDispel = new();

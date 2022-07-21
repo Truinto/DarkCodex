@@ -6,6 +6,9 @@
 - added GetConflictPatches
 - changed Clone<T> will now clear BlueprintComponent.OwnerBlueprint
 - updates some helpers to AnyRef
+- added patch Patch_ContextRankBonus
+- fixed AnyRef naming convention is now consistent
+- AnyRef implicitly casts into blueprints
 
 ## [1.0.5]
 - added PrerequisiteSpontaneousCaster

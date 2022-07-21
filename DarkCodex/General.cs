@@ -693,22 +693,6 @@ namespace DarkCodex
             Resource.Cache.PropertyMythicDispel.SetReference(prop);
         }
 
-        public static void CreateBleedBuff()
-        {
-            var buff = Helper.CreateBlueprintBuff(
-                "BleedVariableBuff",
-                "Bleed",
-                "This creature takes hit point damage each turn. Bleeding can be stopped through the application of any spell that cures hit point damage.",
-                Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
-                ).SetComponents(
-                new BleedBuff(),
-                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed)
-                );
-
-            Resource.Cache.BuffBleed.SetReference(buff);
-            ContextActionIncreaseBleed.BuffBleed.SetReference(buff);
-        }
-
         #endregion
 
     }

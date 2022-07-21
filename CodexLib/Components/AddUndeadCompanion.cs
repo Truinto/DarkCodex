@@ -185,6 +185,7 @@ namespace CodexLib
             [JsonProperty]
             public bool Disabled;
 
+            [JsonProperty]
             public bool AutoLevelup;
         }
 

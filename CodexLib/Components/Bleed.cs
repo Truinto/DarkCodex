@@ -26,7 +26,7 @@ using UnityEngine.Serialization;
 
 namespace CodexLib
 {
-    [AllowedOn(typeof(BlueprintUnitFact), false)]
+    [AllowedOn(typeof(BlueprintUnitFact))]
     public class BleedBuff : UnitBuffComponentDelegate<BleedBuff.RuntimeData>, ITickEachRound, ITargetRulebookHandler<RuleHealDamage>
     {
         public override void OnActivate()
@@ -66,7 +66,31 @@ namespace CodexLib
 
         public class RuntimeData
         {
+            [JsonProperty]
             public DiceValue Value;
+        }
+
+        /// <summary>type: <b>BlueprintBuff</b></summary>
+        public static AnyRef BuffBleed = "e12fafba433448f8b71208b0162061fb";
+
+        public static void Create()
+        {
+            if (BuffBleed.Cached != null)
+                return;
+
+            Helper.ForceOverwriteGuid("e12fafba433448f8b71208b0162061fb");
+            var result = Helper.CreateBlueprintBuff(
+                "BleedVariableBuff",
+                "Bleed",
+                "This creature takes hit point damage each turn. Bleeding can be stopped through the application of any spell that cures hit point damage.",
+                Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
+                ).SetComponents(
+                new BleedBuff(),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed)
+                );
+
+            BuffBleed.Set(result);
+            Helper.AddAsset(result, BuffBleed.deserializedGuid);
         }
     }
 
@@ -85,9 +109,9 @@ namespace CodexLib
 
             //if (context.SourceAbility.IsSpell) return;
 
-            Buff buff = this.Target.Unit.Buffs.GetBuff(BuffBleed);
+            Buff buff = this.Target.Unit.Buffs.GetBuff(BleedBuff.BuffBleed);
             if (buff == null)
-                buff = this.Target.Unit.Descriptor.AddBuff(BuffBleed, context);
+                buff = this.Target.Unit.Descriptor.AddBuff(BleedBuff.BuffBleed, context);
             if (buff == null)
                 return;
 
@@ -169,7 +193,5 @@ namespace CodexLib
         public ContextDiceValue Value;
         public bool IsFlensing; // reduce natural armor by dice count
         public bool IsStacking; // false = apply higher value; true = add value
-        [Obsolete]
-        public static BlueprintBuffReference BuffBleed = Helper.ToRef<BlueprintBuffReference>("e12fafba433448f8b71208b0162061fb"); //TODO: move this to CodexLib
     }
 }

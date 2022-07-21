@@ -25,6 +25,70 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    [AllowedOn(typeof(BlueprintWeaponEnchantment))]
+    public class PoisonEnchantment : EntityFactComponentDelegate<ItemEntity, PoisonEnchantment.RuntimeData>, IInitiatorRulebookHandler<RuleDealDamage>
+    {
+        public void OnEventAboutToTrigger(RuleDealDamage evt)
+        {
+        }
+
+        public void OnEventDidTrigger(RuleDealDamage evt)
+        {
+            //var wielder = this.Owner.Wielder;
+            var target = evt.Target;
+            var data = this.Data;
+
+            var save = new RuleSavingThrow(target, SavingThrowType.Fortitude, data.DC);
+            this.Context.TriggerRule(save);
+            if (!save.IsPassed)
+                target.AddBuff(data.Poison, this.Context);
+
+            if (--this.Data.Sticky <= 0)
+                this.Owner.RemoveEnchantment(this.Fact as ItemEnchantment);
+        }
+
+        public void CoatWeapon(BlueprintBuff poison, int dc, int sticky = 0)
+        {
+            var data = this.Data;
+            data.Poison = poison;
+            data.DC = dc;
+            data.Sticky = sticky;
+        }
+
+        public class RuntimeData
+        {
+            [JsonProperty]
+            public BlueprintBuff Poison;
+
+            [JsonProperty]
+            public int DC;
+
+            [JsonProperty]
+            public int Sticky;
+        }
+
+        /// <summary>type: <b>BlueprintWeaponEnchantment</b></summary>
+        public static AnyRef Enchantment = "fff290919b9d4ec5b86be8c20126b46c";
+
+        public static void Create()
+        {
+            if (Enchantment.Cached != null)
+                return;
+
+            var result = new BlueprintWeaponEnchantment();
+            result.name = "PoisonEnchantmentVariable";
+            result.AssetGuid = Enchantment.deserializedGuid;
+            result.m_EnchantName = "Poisoned".CreateString();
+            result.m_Description = "This weapon has been coated with a poison.".CreateString();
+            result.m_Prefix = "".CreateString();
+            result.m_Suffix = "".CreateString();
+            result.m_EnchantmentCost = 0;
+
+            Enchantment.Set(result);
+            Helper.AddAsset(result, Enchantment.deserializedGuid);
+        }
+    }
+
     public class ContextActionCoatWeapon : ContextAction
     {
         public BlueprintBuff Poison;
@@ -73,64 +137,6 @@ namespace CodexLib
             {
                 pEnchant.CallComponents<PoisonEnchantment>(c => c.CoatWeapon(Poison, dc, sticky));
             }
-        }
-    }
-
-
-    [AllowedOn(typeof(BlueprintWeaponEnchantment), false)]
-    public class PoisonEnchantment : EntityFactComponentDelegate<ItemEntity, PoisonEnchantment.RuntimeData>, IInitiatorRulebookHandler<RuleDealDamage>
-    {
-        public void OnEventAboutToTrigger(RuleDealDamage evt)
-        {
-        }
-
-        public void OnEventDidTrigger(RuleDealDamage evt)
-        {
-            //var wielder = this.Owner.Wielder;
-            var target = evt.Target;
-            var data = this.Data;
-
-            var save = new RuleSavingThrow(target, SavingThrowType.Fortitude, data.DC);
-            this.Context.TriggerRule(save);
-            if (!save.IsPassed)
-                target.AddBuff(data.Poison, this.Context);
-
-            if (--this.Data.Sticky <= 0)
-                this.Owner.RemoveEnchantment(this.Fact as ItemEnchantment);
-        }
-
-        public void CoatWeapon(BlueprintBuff poison, int dc, int sticky = 0)
-        {
-            var data = this.Data;
-            data.Poison = poison;
-            data.DC = dc;
-            data.Sticky = sticky;
-        }
-
-        public class RuntimeData
-        {
-            public BlueprintBuff Poison;
-            public int DC;
-            public int Sticky;
-        }
-
-        public static BlueprintWeaponEnchantmentReference Enchantment = Helper.ToRef<BlueprintWeaponEnchantmentReference>("fff290919b9d4ec5b86be8c20126b46c");
-
-        public static void Create() // TODO: add this
-        {
-            if (Enchantment.Cached != null)
-                return;
-
-            var result = new BlueprintWeaponEnchantment();
-            result.name = "PoisonEnchantmentVariable";
-            result.m_EnchantName = "Poisoned".CreateString();
-            result.m_Description = "This weapon has been coated with a poison.".CreateString();
-            result.m_Prefix = "".CreateString();
-            result.m_Suffix = "".CreateString();
-            result.m_EnchantmentCost = 0;
-
-            Enchantment.Cached = result;
-            Helper.AddAsset(result, Enchantment.deserializedGuid);
         }
     }
 }

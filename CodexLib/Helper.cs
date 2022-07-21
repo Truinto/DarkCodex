@@ -821,6 +821,7 @@ namespace CodexLib
         #region GUID
 
         public static bool Allow_Guid_Generation = false;
+        private static string _overwriteGuid;
         //private static List<string> _guidloaded = new();
         //private static Dictionary<string, string> _guids = new();
 
@@ -851,8 +852,20 @@ namespace CodexLib
             }
         }
 
+        public static void ForceOverwriteGuid(string guid)
+        {
+            _overwriteGuid = guid;
+        }
+
         public static string GetGuid(string key)
         {
+            if (_overwriteGuid != null)
+            {
+                string overwrite = _overwriteGuid;
+                _overwriteGuid = null;
+                return overwrite;
+            }
+
             var map = GetGuidMap();
 
             map.TryGetValue(key, out string result);
@@ -1472,6 +1485,7 @@ namespace CodexLib
             return default;
         }
 
+        /// <param name="blueprintFeature">type: BlueprintFeature</param>
         public static IEnumerable<TData> GetComponentDataAll<TComp, TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
         {
             foreach (var feature in unit.Facts.GetAll<Feature>())
@@ -1794,6 +1808,7 @@ namespace CodexLib
         }
 
         private static BlueprintFeatureSelection _infusions;
+        /// <param name="blueprintFeature">type: BlueprintFeature</param>
         public static void AddInfusion(AnyRef blueprintFeature)
         {
             if (_infusions == null)
@@ -1802,6 +1817,7 @@ namespace CodexLib
         }
 
         private static BlueprintFeatureSelection _wildtalents;
+        /// <param name="blueprintFeature">type: BlueprintFeature</param>
         public static void AddWildTalent(AnyRef blueprintFeature)
         {
             if (_wildtalents == null)
@@ -2117,9 +2133,9 @@ namespace CodexLib
         {
             var levelentry = progression.LevelEntries.FirstOrDefault(f => f.Level == level);
             if (levelentry != null)
-                levelentry.m_Features.Add(blueprintFeature.To<BlueprintFeatureBaseReference>());
+                levelentry.m_Features.Add(blueprintFeature.ToRef<BlueprintFeatureBaseReference>());
             else
-                AppendAndReplace(ref progression.LevelEntries, CreateLevelEntry(level, (BlueprintFeatureBaseReference)blueprintFeature));
+                AppendAndReplace(ref progression.LevelEntries, CreateLevelEntry(level, blueprintFeature));
 
             if (pairWithGuid != null)
             {
@@ -2128,7 +2144,7 @@ namespace CodexLib
                 {
                     if (ui.m_Features.Any(a => a.deserializedGuid == pairGuid))
                     {
-                        ui.m_Features.Add(blueprintFeature.To<BlueprintFeatureBaseReference>());
+                        ui.m_Features.Add(blueprintFeature.ToRef<BlueprintFeatureBaseReference>());
                         break;
                     }
                 }
@@ -2176,13 +2192,13 @@ namespace CodexLib
 
         public static BlueprintFeatureSelection Add(this BlueprintFeatureSelection selection, params AnyRef[] features)
         {
-            AppendAndReplace(ref selection.m_AllFeatures, features.To<BlueprintFeatureReference>());
+            AppendAndReplace(ref selection.m_AllFeatures, features.ToRef<BlueprintFeatureReference>());
             return selection;
         }
 
         public static BlueprintFeatureSelection SetSelection(this BlueprintFeatureSelection selection, params AnyRef[] features)
         {
-            selection.m_AllFeatures = features.To<BlueprintFeatureReference>();
+            selection.m_AllFeatures = features.ToRef<BlueprintFeatureReference>();
             return selection;
         }
 
@@ -3011,19 +3027,11 @@ namespace CodexLib
             return result;
         }
 
-        public static LevelEntry CreateLevelEntry(int level, params BlueprintFeatureBase[] features)
-        {
-            var result = new LevelEntry();
-            result.Level = level;
-            result.m_Features = features.ToRef().ToList();
-            return result;
-        }
-
         public static LevelEntry CreateLevelEntry(int level, params AnyRef[] blueprintFeatureBase)
         {
             var result = new LevelEntry();
             result.Level = level;
-            result.m_Features = blueprintFeatureBase.To<BlueprintFeatureBaseReference>().ToList();
+            result.m_Features = blueprintFeatureBase.ToRef<BlueprintFeatureBaseReference>().ToList();
             return result;
         }
 
@@ -3056,7 +3064,7 @@ namespace CodexLib
         public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(IEnumerable<AnyRef> blueprintFeature, int amount, bool any = false)
         {
             var result = new PrerequisiteFeaturesFromList();
-            result.m_Features = blueprintFeature.To<BlueprintFeatureReference>();
+            result.m_Features = blueprintFeature.ToRef<BlueprintFeatureReference>();
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
             result.Amount = amount;
             return result;
@@ -3124,7 +3132,7 @@ namespace CodexLib
         public static AddFacts CreateAddFacts(params AnyRef[] facts)
         {
             var result = new AddFacts();
-            result.m_Facts = facts.To<BlueprintUnitFactReference>();
+            result.m_Facts = facts.ToRef<BlueprintUnitFactReference>();
             return result;
         }
 
@@ -3572,7 +3580,7 @@ namespace CodexLib
 
             result.ReplaceStartingEquipment = blueprintItem != null; //m_StartingItems //StartingGold
             result.StartingGold = 500;
-            if (blueprintItem != null) result.m_StartingItems = blueprintItem.To<BlueprintItemReference>();
+            if (blueprintItem != null) result.m_StartingItems = blueprintItem.ToRef<BlueprintItemReference>();
 
             result.OverrideAttributeRecommendations = recommendStat != null || notRecommendStat != null; //RecommendedAttributes //NotRecommendedAttributes
             if (recommendStat != null) result.RecommendedAttributes = recommendStat;
@@ -3707,11 +3715,17 @@ namespace CodexLib
             return reference != null && reference.deserializedGuid != BlueprintGuid.Empty;
         }
 
-
         public static void SetReference(this BlueprintReferenceBase reference, SimpleBlueprint bp)
         {
+            if (reference is null || bp is null)
+            {
+                var guid = bp?.AssetGuid ?? reference?.deserializedGuid;
+                PrintError($"SetReference argument is null for {guid}");
+                return;
+            }
+
             if (reference.deserializedGuid != null && reference.deserializedGuid != bp.AssetGuid)
-                throw new Exception("tried to set blueprint reference to a new guid");
+                throw new InvalidOperationException($"tried to set blueprint reference to a new guid old={reference.deserializedGuid} new={bp.AssetGuid}");
 
             reference.deserializedGuid = bp.AssetGuid;
             reference.Cached = bp;
@@ -3729,16 +3743,18 @@ namespace CodexLib
             return new T() { deserializedGuid = reference.deserializedGuid };
         }
 
-        public static T[] To<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
+        public static T[] ToRef<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
         {
             AnyRef[] source = bpRef as AnyRef[] ?? bpRef.ToArray();
             T[] array = new T[source.Length];
 
             for (int i = 0; i < source.Length; i++)
-                array[i] = source[i].To<T>();
+                array[i] = source[i].ToRef<T>();
 
             return array;
         }
+
+        public static AnyRef ToAny(this object obj) => AnyRef.ToAny(obj);
 
         public static AnyRef[] ToAny(this IEnumerable<object> bpRef)
         {
@@ -3746,7 +3762,7 @@ namespace CodexLib
             AnyRef[] array = new AnyRef[source.Length];
 
             for (int i = 0; i < source.Length; i++)
-                array[i] = AnyRef.Get(source[i]);
+                array[i] = AnyRef.ToAny(source[i]);
 
             return array;
         }
@@ -3757,6 +3773,7 @@ namespace CodexLib
                 yield return reference.Get<T>();
         }
 
+        // note: methods below should be phased out in favor of AnyRef
 
         public static BlueprintUnitFactReference ToRef2(this BlueprintAbility feature)
         {
