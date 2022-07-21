@@ -3138,6 +3138,14 @@ namespace CodexLib
 
         public static AddFacts CreateAddFacts(IEnumerable<BlueprintUnitFactReference> facts) => CreateAddFacts(facts.ToArray());
 
+        /// <param name="blueprintFeature">type: <b>BlueprintFeature</b></param>
+        public static AddFeatureOnApply CreateAddFeatureOnApply(AnyRef blueprintFeature)
+        {
+            var result = new AddFeatureOnApply();
+            result.m_Feature = blueprintFeature;
+            return result;
+        }
+
         public static DuplicateSpell CreateDuplicateSpell(Func<AbilityData, bool> abilityCheck, int radius = 30)
         {
             return new DuplicateSpell

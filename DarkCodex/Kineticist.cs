@@ -339,7 +339,7 @@ namespace DarkCodex
 
             // move CompositeBlastBuff to BlastFeature
             foreach (var element in t.GetAll(basic: true))
-                element.BlastFeature.Get()?.AddComponents(Helper.CreateAddFacts(t.CompositeBuff));
+                element.BlastFeature.Get()?.AddComponents(Helper.CreateAddFeatureOnApply(t.CompositeBuff));
 
             // create new simplified selection
             var expandedElement = Helper.CreateBlueprintFeatureSelection(
