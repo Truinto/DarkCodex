@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
-    // TODO: add void
     public class KineticistTree
     {
         public KineticistTree()
@@ -35,15 +34,24 @@ namespace DarkCodex
             SelectionWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("5c883ae0cd6d7d5448b7a420f51f8459");
             ExpandedElement = Helper.ToRef<BlueprintFeatureSelectionReference>("acdb730a59e64153964505587b809f93");
             ExtraWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("bd287f6d1c5247da9b81761cab64021c");
+            KineticBlade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787");
             CompositeBuff = Helper.ToRef<BlueprintBuffReference>("cb30a291c75def84090430fbf2b5c05e");
 
             #region Elements
+
             Air = new()
             {
                 Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("49e55e8f24e1ad24e910fefc0258adba"),
                 Progession = Helper.ToRef<BlueprintProgressionReference>("6f1d86ae43adf1049834457ce5264003"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("cb09e292ad9acc3428fa0dfdcbb83883"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0ab1552e2ebdacf44bb7b20f5393366d")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0ab1552e2ebdacf44bb7b20f5393366d"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("89acea313b9a9cb4d86bbbca01b90346"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("43ff67143efb86d4f894b10577329050"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("89cc522f2e1444b40ba1757320c58530"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("77cb8c607b263194894a929c8ac59708")
+                }
             };
 
             Electric = new()
@@ -51,7 +59,14 @@ namespace DarkCodex
                 Selection = Air.Selection,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("ba7767cb03f7f3949ad08bd3ff8a646f"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("c2c28b6f6f000314eb35fff49bb99920"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("45eb571be891c4c4581b6fcddda72bcd")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("45eb571be891c4c4581b6fcddda72bcd"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("b9e9011e24abcab4996e6bd3228bd60b"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("31862bcb47f539649ae59d7e18f8ed11"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("ca608f545b07ec045954aee5ff94640a"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("8d351d2c4af133a41b103aa25f0c38cc")
+                }
             };
 
             Earth = new()
@@ -59,7 +74,14 @@ namespace DarkCodex
                 Selection = null,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("d945ac76fc6a06e44b890252824db30a"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("7f5f82c1108b961459c9884a0fa0f5c4"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("e53f34fb268a7964caf1566afb82dadd")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("e53f34fb268a7964caf1566afb82dadd"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("77d9c04214a9bd84bbc1eefabcd98220"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a72c3375b022c124986365d23596bd21"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("4fc5cf33da20b5444ad3a96c77af8d20"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("d386e82ad6ef52a4ab5251bc2dc6d93f")
+                }
             };
 
             Fire = new()
@@ -67,7 +89,14 @@ namespace DarkCodex
                 Selection = null,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("fbed3ca8c0d89124ebb3299ccf68c439"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("cbc88c4c166a0ce4a95375a0a721bd01"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("83d5873f306ac954cad95b6aeeeb2d8c")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("83d5873f306ac954cad95b6aeeeb2d8c"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("41e9a0626aa54824db9293f5de71f23f"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("3ca6bbdb3c1dea541891f0568f52db05"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("6e24958866ac8a9498fa6a7396d87270"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("879b666ce3247ed4b8aa379d5946c38e")
+                }
             };
 
             Water = new()
@@ -75,7 +104,14 @@ namespace DarkCodex
                 Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("53a8c2f3543147b4d913c6de0c57c7e8"),
                 Progession = Helper.ToRef<BlueprintProgressionReference>("e4027e0fec48e8048a172c6627d4eba9"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("560887b5187098b428364de03e628b53"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("d663a8d40be1e57478f34d6477a67270")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("d663a8d40be1e57478f34d6477a67270"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("70524e9d61b22e948aee1dfe11dc67c8"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6a1bc011f6bbc7745876ce2692ecdfb5"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("92724a6d6a6225d4895b41e35e973599"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("cf09fb24e432a5c49a1bd9add89699ee")
+                }
             };
 
             Cold = new()
@@ -83,7 +119,14 @@ namespace DarkCodex
                 Selection = Water.Selection,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("dbb1159b0e8137c4ea20434a854ae6a8"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("ce625487d909b154c9305e60e4fc7d60"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("7980e876b0749fc47ac49b9552e259c1")
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("7980e876b0749fc47ac49b9552e259c1"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("37c87f140af6166419fe4c1f1305b2b8"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("df849df04cd828b4489f7827dbbf1dcd"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("cb20c297b1db1cd4ea9430578c90246d"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("2312fb9314d9a99489ec32f8be57a87c")
+                }
             };
 
             Composite_Metal = new()
@@ -93,7 +136,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("ad20bc4e586278c4996d4a81b2448998"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("6276881783962284ea93298c1fe54c48"),
                 Parent1 = Earth,
-                Parent2 = null
+                Parent2 = null,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("ea2b3e7e3b8726d4c94ba58118749742"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("e72caa96c32ca3f4d8b736b97b067f58"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("9cef404da5745314b88f49c1ee9fbab1"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("b66add7c13a8398488ed3e915ade09d3")
+                }
             };
 
             Composite_BlueFlame = new()
@@ -103,7 +153,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("89dfce413170db049b0386fff333e9e1"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("d29186edb20be6449b23660b39435398"),
                 Parent1 = Fire,
-                Parent2 = null
+                Parent2 = null,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("4005fc2cd91860142ba55a369fbbec23"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("5b0f10876af4fe54e989cc4d93bd0545"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("a975a40b710833a468476564fa673cee"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("1c35c032bb452014090d05130fa653df")
+                }
             };
 
             Composite_Plasma = new()
@@ -113,7 +170,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("93d8bc401accfe6489ea3797e316e5d9"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("9afdc3eeca49c594aa7bf00e8e9803ac"),
                 Parent1 = Air,
-                Parent2 = Fire
+                Parent2 = Fire,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("acc31b4666e923b49b3ab85b2304f26c"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("878f68ff160c8fa42b05ade8b2d12ea5"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("fc22c06d63a95154291272577daa0b4d"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("c9262ac06266bc64990ee98e528d8eed")
+                }
             };
 
             Composite_Sand = new()
@@ -123,7 +187,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("af70dce0745f91f4b8aa99a98620e45b"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("b93e1f0540a4fa3478a6b47ae3816f32"),
                 Parent1 = Air,
-                Parent2 = Earth
+                Parent2 = Earth,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("dc6f0b906566aca4d8b86729855959cb"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("4934f54691fa90941b04341d457f4f96"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("a41bfd708a7677f46aede02715f3100d"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("54c7ff613923d304bb39e163959435fb")
+                }
             };
 
             Composite_Thunder = new()
@@ -133,7 +204,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("295080cf4691df9438f58ff5ce79ee65"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("b813ceb82d97eed4486ddd86d3f7771b"),
                 Parent1 = Air,
-                Parent2 = Electric
+                Parent2 = Electric,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("287e0c88af08f3e4ba4aca52566f33a7"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a8cd6e691ad7ee44dbdd4a255bf304d8"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("833e3c01a1492d74588430249e6431af"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("4f6847c9d896da946b6d86bd513e76a9")
+                }
             };
 
             Composite_Blizzard = new()
@@ -143,7 +221,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("52292a32bb5d0ab45a86621bac2c4c9a"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("16617b8c20688e4438a803effeeee8a6"),
                 Parent1 = Air,
-                Parent2 = Cold
+                Parent2 = Cold,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("55790f1d270297f4a998292e1573a09e"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6f121ff0644a2804d8239d4dfe0ace11"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("027ce0b3842170748a63ea04cb02cab7"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("b066761047bbe0348a3a0b2f1debbd34")
+                }
             };
 
             Composite_Ice = new()
@@ -153,7 +238,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("a8cc34ca1a5e55a4e8aa5394efe2678e"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("403bcf42f08ca70498432cf62abee434"),
                 Parent1 = Cold,
-                Parent2 = Water
+                Parent2 = Water,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("3f68b8bdd90ccb0428acd38b84934d30"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a1eee0a2735401546ba2b442e1a9d25d"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("8c8dd4e7c07e468498a6f5ed2c01063f"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("9b8ea70f14970f946ad6c26694062a3f")
+                }
             };
 
             Composite_Magma = new()
@@ -163,7 +255,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("408b25c6d9f223b41b935e6ec550e88d"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("8c25f52fce5113a4491229fd1265fc3c"),
                 Parent1 = Earth,
-                Parent2 = Fire
+                Parent2 = Fire,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("cf1085900220be5459273282389aa9c2"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("f58bc29b252308242a81b3f84a1d176a"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("c49d2ddf72adf85478d6b3e09f52d32e"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("2f391179f4cdd574b9093e62497a6d7e")
+                }
             };
 
             Composite_Mud = new()
@@ -173,7 +272,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("6e33cde96209b5a4f9596a6e509de532"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("e2610c88664e07343b4f3fb6336f210c"),
                 Parent1 = Earth,
-                Parent2 = Water
+                Parent2 = Water,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("5639fadad8b45e2418b356327d072789"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("64885226d77f2bd408dde84fb8ccacc2"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("f82cfcf11b94bef49bf1a8f57aad5c13"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("c6334b1a104de294dba47ce56c74640f")
+                }
             };
 
             Composite_ChargedWater = new()
@@ -183,7 +289,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("9b7bf2754e2012e4dac135fd6c782fac"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("4e2e066dd4dc8de4d8281ed5b3f4acb6"),
                 Parent1 = Electric,
-                Parent2 = Water
+                Parent2 = Water,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("371b160cbb2ce9c4a8d6c28e61393f6d"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7b413fc4f99050349ab5488f83fe25df"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("ff24a4ac444afeb4bab5699828aa4e77"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("f2b96598bcfba72469852b6480bf1397")
+                }
             };
 
             Composite_Steam = new()
@@ -193,7 +306,14 @@ namespace DarkCodex
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("29e4076127a404e4ab1cde7e967e1047"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("3baf01649a92ae640927b0f633db7c11"),
                 Parent1 = Fire,
-                Parent2 = Water
+                Parent2 = Water,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("66028030b96875b4c97066525ff75a27"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("2e72609caf23e4843b246bec80550f06"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("77dc27ae2f48ffe4a8ab17154145f1d8"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("c74117665610ddb4cb8a525c2ec93039")
+                }
             };
 
             Composite_Blood = new()
@@ -204,7 +324,7 @@ namespace DarkCodex
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ba2113cfed0c2c14b93c20e7625a4c74"),
                 Parent1 = null,
                 Parent2 = null,
-                Blade = new() // TODO: add other blades as well
+                Blade = new()
                 {
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("98f0da4bf25a34a4caffa6b8a2d33ef6"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("92f9a719ffd652947ab37363266cc0a6"),
@@ -246,9 +366,57 @@ namespace DarkCodex
                 }
             };
 
+            Gravity = new()
+            {
+                Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("2b5ad478d5874bd48cdf7be60e4a92b6"),
+                Progession = Helper.ToRef<BlueprintProgressionReference>("da0d241e1c63441e8d9ee50f61de8c1f"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("969553ee365642bf9389604cf52b6035"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("d927b99fb8a946c0831edfb97eb749a4"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("6d4210715a824d34a283fc5a8ba1d1df"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("f1ae02e54af04cfd802b652816ce4996"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("c545106ff205431fa7936155728f7490"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("1ec348ed9dcb437eb601f20b98f25181")
+                }
+            };
+
+            Negative = new()
+            {
+                Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("2b5ad478d5874bd48cdf7be60e4a92b6"),
+                Progession = Helper.ToRef<BlueprintProgressionReference>("21b063289b4f4c7783a24b179a0ea3c0"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("b8d46890ceaa4b6c878d9cce68894ff4"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("036de5238a1447a293e4e4749b6724eb"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("dd2f227668514e41a283717bae4517f1"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7f45d4a741ee4ba685b91e4640191de8"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("96e914a61b6948a5baade3290c0260d3"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("4471efdc8c1440faba7110675ddb31af")
+                }
+            };
+
+            Composite_Void = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("69d4bdab76bd4288ba7d06c762403b02"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ec30ffe2d10543d9a2bb04b11e5b1e3d"),
+                Parent1 = Telekinetic,
+                Parent2 = null,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("8be4ef811d614cac8e9764108457cb68"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("e4fdafb5594e435db1aeb814964fe239"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("506c8ef74b6546c7a44b2547eacdd16d"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("6b2bed26fcd847c1a571b5f2ea6cea0a")
+                }
+            };
+
             #endregion
 
             #region Focus
+
             FocusAir = new()
             {
                 First = Helper.ToRef<BlueprintProgressionReference>("2bd0d44953a536f489082534c48f8e31"),
@@ -258,6 +426,7 @@ namespace DarkCodex
                 Element1 = Air,
                 Element2 = Electric
             };
+
             FocusEarth = new()
             {
                 First = Helper.ToRef<BlueprintProgressionReference>("c6816ad80a3df9c4ea7d3b012b06bacd"),
@@ -267,6 +436,7 @@ namespace DarkCodex
                 Element1 = Earth,
                 Element2 = null
             };
+
             FocusFire = new()
             {
                 First = Helper.ToRef<BlueprintProgressionReference>("3d8d3d6678b901444a07984294a1bc24"),
@@ -276,6 +446,7 @@ namespace DarkCodex
                 Element1 = Fire,
                 Element2 = null
             };
+
             FocusWater = new()
             {
                 First = Helper.ToRef<BlueprintProgressionReference>("7ab8947ce2e19c44a9edcf5fd1466686"),
@@ -289,8 +460,24 @@ namespace DarkCodex
             // modded
             FocusAether = new()
             {
-                First = Helper.ToRef<BlueprintProgressionReference>("6AA8A023-FC1D-4DAD-B6C2-7CC01B7BF48D"), // TODO: finish https://github.com/SpencerMycek/KineticistExpandedElements/blob/cd1d1540275e952a2ea968ec1a0e87a12b37e483/ElementAether/Statics.cs#L11
+                First = Helper.ToRef<BlueprintProgressionReference>("6AA8A023-FC1D-4DAD-B6C2-7CC01B7BF48D"),
+                Second = Helper.ToRef<BlueprintProgressionReference>("ff967af2a4634048be9d4beab75d86be"),
+                Third = Helper.ToRef<BlueprintProgressionReference>("ff2e26f01237404f8a820f61212b3917"),
+                Knight = Helper.ToRef<BlueprintProgressionReference>("0af9c49df79a469cbfc29fa469d97a64"),
+                Element1 = Telekinetic,
+                Element2 = null
             };
+
+            FocusVoid = new()
+            {
+                First = Helper.ToRef<BlueprintProgressionReference>("8993ff38adce4d758e9f48cc010b930f"),
+                Second = Helper.ToRef<BlueprintProgressionReference>("ace3846cf5324cd080f0e4cfd68b26e7"),
+                Third = Helper.ToRef<BlueprintProgressionReference>("9f02317d4e5e476ba1678d0ccad13ef9"),
+                Knight = Helper.ToRef<BlueprintProgressionReference>("65e6ed019bc742b78e7a203f8ab45aac"),
+                Element1 = Gravity,
+                Element2 = Negative
+            };
+
             #endregion
 
             BaseBasic = GetAll(true, false).Select(s => s.BaseAbility).ToArray();
@@ -298,44 +485,75 @@ namespace DarkCodex
             BaseAll = GetAll(true, true).Select(s => s.BaseAbility).ToArray();
         }
 
-        public IEnumerable<Element> GetAll(bool basic = false, bool composites = false, bool modded = true)
+        public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool onlyPhysical = false, bool onlyEnergy = false, bool modded = true)
         {
             bool mod1 = modded && UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
 
             if (basic)
             {
-                yield return Air;
-                yield return Electric;
-                yield return Earth;
-                yield return Fire;
-                yield return Water;
-                yield return Cold;
-                if (mod1) yield return Telekinetic;
+                if (!onlyEnergy)
+                {
+                    yield return Air;
+                    yield return Earth;
+                    yield return Water;
+                    if (mod1)
+                    {
+                        yield return Telekinetic;
+                        yield return Gravity;
+                    }
+                }
+                if (!onlyPhysical)
+                {
+                    yield return Electric;
+                    yield return Fire;
+                    yield return Cold;
+                    if (mod1)
+                    {
+                        yield return Negative;
+                    }
+                }
             }
-            if (composites)
+            if (composite)
             {
-                yield return Composite_Metal;
-                yield return Composite_BlueFlame;
-                yield return Composite_Plasma;
-                yield return Composite_Sand;
-                yield return Composite_Thunder;
-                yield return Composite_Blizzard;
-                yield return Composite_Ice;
-                yield return Composite_Magma;
-                yield return Composite_Mud;
-                yield return Composite_ChargedWater;
-                yield return Composite_Steam;
-                yield return Composite_Blood;
-                if (mod1) yield return Composite_Force;
+                if (!onlyEnergy)
+                {
+                    yield return Composite_Metal;
+                    yield return Composite_Plasma;
+                    yield return Composite_Sand;
+                    yield return Composite_Thunder;
+                    yield return Composite_Blizzard;
+                    yield return Composite_Ice;
+                    yield return Composite_Magma;
+                    yield return Composite_Mud;
+                    yield return Composite_ChargedWater;
+                    yield return Composite_Steam;
+                    yield return Composite_Blood;
+                    if (mod1)
+                    {
+                        yield return Composite_Force;
+                        yield return Composite_Void;
+                    }
+                }
+                if (!onlyPhysical)
+                {
+                    yield return Composite_BlueFlame;
+                }
             }
         }
 
-        public IEnumerable<Focus> GetFocus()
+        public IEnumerable<Focus> GetFocus(bool modded = true)
         {
+            bool mod1 = modded && UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
+
             yield return FocusAir;
             yield return FocusEarth;
             yield return FocusFire;
             yield return FocusWater;
+            if (mod1)
+            {
+                yield return FocusAether;
+                yield return FocusVoid;
+            }
         }
 
         public Focus GetFocus(Func<Focus, bool> predicate)
@@ -353,6 +571,16 @@ namespace DarkCodex
             return null;
         }
 
+        public IEnumerable<BlueprintFeature> GetWildTalents()
+        {
+            foreach (var talent in SelectionWildTalent.Get().m_AllFeatures)
+            {
+                var a = talent.Get();
+                if (a != null)
+                    yield return a;
+            }
+        }
+
         public BlueprintCharacterClassReference @Class;
         public BlueprintArchetypeReference ElementalScion;
         public BlueprintFeatureReference KineticBlast;
@@ -366,6 +594,7 @@ namespace DarkCodex
         public BlueprintFeatureSelectionReference SelectionWildTalent;
         public BlueprintFeatureSelectionReference ExpandedElement;
         public BlueprintFeatureSelectionReference ExtraWildTalent;
+        public BlueprintFeatureReference KineticBlade;
         public BlueprintBuffReference CompositeBuff;
 
         public BlueprintAbilityReference[] BaseBasic;
@@ -402,6 +631,15 @@ namespace DarkCodex
         public Element Telekinetic;
         public Element Composite_Force;
 
+        public Focus FocusVoid;
+        public Element Gravity;
+        public Element Negative;
+        public Element Composite_Void;
+
+        public Focus FocusWood; // not yet
+        public Element Wood;
+        public Element Positive;
+
         public class Element
         {
             [CanBeNull] public BlueprintFeatureSelectionReference Selection;
@@ -410,7 +648,7 @@ namespace DarkCodex
             public BlueprintAbilityReference BaseAbility;
             public Blade Blade;
 
-            [CanBeNull] public Element Parent1; // only on composites
+            [CanBeNull] public Element Parent1; // only on composites; not on archetype exclusive (Blood)
             [CanBeNull] public Element Parent2; // only on composites other than metal and blueFlame
         }
 

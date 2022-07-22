@@ -34,11 +34,11 @@ namespace CodexLib
         {
             if (this.Owner.Stats.GetStat(this.Stat) != null)
             {
-                var rule = new RuleDealStatDamage(this.Context.MaybeCaster, this.Owner, this.Stat, this.Value, this.Bonus)
+                var damage = new RuleDealStatDamage(this.Context.MaybeCaster, this.Owner, this.Stat, this.Value, this.Bonus)
                 {
                     Reason = this.Fact
                 };
-                this.Context.TriggerRule(rule);
+                this.Context.TriggerRule(damage);
             }
             this.Data.TicksPassed++;
         }
@@ -63,11 +63,11 @@ namespace CodexLib
             }
 
             var save = new RuleSavingThrow(this.Owner, this.SaveType, this.Context.Params.DC + data.BonusDC) { Reason = this.Fact };
-            Game.Instance.Rulebook.TriggerEvent(save);
+            this.Context.TriggerRule(save);
             if (!save.IsPassed)
             {
                 var damage = new RuleDealStatDamage(base.Owner, this.Owner, stat.Type, this.Value, this.Bonus) { Reason = this.Fact };
-                Game.Instance.Rulebook.TriggerEvent(damage);
+                this.Context.TriggerRule(damage);
                 if (this.ConsecutiveSaves)
                     data.SavesSucceeded = 0;
             }

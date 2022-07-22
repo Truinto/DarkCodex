@@ -38,9 +38,6 @@ namespace DarkCodex
             "f8d0f7099e73c95499830ec0a93e2eeb",  //MetakinesisEmpowerCheaperBuff
             "f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
 
-        public static List<BlueprintFeature> Infusions = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea").m_AllFeatures.Select(s => s.Get()).ToList(); // todo make dynamic
-        public static List<BlueprintFeature> WildTalents = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459").m_AllFeatures.Select(s => s.Get()).ToList();
-
         [PatchInfo(Severity.Create, "Kineticist Background", "regional background: gain +1 Kineticist level for the purpose of feat prerequisites", true)]
         public static void CreateKineticistBackground()
         {
@@ -320,7 +317,7 @@ namespace DarkCodex
 
             // add missing composite cases
             var list = new List<GameAction>();
-            foreach (var element in t.GetAll(composites: true))
+            foreach (var element in t.GetAll(composite: true))
             {
                 if (element.Parent2 != null)
                 {
@@ -345,34 +342,27 @@ namespace DarkCodex
             var expandedElement = Helper.CreateBlueprintFeatureSelection(
                 "ExpandedElementSelection",
                 "",
-                "A kineticist learns to use another element or expands her understanding of her own element. She can choose any element, including her primary element. She gains one of that element's simple blast wild talents that she does not already possess, if any. She also gains all composite blast wild talents whose prerequisites she meets. She doesn't gain the defensive wild talent of the expanded element unless she later selects it with the expanded defense utility wild talent."
+                "A kineticist learns to use another element or expands her understanding of her own element. She can choose any element, including her primary element. She gains one of that element's simple blast wild talents that she does not already possess, if any. She also gains all composite blast wild talents whose prerequisites she meets. She doesn't gain the defensive wild talent of the expanded element unless she later selects it with the expanded defense utility wild talent.",
+                mode: SelectionMode.OnlyNew
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(t.Class, 7)
                 );
             if (t.ElementalScion.Cached != null)
                 expandedElement.AddComponents(Helper.CreatePrerequisiteNoArchetype(t.ElementalScion, t.Class)); // disallow expanded element for this archetype
             expandedElement.m_DisplayName = t.FocusSecond.Get().m_DisplayName;
-            expandedElement.m_AllFeatures = new BlueprintFeatureReference[] {
-                t.Air.BlastFeature,
-                t.Electric.BlastFeature,
-                t.Earth.BlastFeature,
-                t.Composite_Metal.BlastFeature,
-                t.Fire.BlastFeature,
-                t.Composite_BlueFlame.BlastFeature,
-                t.Water.BlastFeature,
-                t.Cold.BlastFeature
-            };
+            expandedElement.m_AllFeatures = t.GetAll(basic: true).Concat(t.GetAll(composite: true).Where(w => w.Parent1 != null && w.Parent2 == null)).Select(s => s.BlastFeature).ToArray();
+
             t.ExpandedElement.SetReference(expandedElement);
 
             // make sure metal and blueflame cannot be taken early
-            t.Composite_Metal.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.Progession));
-            t.Composite_BlueFlame.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.Progession));
+            t.Composite_Metal.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.BlastFeature));
+            t.Composite_BlueFlame.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.BlastFeature));
 
             // add to feats
             Helper.AddFeats(expandedElement);
 
             // change prerequisites of wild talents, check for blasts instead of elemental focus since Expanded Element doesn't grant focus
-            foreach (var talent in WildTalents)
+            foreach (var talent in t.GetWildTalents())
             {
                 var fromlist = talent.GetComponent<PrerequisiteFeaturesFromList>()?.m_Features;
                 if (fromlist != null)
@@ -966,7 +956,7 @@ namespace DarkCodex
 
             // Focused Element
             comps.Clear();
-            foreach (var element in Tree.GetAll(composites: true).Where(w => w.Parent2 == null && w.Parent1 != null))
+            foreach (var element in Tree.GetAll(composite: true).Where(w => w.Parent2 == null && w.Parent1 != null))
             {
                 comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent1.BlastFeature, element.BlastFeature));
             }

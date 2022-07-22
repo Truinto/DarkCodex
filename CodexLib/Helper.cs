@@ -2599,6 +2599,15 @@ namespace CodexLib
             return result;
         }
 
+        public static AddContextStatBonus CreateAddContextStatBonus(ContextValue value, StatType stat, ModifierDescriptor descriptor = ModifierDescriptor.UntypedStackable)
+        {
+            var result = new AddContextStatBonus();
+            result.Value = value;
+            result.Stat = stat;
+            result.Descriptor = descriptor;
+            return result;
+        }
+
         public static AddInitiatorAttackRollTrigger CreateAddInitiatorAttackRollTrigger(ActionList Action, bool OnOwner = false, bool SneakAttack = false, bool OnlyHit = true, bool CriticalHit = false, bool CheckWeapon = false, WeaponCategory WeaponCategory = 0)
         {
             var result = new AddInitiatorAttackRollTrigger();

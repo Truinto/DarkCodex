@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+- fixed Expanded Element allow selection of already acquired elements
+- fixed Venom Infusion context data
+
 ## [1.3.18]
 - added Kineticist archetype Elemental Scion
 

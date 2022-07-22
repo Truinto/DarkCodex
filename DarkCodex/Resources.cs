@@ -53,6 +53,8 @@ namespace DarkCodex
                 200000,
             };
 
+        public static ContextValue ValueRank = Helper.CreateContextValue();
+
         public class Cache
         {
             public static bool IsLoaded;

@@ -117,6 +117,7 @@
     <Compile Include="Components\AddUndeadCompanion.cs" />
     <Compile Include="Components\BuffPoisonStatDamageFix.cs" />
     <Compile Include="Components\ContextSharedBonus.cs" />
+    <Compile Include="Components\CreateAddStatBonusInArmor.cs" />
     <Compile Include="Components\DirtyFightingBonus.cs" />
     <Compile Include="Components\FeatureForPrerequisite.cs" />
     <Compile Include="Components\KineticBlastDiceIncrease.cs" />
