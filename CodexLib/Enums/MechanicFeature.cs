@@ -12,5 +12,6 @@ namespace CodexLib
         SpontaneousMetamagicNoFullRound,
         SummoningNoFullRound,
         ParryUseAttackOfOpportunity,
+        NoMaterialComponent,
     }
 }

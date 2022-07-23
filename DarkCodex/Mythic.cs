@@ -702,6 +702,20 @@ namespace DarkCodex
             Helper.AddMythicFeat(feat);
         }
 
+        [PatchInfo(Severity.Create, "Mythic Eschew Materials", "mythic ability: you cast spells without expending material components", true)]
+        public static void CreateMythicEschewMaterials()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "MythicEschewMaterials",
+                "Mythic Eschew Materials",
+                "You can cast many spells without needing to utilize material components.\nBenefit: You can cast any spell without needing material components. The casting of the spell still provokes attacks of opportunity as normal."
+                ).SetComponents(
+                new AddMechanicFeatureCustom(MechanicFeature.NoMaterialComponent)
+                );
+
+            Helper.AddMythicTalent(feat);
+        }
+
         [PatchInfo(Severity.Extend | Severity.WIP, "Ranging Shots", "doesn't get weaker when hitting", true)]
         public static void PatchRangingShots()
         {

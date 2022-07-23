@@ -96,7 +96,6 @@
     <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
     <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
     <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
-    <Compile Include="Patches\Patch_DuelistParry.cs" />
     <Compile Include="Patches\Patch_FactSelectionParameterized.cs" />
     <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
     <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />

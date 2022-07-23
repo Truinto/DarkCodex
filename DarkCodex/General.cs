@@ -646,8 +646,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Opportune Parry", "combat feat: duelist parry by expending Attack of Opportunities", true)]
         public static void CreateOpportuneParry()
         {
-            Main.Patch(typeof(Patch_DuelistParry));
-
             var feat = Helper.CreateBlueprintFeature(
                 "OpportuneParry",
                 "Opportune Parry",

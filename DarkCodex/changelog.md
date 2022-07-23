@@ -1,8 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.19]
 - fixed Expanded Element allow selection of already acquired elements
 - fixed Venom Infusion context data
+- added Mythic Eschew Materials, mythic ability: you cast spells without expending material components
 
 ## [1.3.18]
 - added Kineticist archetype Elemental Scion

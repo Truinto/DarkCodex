@@ -33,6 +33,8 @@ namespace CodexLib
             typeof(Patch_RuleSpendCharge),
             typeof(Patch_Prerequisite),
             typeof(Patch_ContextRankBonus),
+            typeof(Patch_DuelistParry),
+            typeof(Patch_MaterialComponent),
         };
 
         /// <summary>

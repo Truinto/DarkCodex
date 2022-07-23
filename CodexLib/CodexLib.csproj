@@ -166,8 +166,10 @@
     <Compile Include="Patches\Patch_ConditionExemption.cs" />
     <Compile Include="Patches\Patch_ContextRankBonus.cs" />
     <Compile Include="Patches\Patch_DebugReport.cs" />
+    <Compile Include="Patches\Patch_DuelistParry.cs" />
     <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
     <Compile Include="Patches\Patch_AbilityIsFullRound.cs" />
+    <Compile Include="Patches\Patch_MaterialComponent.cs" />
     <Compile Include="Patches\Patch_Prerequisite.cs" />
     <Compile Include="Patches\Patch_RulebookEventBusPriority.cs" />
     <Compile Include="Components\PreferredSpell.cs" />

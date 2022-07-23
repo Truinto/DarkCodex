@@ -488,6 +488,7 @@ namespace Shared
             LoadSafe(Mythic.CreateDemonMastery);
             LoadSafe(Mythic.CreateDemonLord);
             LoadSafe(Mythic.CreateMetamagicAdept);
+            LoadSafe(Mythic.CreateMythicEschewMaterials);
             LoadSafe(Mythic.PatchKineticOvercharge);
             LoadSafe(Mythic.PatchLimitlessDemonRage);
             LoadSafe(Mythic.PatchUnstoppable);
