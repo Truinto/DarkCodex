@@ -86,6 +86,7 @@
     <Compile Include="Monk.cs" />
     <Compile Include="Mythic.cs" />
     <Compile Include="Patches\Event_RestoreEndOfCombat.cs" />
+    <Compile Include="Patches\Patch_AbilityRange.cs" />
     <Compile Include="Patches\Patch_ArcanistBrownFur.cs" />
     <Compile Include="Patches\Patch_ArcanistSpontaneous.cs" />
     <Compile Include="Patches\Patch_BackgroundChecks.cs" />

@@ -39,14 +39,14 @@ namespace CodexLib
 
         public void OnNewRound()
         {
-            var damage = this.Value?.GetDirect();
+            var damage = this.Data.Value?.GetDirect();
             if (damage == null)
                 return;
 
             var ruleDamage = new RuleDealDamage(this.Owner, this.Owner, damage);
             this.Context.TriggerRule(ruleDamage);
 
-            Helper.PrintDebug($"BleedBuff.OnNewRound {Value.Dice}d{(int)Value.DiceType}+{Value.Bonus} result={ruleDamage.Result}");
+            Helper.PrintDebug($"BleedBuff.OnNewRound result={ruleDamage.Result}");
 
             if (!this.Owner.IsInCombat)
                 this.Owner.Buffs.RemoveFact(this.Buff);
@@ -60,6 +60,63 @@ namespace CodexLib
         {
             if (evt.Value > 0 && evt.HealFormula != DiceFormula.Zero)
                 this.Owner.Buffs.RemoveFact(this.Buff);
+        }
+
+        public void Apply(ContextDiceValue newValue, bool isStacking, bool isFlensing)
+        {
+            var caster = this.Context.MaybeCaster;
+            var target = this.Owner;
+
+            if (caster == null || target == null)
+                return;
+
+            //this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue;
+            int rank = this.Context[AbilityRankType.Default];
+            int sneak = caster.Stats.SneakAttack.ModifiedValue;
+
+            var data = this.Data;
+            DiceValue bleedValue;
+            if (data.Value == null)
+                bleedValue = data.Value = DiceValue.Get(newValue, this.Context);
+            else if (isStacking)
+                bleedValue = data.Value.Increase(newValue, this.Context);
+            else
+                bleedValue = data.Value.Max(newValue, this.Context);
+
+            var damage = bleedValue.GetDirect(); // maybe use physical, if still conflicting with energy attacks
+            var ruleDamage = new RuleDealDamage(caster, target, damage);
+            this.Context.TriggerRule(ruleDamage);
+
+            Helper.PrintDebug($"BleedBuff.Apply {newValue.DiceCountValue}d{(int)newValue.DiceType}+{newValue.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result}");
+            
+            if (isFlensing)
+            {
+                var ac = target.Stats.GetStat(StatType.AC);
+                int natural = ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmor);
+                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorEnhancement);
+                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorForm);
+                natural = Math.Max(0, natural);
+                int value = newValue.Calculate(this.Context);
+                int malus = Math.Min(natural, value);
+
+                Helper.PrintDebug($" -flensing natural={natural} value={value} malus={malus}");
+
+                if (malus > 0)
+                {
+                    var modifier = this.Buff.m_StoredMods?.FirstOrDefault();
+                    if (modifier == null)
+                    {
+                        modifier = ac.AddModifier(-malus, ModifierDescriptor.NaturalArmor);
+                        modifier.StackMode = ModifiableValue.StackMode.ForceStack;
+                        this.Buff.StoreModifier(modifier);
+                    }
+                    else
+                    {
+                        modifier.ModValue -= malus;
+                        ac.UpdateValue();
+                    }
+                }
+            }
         }
 
         public DiceValue Value { get => this.Data.Value; set => this.Data.Value = value; }
@@ -96,18 +153,32 @@ namespace CodexLib
 
     public class ContextActionIncreaseBleed : ContextAction
     {
-        public override string GetCaption()
+        public ContextDiceValue Value;
+        public bool IsFlensing; // reduce natural armor by dice count
+        public bool IsStacking; // false = apply higher value; true = add value
+
+        public ContextActionIncreaseBleed()
         {
-            return "";
         }
+
+        public ContextActionIncreaseBleed(bool flensing)
+        {
+            this.IsFlensing = flensing;
+            this.Value = new ContextDiceValue()
+            {
+                DiceCountValue = 0,
+                DiceType = DiceType.Zero,
+                BonusValue = Helper.CreateContextValue(AbilityRankType.Default)
+            };
+        }
+
+        public override string GetCaption() => nameof(ContextActionIncreaseBleed);
 
         public override void RunAction()
         {
-            var context = ContextData<MechanicsContext.Data>.Current?.Context;
+            var context = this.Context;
             if (context == null)
                 return;
-
-            //if (context.SourceAbility.IsSpell) return;
 
             Buff buff = this.Target.Unit.Buffs.GetBuff(BleedBuff.BuffBleed);
             if (buff == null)
@@ -115,14 +186,12 @@ namespace CodexLib
             if (buff == null)
                 return;
 
-            var bleed = buff.GetComponent<BleedBuff>();
-            if (bleed == null)
-                return;
-
-            ApplyBleed(buff, bleed);
+            buff.CallComponents<BleedBuff>(c => c.Apply(this.Value, this.IsStacking, this.IsFlensing));
+            //ApplyBleed(buff, bleed);
             //buff.Owner.Buffs.UpdateNextEvent();
         }
 
+        [Obsolete]
         public void ApplyBleed(Buff buff, BleedBuff bleed)
         {
             var caster = this.Context.MaybeCaster;
@@ -175,23 +244,5 @@ namespace CodexLib
                 }
             }
         }
-
-        public ContextActionIncreaseBleed()
-        {
-        }
-
-        public ContextActionIncreaseBleed(bool flensing)
-        {
-            this.IsFlensing = flensing;
-            this.Value = new ContextDiceValue() { 
-                DiceCountValue = 0,
-                DiceType = DiceType.Zero,
-                BonusValue = Helper.CreateContextValue(AbilityRankType.Default)
-            };
-        }
-
-        public ContextDiceValue Value;
-        public bool IsFlensing; // reduce natural armor by dice count
-        public bool IsStacking; // false = apply higher value; true = add value
     }
 }

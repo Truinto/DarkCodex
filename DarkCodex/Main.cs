@@ -19,7 +19,12 @@ global using Kingmaker.PubSubSystem;
 global using Kingmaker.RuleSystem.Rules;
 global using Kingmaker.UnitLogic;
 global using Kingmaker.UnitLogic.Abilities;
+global using Kingmaker.UnitLogic.Abilities.Blueprints;
+global using Kingmaker.UnitLogic.Abilities.Components;
 global using Kingmaker.UnitLogic.Abilities.Components.Base;
+global using Kingmaker.UnitLogic.ActivatableAbilities;
+global using Kingmaker.UnitLogic.Commands.Base;
+global using Kingmaker.UnitLogic.FactLogic;
 global using Kingmaker.UnitLogic.Mechanics;
 global using Kingmaker.UnitLogic.Mechanics.Actions;
 global using Kingmaker.UnitLogic.Mechanics.Components;
@@ -444,6 +449,7 @@ namespace Shared
             PatchSafe(typeof(Patch_BackgroundChecks));
             PatchSafe(typeof(Patch_ArcanistSpontaneous));
             PatchSafe(typeof(Patch_ZippySpellLike));
+            PatchSafe(typeof(Patch_AbilityRange));
 
             // General
             LoadSafe(General.CreateHeritage);

@@ -59,6 +59,8 @@ using Kingmaker.Blueprints.Root;
 
 namespace DarkCodex
 {
+    // FogOfWarFeature.m_RevealerOutterRadius
+
     public class DEBUG
     {
         [HarmonyPatch]

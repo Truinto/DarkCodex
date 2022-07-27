@@ -111,6 +111,13 @@ namespace DarkCodex
         {
             //Helper.EnumCreateWeaponCategory(Const.ButcheringAxe, "Butchering Axe"); // TODO: fix new weapon category
 
+            //AccessTools.Field(typeof(WeaponCategoryExtension), nameof(WeaponCategoryExtension.Data)).SetValue(null,
+            //    Helper.Append(WeaponCategoryExtension.Data, new WeaponCategoryExtension.DataItem(
+            //        Const.ButcheringAxe,
+            //        WeaponSubCategory.Exotic,
+            //        WeaponSubCategory.Melee,
+            //        WeaponSubCategory.Metal)));
+
             var butchering = Helper.CreateBlueprintWeaponEnchantment(
                 "ButcheringAxeEnchantment",
                 "Butchering",
@@ -122,7 +129,7 @@ namespace DarkCodex
                 "ButcheringAxeType",
                 "Butchering Axe",
                 "e8059a8eac62cd74f9171d748a5ae428",
-                category: Const.ButcheringAxe,
+                category: WeaponCategory.Greataxe, //Const.ButcheringAxe,
                 damage: new DiceFormula(3, DiceType.D6),
                 form: PhysicalDamageForm.Slashing,
                 critMod: DamageCriticalModifierType.X3);

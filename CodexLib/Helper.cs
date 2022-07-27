@@ -90,7 +90,7 @@ namespace CodexLib
 
         public static int MinMax(this int number, int min, int max)
         {
-            return Math.Max(min, Math.Min(number, max));
+            return min > number ? min : max < number ? max : number;
         }
 
         public static void AttackRollPrint(this RuleAttackRoll attackRoll)
@@ -293,10 +293,23 @@ namespace CodexLib
             code.operand = repl.operand;
         }
 
-        public static void ReplaceCall(this CodeInstruction code, Delegate @delegate)
+        public static void ReplaceCall(this CodeInstruction code, Delegate newFunc)
         {
             code.opcode = OpCodes.Call;
-            code.operand = @delegate.Method;
+            code.operand = newFunc.Method;
+        }
+
+        public static IEnumerable<CodeInstruction> ReplaceCall(this IEnumerable<CodeInstruction> instr, Type type, string name, Delegate newFunc, Type[] parameters = null, Type[] generics = null)
+        {
+            var original = AccessTools.Method(type, name, parameters, generics);
+
+            foreach (var line in instr)
+            {
+                if (line.Calls(original))
+                    line.ReplaceCall(newFunc);
+
+                yield return line;
+            }
         }
 
         /// <summary>
@@ -1113,6 +1126,21 @@ namespace CodexLib
             }
 
             return obj;
+        }
+
+        public static T AddComponents<T>(this T obj, params object[] components) where T : BlueprintScriptableObject
+        {
+            var list = new List<BlueprintComponent>();
+
+            foreach (var comp in components)
+            {
+                if (comp is BlueprintComponent c1)
+                    list.Add(c1);
+                else if (comp is IEnumerable<BlueprintComponent> c2)
+                    list.AddRange(c2);
+            }
+
+            return obj.AddComponents(list.ToArray());
         }
 
         public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
@@ -2319,6 +2347,22 @@ namespace CodexLib
             ResourcesLibrary.BlueprintsCache.AddCachedBlueprint(guid, bp);
         }
 
+        public static T SetUIData<T>(this T dataprovider, IUIDataProvider other) where T : IUIDataProvider
+        {
+            return other switch
+            {
+                BlueprintUnitFact bp => SetUIData(dataprovider, bp.m_DisplayName, bp.m_Description, bp.m_Icon),
+                BlueprintAbilityResource bp => SetUIData(dataprovider, bp.LocalizedName, bp.LocalizedDescription, bp.m_Icon),
+                BlueprintCharacterClass bp => SetUIData(dataprovider, bp.LocalizedName, bp.LocalizedDescription, bp.m_Icon),
+                BlueprintItem bp => SetUIData(dataprovider, bp.m_DisplayNameText, bp.m_DescriptionText, bp.m_Icon),
+                BlueprintArchetype bp => SetUIData(dataprovider, bp.LocalizedName, bp.LocalizedDescription, bp.m_Icon),
+                BlueprintSpellbook bp => SetUIData(dataprovider, bp.Name, null, null),
+                BlueprintWeaponType bp => SetUIData(dataprovider, bp.m_DefaultNameText, bp.m_DescriptionText, bp.m_Icon),
+                BlueprintKingdomBuff bp => SetUIData(dataprovider, bp.DisplayName, bp.Description, bp.Icon),
+                _ => SetUIData(dataprovider, other.Name, other.Description, other.Icon),
+            };
+        }
+
         public static T SetUIData<T>(this T dataprovider, string displayname = null, string description = null, Sprite icon = null) where T : IUIDataProvider
         {
             return SetUIData(dataprovider, displayname?.CreateString(), description?.CreateString(), icon);
@@ -2621,12 +2665,38 @@ namespace CodexLib
             return result;
         }
 
-        public static AddInitiatorAttackWithWeaponTrigger CreateAddInitiatorAttackWithWeaponTrigger(ActionList Action, bool OnlyHit = true, bool OnlySneakAttack = false)
+        public static AddInitiatorAttackWithWeaponTrigger CreateAddInitiatorAttackWithWeaponTrigger(ActionList Action, bool OnlyHit = true, bool OnlySneakAttack = false, bool OnMiss = false, bool OnlyOnFullAttack = false, bool OnlyOnFirstAttack = false, bool OnlyOnFirstHit = false, bool CriticalHit = false, bool OnAttackOfOpportunity = false, bool NotCriticalHit = false, bool NotSneakAttack = false, bool ActionsOnInitiator = false, bool ReduceHPToZero = false, bool DamageMoreTargetMaxHP = false, bool AllNaturalAndUnarmed = false, bool DuelistWeapon = false, bool NotExtraAttack = false, bool OnCharge = false, bool IgnoreAutoHit = false, BlueprintWeaponTypeReference m_WeaponType = null, WeaponCategory? WeaponCategory = null, WeaponFighterGroup? WeaponFighterGroup = null, WeaponRangeType? WeaponRangeType = null, Feet? DistanceLessEqual = null)
         {
             var result = new AddInitiatorAttackWithWeaponTrigger();
             result.Action = Action;
             result.OnlyHit = OnlyHit;
             result.OnlySneakAttack = OnlySneakAttack;
+            result.OnMiss = OnMiss;
+            result.OnlyOnFullAttack = OnlyOnFullAttack;
+            result.OnlyOnFirstAttack = OnlyOnFirstAttack;
+            result.OnlyOnFirstHit = OnlyOnFirstHit;
+            result.CriticalHit = CriticalHit;
+            result.OnAttackOfOpportunity = OnAttackOfOpportunity;
+            result.NotCriticalHit = NotCriticalHit;
+            result.NotSneakAttack = NotSneakAttack;
+            result.ActionsOnInitiator = ActionsOnInitiator;
+            result.ReduceHPToZero = ReduceHPToZero;
+            result.DamageMoreTargetMaxHP = DamageMoreTargetMaxHP;
+            result.AllNaturalAndUnarmed = AllNaturalAndUnarmed;
+            result.DuelistWeapon = DuelistWeapon;
+            result.NotExtraAttack = NotExtraAttack;
+            result.OnCharge = OnCharge;
+            result.IgnoreAutoHit = IgnoreAutoHit;
+            result.m_WeaponType = m_WeaponType;
+            result.CheckWeaponCategory = WeaponCategory != null;
+            result.Category = WeaponCategory.GetValueOrDefault();
+            result.CheckWeaponGroup = WeaponFighterGroup != null;
+            result.Group = WeaponFighterGroup.GetValueOrDefault();
+            result.CheckWeaponRangeType = WeaponRangeType != null;
+            result.RangeType = WeaponRangeType.GetValueOrDefault();
+            result.CheckDistance = DistanceLessEqual != null;
+            result.DistanceLessEqual = DistanceLessEqual.GetValueOrDefault();
+
             return result;
         }
 
@@ -3762,26 +3832,14 @@ namespace CodexLib
 
         public static T[] ToRef<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
         {
-            AnyRef[] source = bpRef as AnyRef[] ?? bpRef.ToArray();
-            T[] array = new T[source.Length];
-
-            for (int i = 0; i < source.Length; i++)
-                array[i] = source[i].ToRef<T>();
-
-            return array;
+            return bpRef.Select(s => s.ToRef<T>()).ToArray();
         }
 
         public static AnyRef ToAny(this object obj) => AnyRef.ToAny(obj);
 
         public static AnyRef[] ToAny(this IEnumerable<object> bpRef)
         {
-            object[] source = bpRef as object[] ?? bpRef.ToArray();
-            AnyRef[] array = new AnyRef[source.Length];
-
-            for (int i = 0; i < source.Length; i++)
-                array[i] = AnyRef.ToAny(source[i]);
-
-            return array;
+            return bpRef.Select(s => AnyRef.ToAny(s)).ToArray();
         }
 
         public static IEnumerable<T> Get<T>(this IEnumerable<AnyRef> bpRef) where T : SimpleBlueprint

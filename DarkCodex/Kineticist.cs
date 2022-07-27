@@ -895,6 +895,15 @@ namespace DarkCodex
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.FeatureRank, feature: Tree.KineticBlast));
             bleed.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0]
                 = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude, null, new ContextActionIncreaseBleed(false));
+
+            var healer = Helper.Get<BlueprintAbility>("eff667a3a43a77d45a193bb7c94b3a6c"); //KineticHealerAbility
+            var vampiric = Helper.Get<BlueprintBuff>("e50e653cff511cd49a55b979346699f1"); //VampiricInfusionBuff
+            var onCaster = vampiric.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0] as ContextActionOnContextCaster;
+            onCaster.Actions.Actions = healer.GetComponent<AbilityEffectRunAction>().Actions.Actions;
+            vampiric.AddComponents(
+                healer.GetComponents<ContextRankConfig>(),
+                healer.GetComponents<ContextCalculateSharedValue>()
+                );
         }
 
         [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "new Kineticist archetype", false)]
@@ -956,20 +965,21 @@ namespace DarkCodex
 
             // Focused Element
             comps.Clear();
-            foreach (var element in Tree.GetAll(composite: true).Where(w => w.Parent2 == null && w.Parent1 != null))
+            foreach (var element in Tree.GetAll(composite: true))
             {
-                comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent1.BlastFeature, element.BlastFeature));
+                if (element.Parent1 != null)
+                    comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent1.BlastFeature, element.BlastFeature));
+                if (element.Parent2 != null)
+                    comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent2.BlastFeature, element.BlastFeature));
             }
-
             var f7_focusedElement = Helper.CreateBlueprintFeatureSelection(
                 "ElementalScionFocusedElement",
                 "Focused Element",
                 "At 7th level, an elemental scion gains a composite blast that requires the expanded element for their primary element (such as metal blast for earth). An elemental scion is treated as 2 levels higher for the purpose of which infusions and utility wild talents they can select, as well as increasing the DCs of their infusions and wild talents by +1. In addition, they also gain an additional utility wild talent or infusion. If an elemental scion did not increase the damage die of their simple blast at 1st level, they can choose to do so for one of their simple blasts in place of the infusion or utility wild talent gained with this ability.\nThis replaces the 7th-level expanded element."
                 ).SetComponents(
                 Helper.CreateClassLevelsForPrerequisites(Tree.Class, 2),
-                new KineticistIncreaseDC(1),
-                Helper.CreateAddFacts(Tree.CompositeBuff)
-                ).SetSelection(f1_increaseDamage, Tree.ExtraWildTalent);
+                new KineticistIncreaseDC(1)
+                ).SetSelection(f1_increaseDamage, f1_getSecondBlast, Tree.ExtraWildTalent);
             f7_focusedElement.AddComponents(comps.ToArray());
 
             // Elemental Master
@@ -1024,6 +1034,20 @@ namespace DarkCodex
 
             Tree.ElementalScion.SetReference(scion);
             Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, Tree.ElementalScion); // add to character class selection
+        }
+
+        public static void CreateKineticFist()
+        {
+            var act = Helper.CreateBlueprintActivatableAbility(
+                "KineticFistActivatable",
+                out var buff,
+                "Kinetic Fist",
+                "DESC"
+                );
+
+            var feat = Helper.CreateBlueprintFeature(
+                "KineticFistInfusion"
+                ).SetUIData(act);
         }
 
         #region Helper

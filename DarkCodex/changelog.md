@@ -1,6 +1,13 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.20]
+- hopefully fixed bleed
+- vampiric infusion will now just trigger kinetic healer, instead of reducing kinetic healer burn
+- fixed kinetic blade interactions with abilities (like charge, blade whirlwind, coup de grace) #97
+- fixed Elemental Scion not getting composites, if she didn't pick ElementalScionSecondBlast
+- added Patch: Ability Range; bonus spell range equal to 5 feet per 2 caster levels
+
 ## [1.3.19]
 - fixed Expanded Element allow selection of already acquired elements
 - fixed Venom Infusion context data

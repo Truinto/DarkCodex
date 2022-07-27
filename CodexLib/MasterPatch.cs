@@ -56,7 +56,7 @@ namespace CodexLib
         }
 
         /// <summary>
-        /// Use this if you only want to enable a specific patch. Ensures patch is only used once.
+        /// Use this if you want to enable only a specific patch. Ensures patch is only used once.
         /// </summary>
         public static bool Run(Type type)
         {

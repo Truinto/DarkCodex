@@ -12,6 +12,8 @@ using Shared;
 using CodexLib;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.Controllers.Combat;
+using Kingmaker.UnitLogic.Commands;
 
 namespace DarkCodex
 {
@@ -24,30 +26,15 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr) // TODO: upgrade to Helper.RemoveMethods()
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
         {
-            List<CodeInstruction> code = instr.ToList();
-            var original = AccessTools.Method(typeof(UnitState), nameof(UnitState.AddCondition));
-
+            var code = instr as List<CodeInstruction> ?? instr.ToList();
             code.RemoveMethods(typeof(UnitState), nameof(UnitState.AddCondition));
-
-            //for (int i = 0; i < code.Count; i++)
-            //{
-            //    if (code[i].Calls(original))
-            //    {
-            //        Main.PrintDebug("Patched at " + i);
-            //        code[i] = CodeInstruction.Call(typeof(Patch_KineticistAllowOpportunityAttack), nameof(NullReplacement));
-            //    }
-            //}
-
             return code;
         }
-        public static void NullReplacement(UnitState state, UnitCondition condition, Buff sourceBuff, UnitConditionExceptions exceptions)
-        {
-        }
 
-        [HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
-        [HarmonyPrefix]
+        //[HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
+        //[HarmonyPrefix]
         public static bool Prefix2(UnitEntityData unit, WeaponSlot hand, ref bool __result)
         {
             if (!hand.HasWeapon)
@@ -69,8 +56,8 @@ namespace DarkCodex
             return false;
         }
 
-        [HarmonyPatch(typeof(AbilityRequirementHasItemInHands), nameof(AbilityRequirementHasItemInHands.IsAbilityRestrictionPassed))]
-        [HarmonyPostfix]
+        //[HarmonyPatch(typeof(AbilityRequirementHasItemInHands), nameof(AbilityRequirementHasItemInHands.IsAbilityRestrictionPassed))]
+        //[HarmonyPostfix]
         public static void Postfix3(AbilityData ability, AbilityRequirementHasItemInHands __instance, ref bool __result)
         {
             if (__result)
@@ -84,6 +71,61 @@ namespace DarkCodex
                 {
                     __result = true;
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(UnitCombatState), nameof(UnitCombatState.CanAttackOfOpportunity), MethodType.Getter)]
+        [HarmonyPrefix]
+        public static bool Prefix4(UnitCombatState __instance, ref bool __result)
+        {
+            if (__instance.AttackOfOpportunityCount <= 0
+                || __instance.Unit.Descriptor.State.HasCondition(UnitCondition.DisableAttacksOfOpportunity)
+                || __instance.Unit.Descriptor.State.HasCondition(UnitCondition.Confusion)
+                || __instance.Unit.Passive)
+            {
+                __result = false;
+                return false;
+            }
+
+            __result = __instance.Unit.CanAttack(f => GetThreatHand_AttackOfOpportunity(f)?.Weapon);
+            return false;
+        }
+
+        [HarmonyPatch(typeof(UnitCombatState), nameof(UnitCombatState.AttackOfOpportunity))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instr)
+        {
+            return instr.ReplaceCall(typeof(UnitHelper), nameof(UnitHelper.GetThreatHand), newFunc: GetThreatHand_AttackOfOpportunity);
+        }
+
+        [HarmonyPatch(typeof(UnitAttackOfOpportunity), nameof(UnitAttackOfOpportunity.Init))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler6(IEnumerable<CodeInstruction> instr)
+        {
+            return instr.ReplaceCall(typeof(UnitHelper), nameof(UnitHelper.GetThreatHand), newFunc: GetThreatHand_AttackOfOpportunity);
+        }
+
+        public static WeaponSlot GetThreatHand_AttackOfOpportunity(UnitEntityData unit)
+        {
+            foreach (var slot in allSlots())
+            {
+                if (!slot.HasWeapon)
+                    continue;
+
+                var bp = slot.Weapon.Blueprint;
+                if ((bp.IsMelee || unit.State.Features.SnapShot)
+                    && (!bp.IsUnarmed || unit.Descriptor.State.Features.ImprovedUnarmedStrike)
+                    && (bp.Type.Category != WeaponCategory.KineticBlast || unit.Buffs.GetBuff(Resource.Cache.BuffKineticWhip) != null))
+                    return slot;
+            }
+            return null;
+
+            IEnumerable<WeaponSlot> allSlots()
+            {
+                yield return unit.Body.PrimaryHand;
+                yield return unit.Body.SecondaryHand;
+                foreach (var slot in unit.Body.AdditionalLimbs)
+                    yield return slot;
             }
         }
 

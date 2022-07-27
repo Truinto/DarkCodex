@@ -642,14 +642,18 @@ namespace DarkCodex
 
         public class Element
         {
+            /// <summary>can be null</summary>
             [CanBeNull] public BlueprintFeatureSelectionReference Selection;
-            [CanBeNull] public BlueprintProgressionReference Progession;     // only on basics
+            /// <summary>only on basics</summary>
+            [CanBeNull] public BlueprintProgressionReference Progession;
             public BlueprintFeatureReference BlastFeature;
             public BlueprintAbilityReference BaseAbility;
             public Blade Blade;
 
-            [CanBeNull] public Element Parent1; // only on composites; not on archetype exclusive (Blood)
-            [CanBeNull] public Element Parent2; // only on composites other than metal and blueFlame
+            /// <summary>only on composites; not on archetype exclusive (Blood)</summary>
+            [CanBeNull] public Element Parent1;
+            /// <summary>only on composites other than metal and blueFlame</summary>
+            [CanBeNull] public Element Parent2;
         }
 
         public class Focus
@@ -660,7 +664,8 @@ namespace DarkCodex
             public BlueprintProgressionReference Knight;
 
             public Element Element1;
-            [CanBeNull] public Element Element2; // other than earth and fire
+            /// <summary>can be null (earth, fire)</summary>
+            [CanBeNull] public Element Element2;
         }
 
         public class Blade

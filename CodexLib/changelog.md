@@ -1,7 +1,7 @@
 ﻿# Changelog
 
 ## [1.1.0]
-- !signature change: CreateAddFeatureIfHasFact, CreateContextConditionHasFact, CreatePrerequisiteFeature
+- !signature change: CreateAddFeatureIfHasFact, CreateContextConditionHasFact, CreatePrerequisiteFeature, CreateAddInitiatorAttackWithWeaponTrigger
 - added limit to exception count
 - added GetConflictPatches
 - changed Clone<T> will now clear BlueprintComponent.OwnerBlueprint
