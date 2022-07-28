@@ -413,6 +413,121 @@ namespace DarkCodex
                 }
             };
 
+            Wood = new()
+            {
+                Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("959431c21e414452ada0ce3c45ed49e6"),
+                Progession = Helper.ToRef<BlueprintProgressionReference>("736473267be3455bad091a5138423175"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("b8d12c67c67a44c383382b5e62b4460d"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("c7451e98f60f4f4fa46b0a5fedea29c1"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("1d89d4f9793e4dbea5ed7cce02757352"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("469e82d66a2e4ece94be280935da805a"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("9040572d07d1402abbcbe095f49b58cc"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("e7c2a4e7dcae40b09dda30a879123483")
+                }
+            };
+
+            Positive = new()
+            {
+                Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("959431c21e414452ada0ce3c45ed49e6"),
+                Progession = Helper.ToRef<BlueprintProgressionReference>("d0d8d2bb86d44473bd24ceb34f0ef6ea"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("e61724bb0727488f97b84164590846cd"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("64e7aabc2b55441d8a2513533fff7eb8"),
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("378d8d54b21743c3a32f26b95f768d44"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7777b5f1d5c24de4a7a42cb4f7752067"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("53ba7977e3ed44b193c31c7f510c52e2"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("22d5001563c74bdfa6e0c5602fd11eef")
+                }
+            };
+
+            Composite_Verdant = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("46703587324247a08bc45992f77c8b16"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("815b096429ca401faa7c5979833a37de"),
+                Parent1 = Wood,
+                Parent2 = Positive,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("b6732b8fcba545e58b5923710435ac42"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("226251dfa5d54a36a89b754cf9a4adde"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("c7c9e1c2d5b9436fa37111ecf4da3477"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("2846063b5b6e4fea9bee612c1e24dd60")
+                }
+            };
+
+            Composite_Spring = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("7b74373443c145a4b08e71c2bd8d5699"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("b0ea56ad77fa4742b0b226d92dbdfe9e"),
+                Parent1 = Wood,
+                Parent2 = Air,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("64f5bf967b5e440fa8cf648c532479ec"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("5bdbf44b60104461934da737825a09bf"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("a5c899151b4943a0a6d0aeb853e8fc88"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("9e26ea79e09b4e1b9ee09cbd25ae1405")
+                }
+            };
+
+            Composite_Summer = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("133df13895884033b4e77b595c48ce68"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("e7aea805765c428d89060b1ff749edc5"),
+                Parent1 = Wood,
+                Parent2 = Fire,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("6958f833102148fe97fc665c607d2372"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6558f16df5b44709b9dc130671c0bb96"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("2ca9d84f2ece4df3951fe0c84879b164"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("b5c7051ae9c8450da9769c955971f0c2")
+                }
+            };
+
+            Composite_Autumn = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("47d82c872f87444bbe7a109fa086ba87"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("08291e4931d14d08b3f7b1dc77e7ec44"),
+                Parent1 = Wood,
+                Parent2 = Earth,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("d37cf8e066b64e4d8437ab2b3805c521"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("2f8dac5035524c08b97d554c9ddee710"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("8186a1b2087b44519791bb059fe43ff8"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("beb6066e7de74ff0a7eb9d0eb0f6ff36")
+                }
+            };
+
+            Composite_Winter = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("b8cb2c99f1194de5af1109835ce7645b"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("555bb22937234202b2dbcd927a7a2676"),
+                Parent1 = Wood,
+                Parent2 = Cold,
+                Blade = new()
+                {
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("ece22aa5b84b4e60957fdabd494e074f"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("639d3c53dd1948ff9c503fda59b8ebab"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("e5945f8fdddc4e0585352a5f12bf1a99"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("380b9f337f2248dc82d4b1c7af8bd507")
+                }
+            };
+
             #endregion
 
             #region Focus
@@ -478,6 +593,16 @@ namespace DarkCodex
                 Element2 = Negative
             };
 
+            FocusWood = new()
+            {
+                First = Helper.ToRef<BlueprintProgressionReference>("738e456aa18543a88027e4e8459d3b87"),
+                Second = Helper.ToRef<BlueprintProgressionReference>("c8355b680ec040efb4e1e1741df662c3"),
+                Third = Helper.ToRef<BlueprintProgressionReference>("1a48f56f45584e619490210319330d4d"),
+                Knight = Helper.ToRef<BlueprintProgressionReference>("ade87cba8c0e4883be35d1b5563f28e1"),
+                Element1 = Wood,
+                Element2 = Positive
+            };
+
             #endregion
 
             BaseBasic = GetAll(true, false).Select(s => s.BaseAbility).ToArray();
@@ -500,6 +625,7 @@ namespace DarkCodex
                     {
                         yield return Telekinetic;
                         yield return Gravity;
+                        yield return Wood;
                     }
                 }
                 if (!onlyPhysical)
@@ -510,6 +636,7 @@ namespace DarkCodex
                     if (mod1)
                     {
                         yield return Negative;
+                        yield return Positive;
                     }
                 }
             }
@@ -532,6 +659,11 @@ namespace DarkCodex
                     {
                         yield return Composite_Force;
                         yield return Composite_Void;
+                        yield return Composite_Verdant;
+                        yield return Composite_Spring;
+                        yield return Composite_Summer;
+                        yield return Composite_Autumn;
+                        yield return Composite_Winter;
                     }
                 }
                 if (!onlyPhysical)
@@ -553,6 +685,7 @@ namespace DarkCodex
             {
                 yield return FocusAether;
                 yield return FocusVoid;
+                yield return FocusWood;
             }
         }
 
@@ -636,9 +769,14 @@ namespace DarkCodex
         public Element Negative;
         public Element Composite_Void;
 
-        public Focus FocusWood; // not yet
+        public Focus FocusWood;
         public Element Wood;
         public Element Positive;
+        public Element Composite_Verdant;
+        public Element Composite_Autumn;
+        public Element Composite_Spring;
+        public Element Composite_Summer;
+        public Element Composite_Winter;
 
         public class Element
         {
