@@ -1,8 +1,10 @@
 ﻿using Kingmaker.Blueprints;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UI.UnitSettings;
 using Newtonsoft.Json;
+using Owlcat.Runtime.UI.Tooltips;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,5 +46,6 @@ namespace CodexLib
         public override bool IsCasting() => false;
         public override bool IsDisabled(int resourceCount) => true;
         public override bool IsBad() => !DefGroup.Unlocked;
+        public override TooltipBaseTemplate GetTooltipTemplate() => new TooltipTemplateDataProvider(new UIData(GetTitle(), GetDescription(), GetIcon()));
     }
 }

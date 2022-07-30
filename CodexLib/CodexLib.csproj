@@ -122,8 +122,13 @@
     <Compile Include="Components\DirtyFightingBonus.cs" />
     <Compile Include="Components\FeatureForPrerequisite.cs" />
     <Compile Include="Components\KineticBlastDiceIncrease.cs" />
+    <Compile Include="Components\KineticEnergizeFist.cs" />
     <Compile Include="Components\KineticistIncreaseDC.cs" />
+    <Compile Include="Classes\MechanicActionBarSlotVariantSelection.cs" />
     <Compile Include="Components\PanacheDodge.cs" />
+    <Compile Include="Enums\DamageTypeMix.cs" />
+    <Compile Include="Interfaces\IActionBarDisableDrag.cs" />
+    <Compile Include="Patches\Patch_ActionBarConvert.cs" />
     <Compile Include="Components\Poison.cs" />
     <Compile Include="Components\AutoMetakinesis.cs" />
     <Compile Include="Components\Bleed.cs" />

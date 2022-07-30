@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.21]
+- changed bonus Ability Range to a 3% bonus per level, reducing overall bonus range (before +5 ft per two levels)
+- fixed expanded element with 3rd party elements
+
 ## [1.3.20]
 - hopefully fixed bleed
 - vampiric infusion will now just trigger kinetic healer, instead of reducing kinetic healer burn

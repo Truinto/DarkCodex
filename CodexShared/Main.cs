@@ -27,6 +27,7 @@ namespace Shared
 
         static partial void OnLoad(UnityModManager.ModEntry modEntry);
         static partial void OnBlueprintsLoaded();
+        static partial void OnBlueprintsLoadedLast();
         static partial void OnMainMenu();
 
         #endregion
@@ -63,8 +64,7 @@ namespace Shared
             {
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                 harmony = new Harmony(modEntry.Info.Id);
-                Patch(typeof(StartGameLoader_LoadAllJson));
-                Patch(typeof(MainMenu_Start));
+                Patch(typeof(Patches));
                 OnLoad(modEntry);
                 Enabled = true;
                 return true;
@@ -115,10 +115,12 @@ namespace Shared
             return null;
         }
 
-        [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
-        private static class MainMenu_Start
+        [HarmonyPatch]
+        private static class Patches
         {
-            private static void Postfix()
+            [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
+            [HarmonyPostfix]
+            private static void Postfix1()
             {
                 try
                 {
@@ -126,16 +128,26 @@ namespace Shared
                 }
                 catch (Exception ex) { logger?.LogException(ex); }
             }
-        }
 
-        [HarmonyPatch(typeof(StartGameLoader), "LoadAllJson")]
-        private static class StartGameLoader_LoadAllJson
-        {
-            private static void Postfix()
+            [HarmonyPatch(typeof(StartGameLoader), nameof(StartGameLoader.LoadAllJson))]
+            [HarmonyPostfix]
+            private static void Postfix2()
             {
                 try
                 {
                     OnBlueprintsLoaded();
+                }
+                catch (Exception ex) { logger?.LogException(ex); }
+            }
+
+            [HarmonyPatch(typeof(StartGameLoader), nameof(StartGameLoader.LoadAllJson))]
+            [HarmonyPriority(Priority.Last - 5)]
+            [HarmonyPostfix]
+            private static void Postfix3()
+            {
+                try
+                {
+                    OnBlueprintsLoadedLast();
 
                     if (applyNullFinalizer)
                     {

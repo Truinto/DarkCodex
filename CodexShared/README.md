@@ -1,5 +1,5 @@
 ﻿# CodexShared
-A shared code project with basic implementation for 
+A shared code project for basic implementation.
 
 How to add to your project
 -----------

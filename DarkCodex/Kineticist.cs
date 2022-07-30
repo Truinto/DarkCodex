@@ -307,7 +307,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Expanded Element", "basic feat: select extra elements", true, Priority: 300)]
-        public static void CreateExpandedElement()
+        public static void CreateExpandedElement() // TODO: compositebuff grant admixture if both wood/void features are picked
         {
             var t = Kineticist.Tree;
 
@@ -350,13 +350,23 @@ namespace DarkCodex
             if (t.ElementalScion.Cached != null)
                 expandedElement.AddComponents(Helper.CreatePrerequisiteNoArchetype(t.ElementalScion, t.Class)); // disallow expanded element for this archetype
             expandedElement.m_DisplayName = t.FocusSecond.Get().m_DisplayName;
-            expandedElement.m_AllFeatures = t.GetAll(basic: true).Concat(t.GetAll(composite: true).Where(w => w.Parent1 != null && w.Parent2 == null)).Select(s => s.BlastFeature).ToArray();
+
+            var list2 = new List<BlueprintFeatureReference>();
+            foreach (var element in t.GetAll(basic: true, composite: true))
+            {
+                if (element.Parent1 != null && element.Parent2 == null)
+                {
+                    element.BlastFeature.Get()?.AddComponents(Helper.CreatePrerequisiteFeature(element.Parent1.BlastFeature)); // make sure metal and blueflame cannot be taken early
+                    list2.Add(element.BlastFeature);
+                }
+                else if (element.Parent1 == null)
+                {
+                    list2.Add(element.BlastFeature);
+                }
+            }
+            expandedElement.m_AllFeatures = list2.ToArray();
 
             t.ExpandedElement.SetReference(expandedElement);
-
-            // make sure metal and blueflame cannot be taken early
-            t.Composite_Metal.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Earth.BlastFeature));
-            t.Composite_BlueFlame.BlastFeature.Get().AddComponents(Helper.CreatePrerequisiteFeature(t.Fire.BlastFeature));
 
             // add to feats
             Helper.AddFeats(expandedElement);
@@ -904,6 +914,8 @@ namespace DarkCodex
                 healer.GetComponents<ContextRankConfig>(),
                 healer.GetComponents<ContextCalculateSharedValue>()
                 );
+
+            // TODO: fix damage preview
         }
 
         [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "new Kineticist archetype", false)]
@@ -1038,13 +1050,25 @@ namespace DarkCodex
 
         public static void CreateKineticFist()
         {
+            Tree.GetAll(true, true, archetype: true).Select(s => s.BaseAbility);
+
             var act = Helper.CreateBlueprintActivatableAbility(
                 "KineticFistActivatable",
                 out var buff,
                 "Kinetic Fist",
                 "DESC"
+                ).SetComponents(
+                new ActivatableVariants()
                 );
-
+            buff.SetComponents(
+                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
+                    Helper.CreateActionList(),
+                    AllNaturalAndUnarmed: true
+                    ),
+                new KineticEnergizeFist()
+                );
+            // 
+            
             var feat = Helper.CreateBlueprintFeature(
                 "KineticFistInfusion"
                 ).SetUIData(act);

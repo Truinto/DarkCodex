@@ -14,5 +14,8 @@ namespace CodexLib
     public interface IActionBarConvert
     {
         public List<MechanicActionBarSlot> GetConverts();
+
+        [CanBeNull]
+        public Sprite GetIcon();
     }
 }

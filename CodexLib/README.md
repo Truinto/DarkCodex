@@ -4,7 +4,7 @@ A shared library
 How to add to your project
 -----------
 * Add a reference to your project.
-* Important! Set local copy to false. Manual copy CodexLib.dll into your mod folder. This way it will trigger AssemblyResolve while load.
+* Important! Set local copy to false. Manual copy CodexLib.dll into your mod folder. This way it will trigger AssemblyResolve during load.
 * Important! Before patching blueprints set the scope to your project. This is where guids will be resolved. If you use CodexLib's components, you should also run MasterPatch.
 ```
 using var scope = new Scope(Main.ModPath, Main.logger);

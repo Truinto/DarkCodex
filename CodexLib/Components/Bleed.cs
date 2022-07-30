@@ -119,7 +119,7 @@ namespace CodexLib
             }
         }
 
-        public DiceValue Value { get => this.Data.Value; set => this.Data.Value = value; }
+        //public DiceValue Value { get => this.Data.Value; set => this.Data.Value = value; }
 
         public class RuntimeData
         {
@@ -191,58 +191,58 @@ namespace CodexLib
             //buff.Owner.Buffs.UpdateNextEvent();
         }
 
-        [Obsolete]
-        public void ApplyBleed(Buff buff, BleedBuff bleed)
-        {
-            var caster = this.Context.MaybeCaster;
-            var target = this.Target.Unit;
+        //[Obsolete]
+        //public void ApplyBleed(Buff buff, BleedBuff bleed)
+        //{
+        //    var caster = this.Context.MaybeCaster;
+        //    var target = this.Target.Unit;
 
-            //this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue;
-            int rank = this.Context[AbilityRankType.Default];
-            int sneak = caster.Stats.SneakAttack.ModifiedValue;
+        //    //this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue;
+        //    int rank = this.Context[AbilityRankType.Default];
+        //    int sneak = caster.Stats.SneakAttack.ModifiedValue;
 
-            DiceValue bleedValue;
-            if (bleed.Value == null)
-                bleedValue = bleed.Value = DiceValue.Get(this.Value, this.Context);
-            else if (this.IsStacking)
-                bleedValue = bleed.Value.Increase(this.Value, this.Context);
-            else
-                bleedValue = bleed.Value.Max(this.Value, this.Context);
+        //    DiceValue bleedValue;
+        //    if (bleed.Value == null)
+        //        bleedValue = bleed.Value = DiceValue.Get(this.Value, this.Context);
+        //    else if (this.IsStacking)
+        //        bleedValue = bleed.Value.Increase(this.Value, this.Context);
+        //    else
+        //        bleedValue = bleed.Value.Max(this.Value, this.Context);
 
-            var damage = bleedValue.GetDirect(); // maybe use physical, if still conflicting with energy attacks
-            var ruleDamage = new RuleDealDamage(caster, target, damage);
-            this.Context.TriggerRule(ruleDamage);
+        //    var damage = bleedValue.GetDirect(); // maybe use physical, if still conflicting with energy attacks
+        //    var ruleDamage = new RuleDealDamage(caster, target, damage);
+        //    this.Context.TriggerRule(ruleDamage);
 
-            Helper.PrintDebug($"ContextActionIncreaseBleed.ApplyBleed {Value.DiceCountValue}d{(int)Value.DiceType}+{Value.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result}");
+        //    Helper.PrintDebug($"ContextActionIncreaseBleed.ApplyBleed {Value.DiceCountValue}d{(int)Value.DiceType}+{Value.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result}");
 
-            if (this.IsFlensing)
-            {
-                var ac = target.Stats.GetStat(StatType.AC);
-                int natural = ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmor);
-                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorEnhancement);
-                natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorForm);
-                natural = Math.Max(0, natural);
-                int value = this.Value.Calculate(this.Context);
-                int malus = Math.Min(natural, value);
+        //    if (this.IsFlensing)
+        //    {
+        //        var ac = target.Stats.GetStat(StatType.AC);
+        //        int natural = ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmor);
+        //        natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorEnhancement);
+        //        natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorForm);
+        //        natural = Math.Max(0, natural);
+        //        int value = this.Value.Calculate(this.Context);
+        //        int malus = Math.Min(natural, value);
 
-                Helper.PrintDebug($" -flensing natural={natural} value={value} malus={malus}");
+        //        Helper.PrintDebug($" -flensing natural={natural} value={value} malus={malus}");
 
-                if (malus > 0)
-                {
-                    var modifier = buff.m_StoredMods?.FirstOrDefault();
-                    if (modifier == null)
-                    {
-                        modifier = ac.AddModifier(-malus, ModifierDescriptor.NaturalArmor);
-                        modifier.StackMode = ModifiableValue.StackMode.ForceStack;
-                        buff.StoreModifier(modifier);
-                    }
-                    else
-                    {
-                        modifier.ModValue -= malus;
-                        ac.UpdateValue();
-                    }
-                }
-            }
-        }
+        //        if (malus > 0)
+        //        {
+        //            var modifier = buff.m_StoredMods?.FirstOrDefault();
+        //            if (modifier == null)
+        //            {
+        //                modifier = ac.AddModifier(-malus, ModifierDescriptor.NaturalArmor);
+        //                modifier.StackMode = ModifiableValue.StackMode.ForceStack;
+        //                buff.StoreModifier(modifier);
+        //            }
+        //            else
+        //            {
+        //                modifier.ModValue -= malus;
+        //                ac.UpdateValue();
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

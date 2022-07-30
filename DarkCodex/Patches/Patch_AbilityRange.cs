@@ -23,7 +23,8 @@ namespace DarkCodex
             if (abilityRange > AbilityRange.Long || (!reach && abilityRange == AbilityRange.Touch))
                 return;
 
-            __result.m_Value += 5f * (abilityData.Spellbook.CasterLevel / 2).MinMax(0, 10);
+            //__result.m_Value += 5f * (abilityData.Spellbook.CasterLevel / 2).MinMax(0, 10);
+            __result.m_Value += __result.m_Value * abilityData.Spellbook.CasterLevel * 0.03f;
         }
     }
 }

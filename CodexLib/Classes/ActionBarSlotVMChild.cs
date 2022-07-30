@@ -25,5 +25,19 @@ namespace CodexLib
             Parent = null;
             base.DisposeImplementation();
         }
+
+        public override void OnMainClick()
+        {
+            base.OnMainClick();
+
+            if (this.MechanicActionBarSlot is MechanicActionBarSlotVariantSelection selection)
+            {
+                if (selection.IsActive())
+                    this.Parent.ForeIcon.Value = selection.GetIcon();
+                else
+                    this.Parent.ForeIcon.Value = null;
+            }
+
+        }
     }
 }

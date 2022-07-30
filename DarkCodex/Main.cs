@@ -380,6 +380,10 @@ namespace Shared
             //harmony.PatchAll(typeof(Main).Assembly);
             //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
             //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
+
+            //[HarmonyPatch(typeof(BlueprintsCache), "Init")] used by some mods
+            //[HarmonyPriority(Priority.First + 5)]
+            //[HarmonyPriority(Priority.Last - 5)]
         }
 
         static partial void OnMainMenu()
@@ -409,8 +413,14 @@ namespace Shared
             PatchSafe(typeof(DEBUG.SpellReach));
             PatchSafe(typeof(Patch_Prebuilds));
             //PatchSafe(typeof(Patch_SaveExtension));
-            //PatchSafe(typeof(Patch_FactSelectionParameterized));
+            PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
+
+            // test activatablevariants
+            PatchSafe(typeof(CodexLib.Patches.Patch_ActionBarConvert));
+            Helper.Get<BlueprintActivatableAbility>("09d742e8b50b0214fb71acfc99cc00b3").AddComponents(
+                new ActivatableVariants("09d742e8b50b0214fb71acfc99cc00b3", "2d81362af43aeac4387a3d4fced489c3", "ba1ae42c58e228c4da28328ea6b4ae34")
+                );
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -521,7 +531,6 @@ namespace Shared
             LoadSafe(Kineticist.PatchGatherPower);
             LoadSafe(Kineticist.PatchDarkElementalist);
             LoadSafe(Kineticist.PatchDemonCharge); // after createMobileGatheringFeat
-            LoadSafe(Kineticist.CreateExpandedElement);
             LoadSafe(Kineticist.PatchVarious);
             LoadSafe(Kineticist.FixBlastsAreSpellLike);
             LoadSafe(Kineticist.FixBloodKineticist);
@@ -547,10 +556,6 @@ namespace Shared
             // Ranger
             LoadSafe(Ranger.CreateImprovedHuntersBond);
 
-            // Unlocks
-            LoadSafe(Unlock.UnlockAnimalCompanion);
-            LoadSafe(Unlock.UnlockKineticist); // keep late
-
             // Extra Features - keep last
             LoadSafe(General.CreateSpellPerfection); // keep last
             LoadSafe(General.CreateBackgrounds); // keep last
@@ -568,6 +573,17 @@ namespace Shared
             // Event subscriptions
             SubscribeSafe(typeof(Event_RestoreEndOfCombat));
             SubscribeSafe(typeof(Event_AreaEffects));
+        }
+
+        static partial void OnBlueprintsLoadedLast()
+        {
+            using var scope = new Scope(Main.ModPath, Main.logger);
+
+            LoadSafe(Kineticist.CreateExpandedElement);
+
+            // Unlocks
+            LoadSafe(Unlock.UnlockAnimalCompanion);
+            LoadSafe(Unlock.UnlockKineticist);
 
             patchInfos.Sort(); // sort info list for GUI
             patchInfos.Update();

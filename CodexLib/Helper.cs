@@ -1429,47 +1429,6 @@ namespace CodexLib
             return false;
         }
 
-        public static bool HasParam<TComp>(this UnitEntityData unit, FeatureParam param) where TComp : UnitFactComponentDelegate
-        {
-            foreach (var feature in unit.Facts.GetAll<Feature>())
-            {
-                foreach (var component in feature.Components)
-                {
-                    if (component.SourceBlueprintComponent is TComp tcomp)
-                    {
-                        using (component.RequestEventContext())
-                        {
-                            if (FeatureParamEquals(tcomp.Param, param))
-                                return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        public static bool HasParam<TComp, TData>(this UnitEntityData unit, FeatureParam param) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
-        {
-            foreach (var feature in unit.Facts.GetAll<Feature>())
-            {
-                foreach (var component in feature.Components)
-                {
-                    if (component.SourceBlueprintComponent is TComp tcomp)
-                    {
-                        using (component.RequestEventContext())
-                        {
-                            if (FeatureParamEquals(tcomp.Param, param))
-                                return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Only works if Component has EmptyComponentData.
-        /// </summary>
         public static bool HasParam(this UnitEntityData unit, BlueprintFeature blueprintFeature, FeatureParam param)
         {
             foreach (var feature in unit.Facts.GetAll<Feature>())
@@ -1477,44 +1436,73 @@ namespace CodexLib
                 if (blueprintFeature != null && blueprintFeature != feature?.Blueprint)
                     continue;
 
-                foreach (var component in feature.Components)
-                {
-                    if (component.SourceBlueprintComponent is UnitFactComponentDelegate tcomp)
-                    {
-                        using (component.RequestEventContext())
-                        {
-                            if (FeatureParamEquals(tcomp.Param, param))
-                                return true;
-                        }
-                    }
-                }
+                if (FeatureParamEquals(feature.Param, param))
+                    return true;
             }
             return false;
         }
 
-        public static TData GetComponentData<TComp, TData>(this UnitEntityData unit, BlueprintFeature blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
+        public static TData GetFactData<TComp, TData>(this UnitEntityData unit, BlueprintFeature blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
         {
             foreach (var feature in unit.Facts.GetAll<Feature>())
             {
                 if (blueprintFeature != null && blueprintFeature != feature?.Blueprint)
                     continue;
 
-                foreach (var component in feature.Components)
-                {
-                    if (component.SourceBlueprintComponent is TComp tcomp)
-                    {
-                        using (component.RequestEventContext())
-                        {
-                            return tcomp.Data;
-                        }
-                    }
-                }
+                var data = Helper.GetDataExt<TData>(feature);
+                if (data != null)
+                    return data;
             }
-            return default;
+            return null;
+        }
+
+        public static TData GetDataExt<TData>(this EntityFact fact) where TData : class, new()
+        {
+            if (fact == null)
+                return null;
+
+            foreach (var component in fact.Components)
+            {
+                var data = Helper.GetDataExt<TData>(component);
+                if (data != null)
+                    return data;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Use this instead of GetData&lt;<typeparamref name="TData"/>&gt;. This returns null instead of an exception.
+        /// </summary>
+        public static TData GetDataExt<TData>(this EntityFactComponent component) where TData : class, new()
+        {
+            if (component is EntityFactComponentDelegate<UnitEntityData, TData>.ComponentRuntime runtime)
+            {
+                return runtime.m_Data;
+            }
+
+            PrintDebug("GetData<TData>(EntityFactComponent) is not runtime: " + Environment.StackTrace);
+            return null;
+        }
+        
+        public static TData GetDataExt<TComponent, TData>(this EntityFact fact) where TComponent : class where TData : class, new()
+        {
+            if (fact == null)
+                return null;
+
+            foreach (var component in fact.Components)
+            {
+                if (component.SourceBlueprintComponent is not TComponent)
+                    continue;
+
+                var data = Helper.GetDataExt<TData>(component);
+                if (data != null)
+                    return data;
+            }
+            return null;
         }
 
         /// <param name="blueprintFeature">type: BlueprintFeature</param>
-        public static IEnumerable<TData> GetComponentDataAll<TComp, TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
+        public static IEnumerable<TData> GetDataAllExt<TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TData : class, new()
         {
             foreach (var feature in unit.Facts.GetAll<Feature>())
             {
@@ -1523,34 +1511,35 @@ namespace CodexLib
 
                 foreach (var component in feature.Components)
                 {
-                    if (component.SourceBlueprintComponent is TComp tcomp)
-                    {
-                        using (component.RequestEventContext())
-                        {
-                            yield return tcomp.Data;
-                        }
-                    }
+                    var data = Helper.GetDataExt<TData>(component);
+                    if (data != null)
+                        yield return data;
                 }
             }
         }
 
-        public static IEnumerable<TComp> GetComponents<TComp>(this UnitEntityData unit) where TComp : class
+        public static IEnumerable<EntityFactComponent> GetRuntimeComponents<TComp>(this UnitEntityData unit) where TComp : class
         {
             //return unit.Progression.Features.SelectFactComponents<TComp>();
             foreach (var fact in unit.Facts.m_Facts)
             {
-                foreach (var comp in fact.BlueprintComponents)
+                foreach (var comp in fact.Components)
                 {
-                    if (comp is TComp t)
-                        yield return t;
+                    if (comp.SourceBlueprintComponent is TComp)
+                        yield return comp;
                 }
             }
         }
 
-        public static IEnumerable<TComp> GetFeatureComponents<TComp>(this UnitEntityData unit) where TComp : class
+        public static EntityFactComponent GetRuntimeComponent<TComp>(this EntityFact fact) where TComp : class
         {
-            foreach (var comp in unit.Progression.Features.SelectFactComponents<TComp>())
-                yield return comp;
+            fact.GetComponent<BlueprintComponent>();
+            foreach (var comp in fact.Components)
+            {
+                if (comp.SourceBlueprintComponent is TComp)
+                    return comp;
+            }
+            return null;
         }
 
         #endregion
@@ -3406,12 +3395,11 @@ namespace CodexLib
             buff.name = name + "_Buff";
             buff.m_DisplayName = result.m_DisplayName;
             buff.m_Description = result.m_Description;
-            buff.AssetGuid = BlueprintGuid.Parse(GetGuid(buff.name));
             buff.m_Icon = icon;
             buff.FxOnStart = new PrefabLink();
             buff.FxOnRemove = new PrefabLink();
             buff.IsClassFeature = true;
-            AddAsset(buff, buff.AssetGuid);
+            AddAsset(buff, GetGuid(buff.name));
 
             result.m_Buff = buff.ToRef();
             return result;
@@ -3799,7 +3787,7 @@ namespace CodexLib
 
         public static bool NotEmpty(this BlueprintReferenceBase reference)
         {
-            return reference != null && reference.deserializedGuid != BlueprintGuid.Empty;
+            return reference != null && reference.deserializedGuid != BlueprintGuid.Empty && reference.GetBlueprint() != null;
         }
 
         public static void SetReference(this BlueprintReferenceBase reference, SimpleBlueprint bp)

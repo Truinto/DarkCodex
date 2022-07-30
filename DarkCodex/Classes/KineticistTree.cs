@@ -4,6 +4,7 @@ using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
@@ -51,7 +52,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("43ff67143efb86d4f894b10577329050"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("89cc522f2e1444b40ba1757320c58530"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("77cb8c607b263194894a929c8ac59708")
-                }
+                },
+                DamageType = DamageTypeMix.Bludgeoning
             };
 
             Electric = new()
@@ -610,7 +612,7 @@ namespace DarkCodex
             BaseAll = GetAll(true, true).Select(s => s.BaseAbility).ToArray();
         }
 
-        public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool onlyPhysical = false, bool onlyEnergy = false, bool modded = true)
+        public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)
         {
             bool mod1 = modded && UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
 
@@ -654,7 +656,8 @@ namespace DarkCodex
                     yield return Composite_Mud;
                     yield return Composite_ChargedWater;
                     yield return Composite_Steam;
-                    yield return Composite_Blood;
+                    if (archetype)
+                        yield return Composite_Blood;
                     if (mod1)
                     {
                         yield return Composite_Force;
@@ -788,10 +791,17 @@ namespace DarkCodex
             public BlueprintAbilityReference BaseAbility;
             public Blade Blade;
 
-            /// <summary>only on composites; not on archetype exclusive (Blood)</summary>
+            /// <summary>only on composites</summary>
             [CanBeNull] public Element Parent1;
             /// <summary>only on composites other than metal and blueFlame</summary>
             [CanBeNull] public Element Parent2;
+
+            public DamageTypeMix DamageType;
+
+            public bool IsBasic { get => Parent1 == null; }
+            public bool IsComposite { get => Parent1 != null; }
+            public bool IsMonoComposite { get => Parent1 != null && Parent2 == null; }
+            public bool IsDualComposite { get => Parent1 != null && Parent2 != null; }
         }
 
         public class Focus
