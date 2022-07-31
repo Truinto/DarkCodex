@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Classes\AbilityRegister.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
+    <Compile Include="Components\KineticEnergizeFist.cs" />
     <Compile Include="DEBUG.cs" />
     <Compile Include="MartialArt.cs" />
     <Compile Include="Patches\Event_AreaEffects.cs" />

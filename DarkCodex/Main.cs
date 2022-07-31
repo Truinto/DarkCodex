@@ -23,6 +23,7 @@ global using Kingmaker.UnitLogic.Abilities.Blueprints;
 global using Kingmaker.UnitLogic.Abilities.Components;
 global using Kingmaker.UnitLogic.Abilities.Components.Base;
 global using Kingmaker.UnitLogic.ActivatableAbilities;
+global using Kingmaker.UnitLogic.Buffs.Blueprints;
 global using Kingmaker.UnitLogic.Commands.Base;
 global using Kingmaker.UnitLogic.FactLogic;
 global using Kingmaker.UnitLogic.Mechanics;

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Component to add foldable to any BlueprintAbility or BlueprintActivatableAbility. Takes priority over existing conversions, if any.
+    /// </summary>
     public class ActivatableVariants : UnitFactComponentDelegate<VariantSelectionData>, IActionBarConvert
     {
         public bool NeedFact = true;

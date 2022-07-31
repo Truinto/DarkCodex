@@ -1065,7 +1065,7 @@ namespace DarkCodex
                     Helper.CreateActionList(),
                     AllNaturalAndUnarmed: true
                     ),
-                new KineticEnergizeFist()
+                new ActivatableVariantsExample()
                 );
             // 
             

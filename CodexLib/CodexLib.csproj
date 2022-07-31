@@ -122,7 +122,7 @@
     <Compile Include="Components\DirtyFightingBonus.cs" />
     <Compile Include="Components\FeatureForPrerequisite.cs" />
     <Compile Include="Components\KineticBlastDiceIncrease.cs" />
-    <Compile Include="Components\KineticEnergizeFist.cs" />
+    <Compile Include="Components\ActivatableVariantsExample.cs" />
     <Compile Include="Components\KineticistIncreaseDC.cs" />
     <Compile Include="Classes\MechanicActionBarSlotVariantSelection.cs" />
     <Compile Include="Components\PanacheDodge.cs" />
