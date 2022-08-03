@@ -6,6 +6,7 @@
 - added infusion Energize Weapon
 - fixed Spell Perfection not working with Spell Specialization and some interactions with TableTopTweaks
 - fixed Metamagic Master &co not working with Bladed Dash
+- added Hexcrafter to Cursing Gaze
 
 ## [1.3.21]
 - changed bonus Ability Range to a 3% bonus per level, reducing overall bonus range (before +5 ft per two levels)

@@ -432,7 +432,7 @@ namespace DarkCodex
 
             var abilities = new List<BlueprintAbilityReference>();
 
-            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures).Concat(hexcrafterMagus_selection.m_AllFeatures))
+            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures))
             {
                 var hex = sel.Get();
                 if (hex.GetComponent<PrerequisiteFeature>()?.m_Feature?.Guid == grant_hex)
