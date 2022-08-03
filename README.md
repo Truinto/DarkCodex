@@ -38,17 +38,20 @@ Content
 |General.CreateAbilityFocus|basic feat: Ability Focus, increase DC of one ability by +2|:book:|:x:|
 |General.CreateBackgrounds|basic feat: Additional Traits traits: Magical Lineage, Metamagic Master|:book:|:heavy_check_mark:|
 |General.CreateBardStopSong|adds ability to stop any activatable immediately|:book:|:heavy_check_mark:|
+|General.CreateDirtyFighting|basic feat: Dirty Fighting; you don't suffer an attack of opportunity but incure a -4 penalty if you are not flanking and don't have the right maneuver feat|:book:|:heavy_check_mark:|
 |General.CreateHeritage|adds Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity|:house:|:heavy_check_mark:|
 |General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
+|General.CreateOpportuneParry|combat feat: duelist parry by expending Attack of Opportunities|:house:|:heavy_check_mark:|
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
 |General.CreateSacredSummons|basic feat: requires Channel Energy, summons act immediately|:book:|:heavy_check_mark:|
+|General.CreateSpellPerfection|basic feat: Spell Perfection|:book:|:heavy_check_mark:|
 |General.PatchAngelsLight|'Light of the Angels' give temporary HP equal to character level|:house:|:heavy_check_mark:|
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
 |General.PatchHideBuffs|unclogs UI by hiding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
 |General.FixMasterShapeshifter|ensures spells with the Polymorph descriptor get the benefit of Master Shapeshifter|:book:|:heavy_check_mark:|
 |General.FixSpellElementChange|fixes Elemental Bloodline and Spell Focus interaction|:book:|:heavy_check_mark:|
-|Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:heavy_check_mark:|
+|Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:construction:|
 |Items.CreateImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|
 |Items.CreateKineticArtifact|new weapon for Kineticists|:house:|:heavy_check_mark:|
 |Items.PatchArrows|will pick up non-magical arrows after combat|:book:|:heavy_check_mark:|
@@ -56,10 +59,13 @@ Content
 |Kineticist.CreateAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:book:|:heavy_check_mark:|
 |Kineticist.CreateBladeRushInfusion|infusion: Blade Rush, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Kineticist.CreateChainInfusion|infusion: Chain|:book:|:heavy_check_mark:|
+|Kineticist.CreateElementalScion|new Kineticist archetype|:book:|:construction:|
 |Kineticist.CreateExpandedElement|basic feat: select extra elements|:house:|:heavy_check_mark:|
-|Kineticist.CreateExtraWildTalentFeat|basic feat: Extra Wild Talent|:book:|:heavy_check_mark:|
+|Kineticist.CreateExtraWildTalentFeat|basic feat: Extra Wild Talent; required by other kineticist features!|:book:|:heavy_check_mark:|
 |Kineticist.CreateHurricaneQueen|Wild Talent: Hurricane Queen|:book:|:heavy_check_mark:|
 |Kineticist.CreateImpaleInfusion|infusion: Impale|:book:|:heavy_check_mark:|
+|Kineticist.CreateKineticEnergizeWeapon|infusion|:book:|:heavy_check_mark:|
+|Kineticist.CreateKineticFist|infusion|:book:|:heavy_check_mark:|
 |Kineticist.CreateKineticistBackground|regional background: gain +1 Kineticist level for the purpose of feat prerequisites|:house:|:heavy_check_mark:|
 |Kineticist.CreateMindShield|Wild Talent: half Psychokineticist's penalties|:house:|:heavy_check_mark:|
 |Kineticist.CreateMobileGatheringFeat|basic feat: Mobile Gathering|:book:|:heavy_check_mark:|
@@ -71,6 +77,7 @@ Content
 |Kineticist.PatchGatherPower|Kineticist Gather Power can be used manually|:book:|:heavy_check_mark:|
 |Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting|:house:|:heavy_check_mark:|
 |Kineticist.FixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
+|Kineticist.FixBloodKineticist|seeks to fix bugs in Blood Kineticist|:book:|:construction:|
 |Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:x:|
 |Magus.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
 |Magus.FixHexcrafterProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
@@ -92,6 +99,7 @@ Content
 |Mythic.CreateLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:house:|:heavy_check_mark:|
 |Mythic.CreateMagicItemAdept|mythic feat: trinket items use character level as caster level|:house:|:heavy_check_mark:|
 |Mythic.CreateMetamagicAdept|mythic feat: allow spontaneous spellcasters to apply metamagic without casting time penalty|:house:|:heavy_check_mark:|
+|Mythic.CreateMythicEschewMaterials|mythic ability: you cast spells without expending material components|:house:|:heavy_check_mark:|
 |Mythic.CreateResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
@@ -118,6 +126,7 @@ Content
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
 |Witch.CreateSplitHex|basic feat: Split Hex|:book:|:x:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
+|Patch.Patch_AbilityRange|bonus spell range equal to 5 feet per 2 caster levels|:house:|:heavy_check_mark:|
 |Patch.Patch_ActivatableHandleUnitRunCommand|fixes move actions disabling the activatable (since we have 2 of them)|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnNewRound|uses up move action when triggered; deactivates activatable if no action left|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnTurnOn|fixes activatable not being allowed to be active when they have the same action (like 2 move actions)|:book:|:heavy_check_mark:|
@@ -141,6 +150,7 @@ Content
 |Patch.Patch_PreferredSpellMetamagic|necessary patches for Preferred Spell|:book:|:heavy_check_mark:|
 |Patch.Patch_ResourcefulCaster|patches for Resourceful Caster|:house:|:heavy_check_mark:|
 |Patch.Patch_TrueGatherPowerLevel|Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost. Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.|:book:|:heavy_check_mark:|
+|Patch.Patch_ZippySpellLike|allows zippy to work on spell-like abilities|:house:|:heavy_check_mark:|
 
 :heavy_check_mark: works, please report bugs you find \
 :construction: not tested, please let me know if this works or not \
