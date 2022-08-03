@@ -1,23 +1,27 @@
-﻿using CodexLib;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.RuleSystem.Rules.Damage;
+using Kingmaker.UI;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Owlcat.Runtime.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DarkCodex
+namespace CodexLib
 {
     public class KineticistTree
     {
+        private static KineticistTree instance;
+        public static KineticistTree Instance { get => instance ??= new(); }
+
         public KineticistTree()
         {
             // Expanded Defense: d741f298dfae8fc40b4615aaf83b6548
@@ -53,7 +57,7 @@ namespace DarkCodex
                     Damage = Helper.ToRef<BlueprintAbilityReference>("89cc522f2e1444b40ba1757320c58530"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("77cb8c607b263194894a929c8ac59708")
                 },
-                DamageType = DamageTypeMix.Bludgeoning
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
             };
 
             Electric = new()
@@ -68,7 +72,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("31862bcb47f539649ae59d7e18f8ed11"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("ca608f545b07ec045954aee5ff94640a"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("8d351d2c4af133a41b103aa25f0c38cc")
-                }
+                },
+                DamageType = GetDamageType(e1: DamageEnergyType.Electricity)
             };
 
             Earth = new()
@@ -83,7 +88,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a72c3375b022c124986365d23596bd21"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4fc5cf33da20b5444ad3a96c77af8d20"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("d386e82ad6ef52a4ab5251bc2dc6d93f")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Fire = new()
@@ -98,7 +104,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("3ca6bbdb3c1dea541891f0568f52db05"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("6e24958866ac8a9498fa6a7396d87270"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("879b666ce3247ed4b8aa379d5946c38e")
-                }
+                },
+                DamageType = GetDamageType(e1: DamageEnergyType.Fire)
             };
 
             Water = new()
@@ -113,7 +120,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6a1bc011f6bbc7745876ce2692ecdfb5"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("92724a6d6a6225d4895b41e35e973599"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("cf09fb24e432a5c49a1bd9add89699ee")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
             };
 
             Cold = new()
@@ -128,7 +136,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("df849df04cd828b4489f7827dbbf1dcd"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("cb20c297b1db1cd4ea9430578c90246d"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("2312fb9314d9a99489ec32f8be57a87c")
-                }
+                },
+                DamageType = GetDamageType(e1: DamageEnergyType.Cold)
             };
 
             Composite_Metal = new()
@@ -145,7 +154,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("e72caa96c32ca3f4d8b736b97b067f58"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("9cef404da5745314b88f49c1ee9fbab1"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("b66add7c13a8398488ed3e915ade09d3")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Composite_BlueFlame = new()
@@ -162,7 +172,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("5b0f10876af4fe54e989cc4d93bd0545"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("a975a40b710833a468476564fa673cee"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("1c35c032bb452014090d05130fa653df")
-                }
+                },
+                DamageType = GetDamageType(e1: DamageEnergyType.Fire)
             };
 
             Composite_Plasma = new()
@@ -179,7 +190,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("878f68ff160c8fa42b05ade8b2d12ea5"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("fc22c06d63a95154291272577daa0b4d"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("c9262ac06266bc64990ee98e528d8eed")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Fire)
             };
 
             Composite_Sand = new()
@@ -196,7 +208,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("4934f54691fa90941b04341d457f4f96"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("a41bfd708a7677f46aede02715f3100d"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("54c7ff613923d304bb39e163959435fb")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Composite_Thunder = new()
@@ -213,7 +226,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a8cd6e691ad7ee44dbdd4a255bf304d8"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("833e3c01a1492d74588430249e6431af"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("4f6847c9d896da946b6d86bd513e76a9")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Electricity)
             };
 
             Composite_Blizzard = new()
@@ -230,7 +244,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6f121ff0644a2804d8239d4dfe0ace11"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("027ce0b3842170748a63ea04cb02cab7"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("b066761047bbe0348a3a0b2f1debbd34")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Piercing, DamageEnergyType.Cold)
             };
 
             Composite_Ice = new()
@@ -247,7 +262,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a1eee0a2735401546ba2b442e1a9d25d"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("8c8dd4e7c07e468498a6f5ed2c01063f"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("9b8ea70f14970f946ad6c26694062a3f")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Piercing, DamageEnergyType.Cold)
             };
 
             Composite_Magma = new()
@@ -264,7 +280,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("f58bc29b252308242a81b3f84a1d176a"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("c49d2ddf72adf85478d6b3e09f52d32e"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("2f391179f4cdd574b9093e62497a6d7e")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Fire)
             };
 
             Composite_Mud = new()
@@ -281,7 +298,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("64885226d77f2bd408dde84fb8ccacc2"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("f82cfcf11b94bef49bf1a8f57aad5c13"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("c6334b1a104de294dba47ce56c74640f")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
             };
 
             Composite_ChargedWater = new()
@@ -298,7 +316,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7b413fc4f99050349ab5488f83fe25df"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("ff24a4ac444afeb4bab5699828aa4e77"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("f2b96598bcfba72469852b6480bf1397")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Electricity)
             };
 
             Composite_Steam = new()
@@ -315,7 +334,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("2e72609caf23e4843b246bec80550f06"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("77dc27ae2f48ffe4a8ab17154145f1d8"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("c74117665610ddb4cb8a525c2ec93039")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Fire)
             };
 
             Composite_Blood = new()
@@ -332,7 +352,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("92f9a719ffd652947ab37363266cc0a6"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("0a386b1c2b4ae9b4f81ddf4557155810"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("15278f2a9a5eaa441a261ec033b60b57")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
             };
 
             // modded
@@ -348,7 +369,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("45b1ace89f03422199a394089e3dfc8c"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4623d7cc61c34d7190cc315695821e61"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("5d81270056d24a2e88df79dfb983cbcd")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Composite_Force = new()
@@ -365,7 +387,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("110bb5800599469ebb5f50b400b860d6"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4e2d7b4eebc348b2bdf4968053c76af9"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("0b8bc0ee998a41508052ca7ff31c14f8")
-                }
+                },
+                DamageType = new DamageTypeDescription { Type = DamageType.Force }.ObjToArray()
             };
 
             Gravity = new()
@@ -380,7 +403,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("f1ae02e54af04cfd802b652816ce4996"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("c545106ff205431fa7936155728f7490"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("1ec348ed9dcb437eb601f20b98f25181")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
             };
 
             Negative = new()
@@ -395,7 +419,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7f45d4a741ee4ba685b91e4640191de8"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("96e914a61b6948a5baade3290c0260d3"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("4471efdc8c1440faba7110675ddb31af")
-                }
+                },
+                DamageType = GetDamageType(e1: DamageEnergyType.NegativeEnergy)
             };
 
             Composite_Void = new()
@@ -412,7 +437,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("e4fdafb5594e435db1aeb814964fe239"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("506c8ef74b6546c7a44b2547eacdd16d"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("6b2bed26fcd847c1a571b5f2ea6cea0a")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.NegativeEnergy)
             };
 
             Wood = new()
@@ -427,7 +453,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("469e82d66a2e4ece94be280935da805a"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("9040572d07d1402abbcbe095f49b58cc"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("e7c2a4e7dcae40b09dda30a879123483")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Positive = new()
@@ -442,7 +469,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7777b5f1d5c24de4a7a42cb4f7752067"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("53ba7977e3ed44b193c31c7f510c52e2"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("22d5001563c74bdfa6e0c5602fd11eef")
-                }
+                },
+                DamageType = GetDamageType(e1: DamageEnergyType.PositiveEnergy)
             };
 
             Composite_Verdant = new()
@@ -459,7 +487,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("226251dfa5d54a36a89b754cf9a4adde"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("c7c9e1c2d5b9436fa37111ecf4da3477"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("2846063b5b6e4fea9bee612c1e24dd60")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, DamageEnergyType.PositiveEnergy)
             };
 
             Composite_Spring = new()
@@ -476,7 +505,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("5bdbf44b60104461934da737825a09bf"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("a5c899151b4943a0a6d0aeb853e8fc88"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("9e26ea79e09b4e1b9ee09cbd25ae1405")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Composite_Summer = new()
@@ -493,7 +523,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6558f16df5b44709b9dc130671c0bb96"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("2ca9d84f2ece4df3951fe0c84879b164"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("b5c7051ae9c8450da9769c955971f0c2")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, DamageEnergyType.Fire)
             };
 
             Composite_Autumn = new()
@@ -510,7 +541,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("2f8dac5035524c08b97d554c9ddee710"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("8186a1b2087b44519791bb059fe43ff8"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("beb6066e7de74ff0a7eb9d0eb0f6ff36")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
             };
 
             Composite_Winter = new()
@@ -527,7 +559,8 @@ namespace DarkCodex
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("639d3c53dd1948ff9c503fda59b8ebab"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("e5945f8fdddc4e0585352a5f12bf1a99"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("380b9f337f2248dc82d4b1c7af8bd507")
-                }
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, DamageEnergyType.Cold)
             };
 
             #endregion
@@ -707,6 +740,17 @@ namespace DarkCodex
             return null;
         }
 
+        public IEnumerable<Element> GetComposites(Element element, Element element2 = null)
+        {
+            foreach (var e in GetAll(false, true))
+            {
+                if (e.Parent1 == element && (element2 == null || element2 == e.Parent2))
+                    yield return e;
+                else if (e.Parent2 == element && (element2 == null || element2 == e.Parent1))
+                    yield return e;
+            }
+        }
+
         public IEnumerable<BlueprintFeature> GetWildTalents()
         {
             foreach (var talent in SelectionWildTalent.Get().m_AllFeatures)
@@ -781,7 +825,7 @@ namespace DarkCodex
         public Element Composite_Summer;
         public Element Composite_Winter;
 
-        public class Element
+        public class Element : IUIDataProvider
         {
             /// <summary>can be null</summary>
             [CanBeNull] public BlueprintFeatureSelectionReference Selection;
@@ -796,12 +840,24 @@ namespace DarkCodex
             /// <summary>only on composites other than metal and blueFlame</summary>
             [CanBeNull] public Element Parent2;
 
-            public DamageTypeMix DamageType;
+            public DamageTypeDescription[] DamageType;
 
             public bool IsBasic { get => Parent1 == null; }
             public bool IsComposite { get => Parent1 != null; }
             public bool IsMonoComposite { get => Parent1 != null && Parent2 == null; }
             public bool IsDualComposite { get => Parent1 != null && Parent2 != null; }
+            public bool IsMixType { get => DamageType.Length >= 2; }
+
+            // IUIDataProvider
+            public string Name => BlastFeature?.Get()?.Name;
+            public string Description => BlastFeature?.Get()?.Description;
+            public Sprite Icon => BlastFeature?.Get()?.Icon;
+            public string NameForAcronym => BlastFeature?.Get()?.NameForAcronym;
+
+            public override string ToString()
+            {
+                return BlastFeature?.Get()?.name;
+            }
         }
 
         public class Focus
@@ -823,5 +879,37 @@ namespace DarkCodex
             public BlueprintAbilityReference Damage;
             public BlueprintAbilityReference Burn;
         }
+
+        #region Helper
+
+        private DamageTypeDescription[] GetDamageType(PhysicalDamageForm? p1 = null, DamageEnergyType? e2 = null, DamageEnergyType? e1 = null)
+        {
+            var result = new DamageTypeDescription[e2 != null ? 2 : 1];
+
+            if (p1 != null)
+                result[0] = new DamageTypeDescription
+                {
+                    Type = DamageType.Physical,
+                    Physical = new DamageTypeDescription.PhysicalData { Form = p1.Value }
+                };
+
+            if (e1 != null)
+                result[0] = new DamageTypeDescription
+                {
+                    Type = DamageType.Energy,
+                    Energy = e1.Value
+                };
+
+            if (e2 != null)
+                result[1] = new DamageTypeDescription
+                {
+                    Type = DamageType.Energy,
+                    Energy = e2.Value
+                };
+
+            return result;
+        }
+
+        #endregion
     }
 }

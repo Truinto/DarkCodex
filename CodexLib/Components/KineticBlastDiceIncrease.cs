@@ -49,7 +49,7 @@ namespace CodexLib
                     default:
                         continue;
                 }
-                bundles[0].ReplaceDice(dmg);
+                bundles[i].ReplaceDice(dmg);
             }
         }
 

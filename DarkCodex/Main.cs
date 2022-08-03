@@ -4,6 +4,7 @@ global using JetBrains.Annotations;
 global using Kingmaker;
 global using Kingmaker.Blueprints;
 global using Kingmaker.Blueprints.Classes;
+global using Kingmaker.Blueprints.Classes.Selection;
 global using Kingmaker.Blueprints.Facts;
 global using Kingmaker.Blueprints.Items.Armors;
 global using Kingmaker.Blueprints.Root;
@@ -12,10 +13,12 @@ global using Kingmaker.EntitySystem;
 global using Kingmaker.EntitySystem.Entities;
 global using Kingmaker.EntitySystem.Stats;
 global using Kingmaker.Enums;
+global using Kingmaker.Enums.Damage;
 global using Kingmaker.Items;
 global using Kingmaker.Items.Slots;
 global using Kingmaker.Localization;
 global using Kingmaker.PubSubSystem;
+global using Kingmaker.RuleSystem;
 global using Kingmaker.RuleSystem.Rules;
 global using Kingmaker.UnitLogic;
 global using Kingmaker.UnitLogic.Abilities;
@@ -417,11 +420,8 @@ namespace Shared
             PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
 
-            // test activatablevariants
-            PatchSafe(typeof(CodexLib.Patches.Patch_ActionBarConvert));
-            Helper.Get<BlueprintActivatableAbility>("09d742e8b50b0214fb71acfc99cc00b3").AddComponents(
-                new ActivatableVariants("09d742e8b50b0214fb71acfc99cc00b3", "2d81362af43aeac4387a3d4fced489c3", "ba1ae42c58e228c4da28328ea6b4ae34")
-                );
+
+            LoadSafe(Kineticist.FixExpandedElementFocus);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -461,6 +461,10 @@ namespace Shared
             PatchSafe(typeof(Patch_ArcanistSpontaneous));
             PatchSafe(typeof(Patch_ZippySpellLike));
             PatchSafe(typeof(Patch_AbilityRange));
+            PatchSafe(typeof(Patch_FixMisc));
+
+            // Spells - early
+            LoadSafe(Spells.CreateBladedDash);
 
             // General
             LoadSafe(General.CreateHeritage);
@@ -473,9 +477,6 @@ namespace Shared
             LoadSafe(General.PatchVarious);
             LoadSafe(General.CreateDirtyFighting);
             LoadSafe(General.CreateOpportuneParry);
-
-            // Spells
-            LoadSafe(Spells.CreateBladedDash);
 
             // Spellcasters
             LoadSafe(Spellcasters.FixBloodlineArcane);
@@ -535,6 +536,8 @@ namespace Shared
             LoadSafe(Kineticist.PatchVarious);
             LoadSafe(Kineticist.FixBlastsAreSpellLike);
             LoadSafe(Kineticist.FixBloodKineticist);
+            LoadSafe(Kineticist.CreateKineticFist);
+            LoadSafe(Kineticist.CreateKineticEnergizeWeapon);
             LoadSafe(Kineticist.CreateVenomInfusion); // keep late
             LoadSafe(Kineticist.CreateSelectiveMetakinesis); // keep late
 

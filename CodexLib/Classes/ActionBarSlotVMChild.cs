@@ -32,10 +32,15 @@ namespace CodexLib
 
             if (this.MechanicActionBarSlot is MechanicActionBarSlotVariantSelection selection)
             {
-                if (selection.IsActive())
+                bool isOn = selection.IsActive();
+
+                if (isOn)
                     this.Parent.ForeIcon.Value = selection.GetIcon();
                 else
                     this.Parent.ForeIcon.Value = null;
+
+                if (this.Parent.MechanicActionBarSlot is MechanicActionBarSlotActivableAbility act)
+                    act.ActivatableAbility.IsOn = isOn;
             }
 
         }

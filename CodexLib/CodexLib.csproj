@@ -90,6 +90,8 @@
     <Compile Include="Classes\AnyRef.cs" />
     <Compile Include="Classes\CountableFlagArray.cs" />
     <Compile Include="Classes\DefGroup.cs" />
+    <Compile Include="Classes\VariantSelectionWrapperConverter.cs" />
+    <Compile Include="Classes\KineticistTree.cs" />
     <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />
     <Compile Include="Classes\MechanicActionBarSlotPlaceholder.cs" />
     <Compile Include="Classes\MechanicActionBarSlotSpellGroup.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Components\AddConditionExceptions.cs" />
     <Compile Include="Components\AddDamageResistancePhysicalImproved.cs" />
     <Compile Include="Components\AddFactOnlyParty.cs" />
+    <Compile Include="Components\AddFeatureOnApplyPrerequisite.cs" />
     <Compile Include="Components\AddFeatureSelection.cs" />
     <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
     <Compile Include="Components\AddMechanicFeatureCustom.cs" />
@@ -123,6 +126,8 @@
     <Compile Include="Components\FeatureForPrerequisite.cs" />
     <Compile Include="Components\KineticBlastDiceIncrease.cs" />
     <Compile Include="Components\ActivatableVariantsExample.cs" />
+    <Compile Include="Components\KineticEnergizeFist.cs" />
+    <Compile Include="Components\KineticExpandedMastery.cs" />
     <Compile Include="Components\KineticistIncreaseDC.cs" />
     <Compile Include="Classes\MechanicActionBarSlotVariantSelection.cs" />
     <Compile Include="Components\PanacheDodge.cs" />

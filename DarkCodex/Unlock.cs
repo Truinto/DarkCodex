@@ -58,7 +58,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create | Severity.WIP, "Unlock Kineticist", "adds infusion, wild talent, and element focus up to level 40", true, Requirement: typeof(Patch_UnlockClassLevels))]
         public static void UnlockKineticist()
         {
-            var t = Kineticist.Tree;
+            var t = KineticistTree.Instance;
 
             // replace original with simplified
             //if (t.ExpandedElement.NotEmpty())

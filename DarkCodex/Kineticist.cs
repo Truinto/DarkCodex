@@ -25,10 +25,13 @@ using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCas
 
 namespace DarkCodex
 {
+    /* Notes:
+     * - when creating new elements, remember to put xxxBlastBladeDamage into the BaseBlast (otherwise substance infusion won't work with it)
+     *
+     */
     public class Kineticist
     {
-
-        public static KineticistTree Tree = new();
+        public static KineticistTree Tree = KineticistTree.Instance;
 
         public static AbilityRegister Blasts = new(
             "c4b74e4448b81d04f9df89ed14c38a95",  //MetakinesisQuickenCheaperBuff
@@ -54,7 +57,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
 
-        [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent", false)]
+        [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent; required by other kineticist features!", false, Priority: 300)]
         public static void CreateExtraWildTalentFeat()
         {
             var extra_wild_talent_selection = Helper.CreateBlueprintFeatureSelection(
@@ -1048,30 +1051,74 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, Tree.ElementalScion); // add to character class selection
         }
 
+        [PatchInfo(Severity.Create, "Kinetic Fist", "infusion", false)]
         public static void CreateKineticFist()
         {
-            Tree.GetAll(true, true, archetype: true).Select(s => s.BaseAbility);
-
             var act = Helper.CreateBlueprintActivatableAbility(
                 "KineticFistActivatable",
-                out var buff,
+                out var _,
                 "Kinetic Fist",
-                "DESC"
+                "Element: universal\nType: form infusion\nLevel: 1\nBurn: 1\nAssociated Blasts: any\nYou surround your body with energy or elemental matter from your kinetic abilities. You can use this form infusion as part of an attack action, a charge action, or a full-attack action to add damage to each of your natural attacks and unarmed strikes until the beginning of your next turn. Since kinetic fist is part of another action, using this wild talent doesn’t provoke any additional attack of opportunity. You deal an additional 1d6 points of damage per 3 dice of your kinetic blast’s damage (minimum 1d6), and this damage is of the same type as your kinetic blast’s damage. This extra damage ignores spell resistance and doesn’t apply any modifiers to your kinetic blast’s damage, such as your Constitution modifier.",
+                icon: Helper.StealIcon("a29a582c3daa4c24bb0e991c596ccb28")
                 ).SetComponents(
-                new ActivatableVariants()
+                new KineticEnergizeFist(true)
                 );
-            buff.SetComponents(
-                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
-                    Helper.CreateActionList(),
-                    AllNaturalAndUnarmed: true
-                    ),
-                new ActivatableVariantsExample()
-                );
-            // 
             
             var feat = Helper.CreateBlueprintFeature(
                 "KineticFistInfusion"
-                ).SetUIData(act);
+                ).SetUIData(act
+                ).SetComponents(
+                Helper.CreateAddFacts(act)
+                );
+
+            Helper.AddInfusion(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Energize Weapon", "infusion", false)]
+        public static void CreateKineticEnergizeWeapon()
+        {
+            var act = Helper.CreateBlueprintActivatableAbility(
+                "EnergizeWeaponActivatable",
+                out var _,
+                "Energize Weapon",
+                "Element: universal\nType: form infusion\nLevel: 1\nBurn: 1\nAssociated Blasts: any\nYou imbue your manufactured weapons (not an unarmed strike or natural attack) with your elemental energy as part of an attack action, charge action, or full-attack action to deal an additional 1d6 points of damage to each of your attacks with these weapons until the beginning of your next turn. At 7th level and every 6 levels thereafter, this bonus damage increases by 1d6 points. Composite blasts deal double this additional damage.\n\nThe additional damage is of the same type as the infused blast’s damage. This additional damage ignores spell resistance and doesn’t apply any modifiers to your kinetic blast’s damage (such as your Constitution modifier).",
+                icon: Helper.StealIcon("d7fdd79f0f6b6a2418298e936bb68e40")
+                ).SetComponents(
+                new KineticEnergizeFist(false)
+                );
+
+            var feat = Helper.CreateBlueprintFeature(
+                "EnergizeWeaponInfusion"
+                ).SetUIData(act
+                ).SetComponents(
+                Helper.CreateAddFacts(act)
+                );
+
+            Helper.AddInfusion(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Fix Expanded Element", "fix missing talents and mastery when picking the same element focus multiple times", false, Priority: 300)]
+        public static void FixExpandedElementFocus()
+        {
+            var mastery = Helper.CreateBlueprintFeatureSelection(
+                "KineticistMastery123",
+                "Greater Element Mastery",
+                "A Kineticist focusing on her primary element gains a bonus wild talent. For blasts of her element, the kineticist gains a +1 bonus on attack rolls and damage rolls, as well as to caster level and DCs."
+                ).SetComponents(
+                new KineticExpandedMastery()
+                );
+            mastery.m_AllFeatures = Helper.Append(Tree.SelectionInfusion.Get().m_AllFeatures, Tree.SelectionWildTalent.Get().m_AllFeatures);
+
+            foreach (var focus in Tree.GetFocus())
+            {
+                focus.Second.Get()?.AddComponents(
+                    new AddFeatureOnApplyPrerequisite(1, Tree.ExtraWildTalent, focus.First, focus.Knight)
+                    );
+
+                focus.Third.Get()?.AddComponents(
+                    new AddFeatureOnApplyPrerequisite(2, mastery, focus.First, focus.Knight, focus.Second)
+                    ).RemoveComponents<PrerequisiteNoFeature>();
+            }
         }
 
         #region Helper

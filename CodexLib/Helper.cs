@@ -150,6 +150,30 @@ namespace CodexLib
         public const BindingFlags BindingInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         public const BindingFlags BindingStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
+        private static List<Action> _patchLast = new();
+        public static void PatchLast(Action action) // TODO: function to apply properties at the very last moment
+        {
+            if (_patchLast == null)
+                action();
+            else
+                _patchLast.Add(action);
+        }
+        public static void RunPatchLast()
+        {
+            if (_patchLast == null)
+                return;
+            foreach (var action in _patchLast)
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception e) { PrintException(e); }
+            }
+
+            _patchLast = null;
+        }
+
         public static void Patch(this Harmony harmony, Type patch)
         {
             try
@@ -1483,7 +1507,7 @@ namespace CodexLib
             PrintDebug("GetData<TData>(EntityFactComponent) is not runtime: " + Environment.StackTrace);
             return null;
         }
-        
+
         public static TData GetDataExt<TComponent, TData>(this EntityFact fact) where TComponent : class where TData : class, new()
         {
             if (fact == null)
@@ -2255,6 +2279,16 @@ namespace CodexLib
 
         #endregion
 
+        #region Rules
+
+        private static FieldInfo _fieldRuleReasonAbility = AccessTools.Field(typeof(RuleReason), "<Ability>k__BackingField");
+        public static void SetRuleAbility(this RuleReason reason, AbilityData abilityData)
+        {
+            _fieldRuleReasonAbility.SetValue(reason, abilityData);
+        }
+
+        #endregion
+
         #region Spells
 
         public static void Add(this BlueprintSpellList spellList, BlueprintAbility spell, int level)
@@ -2276,15 +2310,15 @@ namespace CodexLib
                 CreateSpellListComponent(spellList.ToReference<BlueprintSpellListReference>(), level)
                 );
 
+            // TODO: cache blueprints
             var specializationFirst = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35");  //SpellSpecializationFirst
             AppendAndReplace(ref specializationFirst.BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
 
             var spellSelection = Helper.Get<BlueprintFeatureSelection>("fe67bc3b04f1cd542b4df6e28b6e0ff5"); // SpellSpecializationSelection
             foreach (var feature in spellSelection.m_AllFeatures)
             {
-                if (feature.Get() is not BlueprintParametrizedFeature specialization)
-                    continue;
-                AppendAndReplace(ref specialization.BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
+                if (feature.Get() is BlueprintParametrizedFeature specialization)
+                    specialization.BlueprintParameterVariants = specializationFirst.BlueprintParameterVariants;
             }
         }
 

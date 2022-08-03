@@ -16,11 +16,20 @@ namespace CodexLib
     {
         public string modPath;
         public UnityModManager.ModEntry.ModLogger logger;
+        public Harmony harmony;
 
         public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger)
         {
             this.modPath = modPath;
             this.logger = logger;
+            Stack.Push(this);
+        }
+
+        public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger, Harmony harmony)
+        {
+            this.modPath = modPath;
+            this.logger = logger;
+            this.harmony = harmony;
             Stack.Push(this);
         }
 
@@ -32,12 +41,13 @@ namespace CodexLib
         static Scope()
         {
             Stack = new();
-            new Scope("Mods", new UnityModManager.ModEntry.ModLogger("CodexLib"));
+            new Scope("Mods", new UnityModManager.ModEntry.ModLogger("CodexLib"), new Harmony("CodexLib"));
         }
 
         public static Stack<Scope> Stack;
 
         public static string ModPath => Stack.Peek().modPath;
         public static UnityModManager.ModEntry.ModLogger Logger => Stack.Peek().logger;
+        public static Harmony Harmony => Stack.Peek().harmony; // TODO: use this in Helper
     }
 }

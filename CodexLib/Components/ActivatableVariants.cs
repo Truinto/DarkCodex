@@ -29,7 +29,7 @@ namespace CodexLib
             foreach (var fact in this.Facts)
             {
                 if (fact.NotEmpty() && (!this.NeedFact || this.Owner.HasFact(fact)))
-                    list.Add(new MechanicActionBarSlotVariantSelection(this.Owner, fact, data));
+                    list.Add(new MechanicActionBarSlotVariantSelection(this.Owner, fact.Get(), data));
             }
 
             return list;
@@ -37,12 +37,24 @@ namespace CodexLib
 
         public Sprite GetIcon()
         {
-            return this.Data.Selected?.Get()?.Icon;
+            return this.Data.Wrapper.Selected?.Icon;
         }
     }
 
     public class VariantSelectionData
     {
-        public BlueprintUnitFactReference Selected;
+        [JsonProperty]
+        public VariantSelectionWrapper Wrapper = new();
+    }
+
+    /// <summary>
+    /// It is necessary to wrap this value, because the json converter for UnitFactComponentDelegate does save $type.
+    /// Without $type it is necessary that my converter can resolve UIDataProvider, which could be used by other converters causing incompatabilities.
+    /// By using a wrapper I can ensure my JsonConverter will not try and fail to convert foreign types.
+    /// </summary>
+    public sealed class VariantSelectionWrapper
+    {
+        [JsonProperty]
+        public IUIDataProvider Selected;
     }
 }

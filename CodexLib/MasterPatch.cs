@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CodexLib.Patches;
 using Kingmaker.Enums;
+using Kingmaker.EntitySystem.Persistence.JsonUtility;
 
 namespace CodexLib
 {
@@ -19,22 +20,23 @@ namespace CodexLib
         public static List<Type> PatchList = new()
         {
             typeof(Patch_AbilityAtWill),
+            typeof(Patch_AbilityIsFullRound),
+            typeof(Patch_ActionBarConvert),
             typeof(Patch_ActivatableActionBar),
             typeof(Patch_AOEAttackRolls),
             typeof(Patch_ConditionExemption),
+            typeof(Patch_ContextRankBonus),
             typeof(Patch_ContextStatValue),
             typeof(Patch_DebugReport),
+            typeof(Patch_DuelistParry),
             typeof(Patch_FixAbilityTargets),
             typeof(Patch_GetTargetProjectileFix),
+            typeof(Patch_MaterialComponent),
+            typeof(Patch_Prerequisite),
             typeof(Patch_RulebookEventBusPriority),
+            typeof(Patch_RuleSpendCharge),
             typeof(Patch_SpellSelectionParametrized),
             typeof(Patch_WeaponCategory),
-            typeof(Patch_AbilityIsFullRound),
-            typeof(Patch_RuleSpendCharge),
-            typeof(Patch_Prerequisite),
-            typeof(Patch_ContextRankBonus),
-            typeof(Patch_DuelistParry),
-            typeof(Patch_MaterialComponent),
         };
 
         /// <summary>
@@ -53,6 +55,8 @@ namespace CodexLib
 
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");
+
+            DefaultJsonSettings.DefaultSettings.Converters.Add(new VariantSelectionWrapperConverter());
         }
 
         /// <summary>

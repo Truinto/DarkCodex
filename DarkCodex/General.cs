@@ -607,24 +607,24 @@ namespace DarkCodex
             var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
 
             Main.Patch(typeof(Patch_SpellPerfection));
-            
-            Helper.Get<BlueprintFeature>("16fa59cc9a72a6043b566b49184f53fe").GetComponent<SpellFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //SpellFocus
-            Helper.Get<BlueprintFeature>("5b04b45b228461c43bad768eb0f7c7bf").GetComponent<SpellFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //SpellFocusGreater
 
-            Helper.Get<BlueprintFeature>("1e1f627d26ad36f43bbd26cc2bf8ac7e").GetComponent<WeaponFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //WeaponFocus
-            Helper.Get<BlueprintFeature>("09c9e82965fb4334b984a1e9df3bd088").GetComponent<WeaponFocusParametrized>().Descriptor = ModifierDescriptor.Feat; //WeaponFocusGreater
+            setValue(ref Helper.Get<BlueprintFeature>("16fa59cc9a72a6043b566b49184f53fe").GetComponent<SpellFocusParametrized>().Descriptor); //SpellFocus
+            setValue(ref Helper.Get<BlueprintFeature>("5b04b45b228461c43bad768eb0f7c7bf").GetComponent<SpellFocusParametrized>().Descriptor); //SpellFocusGreater
 
-            Helper.Get<BlueprintFeature>("ee7dc126939e4d9438357fbd5980d459").GetComponent<SpellPenetrationBonus>().Descriptor = ModifierDescriptor.Feat; //SpellPenetration
-            Helper.Get<BlueprintFeature>("1978c3f91cfbbc24b9c9b0d017f4beec").GetComponent<SpellPenetrationBonus>().Descriptor = ModifierDescriptor.Feat; //GreaterSpellPenetration
+            setValue(ref Helper.Get<BlueprintFeature>("1e1f627d26ad36f43bbd26cc2bf8ac7e").GetComponent<WeaponFocusParametrized>().Descriptor); //WeaponFocus
+            setValue(ref Helper.Get<BlueprintFeature>("09c9e82965fb4334b984a1e9df3bd088").GetComponent<WeaponFocusParametrized>().Descriptor); //WeaponFocusGreater
 
-            Helper.Get<BlueprintFeature>("52135eada006e9045a848cd659749608").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusAcid
-            Helper.Get<BlueprintFeature>("49926dc94aca16145b6a608277b6f31c").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusAcid
-            Helper.Get<BlueprintFeature>("2ed9d8bf76412ba4a8afe38fa9925fca").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusCold
-            Helper.Get<BlueprintFeature>("f37a210a77d769c4ea2b23c22c07b83a").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusCold
-            Helper.Get<BlueprintFeature>("13bdf8d542811ac4ca228a53aa108145").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusFire
-            Helper.Get<BlueprintFeature>("7a722c3e782aa5349a867c3516a2a4cf").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusFire
-            Helper.Get<BlueprintFeature>("d439691f37d17804890bd9c263ae1e80").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //ElementalFocusElectricity
-            Helper.Get<BlueprintFeature>("6a3be3df06f555d44a2b9dbfbcc2df23").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor = ModifierDescriptor.Feat; //GreaterElementalFocusElectricity
+            setValue(ref Helper.Get<BlueprintFeature>("ee7dc126939e4d9438357fbd5980d459").GetComponent<SpellPenetrationBonus>().Descriptor); //SpellPenetration
+            setValue(ref Helper.Get<BlueprintFeature>("1978c3f91cfbbc24b9c9b0d017f4beec").GetComponent<SpellPenetrationBonus>().Descriptor); //GreaterSpellPenetration
+
+            setValue(ref Helper.Get<BlueprintFeature>("52135eada006e9045a848cd659749608").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //ElementalFocusAcid
+            setValue(ref Helper.Get<BlueprintFeature>("49926dc94aca16145b6a608277b6f31c").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //GreaterElementalFocusAcid
+            setValue(ref Helper.Get<BlueprintFeature>("2ed9d8bf76412ba4a8afe38fa9925fca").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //ElementalFocusCold
+            setValue(ref Helper.Get<BlueprintFeature>("f37a210a77d769c4ea2b23c22c07b83a").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //GreaterElementalFocusCold
+            setValue(ref Helper.Get<BlueprintFeature>("13bdf8d542811ac4ca228a53aa108145").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //ElementalFocusFire
+            setValue(ref Helper.Get<BlueprintFeature>("7a722c3e782aa5349a867c3516a2a4cf").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //GreaterElementalFocusFire
+            setValue(ref Helper.Get<BlueprintFeature>("d439691f37d17804890bd9c263ae1e80").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //ElementalFocusElectricity
+            setValue(ref Helper.Get<BlueprintFeature>("6a3be3df06f555d44a2b9dbfbcc2df23").GetComponent<IncreaseSpellDescriptorDC>().ModifierDescriptor); //GreaterElementalFocusElectricity
 
             var feat = Helper.CreateBlueprintParametrizedFeature(
                 "SpellPerfection",
@@ -641,6 +641,13 @@ namespace DarkCodex
                 );
 
             Helper.AddFeats(feat);
+            return;
+
+            void setValue(ref ModifierDescriptor descriptor)
+            {
+                if (descriptor == ModifierDescriptor.UntypedStackable)
+                    descriptor = ModifierDescriptor.Feat;
+            }
         }
 
         [PatchInfo(Severity.Create, "Opportune Parry", "combat feat: duelist parry by expending Attack of Opportunities", true)]

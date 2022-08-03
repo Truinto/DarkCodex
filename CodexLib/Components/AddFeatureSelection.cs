@@ -35,7 +35,7 @@ namespace CodexLib
 
             if (feature is BlueprintProgression progression) // this code is from AddFeatureOnApply
             {
-                this.Data.AppliedFact = this.Owner.Progression.Features.AddFeature(feature, null);
+                this.Data.AppliedFact = this.Owner.Progression.Features.AddFeature(progression, null);
                 var state = (Game.Instance.LevelUpController?.State) ?? new LevelUpState(this.Owner, LevelUpState.CharBuildMode.LevelUp, false);
                 if (progression.ExclusiveProgression && this.Owner.Progression.GetClassData(progression.ExclusiveProgression) != null)
                     state.SelectedClass = progression.ExclusiveProgression;
@@ -43,14 +43,14 @@ namespace CodexLib
             }
             else if (feature is BlueprintFeatureSelection selection) // this code is from SelectFeature.Apply
             {
-                var state = (Game.Instance.LevelUpController?.State) ?? new LevelUpState(this.Owner, LevelUpState.CharBuildMode.LevelUp, false);
-
                 if (this.Fact is not Feature f)
                 {
                     Helper.PrintDebug("Add selection is not Feature");
                     return;
                 }
+
                 Helper.PrintDebug($"Add selection source={f.Source} level={f.SourceLevel}");
+                var state = (Game.Instance.LevelUpController?.State) ?? new LevelUpState(this.Owner, LevelUpState.CharBuildMode.LevelUp, false);
                 state.AddSelection(null, f.Source.GetValueOrDefault(), selection, f.SourceLevel); // enhancement: could set parent here
             }
             else if (feature is not null)

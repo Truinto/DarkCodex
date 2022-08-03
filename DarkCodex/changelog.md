@@ -1,6 +1,12 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.22]
+- added infusion Kinetic Fist
+- added infusion Energize Weapon
+- fixed Spell Perfection not working with Spell Specialization and some interactions with TableTopTweaks
+- fixed Metamagic Master &co not working with Bladed Dash
+
 ## [1.3.21]
 - changed bonus Ability Range to a 3% bonus per level, reducing overall bonus range (before +5 ft per two levels)
 - fixed expanded element with 3rd party elements

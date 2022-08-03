@@ -29,5 +29,9 @@ namespace DarkCodex
         [HarmonyPatch(typeof(SpellPenetrationMythicBonus), nameof(SpellPenetrationMythicBonus.OnEventAboutToTrigger))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instr) => Transpiler1(instr);
+
+        [HarmonyPatch(typeof(SpellSpecializationParametrized), nameof(SpellSpecializationParametrized.OnEventAboutToTrigger))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instr) => Transpiler1(instr);
     }
 }
