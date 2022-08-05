@@ -30,8 +30,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Durable Cold Iron Arrows", "will pick up non-magical arrows after combat", false, Requirement: typeof(Event_RestoreEndOfCombat))]
         public static void PatchArrows()
         {
-            var ColdIronArrowsQuiverItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("a5a537ad28053ad48a7be1c53d7fd7ed");
-            var ColdIronArrowsQuiverItem_20Charges = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("464ecede228b0f745a578f69a968226d");
+            var ColdIronArrowsQuiverItem = Helper.Get<BlueprintItemEquipmentUsable>("a5a537ad28053ad48a7be1c53d7fd7ed");
+            var ColdIronArrowsQuiverItem_20Charges = Helper.Get<BlueprintItemEquipmentUsable>("464ecede228b0f745a578f69a968226d");
 
             ColdIronArrowsQuiverItem.RestoreChargesOnRest = true;
             ColdIronArrowsQuiverItem_20Charges.RestoreChargesOnRest = true;
@@ -43,19 +43,20 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Terendelev´s Scale", "make the revive scale usable once per day", true)]
         public static void PatchTerendelevScale()
         {
-            var TerendelevScaleItem = ResourcesLibrary.TryGetBlueprint<BlueprintItemEquipmentUsable>("816f244523b5455a85ae06db452d4330");
+            var TerendelevScaleItem = Helper.Get<BlueprintItemEquipmentUsable>("816f244523b5455a85ae06db452d4330");
             TerendelevScaleItem.RestoreChargesOnRest = true;
         }
 
-        [PatchInfo(Severity.Create, "Kinetic Artifact", "new weapon for Kineticists", true)]
+        [PatchInfo(Severity.Create | Severity.Faulty | Severity.Hidden, "Kinetic Artifact", "new weapon for Kineticists", true)]
         public static void CreateKineticArtifact()
         {
+            // see  #105
             var bladetype = Helper.ToRef<BlueprintWeaponTypeReference>("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
-            var staff = ResourcesLibrary.TryGetBlueprint<BlueprintItemWeapon>("e33fd75689190094f897a57a227fa272"); //BurnedAshwoodItem
+            var staff = Helper.Get<BlueprintItemWeapon>("e33fd75689190094f897a57a227fa272"); //BurnedAshwoodItem
             var enchant_air = Helper.ToRef<BlueprintWeaponEnchantmentReference>("1d64abd0002b98043b199c0e3109d3ee"); //AirKineticBladeEnchantment
             var enchant_3 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b"); //Enhancement3
-            var air_damage = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("89cc522f2e1444b40ba1757320c58530"); //AirBlastKineticBladeDamage
-            var air_burn = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("77cb8c607b263194894a929c8ac59708"); //KineticBladeAirBlastBurnAbility
+            var air_damage = Helper.Get<BlueprintAbility>("89cc522f2e1444b40ba1757320c58530"); //AirBlastKineticBladeDamage
+            var air_burn = Helper.Get<BlueprintAbility>("77cb8c607b263194894a929c8ac59708"); //KineticBladeAirBlastBurnAbility
 
             var fake_blade_damage = Helper.CreateBlueprintAbility(
                 "KineticCatalystDamage",
@@ -101,9 +102,9 @@ namespace DarkCodex
             weapon.m_DescriptionText = Helper.CreateString("This +3 staff grants its wearer its enchantment bonus on attack and damage rolls with kinetic blasts. It can be used like a simple physical kinetic blade. Wielding this weapon doesn’t prevent a kineticst from gathering power.");
             weapon.name = "KineticCatalystStaff";
             weapon.AddAsset(Helper.GetGuid(weapon.name));
-            weapon.SetComponents(new WeaponKineticBlade() { m_ActivationAbility = fake_blade_burn.ToRef(), m_Blast = fake_blade_damage.ToRef() });
+            //weapon.SetComponents(new WeaponKineticBlade() { m_ActivationAbility = fake_blade_burn.ToRef(), m_Blast = fake_blade_damage.ToRef() });
 
-            Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
+            //Helper.AddArcaneVendorItem(weapon.ToReference<BlueprintItemReference>(), 1);
         }
 
         [PatchInfo(Severity.Create | Severity.WIP, "Butchering Axe", "new weapon type Butchering Axe", false)]

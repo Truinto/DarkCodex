@@ -150,44 +150,26 @@ namespace CodexLib
         public const BindingFlags BindingInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         public const BindingFlags BindingStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
-        private static List<Action> _patchLast = new();
-        public static void PatchLast(Action action) // TODO: function to apply properties at the very last moment
-        {
-            if (_patchLast == null)
-                action();
-            else
-                _patchLast.Add(action);
-        }
-        public static void RunPatchLast()
-        {
-            if (_patchLast == null)
-                return;
-            foreach (var action in _patchLast)
-            {
-                try
-                {
-                    action();
-                }
-                catch (Exception e) { PrintException(e); }
-            }
-
-            _patchLast = null;
-        }
-
-        public static void Patch(this Harmony harmony, Type patch)
+        public static List<MethodInfo> Patch(Type patch)
         {
             try
             {
                 Print("Patching " + patch.Name);
-                var processor = harmony.CreateClassProcessor(patch);
-                processor.Patch();
-#if DEBUG
-                var patches = GetConflictPatches(harmony, processor);
-                if (patches != null && patches.Count > 0)
-                    PrintDebug("warning: potential conflict\n\t" + patches.Join(s => $"{s.owner}, {s.PatchMethod.Name}", "\n\t"));
-#endif
+                var processor = Scope.Harmony.CreateClassProcessor(patch);
+                return processor.Patch();
             }
             catch (Exception e) { PrintException(e); }
+            return null;
+        }
+
+        /// <summary>
+        /// Prints possible patching conflicts.
+        /// </summary>
+        public static void Check(this PatchClassProcessor processor)
+        {
+            var patches = GetConflictPatches(processor);
+            if (patches != null && patches.Count > 0)
+                PrintDebug("warning: potential conflict\n\t" + patches.Join(s => $"{s.owner}, {s.PatchMethod?.Name}", "\n\t"));
         }
 
         //private static void PatchManual(this Harmony harmony, Type patch)
@@ -207,7 +189,7 @@ namespace CodexLib
         //    patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public)?.SetValue(null, true);
         //}
 
-        public static void Unpatch(this Harmony harmony, Type patch, HarmonyPatchType patchType)
+        public static void Unpatch(Harmony harmony, Type patch, HarmonyPatchType patchType)
         {
             Print("Unpatch " + patch);
             if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
@@ -237,12 +219,12 @@ namespace CodexLib
             return true;
         }
 
-        public static List<Patch> GetConflictPatches(this Harmony harmony, PatchClassProcessor processor)
+        public static List<Patch> GetConflictPatches(PatchClassProcessor processor)
         {
-            var list = new List<Patch>();
-
             try
             {
+                var harmony = Scope.Harmony;
+                var list = new List<Patch>();
                 foreach (var patch in processor.patchMethods)
                 {
                     var orignal = patch.info.GetOriginalMethod();
@@ -261,10 +243,10 @@ namespace CodexLib
                     var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
                     list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
                 }
+                return list;
             }
             catch (Exception e) { PrintException(e); }
-
-            return list;
+            return null;
         }
 
         public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
@@ -857,6 +839,7 @@ namespace CodexLib
 
         #region GUID
 
+        [Obsolete]
         public static bool Allow_Guid_Generation = false;
         private static string _overwriteGuid;
         //private static List<string> _guidloaded = new();
@@ -909,7 +892,7 @@ namespace CodexLib
             if (result != null)
                 return result;
 
-            if (!Allow_Guid_Generation)
+            if (!Scope.AllowGuidGeneration)
                 throw new Exception("Tried to generate a new GUID while not allowed! " + key);
 
             Print("Warning: Generating new GUID for " + key);
@@ -984,7 +967,7 @@ namespace CodexLib
         {
             string modPath = Scope.ModPath;
 
-            if (_mappedStrings.Ensure(modPath, out var map) && !Allow_Guid_Generation)
+            if (_mappedStrings.Ensure(modPath, out var map) && !Scope.AllowGuidGeneration)
             {
                 load(Path.Combine(modPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
             }
@@ -2583,14 +2566,6 @@ namespace CodexLib
             var result = new CombatStateTrigger();
             result.CombatStartActions = CreateActionList(start);
             result.CombatEndActions = CreateActionList(start);
-            return result;
-        }
-
-        public static AddFactOnlyParty CreateAddFactOnlyParty(BlueprintUnitFactReference fact, FeatureParam param = null)
-        {
-            var result = new AddFactOnlyParty();
-            result.Feature = fact;
-            result.Parameter = param;
             return result;
         }
 

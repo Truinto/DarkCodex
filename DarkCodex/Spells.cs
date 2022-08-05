@@ -26,7 +26,7 @@ namespace DarkCodex
             // sfx from CallLightningAbility AbilitySpawnFx
             // StormwalkerFlashStepAbility AbilityCustomFlashStep
             // DragonsBreathBlue AbilityDeliverProjectile
-            var flashstep = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
+            var flashstep = Helper.Get<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
 
             var checkWeapon = Helper.CreateAbilityRequirementHasItemInHands();
             var school = Helper.CreateSpellComponent(SpellSchool.Transmutation);

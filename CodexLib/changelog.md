@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## [1.1.1]
+- added harmony and allowGuidGeneration to Scope settings; old constructors will be removed in future releases
+- changed AddFactOnlyParty to include minimum character level
+
 ## [1.1.0]
 - !signature change: CreateAddFeatureIfHasFact, CreateContextConditionHasFact, CreatePrerequisiteFeature, CreateAddInitiatorAttackWithWeaponTrigger
 - added limit to exception count

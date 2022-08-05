@@ -121,8 +121,8 @@ namespace DarkCodex
             }
 
             // resource based
-            ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
-            ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("cedc4959ab311d548881844eecddf57a").GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2()); // WitchHexLifeGiverAbility
+            Helper.Get<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
+            Helper.Get<BlueprintAbility>("cedc4959ab311d548881844eecddf57a").GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2()); // WitchHexLifeGiverAbility
 
             Helper.AddMythicTalent(limitless);
         }
@@ -130,9 +130,9 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Limitless Smite", "mythic ability: infinite Smites (chaotic and evil), requires Abundant Smite", true)]
         public static void CreateLimitlessSmite()
         {
-            var smite_evil = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("7bb9eb2042e67bf489ccd1374423cdec");
-            var smite_chaos = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("a4df3ed7ef5aa9148a69e8364ad359c5");
-            var mark_of_justice = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("7a4f0c48829952e47bb1fd1e4e9da83a");
+            var smite_evil = Helper.Get<BlueprintAbility>("7bb9eb2042e67bf489ccd1374423cdec");
+            var smite_chaos = Helper.Get<BlueprintAbility>("a4df3ed7ef5aa9148a69e8364ad359c5");
+            var mark_of_justice = Helper.Get<BlueprintAbility>("7a4f0c48829952e47bb1fd1e4e9da83a");
             var abundant_smite = Helper.ToRef<BlueprintFeatureReference>("7e5b63faeca24474db0bfd019167dda4");
             var abundant_smitechaos = Helper.ToRef<BlueprintFeatureReference>("4cdc155e26204491ba4d193646cb4443");
 
@@ -378,9 +378,9 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Extra Mythic Feats", "mythic feat: can pick mythic abilities as feats and vice versa", true)]
         public static void CreateExtraMythicFeats()
         {
-            var base_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81"); //MythicFeatSelection
-            var base_selection2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d"); //MythicAbilitySelection
-            var extra_selection1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8"); //ExtraMythicAbilityMythicFeat
+            var base_selection1 = Helper.Get<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81"); //MythicFeatSelection
+            var base_selection2 = Helper.Get<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d"); //MythicAbilitySelection
+            var extra_selection1 = Helper.Get<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8"); //ExtraMythicAbilityMythicFeat
 
             extra_selection1.Ranks = 10;
 
@@ -463,8 +463,8 @@ namespace DarkCodex
         {
             // DC = 10 + ~~HD + Mythic Rank~~ + Mental Stat
             // works only on demons with HD < player HD
-            var dp = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("d7cbd2004ce66a042aeab2e95a3c5c61"); //DominatePerson
-            var dpbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("c0f4e1c24c9cd334ca988ed1bd9d201f"); //DominatePersonBuff
+            var dp = Helper.Get<BlueprintAbility>("d7cbd2004ce66a042aeab2e95a3c5c61"); //DominatePerson
+            var dpbuff = Helper.Get<BlueprintBuff>("c0f4e1c24c9cd334ca988ed1bd9d201f"); //DominatePersonBuff
             var typedemon = Helper.ToRef<BlueprintUnitFactReference>("dc960a234d365cb4f905bdc5937e623a"); //SubtypeDemon
             var ddbuff = dpbuff.Clone("DominateDemonBuff")
                 .RemoveComponents<AddFactContextActions>();
@@ -562,7 +562,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Kinetic Overcharge", "Kinetic Overcharge works always, not only while gathering power", true)]
         public static void PatchKineticOvercharge()
         {
-            var overcharge = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("4236ca275c6fa9b4a9945b2645262616");
+            var overcharge = Helper.Get<BlueprintFeature>("4236ca275c6fa9b4a9945b2645262616");
             overcharge.m_Description = Helper.CreateString("You use your mythic powers to fuel kineticist abilities.\nBenefit: Reduce the burn cost of kineticist blasts by one burn point.");
             overcharge.Ranks = 6;
             overcharge.RemoveComponents<AddFacts>();
@@ -575,8 +575,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Limitless Demon Rage", "Limitless Rage also applies to Demon Rage", true)]
         public static void PatchLimitlessDemonRage()
         {
-            var rage = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
-            var rage2 = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("260daa5144194a8ab5117ff568b680f5"); //DemonRageActivateAbility
+            var rage = Helper.Get<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
+            var rage2 = Helper.Get<BlueprintAbility>("260daa5144194a8ab5117ff568b680f5"); //DemonRageActivateAbility
             var limitless = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
 
             rage.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
@@ -586,7 +586,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Unstoppable", "Unstoppable works against more conditions like stun, daze, and confusion", true)]
         public static void PatchUnstoppable()
         {
-            var unstoppable = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("74afc3465db56924c9618a42d84efab8"); //Unstoppable
+            var unstoppable = Helper.Get<BlueprintFeature>("74afc3465db56924c9618a42d84efab8"); //Unstoppable
             var dominate = Helper.ToRef<BlueprintBuffReference>("c0f4e1c24c9cd334ca988ed1bd9d201f"); //DominatePersonBuff
             var entangle = Helper.ToRef<BlueprintBuffReference>("f7f6330726121cf4b90a6086b05d2e38"); //EntangleBuff
 
@@ -600,7 +600,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Boundless Healing", "Boundless Healing also grants healing spells to spellbooks", true)]
         public static void PatchBoundlessHealing()
         {
-            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
+            var feat = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
             feat.AddComponents(new AddKnownSpellsAnyClass()
             {
                 Spells = new BlueprintAbilityReference[] {
@@ -641,7 +641,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Boundless Injury", "Boundless Healing also applies to inflict wound spells and grants those to spellbooks", true)]
         public static void PatchBoundlessInjury()
         {
-            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
+            var feat = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
 
             var addKnownSpells = new AddKnownSpellsAnyClass()
             {
@@ -721,8 +721,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend | Severity.WIP, "Ranging Shots", "doesn't get weaker when hitting", true)]
         public static void PatchRangingShots()
         {
-            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("2b558167862b05d47b8472d176257f82"); //RangingShots
-            var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e9da1dc30535fc94ab458ee20f8d3c4e"); //RangingShotsBuff
+            var feat = Helper.Get<BlueprintFeature>("2b558167862b05d47b8472d176257f82"); //RangingShots
+            var buff = Helper.Get<BlueprintBuff>("e9da1dc30535fc94ab458ee20f8d3c4e"); //RangingShotsBuff
 
             // keep attack bonus while hitting
             feat.RemoveComponents(r => r is AddInitiatorAttackWithWeaponTrigger trigger && trigger.OnlyHit);
@@ -733,7 +733,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Wandering Hex", "can swap hex at will", true)]
         public static void PatchWanderingHex()
         {
-            var feat = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
+            var feat = Helper.Get<BlueprintAbility>("b209beab784d93546b40a2fa2a09ffa8"); //WitchWanderingHexAbility
             feat.RemoveComponents<AbilityResourceLogic>();
         }
 
@@ -779,7 +779,7 @@ namespace DarkCodex
         public static void PatchVarious()
         {
             // allow quicken metamagic on demon teleport
-            ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
+            Helper.Get<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
                 .AvailableMetamagic |= Metamagic.Quicken;
         }
 

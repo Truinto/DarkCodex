@@ -21,8 +21,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Improved Hunters Bond", "combat feat: Improved Hunter's Bond", false)]
         public static void CreateImprovedHuntersBond()
         {
-            var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("2f93cad6b132aac4e80728d7fa03a8aa"); //HuntersBondBuff
-            var ability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("cd80ea8a7a07a9d4cb1a54e67a9390a5"); //HuntersBondAbility
+            var buff = Helper.Get<BlueprintBuff>("2f93cad6b132aac4e80728d7fa03a8aa"); //HuntersBondBuff
+            var ability = Helper.Get<BlueprintAbility>("cd80ea8a7a07a9d4cb1a54e67a9390a5"); //HuntersBondAbility
             var ranger = Helper.ToRef<BlueprintCharacterClassReference>("cda0615668a6df14eb36ba19ee881af6"); //RangerClass
             var huntersbond = Helper.ToRef<BlueprintFeatureReference>("6dddf5ba2291f41498df2df7f8fa2b35"); //HuntersBondFeature
 

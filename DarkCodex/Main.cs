@@ -384,10 +384,6 @@ namespace Shared
             //harmony.PatchAll(typeof(Main).Assembly);
             //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
             //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
-
-            //[HarmonyPatch(typeof(BlueprintsCache), "Init")] used by some mods
-            //[HarmonyPriority(Priority.First + 5)]
-            //[HarmonyPriority(Priority.Last - 5)]
         }
 
         static partial void OnMainMenu()
@@ -402,14 +398,17 @@ namespace Shared
 
         static partial void OnBlueprintsLoaded()
         {
-            using var scope = new Scope(Main.ModPath, Main.logger);
+#if DEBUG
+            using var scope = new Scope(Main.ModPath, Main.logger, harmony, true);
+#else
+            using var scope = new Scope(Main.ModPath, Main.logger, harmony, false);
+#endif
             MasterPatch.Run();
             Print("Loading Dark Codex");
             patchInfos = new(Settings.State);
 
             // Debug
 #if DEBUG
-            Helper.Allow_Guid_Generation = true;
             PatchSafe(typeof(DEBUG.WatchCalculateParams));
             PatchSafe(typeof(DEBUG.Settlement1));
             PatchSafe(typeof(DEBUG.Settlement2));
@@ -581,7 +580,11 @@ namespace Shared
 
         static partial void OnBlueprintsLoadedLast()
         {
-            using var scope = new Scope(Main.ModPath, Main.logger);
+#if DEBUG
+            using var scope = new Scope(Main.ModPath, Main.logger, harmony, true);
+#else
+            using var scope = new Scope(Main.ModPath, Main.logger, harmony, false);
+#endif
 
             LoadSafe(Kineticist.CreateExpandedElement);
 

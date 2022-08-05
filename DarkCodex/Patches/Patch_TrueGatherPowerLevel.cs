@@ -11,9 +11,9 @@ namespace DarkCodex
     [HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryApplyGatherPower))]
     public class Patch_TrueGatherPowerLevel
     {
-        public static BlueprintBuff buff1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e6b8b31e1f8c524458dc62e8a763cfb1");
-        public static BlueprintBuff buff2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("3a2bfdc8bf74c5c4aafb97591f6e4282");
-        public static BlueprintBuff buff3 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("82eb0c274eddd8849bb89a8e6dbc65f8");
+        public static BlueprintBuff buff1 = Helper.Get<BlueprintBuff>("e6b8b31e1f8c524458dc62e8a763cfb1");
+        public static BlueprintBuff buff2 = Helper.Get<BlueprintBuff>("3a2bfdc8bf74c5c4aafb97591f6e4282");
+        public static BlueprintBuff buff3 = Helper.Get<BlueprintBuff>("82eb0c274eddd8849bb89a8e6dbc65f8");
 
         public static bool Prefix(UnitPartKineticist kineticist, BlueprintAbility abilityBlueprint, ref KineticistAbilityBurnCost cost)
         {

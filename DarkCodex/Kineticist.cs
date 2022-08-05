@@ -54,7 +54,7 @@ namespace DarkCodex
                 Helper.CreateClassLevelsForPrerequisites(Tree.Class, 1)
                 );
 
-            Helper.AppendAndReplace(ref ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintFeatureSelection>("fa621a249cc836f4382ca413b976e65e").m_AllFeatures, feature.ToRef());
         }
 
         [PatchInfo(Severity.Create, "Kineticist Extra Wild Talent", "basic feat: Extra Wild Talent; required by other kineticist features!", false, Priority: 300)]
@@ -64,7 +64,7 @@ namespace DarkCodex
                 "ExtraWildTalentFeat",
                 "Extra Wild Talent",
                 "You gain a wild talent for which you meet the prerequisites. You can select an infusion or a non-infusion wild talent, but not a blast or defense wild talent.\nSpecial: You can take this feat multiple times. Each time, you must choose a different wild talent.",
-                ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("42f96fc8d6c80784194262e51b0a1d25").Icon,
+                Helper.Get<BlueprintFeature>("42f96fc8d6c80784194262e51b0a1d25").Icon,
                 FeatureGroup.Feat
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(Tree.Class, 1, true)
@@ -80,10 +80,10 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Whip Infusion", "infusion: Kinetic Whip, expands Kinetic Knight", false, Requirement: typeof(Patch_KineticistAllowOpportunityAttack))]
         public static void CreateWhipInfusion()
         {
-            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var infusion_selection = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
-            var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
+            var knight = Helper.Get<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
             var applicable = Blasts.Where(g => g.Get().name.StartsWith("KineticBlade")).ToArray();
             Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
@@ -138,13 +138,13 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Blade Rush Infusion", "infusion: Blade Rush, expands Kinetic Knight", false)]
         public static void CreateBladeRushInfusion()
         {
-            var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
-            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
-            var demoncharge = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
+            var knight = Helper.Get<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
+            var infusion_selection = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var demoncharge = Helper.Get<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
             var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
             var dimensiondoor = Helper.ToRef<BlueprintAbilityReference>("a9b8be9b87865744382f7c64e599aeb2"); //DimensionDoorCasterOnly
-            var flashstep = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
+            var flashstep = Helper.Get<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
 
             string name = "Blade Rush";
             string description = "Element: universal\nType: form infusion\nLevel: 2\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou use your element’s power to instantly move 30 feet, manifest a kinetic blade, and attack once. You gain a +2 bonus on the attack roll and take a –2 penalty to your AC until the start of your next turn. The movement doesn’t provoke attacks of opportunity, though activating blade rush does.";
@@ -210,10 +210,10 @@ namespace DarkCodex
         public static void CreateMobileGatheringFeat()
         {
             // --- base game stuff ---
-            var buff1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e6b8b31e1f8c524458dc62e8a763cfb1");   //GatherPowerBuffI
-            var buff2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("3a2bfdc8bf74c5c4aafb97591f6e4282");   //GatherPowerBuffII
-            var buff3 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("82eb0c274eddd8849bb89a8e6dbc65f8");   //GatherPowerBuffIII
-            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
+            var buff1 = Helper.Get<BlueprintBuff>("e6b8b31e1f8c524458dc62e8a763cfb1");   //GatherPowerBuffI
+            var buff2 = Helper.Get<BlueprintBuff>("3a2bfdc8bf74c5c4aafb97591f6e4282");   //GatherPowerBuffII
+            var buff3 = Helper.Get<BlueprintBuff>("82eb0c274eddd8849bb89a8e6dbc65f8");   //GatherPowerBuffIII
+            var gather_original_ab = Helper.Get<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a");    //GatherPower
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
 
             // rename buffs, so it's easier to tell them apart
@@ -408,7 +408,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Impale Infusion", "infusion: Impale", false)]
         public static void CreateImpaleInfusion()
         {
-            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var infusion_selection = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var weapon = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8");
             var icon = Helper.StealIcon("2aad85320d0751340a0786de073ee3d5"); //TorrentInfusionFeature
@@ -520,7 +520,7 @@ namespace DarkCodex
         public static void CreateChainInfusion()
         {
             // idea: make thunderstorm full electric and add this infusion
-            var infusion_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            var infusion_selection = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
             var icon = Helper.StealIcon("645558d63604747428d55f0dd3a4cb58"); //ChainLightning
 
@@ -602,7 +602,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Gather Power", "Kineticist Gather Power can be used manually", false, Requirement: typeof(Patch_TrueGatherPowerLevel))]
         public static void PatchGatherPower()
         {
-            var gather_original_ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
+            var gather_original_ab = Helper.Get<BlueprintAbility>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
             gather_original_ab.Hidden = false;
             gather_original_ab.Animation = CastAnimationStyle.SelfTouch;
             gather_original_ab.AddComponents(new RestrictionCanGatherPowerAbility());
@@ -611,7 +611,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Demon Charge", "Demon Charge also gathers power", true)]
         public static void PatchDemonCharge()
         {
-            var charge = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
+            var charge = Helper.Get<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
             var gather = Helper.ToRef<BlueprintAbilityReference>("6dcbffb8012ba2a4cb4ac374a33e2d9a"); //GatherPower
 
             Helper.AppendAndReplace(ref charge.GetComponent<AbilityExecuteActionOnCast>().Actions.Actions, new ContextActionCastSpellOnCaster() { m_Spell = gather });
@@ -620,7 +620,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Dark Elementalist QoL", "faster animation and use anywhere, but only out of combat", true)]
         public static void PatchDarkElementalist()
         {
-            var soulability = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c"); //DarkElementalistSoulPowerAbility
+            var soulability = Helper.Get<BlueprintAbility>("31a1e5b27cdb78f4094630610519981c"); //DarkElementalistSoulPowerAbility
             soulability.ActionType = UnitCommand.CommandType.Free;
             soulability.m_IsFullRoundAction = false;
             soulability.HasFastAnimation = true;
@@ -633,7 +633,7 @@ namespace DarkCodex
         public static void PatchVarious()
         {
             // allow bowling infusion on sandblasts
-            var bowling = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("918b2524af5c3f647b5daa4f4e985411"); //BowlingInfusionBuff
+            var bowling = Helper.Get<BlueprintBuff>("918b2524af5c3f647b5daa4f4e985411"); //BowlingInfusionBuff
             var sandstorm = Helper.ToRef<BlueprintAbilityReference>("b93e1f0540a4fa3478a6b47ae3816f32"); //SandstormBlastBase
             ExpandSubstance(bowling, sandstorm);
 
@@ -680,12 +680,12 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Selective Metakinesis", "gain selective metakinesis at level 7", true)]
         public static void CreateSelectiveMetakinesis()
         {
-            //var empower1 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
-            //var empower2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"); //MetakinesisEmpowerCheaperBuff
-            var kineticist = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("b79e92dd495edd64e90fb483c504b8df"); //KineticistProgression
-            var knight = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
+            //var empower1 = Helper.Get<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
+            //var empower2 = Helper.Get<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"); //MetakinesisEmpowerCheaperBuff
+            var kineticist = Helper.Get<BlueprintProgression>("b79e92dd495edd64e90fb483c504b8df"); //KineticistProgression
+            var knight = Helper.Get<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
-            Sprite icon = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("85f3340093d144dd944fff9a9adfd2f2").Icon;
+            Sprite icon = Helper.Get<BlueprintFeature>("85f3340093d144dd944fff9a9adfd2f2").Icon;
             string displayname = "Metakinesis — Selective";
             string description = "At 7th level, by accepting 1 point of burn, a kineticist can adjust her kinetic blast as if using Selective Spell.";
 
@@ -724,9 +724,9 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Auto Metakinesis", "activatable to automatically empower and maximize blasts, if you have unused burn", false)]
         public static void CreateAutoMetakinesis()
         {
-            var empower = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("70322f5a2a294e54a9552f77ee85b0a7"); //MetakinesisEmpowerFeature
-            var quickenbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"); //MetakinesisQuickenBuff
-            var quickenbuff2 = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("c4b74e4448b81d04f9df89ed14c38a95"); //MetakinesisQuickenCheaperBuff
+            var empower = Helper.Get<BlueprintFeature>("70322f5a2a294e54a9552f77ee85b0a7"); //MetakinesisEmpowerFeature
+            var quickenbuff = Helper.Get<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"); //MetakinesisQuickenBuff
+            var quickenbuff2 = Helper.Get<BlueprintBuff>("c4b74e4448b81d04f9df89ed14c38a95"); //MetakinesisQuickenCheaperBuff
 
             var auto = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisAutoAbility",
@@ -750,10 +750,10 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Hurricane Queen", "Wild Talent: Hurricane Queen", false, Requirement: typeof(Patch_EnvelopingWindsCap))]
         public static void CreateHurricaneQueen()
         {
-            var windsBuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff
+            var windsBuff = Helper.Get<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff
             var windsFeat = Helper.ToRef<BlueprintFeatureReference>("bb0de2047c448bd46aff120be3b39b7a");  //EnvelopingWinds
             var windsEffect = Helper.ToRef<BlueprintUnitFactReference>("bbba1600582cf8446bb515a33bd89af8"); //EnvelopingWindsEffectFeature
-            var wildtalent_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
+            var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
 
             var feat = Helper.CreateBlueprintFeature(
@@ -895,6 +895,7 @@ namespace DarkCodex
             var description = blood.BlastFeature.Get().m_Description;
             var bladeName = "Blood Blast — Kinetic Blade".CreateString();
 
+            // fix strings
             blood.BaseAbility.Get().m_DisplayName = displayName;
             blood.BaseAbility.Get().m_Description = description;
             blood.Blade.Damage.Get().m_DisplayName = displayName;
@@ -903,12 +904,14 @@ namespace DarkCodex
             blood.Blade.Activatable.Get().m_DisplayName = bladeName;
             blood.Blade.Damage.Get().m_DisplayName = bladeName;
 
+            // update to new bleed mechanic
             var bleed = Helper.Get<BlueprintBuff>("492a8156ecede6345a8e82475eed85ac"); //BleedingInfusionBuff
             bleed.AddComponents(
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.FeatureRank, feature: Tree.KineticBlast));
             bleed.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0]
                 = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude, null, new ContextActionIncreaseBleed(false));
 
+            // make vampiric infusion activate immediately
             var healer = Helper.Get<BlueprintAbility>("eff667a3a43a77d45a193bb7c94b3a6c"); //KineticHealerAbility
             var vampiric = Helper.Get<BlueprintBuff>("e50e653cff511cd49a55b979346699f1"); //VampiricInfusionBuff
             var onCaster = vampiric.GetComponent<AddKineticistInfusionDamageTrigger>().Actions.Actions[0] as ContextActionOnContextCaster;
@@ -918,7 +921,26 @@ namespace DarkCodex
                 healer.GetComponents<ContextCalculateSharedValue>()
                 );
 
-            // TODO: fix damage preview
+            // fix spell descriptors and cached damage info
+            foreach (var ab in blood.BaseAbility.Get().AbilityVariants.Variants)
+            {
+                var spelldescriptor = ab.GetComponent<SpellDescriptorComponent>();
+                if (spelldescriptor != null)
+                    spelldescriptor.Descriptor &= ~SpellDescriptor.Electricity;
+
+                var damageInfo = ab.GetComponent<AbilityKineticist>()?.CachedDamageInfo;
+                for (int i = (damageInfo?.Count ?? 0) - 1; i >= 0; i--)
+                {
+                    var info = damageInfo[i];
+                    if (info.Type.IsEnergy)
+                    {
+                        damageInfo.RemoveAt(i);
+                        continue;
+                    }
+                    info.Half = false;
+                    damageInfo[i] = info;
+                }
+            }
         }
 
         [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "new Kineticist archetype", false)]
@@ -1063,7 +1085,7 @@ namespace DarkCodex
                 ).SetComponents(
                 new KineticEnergizeFist(true)
                 );
-            
+
             var feat = Helper.CreateBlueprintFeature(
                 "KineticFistInfusion"
                 ).SetUIData(act

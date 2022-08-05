@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+- removed Kinetic Artifact "Catalyst", because it causes bugs I can't seem to fix
+- fixed kinetic fist and energize weapon dealing damage even if burn cannot be paid
+- fixed Blood Kineticist cached damage info
+
 ## [1.3.22]
 - added infusion Kinetic Fist
 - added infusion Energize Weapon

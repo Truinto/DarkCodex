@@ -22,7 +22,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Bleeding Attack", "rogue talent: Bleeding Attack; basic talent: Flensing Strike", false)]
         public static void CreateBleedingAttack()
         {
-            var RogueTalentSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
+            var RogueTalentSelection = Helper.Get<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
             var SneakAttack = Helper.ToRef<BlueprintFeatureReference>("9b9eac6709e1c084cb18c3a366e0ec87");
 
             BlueprintFeature flensing = Helper.CreateBlueprintFeature(
@@ -61,7 +61,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Extra Rogue Talent", "basic feat: Extra Rogue Talent", false)]
         public static void CreateExtraRogueTalent()
         {
-            var RogueTalentSelection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
+            var RogueTalentSelection = Helper.Get<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
             var RogueClass = Helper.ToRef<BlueprintCharacterClassReference>("299aa766dee3cbf4790da4efb8c72484");
 
             var extrarogue = Helper.CreateBlueprintFeatureSelection(

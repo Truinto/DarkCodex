@@ -17,7 +17,9 @@ namespace CodexLib
         public string modPath;
         public UnityModManager.ModEntry.ModLogger logger;
         public Harmony harmony;
+        public bool allowGuidGeneration;
 
+        [Obsolete]
         public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger)
         {
             this.modPath = modPath;
@@ -25,11 +27,21 @@ namespace CodexLib
             Stack.Push(this);
         }
 
+        [Obsolete]
         public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger, Harmony harmony)
         {
             this.modPath = modPath;
             this.logger = logger;
             this.harmony = harmony;
+            Stack.Push(this);
+        }
+
+        public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger, Harmony harmony, bool allowGuidGeneration)
+        {
+            this.modPath = modPath;
+            this.logger = logger;
+            this.harmony = harmony;
+            this.allowGuidGeneration = allowGuidGeneration;
             Stack.Push(this);
         }
 
@@ -41,7 +53,7 @@ namespace CodexLib
         static Scope()
         {
             Stack = new();
-            new Scope("Mods", new UnityModManager.ModEntry.ModLogger("CodexLib"), new Harmony("CodexLib"));
+            new Scope("Mods", new UnityModManager.ModEntry.ModLogger("CodexLib"), new Harmony("CodexLib"), false);
         }
 
         public static Stack<Scope> Stack;
@@ -49,5 +61,6 @@ namespace CodexLib
         public static string ModPath => Stack.Peek().modPath;
         public static UnityModManager.ModEntry.ModLogger Logger => Stack.Peek().logger;
         public static Harmony Harmony => Stack.Peek().harmony; // TODO: use this in Helper
+        public static bool AllowGuidGeneration => Stack.Peek().allowGuidGeneration;
     }
 }

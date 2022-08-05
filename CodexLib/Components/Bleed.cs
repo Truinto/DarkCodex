@@ -87,7 +87,7 @@ namespace CodexLib
             var ruleDamage = new RuleDealDamage(caster, target, damage);
             this.Context.TriggerRule(ruleDamage);
 
-            Helper.PrintDebug($"BleedBuff.Apply {newValue.DiceCountValue}d{(int)newValue.DiceType}+{newValue.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result}");
+            Helper.PrintDebug($"BleedBuff.Apply {newValue.DiceCountValue}d{(int)newValue.DiceType}+{newValue.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result} caster={caster}");
             
             if (isFlensing)
             {

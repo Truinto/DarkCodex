@@ -118,18 +118,19 @@ namespace Shared
         [HarmonyPatch]
         private static class Patches
         {
-            [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
-            [HarmonyPostfix]
+            //[HarmonyPatch(typeof(BlueprintsCache), nameof(BlueprintsCache.Init))] // used by some mods
+            //[HarmonyPostfix]
+            //[HarmonyPriority(Priority.First + 5)]
             private static void Postfix1()
             {
                 try
                 {
-                    OnMainMenu();
                 }
                 catch (Exception ex) { logger?.LogException(ex); }
             }
 
             [HarmonyPatch(typeof(StartGameLoader), nameof(StartGameLoader.LoadAllJson))]
+            [HarmonyPriority(Priority.Normal)]
             [HarmonyPostfix]
             private static void Postfix2()
             {
@@ -148,6 +149,7 @@ namespace Shared
                 try
                 {
                     OnBlueprintsLoadedLast();
+                    RunLastNow();
 
                     if (applyNullFinalizer)
                     {
@@ -161,11 +163,51 @@ namespace Shared
                 }
                 catch (Exception ex) { logger?.LogException(ex); }
             }
+
+            [HarmonyPatch(typeof(MainMenu), nameof(MainMenu.Start))]
+            [HarmonyPostfix]
+            private static void Postfix4()
+            {
+                try
+                {
+                    OnMainMenu();
+                }
+                catch (Exception ex) { logger?.LogException(ex); }
+            }
         }
 
         #endregion
 
         #region Helper
+
+        private static List<(string, Action)> _patchLast = new();
+        internal static void RunLast(string message, Action action)
+        {
+            if (_patchLast == null)
+                action();
+            else
+                _patchLast.Add((message, action));
+        }
+        private static void RunLastNow()
+        {
+            if (_patchLast == null)
+                return;
+
+            if (_patchLast.Count > 0)
+                PrintDebug("Running _patchLast");
+
+            foreach (var (message, action) in _patchLast)
+            {
+                try
+                {
+                    PrintDebug(message);
+                    action();
+                }
+                catch (Exception e) { PrintException(e); }
+            }
+
+            _patchLast = null;
+        }
 
         internal static void Print(string msg) => logger?.Log(msg);
 
@@ -187,7 +229,7 @@ namespace Shared
 
         internal static void PrintError(string msg) => logger?.Log("[Error/Exception] " + msg);
 
-        public static void Patch(Type patch)
+        internal static void Patch(Type patch)
         {
             Print("Patching " + patch.Name);
             var processor = harmony.CreateClassProcessor(patch);
@@ -202,7 +244,7 @@ namespace Shared
         /// <summary>
         /// Only works if all harmony attributes are on the class. Does not support bulk patches.
         /// </summary>
-        public static bool IsPatched(Type patch)
+        internal static bool IsPatched(Type patch)
         {
             try
             {
@@ -219,7 +261,7 @@ namespace Shared
             return true;
         }
 
-        public static List<Patch> GetConflictPatches(PatchClassProcessor processor)
+        internal static List<Patch> GetConflictPatches(PatchClassProcessor processor)
         {
             var list = new List<Patch>();
 
@@ -249,7 +291,7 @@ namespace Shared
             return list;
         }
 
-        public static bool LoadSafe(Action action)
+        internal static bool LoadSafe(Action action)
         {
             ProcessInfo(action.Method);
 #if DEBUG
@@ -283,7 +325,7 @@ namespace Shared
             }
         }
 
-        public static bool LoadSafe(Action<bool> action, bool flag)
+        internal static bool LoadSafe(Action<bool> action, bool flag)
         {
             ProcessInfo(action.Method);
 #if DEBUG
@@ -317,7 +359,7 @@ namespace Shared
             }
         }
 
-        public static void PatchUnique(Type patch)
+        internal static void PatchUnique(Type patch)
         {
             /// needs to have field: static bool Patched
             ProcessInfo(patch);
@@ -331,7 +373,7 @@ namespace Shared
                 patch.GetField("Patched", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)?.SetValue(null, true);
         }
 
-        public static bool PatchSafe(Type patch)
+        internal static bool PatchSafe(Type patch)
         {
             ProcessInfo(patch);
             if (CheckSetting("Patch." + patch.Name))
@@ -352,7 +394,7 @@ namespace Shared
             }
         }
 
-        public static void SubscribeSafe(Type type)
+        internal static void SubscribeSafe(Type type)
         {
             ProcessInfo(type);
             if (CheckSetting("Patch." + type.Name))
@@ -372,7 +414,7 @@ namespace Shared
             }
         }
 
-        public static MethodBase GetOriginalMethod(this HarmonyMethod attr)
+        internal static MethodBase GetOriginalMethod(this HarmonyMethod attr)
         {
             try
             {
@@ -434,7 +476,7 @@ namespace Shared
             patchInfos?.Add(attr, info);
         }
 
-        public static Exception NullFinalizer(Exception __exception)
+        internal static Exception NullFinalizer(Exception __exception)
         {
             if (__exception == null)
                 return null;

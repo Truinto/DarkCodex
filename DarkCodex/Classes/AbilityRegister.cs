@@ -34,7 +34,7 @@ namespace DarkCodex
             this.Components = new List<BlueprintComponent>();
             foreach (var guid in guids)
             {
-                var bp = ResourcesLibrary.TryGetBlueprint<BlueprintScriptableObject>(guid);
+                var bp = Helper.Get<BlueprintScriptableObject>(guid);
                 Register(bp);
             }
 

@@ -115,8 +115,17 @@ namespace CodexLib
                 EventBus.RaiseEvent<IKineticistCalculateAbilityCostHandler>(h => h.HandleKineticistCalculateAbilityCost(evt.Initiator, element.BaseAbility, ref cost), true);
                 int total = cost.Total;
 
+                // if burn cannot be paid, remove damage and return
                 if (kineticist.LeftBurnThisRound < total)
+                {
+                    var chunks = evt.Damage.m_DamageBundle.m_Chunks;
+                    for (int i = chunks.Count - 1; i >= 1; i--)
+                    {
+                        if (chunks[i].SourceFact == act)
+                            chunks.RemoveAt(i);
+                    }
                     return;
+                }
 
                 total = kineticist.AcceptBurn(total, abilityData);
                 EventBus.RaiseEvent<IKineticistAcceptBurnHandler>(evt.Initiator, h => h.HandleKineticistAcceptBurn(kineticist, total, abilityData));

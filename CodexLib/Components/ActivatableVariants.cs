@@ -41,7 +41,7 @@ namespace CodexLib
         }
     }
 
-    public class VariantSelectionData
+    public sealed class VariantSelectionData
     {
         [JsonProperty]
         public VariantSelectionWrapper Wrapper = new();

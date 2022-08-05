@@ -34,9 +34,9 @@ namespace DarkCodex
         {
             var witch_class = Helper.ToRef<BlueprintCharacterClassReference>("1b9873f1e7bfe5449bc84d03e9c8e3cc"); //WitchClass
             var hexcrafter_class = Helper.ToRef<BlueprintArchetypeReference>("79ccf7a306a5d5547bebd97299f6fc89"); //HexcrafterArchetype
-            var witch_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
+            var witch_selection = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
             var shaman_class = Helper.ToRef<BlueprintCharacterClassReference>("145f1d3d360a7ad48bd95d392c81b38e"); //ShamanClass
-            var shaman_selection = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
+            var shaman_selection = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
 
             var witch_extra = Helper.CreateBlueprintFeatureSelection(
                 "WitchHexExtra",
@@ -112,10 +112,10 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Cackle Activatable", "Cackle/Chant can be toggled to use move action passively", Requirement: typeof(Patch_ActivatableOnNewRound))]
         public static void CreateCackleActivatable()
         {
-            var cackle_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("36f2467103d4635459d412fb418276f4");
-            var cackle = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("4bd01292a9bc4304f861a6a07f03b855");
-            var chant_feat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("3f776576b5f27604a9dad54d361153af");
-            var chant = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("6cd07c80aabf2b248a11921090de9c17");
+            var cackle_feat = Helper.Get<BlueprintFeature>("36f2467103d4635459d412fb418276f4");
+            var cackle = Helper.Get<BlueprintAbility>("4bd01292a9bc4304f861a6a07f03b855");
+            var chant_feat = Helper.Get<BlueprintFeature>("3f776576b5f27604a9dad54d361153af");
+            var chant = Helper.Get<BlueprintAbility>("6cd07c80aabf2b248a11921090de9c17");
             var sfx = new PrefabLink() { AssetId = "79665f3d500fdf44083feccf4cbfc00a" };
 
             var consume_move = new ActivatableAbilityUnitCommand { Type = CommandType.Move };
@@ -179,7 +179,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Ice Tomb", "Hex: Ice Tomb", false)]
         public static void CreateIceTomb()
         {
-            var IcyPrison = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>("65e8d23aef5e7784dbeb27b1fca40931");
+            var IcyPrison = Helper.Get<BlueprintAbility>("65e8d23aef5e7784dbeb27b1fca40931");
             var WitchMajorHex = Helper.ToRef<BlueprintFeatureReference>("8ac781b33e380c84aa578f1b006dd6c5");
             var Staggered = Helper.ToRef<BlueprintBuffReference>("df3950af5a783bd4d91ab73eb8fa0fd3");
             var IcyPrisonParalyzedBuff = Helper.ToRef<BlueprintBuffReference>("6f0e450771cc7d446aea798e1fef1c7a");
@@ -239,7 +239,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Fix, "Boundless Healing Hex", "boundless healing applies to healing hex", false)]
         public static void FixBoundlessHealing()
         {
-            var boundless = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
+            var boundless = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
             var heal1 = Helper.ToRef<BlueprintAbilityReference>("ed4fbfcdb0f5dcb41b76d27ed00701af"); //WitchHexHealingAbility
             var heal2 = Helper.ToRef<BlueprintAbilityReference>("3408c351753aa9049af25af31ebef624"); //WitchHexMajorHealingAbility
 

@@ -19,7 +19,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create | Severity.Faulty, "Accursed Strike", "hexcrafter arcana: Accursed Strike", false)]
         public static void CreateAccursedStrike()
         {
-            var hexes = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
+            var hexes = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
             var hexcrafter = Helper.ToRef<BlueprintArchetypeReference>("79ccf7a306a5d5547bebd97299f6fc89");
 
             // touch spells

@@ -91,7 +91,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Empower Angels Light", "'Light of the Angels' give temporary HP equal to character level", true)]
         public static void PatchAngelsLight()
         {
-            var angelbuff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("e173dc1eedf4e344da226ffbd4d76c60"); // AngelMinorAbilityEffectBuff
+            var angelbuff = Helper.Get<BlueprintBuff>("e173dc1eedf4e344da226ffbd4d76c60"); // AngelMinorAbilityEffectBuff
 
             var temphp = angelbuff.GetComponent<TemporaryHitPointsFromAbilityValue>();
             temphp.Value = Helper.CreateContextValue(AbilityRankType.Default);
@@ -101,40 +101,40 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend | Severity.DefaultOff, "Basic Freebie Feats", "reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/", true)]
         public static void PatchBasicFreebieFeats()
         {
-            var basics = ResourcesLibrary.TryGetBlueprint<BlueprintProgression>("5b72dd2ca2cb73b49903806ee8986325"); //BasicFeatsProgression
+            var basics = Helper.Get<BlueprintProgression>("5b72dd2ca2cb73b49903806ee8986325"); //BasicFeatsProgression
             basics.AddComponents(
-                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("9972f33f977fc724c838e59641b2fca5")), //PowerAttackFeature
-                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("0da0c194d6e1d43419eb8d990b28e0ab")), //PointBlankShot
-                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("4c44724ffa8844f4d9bedb5bb27d144a")), //CombatExpertiseFeature
-                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("90e54424d682d104ab36436bd527af09")), //WeaponFinesse
-                Helper.CreateAddFactOnlyParty(Helper.ToRef<BlueprintUnitFactReference>("f47df34d53f8c904f9981a3ee8e84892")) //DeadlyAimFeature
+                new AddFactOnlyParty("9972f33f977fc724c838e59641b2fca5"), //PowerAttackFeature
+                new AddFactOnlyParty("0da0c194d6e1d43419eb8d990b28e0ab"), //PointBlankShot
+                new AddFactOnlyParty("4c44724ffa8844f4d9bedb5bb27d144a"), //CombatExpertiseFeature
+                new AddFactOnlyParty("90e54424d682d104ab36436bd527af09"), //WeaponFinesse
+                new AddFactOnlyParty("f47df34d53f8c904f9981a3ee8e84892")  //DeadlyAimFeature
                 );
 
-            var powerattack = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("a7b339e4f6ff93a4697df5d7a87ff619"); //PowerAttackToggleAbility
+            var powerattack = Helper.Get<BlueprintActivatableAbility>("a7b339e4f6ff93a4697df5d7a87ff619"); //PowerAttackToggleAbility
             powerattack.IsOnByDefault = false;
             powerattack.DoNotTurnOffOnRest = true;
-            var combatexpertise = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("a75f33b4ff41fc846acbac75d1a88442"); //CombatExpertiseToggleAbility
+            var combatexpertise = Helper.Get<BlueprintActivatableAbility>("a75f33b4ff41fc846acbac75d1a88442"); //CombatExpertiseToggleAbility
             combatexpertise.IsOnByDefault = false;
             combatexpertise.DoNotTurnOffOnRest = true;
             combatexpertise.DeactivateIfCombatEnded = false;
             combatexpertise.DeactivateAfterFirstRound = false;
             combatexpertise.ActivationType = AbilityActivationType.Immediately;
             combatexpertise.DeactivateIfOwnerDisabled = true;
-            var deadlyaim = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>("ccde5ab6edb84f346a74c17ea3e3a70c"); //DeadlyAimToggleAbility
+            var deadlyaim = Helper.Get<BlueprintActivatableAbility>("ccde5ab6edb84f346a74c17ea3e3a70c"); //DeadlyAimToggleAbility
             deadlyaim.IsOnByDefault = false;
             deadlyaim.DoNotTurnOffOnRest = true;
 
             var mobility = Helper.ToRef<BlueprintUnitFactReference>("2a6091b97ad940943b46262600eaeaeb"); //Mobility
             var dodge = Helper.ToRef<BlueprintUnitFactReference>("97e216dbb46ae3c4faef90cf6bbe6fd5"); //Dodge
-            mobility.Get().AddComponents(Helper.CreateAddFactOnlyParty(dodge));
-            dodge.Get().AddComponents(Helper.CreateAddFactOnlyParty(mobility));
+            mobility.Get().AddComponents(new AddFactOnlyParty(dodge));
+            dodge.Get().AddComponents(new AddFactOnlyParty(mobility));
 
             var twf = Helper.ToRef<BlueprintUnitFactReference>("ac8aaf29054f5b74eb18f2af950e752d"); //TwoWeaponFighting
             var twfi = Helper.ToRef<BlueprintUnitFactReference>("9af88f3ed8a017b45a6837eab7437629"); //TwoWeaponFightingImproved
             var twfg = Helper.ToRef<BlueprintUnitFactReference>("c126adbdf6ddd8245bda33694cd774e8"); //TwoWeaponFightingGreater
             var multi = Helper.ToRef<BlueprintUnitFactReference>("8ac319e47057e2741b42229210eb43ed"); //Multiattack
-            twf.Get().AddComponents(Helper.CreateAddFactOnlyParty(multi));
-            twfi.Get().AddComponents(Helper.CreateAddFactOnlyParty(twfg));
+            twf.Get().AddComponents(new AddFactOnlyParty(multi));
+            twfi.Get().AddComponents(new AddFactOnlyParty(twfg, 8));
 
             //Deft Maneuvers
             //ImprovedTrip.0f15c6f70d8fb2b49aa6cc24239cc5fa
@@ -149,8 +149,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Preferred Spell", "basic feat: Preferred Spell, spontaneously cast a specific spell", false, Requirement: typeof(Patch_PreferredSpellMetamagic))]
         public static void CreatePreferredSpell()
         {
-            var specialization = ResourcesLibrary.TryGetBlueprint<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
-            var wizard = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8c3102c2ff3b69444b139a98521a4899"); //WizardFeatSelection
+            var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
+            var wizard = Helper.Get<BlueprintFeatureSelection>("8c3102c2ff3b69444b139a98521a4899"); //WizardFeatSelection
             var heighten = Helper.ToRef<BlueprintFeatureReference>("2f5d1e705c7967546b72ad8218ccf99c"); //HeightenSpellFeat
 
             var feat = Helper.CreateBlueprintParametrizedFeature(
@@ -171,6 +171,8 @@ namespace DarkCodex
 
             Helper.AddFeats(feat);
             Helper.AppendAndReplace(ref wizard.m_AllFeatures, feat.ToRef());
+
+            Main.RunLast("Preferred Spell", () => feat.BlueprintParameterVariants = specialization.BlueprintParameterVariants);
         }
 
         [PatchInfo(Severity.Extend | Severity.WIP, "Hide Buffs", "unclogs UI by hiding a few buffs", false)]
@@ -186,7 +188,7 @@ namespace DarkCodex
             {
                 try
                 {
-                    var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(guid);
+                    var buff = Helper.Get<BlueprintBuff>(guid);
                     buff.Flags(hidden: true);
                 }
                 catch (Exception)
@@ -200,7 +202,7 @@ namespace DarkCodex
         public static void PatchVarious()
         {
             // remove penalty on Precious Treat item
-            var buff = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("ee8ee3c5c8f055e48a1ec1bfb92778f1"); //PreciousTreatBuff
+            var buff = Helper.Get<BlueprintBuff>("ee8ee3c5c8f055e48a1ec1bfb92778f1"); //PreciousTreatBuff
             buff.RemoveComponents<AddStatBonus>();
 
             // extend protection from X to 10 minutes
@@ -218,7 +220,7 @@ namespace DarkCodex
             {
                 try
                 {
-                    var ab = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>(guid);
+                    var ab = Helper.Get<BlueprintAbility>(guid);
                     ab.LocalizedDuration = Resource.Strings.TenMinutes;
                     ab.Get<ContextActionApplyBuff>(f => f.DurationValue.BonusValue = 10);
                 }
@@ -226,11 +228,11 @@ namespace DarkCodex
             }
 
             // demon graft respects immunities
-            var discordRage = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("5d3029eb16956124da2c6b79ed32c675"); //SongOfDiscordEnragedBuff
+            var discordRage = Helper.Get<BlueprintBuff>("5d3029eb16956124da2c6b79ed32c675"); //SongOfDiscordEnragedBuff
             discordRage.AddComponents(Helper.CreateSpellDescriptorComponent(SpellDescriptor.MindAffecting | SpellDescriptor.Compulsion));
 
             // fix BloodlineUndeadArcana and DirgeBardSecretsOfTheGraveFeature not allowing shaken/confusion
-            var undeadImmunities = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("8a75eb16bfff86949a4ddcb3dd2f83ae"); //UndeadImmunities
+            var undeadImmunities = Helper.Get<BlueprintFeature>("8a75eb16bfff86949a4ddcb3dd2f83ae"); //UndeadImmunities
             undeadImmunities.GetComponents<BuffDescriptorImmunity>().First(f => f.IgnoreFeature == null)
                 .Descriptor &= ~SpellDescriptor.Shaken & ~SpellDescriptor.Confusion;
             undeadImmunities.GetComponents<SpellImmunityToSpellDescriptor>().First(f => f.CasterIgnoreImmunityFact == null)
@@ -239,13 +241,13 @@ namespace DarkCodex
             // add icon to CompletelyNormal metamagic
             //if (UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal == null)
             //{
-            //    var cnfeat = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>("094b6278f7b570f42aeaa98379f07cf2"); //CompletelyNormalSpellFeat
+            //    var cnfeat = Helper.Get<BlueprintFeature>("094b6278f7b570f42aeaa98379f07cf2"); //CompletelyNormalSpellFeat
             //    cnfeat.m_Icon = Helper.CreateSprite("CompletelyNormal.png");
             //    UIRoot.Instance.SpellBookColors.MetamagicCompletelyNormal = cnfeat.m_Icon;
             //}
 
             // add confusion descriptor to song of discord
-            var songDiscord = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>("2e1646c2449c88a4188e58043455a43a"); //SongOfDiscordBuff
+            var songDiscord = Helper.Get<BlueprintBuff>("2e1646c2449c88a4188e58043455a43a"); //SongOfDiscordBuff
             songDiscord.GetComponent<SpellDescriptorComponent>().Descriptor |= SpellDescriptor.Confusion;
 
             // fix destrutive dispel scaling
