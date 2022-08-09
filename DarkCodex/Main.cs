@@ -399,7 +399,7 @@ namespace Shared
         static partial void OnBlueprintsLoaded()
         {
 #if DEBUG
-            using var scope = new Scope(Main.ModPath, Main.logger, harmony, true);
+            using var scope = new Scope(modPath: Main.ModPath, logger: Main.logger, harmony: Main.harmony, allowGuidGeneration: true);
 #else
             using var scope = new Scope(Main.ModPath, Main.logger, harmony, false);
 #endif
@@ -461,11 +461,13 @@ namespace Shared
             PatchSafe(typeof(Patch_ZippySpellLike));
             PatchSafe(typeof(Patch_AbilityRange));
             PatchSafe(typeof(Patch_FixMisc));
+            PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike));
 
             // Spells - early
             LoadSafe(Spells.CreateBladedDash);
 
             // General
+            LoadSafe(General.CreatePreferredSpell);
             LoadSafe(General.CreateHeritage);
             LoadSafe(General.CreateMadMagic);
             LoadSafe(General.CreateSacredSummons);
@@ -533,8 +535,8 @@ namespace Shared
             LoadSafe(Kineticist.PatchDarkElementalist);
             LoadSafe(Kineticist.PatchDemonCharge); // after createMobileGatheringFeat
             LoadSafe(Kineticist.PatchVarious);
-            LoadSafe(Kineticist.FixBlastsAreSpellLike);
             LoadSafe(Kineticist.FixBloodKineticist);
+            LoadSafe(Kineticist.FixBlastsAreSpellLike);
             LoadSafe(Kineticist.CreateKineticFist);
             LoadSafe(Kineticist.CreateKineticEnergizeWeapon);
             LoadSafe(Kineticist.CreateVenomInfusion); // keep late
@@ -564,7 +566,6 @@ namespace Shared
             LoadSafe(General.CreateBackgrounds); // keep last
             LoadSafe(General.FixSpellElementChange); // keep last
             LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last
-            LoadSafe(General.CreatePreferredSpell); // keep last
             LoadSafe(General.CreateAbilityFocus); // keep last
             LoadSafe(Kineticist.CreateExtraWildTalentFeat); // keep last
             LoadSafe(Witch.CreateExtraHex); // keep last
@@ -594,8 +595,6 @@ namespace Shared
 
             patchInfos.Sort(); // sort info list for GUI
             patchInfos.Update();
-
-            Print("Finished loading Dark Codex");
 #if DEBUG
             PrintDebug("Running in debug. " + Main.IsInGame);
             Helper.ExportStrings();

@@ -85,6 +85,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\AbilityRegister.cs" />
     <Compile Include="Classes\ActionBarConvertedVMAny.cs" />
     <Compile Include="Classes\ActionBarSlotVMChild.cs" />
     <Compile Include="Classes\AnyRef.cs" />

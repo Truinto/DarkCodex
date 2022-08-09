@@ -42,6 +42,20 @@ namespace CodexLib
             KineticBlade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787");
             CompositeBuff = Helper.ToRef<BlueprintBuffReference>("cb30a291c75def84090430fbf2b5c05e");
 
+            #region Metakinesis
+
+            MetakinesisBuffs = new()
+            {
+                Helper.Get<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"), //MetakinesisEmpowerBuff
+                Helper.Get<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"), //MetakinesisEmpowerCheaperBuff
+                Helper.Get<BlueprintBuff>("870d7e67e97a68f439155bdf465ea191"), //MetakinesisMaximizedBuff
+                Helper.Get<BlueprintBuff>("b8f43f0040155c74abd1bc794dbec320"), //MetakinesisMaximizedCheaperBuff
+                Helper.Get<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"), //MetakinesisQuickenBuff
+                Helper.Get<BlueprintBuff>("c4b74e4448b81d04f9df89ed14c38a95"), //MetakinesisQuickenCheaperBuff
+            };
+
+            #endregion
+
             #region Elements
 
             Air = new()
@@ -750,6 +764,16 @@ namespace CodexLib
                     yield return e;
             }
         }
+        
+        public IEnumerable<BlueprintFeature> GetInfusionTalents()
+        {
+            foreach (var talent in SelectionInfusion.Get().m_AllFeatures)
+            {
+                var a = talent.Get();
+                if (a != null)
+                    yield return a;
+            }
+        }
 
         public IEnumerable<BlueprintFeature> GetWildTalents()
         {
@@ -758,6 +782,28 @@ namespace CodexLib
                 var a = talent.Get();
                 if (a != null)
                     yield return a;
+            }
+        }
+
+        public IEnumerable<BlueprintAbility> GetBlasts(bool bases = false, bool variants = false, bool bladeburn = false, bool bladedamage = false)
+        {
+            foreach (var element in GetAll(true, true, archetype: true))
+            {
+                var b = element.BaseAbility.Get();
+                if (b == null)
+                    continue;
+
+                if (bases)
+                    yield return b;
+                if (variants && b.HasVariants)
+                    foreach (var variant in b.AbilityVariants.Variants)
+                        yield return variant;
+
+                if (bladeburn && element.Blade.Burn.NotEmpty())
+                    yield return element.Blade.Burn;
+
+                if (bladedamage && element.Blade.Damage.NotEmpty())
+                    yield return element.Blade.Damage;
             }
         }
 
@@ -776,6 +822,7 @@ namespace CodexLib
         public BlueprintFeatureSelectionReference ExtraWildTalent;
         public BlueprintFeatureReference KineticBlade;
         public BlueprintBuffReference CompositeBuff;
+        public List<BlueprintBuff> MetakinesisBuffs;
 
         public BlueprintAbilityReference[] BaseBasic;
         public BlueprintAbilityReference[] BaseComposite;

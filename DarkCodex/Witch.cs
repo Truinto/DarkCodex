@@ -202,7 +202,7 @@ namespace DarkCodex
                 Helper.CreateContextActionDealDamage(DamageEnergyType.Cold, Helper.CreateContextDiceValue(dice: DiceType.D6, diceCount: 3, bonus: 0), halfIfSaved: true),
                 Helper.CreateContextActionConditionalSaved(
                     failed: Helper.CreateContextActionApplyBuff(icetomb_debuff, Helper.CreateContextDurationValue(diceRank: AbilityRankType.Default, rate: DurationRate.Minutes), false, false),
-                    succeed: Helper.CreateContextActionApplyBuff(Staggered, Helper.CreateContextDurationValue(diceCount: 1, dice: DiceType.D4), false, false)
+                    succeed: Helper.CreateContextActionApplyBuff(Staggered.Get(), Helper.CreateContextDurationValue(diceCount: 1, dice: DiceType.D4), false, false)
                     )
                 );
 

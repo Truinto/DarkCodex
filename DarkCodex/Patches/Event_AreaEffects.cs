@@ -25,44 +25,52 @@ namespace DarkCodex
 
         public static void Stop()
         {
-            foreach (var effect in Game.Instance.State.AreaEffects)
+            try
             {
-                if (effect.Destroyed || effect.DestroyMark)
-                    continue;
+                foreach (var effect in Game.Instance.State.AreaEffects)
+                {
+                    if (effect.Destroyed || effect.DestroyMark)
+                        continue;
 
-                var caster = (effect.Context.ParentContext as AbilityExecutionContext)?.MaybeCaster;
-                if (caster == null || !caster.IsPlayerFaction)
-                    continue;
+                    var caster = (effect.Context.ParentContext as AbilityExecutionContext)?.MaybeCaster;
+                    if (caster == null || !caster.IsPlayerFaction)
+                        continue;
 
-                var fx = effect.View?.m_SpawnedFx;
-                if (fx == null || !fx.activeSelf)
-                    continue;
+                    var fx = effect.View?.m_SpawnedFx;
+                    if (fx == null || !fx.activeSelf)
+                        continue;
 
-                //fx.SetActive(false);
-                FxHelper.Destroy(fx, false);
-                effect.View.m_SpawnedFx = null;
+                    //fx.SetActive(false);
+                    FxHelper.Destroy(fx, false);
+                    effect.View.m_SpawnedFx = null;
 
-                paused.Add(effect);
-                Main.PrintDebug(" pausing effect " + effect);
+                    paused.Add(effect);
+                    Main.PrintDebug(" pausing effect " + effect);
+                }
             }
+            catch (Exception e) { Main.PrintException(e); }
         }
 
         public static void Continue(bool force = false)
         {
-            if (!force && (Game.Instance.IsModeActive(GameModeType.Dialog) || Game.Instance.IsModeActive(GameModeType.Cutscene)))
-                return;
-
-            for (int i = paused.Count - 1; i >= 0; i--)
+            try
             {
-                if (!paused[i].Destroyed && !paused[i].DestroyMark)
-                {
-                    //paused[i].View.m_SpawnedFx?.SetActive(true);
-                    paused[i].View?.SpawnFxs();
-                    Main.PrintDebug(" continuing effect " + paused[i]);
-                }
+                if (!force && (Game.Instance.IsModeActive(GameModeType.Dialog) || Game.Instance.IsModeActive(GameModeType.Cutscene)))
+                    return;
 
-                paused.RemoveAt(i);
+                for (int i = paused.Count - 1; i >= 0; i--)
+                {
+                    if (!paused[i].Destroyed && !paused[i].DestroyMark)
+                    {
+                        //paused[i].View.m_SpawnedFx?.SetActive(true);
+                        paused[i].View?.SpawnFxs();
+                        Main.PrintDebug(" continuing effect " + paused[i]);
+                    }
+
+                    paused.RemoveAt(i);
+                }
             }
+            catch (Exception e) { Main.PrintException(e); }
         }
 
         public void HandleDialogStarted(BlueprintDialog dialog)

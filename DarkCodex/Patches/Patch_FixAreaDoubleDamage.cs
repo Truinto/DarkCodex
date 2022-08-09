@@ -18,11 +18,11 @@ namespace DarkCodex
     {
         [HarmonyPatch(typeof(AreaEffectEntityData), MethodType.Constructor, typeof(AreaEffectView), typeof(MechanicsContext), typeof(BlueprintAbilityAreaEffect), typeof(TargetWrapper), typeof(TimeSpan), typeof(TimeSpan?), typeof(bool))]
         [HarmonyPostfix]
-        public static void OnCast(AreaEffectEntityData __instance, ref float ___m_TimeToNextRound)
+        public static void OnCast(AreaEffectEntityData __instance)
         {
             // start the OnRound timer at 6 seconds; this will fix the immediate trigger of OnEnter and OnRound at the same time
             if (__instance.Blueprint.GetComponent<AbilityAreaEffectRunAction>()?.UnitEnter?.HasActions == true)
-                ___m_TimeToNextRound = 6f;
+                __instance.m_TimeToNextRound = 6f;
         }
     }
 }

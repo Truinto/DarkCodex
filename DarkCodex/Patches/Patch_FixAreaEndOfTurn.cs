@@ -192,18 +192,5 @@ namespace DarkCodex
                 return false;
             return true;
         }
-
-        public static void GetTTTSetting()
-        {
-            var Fixes = AccessTools.Field(Type.GetType("TabletopTweaks.Config.ModSettings, TabletopTweaks"), "Fixes").GetValue(null);
-            var BaseFixes = AccessTools.Field(Type.GetType("TabletopTweaks.Config.SettingGroup, TabletopTweaks"), "BaseFixes").GetValue(Fixes);
-            var flag = (bool)AccessTools.Method(Type.GetType("TabletopTweaks.Config.SettingGroup, TabletopTweaks"), "IsEnabled").Invoke(BaseFixes, new object[] { "FixShadowSpells" });
-
-
-            //namespace TabletopTweaks.Core
-            //static Main.TTTContext
-            //TTTContext.Fixes.MythicFeats.IsDisabled("ExpandedArsenal")
-
-        }
     }
 }

@@ -62,7 +62,7 @@ namespace Shared
 
             try
             {
-                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+                EnsureCodexLib(modEntry.Path);
                 harmony = new Harmony(modEntry.Info.Id);
                 Patch(typeof(Patches));
                 OnLoad(modEntry);
@@ -81,6 +81,31 @@ namespace Shared
             harmony?.UnpatchAll(modEntry.Info.Id);
             Enabled = false;
             return true;
+        }
+
+        private static void EnsureCodexLib(string modPath)
+        {
+            if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("CodexLib, ")))
+                return;
+
+            string path = null;
+            Version version = null;
+
+            foreach (string cPath in Directory.GetFiles(Directory.GetParent(modPath).FullName, "CodexLib.dll"))
+            {
+                var cVersion = new Version(FileVersionInfo.GetVersionInfo(cPath).FileVersion);
+                if (version == null || cVersion > version)
+                {
+                    path = cPath;
+                    version = cVersion;
+                }
+            }
+
+            if (path != null)
+            {
+                Print("Loading CodexLib " + path);
+                AppDomain.CurrentDomain.Load(File.ReadAllBytes(path));
+            }
         }
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)

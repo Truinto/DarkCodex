@@ -142,6 +142,13 @@ namespace CodexLib
             return type != @interface && @interface.IsAssignableFrom(type);
         }
 
+        private static void GetTTT()
+        {
+            //namespace TabletopTweaks.Core
+            //static Main.TTTContext
+            //TTTContext.Fixes.MythicFeats.IsDisabled("ExpandedArsenal")
+        }
+
         #endregion
 
         #region Patching/Harmony
@@ -1216,7 +1223,9 @@ namespace CodexLib
             {
                 result.Add(source[i]);
 
-                var variants = source[i].Get().GetComponent<AbilityVariants>()?.m_Variants ?? Array.Empty<BlueprintAbilityReference>();
+                var variants = source[i].Get()?.GetComponent<AbilityVariants>()?.m_Variants;
+                if (variants == null)
+                    continue;
                 foreach (var variant in variants)
                 {
                     if (predicate == null || predicate(variant.Get()))
@@ -1233,7 +1242,9 @@ namespace CodexLib
 
             for (int i = 0; i < source.Count; i++)
             {
-                var variants = source[i].Get().GetComponent<AbilityVariants>()?.m_Variants ?? Array.Empty<BlueprintAbilityReference>();
+                var variants = source[i].Get()?.GetComponent<AbilityVariants>()?.m_Variants;
+                if (variants == null)
+                    continue;
                 foreach (var variant in variants)
                 {
                     if (predicate == null || predicate(variant.Get()))
@@ -1991,6 +2002,16 @@ namespace CodexLib
             effect.Animation = CastAnimationStyle.Touch;
         }
 
+        /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        public static AbilityEffectRunAction MakeRunActionApplyBuff(AnyRef buff, ContextDurationValue duration = null, bool dispellable = false, bool toCaster = false)
+        {
+            var result = new AbilityEffectRunAction();
+            result.Actions = CreateActionList(
+                CreateContextActionApplyBuff(buff, duration, dispellable: dispellable, toCaster: toCaster, asChild: toCaster, permanent: duration == null)
+                );
+            return result;
+        }
+
         public static BlueprintAbility TargetPoint(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = false)
         {
             ability.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
@@ -2429,6 +2450,15 @@ namespace CodexLib
             return feature;
         }
 
+        /// <param name="resource">type: <b>BlueprintAbilityResource</b></param>
+        public static AbilityResourceLogic CreateAbilityResourceLogic(AnyRef resource, int amount = 1)
+        {
+            var result = new AbilityResourceLogic();
+            result.m_RequiredResource = resource;
+            result.Amount = 1;
+            return result;
+        }
+
         public static ContextSetAbilityParams CreateContextSetAbilityParams(ContextValue dc = null, ContextValue casterLevel = null, ContextValue spellLevel = null, ContextValue concentration = null, bool add10toDC = true)
         {
             var result = new ContextSetAbilityParams();
@@ -2557,7 +2587,7 @@ namespace CodexLib
         public static AddAreaEffect CreateAddAreaEffect(this BlueprintAbilityAreaEffect area)
         {
             var result = new AddAreaEffect();
-            result.m_AreaEffect = area.ToRef();
+            result.m_AreaEffect = area.ToReference<BlueprintAbilityAreaEffectReference>();
             return result;
         }
 
@@ -3087,6 +3117,20 @@ namespace CodexLib
             result.ToCaster = toCaster;
             result.AsChild = asChild;
             result.Permanent = permanent;
+            return result;
+        }
+
+        /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(AnyRef buff, ContextDurationValue duration = null, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false)
+        {
+            var result = new ContextActionApplyBuff();
+            result.m_Buff = buff;
+            result.DurationValue = duration;
+            result.IsFromSpell = fromSpell;
+            result.IsNotDispelable = !dispellable;
+            result.ToCaster = toCaster;
+            result.AsChild = asChild;
+            result.Permanent = duration == null;
             return result;
         }
 
@@ -3815,28 +3859,115 @@ namespace CodexLib
             reference.Cached = bp;
         }
 
+        private static List<object> _list = new();
+
+        private static void AppendAndReplace<T>(ref T[] orig, params object[] objs) where T : BlueprintReferenceBase, new()
+        {
+            // TODO:
+        }
+
+        private static void AppendAndReplace<T>(ref T[] orig, object obj) where T : BlueprintReferenceBase, new()
+        {
+            // TODO:
+            T t;
+            var list = new List<object>();
+
+            list.AddRange(orig);
+
+            if (obj is IEnumerable<object> range)
+            {
+                foreach (var sub in range)
+                {
+                    t = ToRef<T>(sub);
+                    if (t != null)
+                        list.Add(t);
+                }
+            }
+            else
+            {
+
+            }
+
+
+
+            T[] result = new T[list.Count];
+            list.CopyTo(result);
+            orig = result;
+        }
+
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
         {
-            T tref = new T();
-            tref.ReadGuidFromJson(guid);
-            return tref;
+            return new T { deserializedGuid = BlueprintGuid.Parse(guid) };
         }
 
         public static T ToRef<T>(this BlueprintReferenceBase reference) where T : BlueprintReferenceBase, new()
         {
-            return new T() { deserializedGuid = reference.deserializedGuid };
+            return new T { deserializedGuid = reference.deserializedGuid };
         }
 
-        public static T[] ToRef<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
+        public static T ToRef<T>(this object obj) where T : BlueprintReferenceBase, new()
         {
-            return bpRef.Select(s => s.ToRef<T>()).ToArray();
+            if (obj is T t)
+                return t;
+            if (obj is string str)
+                return new T { deserializedGuid = BlueprintGuid.Parse(str) };
+            if (obj is BlueprintReferenceBase bp)
+                return new T { deserializedGuid = bp.deserializedGuid, Cached = bp.Cached };
+            if (obj is SimpleBlueprint sb)
+                return new T { deserializedGuid = sb.AssetGuid, Cached = sb };
+            Helper.PrintError($"ToRef could not resolve type '{obj?.GetType()}'");
+            return null;
+        }
+
+        //public static T[] ToRef<T>(this IEnumerable<AnyRef> bpRef) where T : BlueprintReferenceBase, new()
+        //{
+        //    return bpRef.Select(s => s.ToRef<T>()).ToArray();
+        //}
+
+        public static T[] ToRef<T>(this IEnumerable<object> source) where T : BlueprintReferenceBase, new()
+        {
+            recursiveToRef(source);
+
+            var result = new T[_list.Count];
+            _list.CopyTo(result);
+            _list.Clear();
+            return result;
+
+            void recursiveToRef(IEnumerable<object> range)
+            {
+                T t;
+                foreach (var sub in range)
+                {
+                    if (sub is IEnumerable<object> range2)
+                        recursiveToRef(range2);
+                    else if ((t = ToRef<T>(sub)) != null)
+                        _list.Add(t);
+                }
+            }
         }
 
         public static AnyRef ToAny(this object obj) => AnyRef.ToAny(obj);
 
-        public static AnyRef[] ToAny(this IEnumerable<object> bpRef)
+        public static AnyRef[] ToAny(this IEnumerable<object> source)
         {
-            return bpRef.Select(s => AnyRef.ToAny(s)).ToArray();
+            recursiveToAny(source);
+
+            var result = new AnyRef[_list.Count];
+            _list.CopyTo(result);
+            _list.Clear();
+            return result;
+
+            void recursiveToAny(IEnumerable<object> range)
+            {
+                AnyRef any;
+                foreach (var sub in range)
+                {
+                    if (sub is IEnumerable<object> range2)
+                        recursiveToAny(range2);
+                    else if ((any = AnyRef.ToAny(sub)) != null)
+                        _list.Add(any);
+                }
+            }
         }
 
         public static IEnumerable<T> Get<T>(this IEnumerable<AnyRef> bpRef) where T : SimpleBlueprint
@@ -3866,46 +3997,6 @@ namespace CodexLib
             if (feature == null) return null;
             var result = new BlueprintUnitFactReference();
             result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-
-
-        public static AnyBlueprintReference ToRef3(this BlueprintAbility feature)
-        {
-            if (feature == null) return null;
-            var result = new AnyBlueprintReference();
-            result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static AnyBlueprintReference[] ToRef3(this BlueprintAbility[] feature)
-        {
-            if (feature == null) return null;
-            var result = new AnyBlueprintReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new AnyBlueprintReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
-
-
-        public static AnyBlueprintReference ToRef(this BlueprintScriptableObject feature)
-        {
-            if (feature == null) return null;
-            var result = new AnyBlueprintReference();
-            result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static AnyBlueprintReference[] ToRef(this BlueprintScriptableObject[] feature)
-        {
-            if (feature == null) return null;
-            var result = new AnyBlueprintReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new AnyBlueprintReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
             return result;
         }
 
@@ -3955,34 +4046,12 @@ namespace CodexLib
             result.deserializedGuid = feature.AssetGuid;
             return result;
         }
-        public static BlueprintCharacterClassReference[] ToRef(this BlueprintCharacterClass[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintCharacterClassReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintCharacterClassReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
 
         public static BlueprintFeatureBaseReference ToRef(this BlueprintFeatureBase feature)
         {
             if (feature == null) return null;
             var result = new BlueprintFeatureBaseReference();
             result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintFeatureBaseReference[] ToRef(this BlueprintFeatureBase[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintFeatureBaseReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintFeatureBaseReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
             return result;
         }
 
@@ -3993,34 +4062,12 @@ namespace CodexLib
             result.deserializedGuid = feature.AssetGuid;
             return result;
         }
-        public static BlueprintBuffReference[] ToRef(this BlueprintBuff[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintBuffReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintBuffReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
 
         public static BlueprintUnitFactReference ToRef(this BlueprintUnitFact feature)
         {
             if (feature == null) return null;
             var result = new BlueprintUnitFactReference();
             result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintUnitFactReference[] ToRef(this BlueprintUnitFact[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintUnitFactReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintUnitFactReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
             return result;
         }
 
@@ -4031,91 +4078,12 @@ namespace CodexLib
             result.deserializedGuid = feature.AssetGuid;
             return result;
         }
-        public static BlueprintUnitPropertyReference[] ToRef(this BlueprintUnitProperty[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintUnitPropertyReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintUnitPropertyReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
 
         public static BlueprintArchetypeReference ToRef(this BlueprintArchetype feature)
         {
             if (feature == null) return null;
             var result = new BlueprintArchetypeReference();
             result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintArchetypeReference[] ToRef(this BlueprintArchetype[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintArchetypeReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintArchetypeReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
-
-        public static BlueprintProjectileReference ToRef(this BlueprintProjectile feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintProjectileReference();
-            result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintProjectileReference[] ToRef(this BlueprintProjectile[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintProjectileReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintProjectileReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
-
-        public static BlueprintItemWeaponReference ToRef(this BlueprintItemWeapon feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintItemWeaponReference();
-            result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintItemWeaponReference[] ToRef(this BlueprintItemWeapon[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintItemWeaponReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintItemWeaponReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
-
-        public static BlueprintWeaponTypeReference ToRef(this BlueprintWeaponType feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintWeaponTypeReference();
-            result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintWeaponTypeReference[] ToRef(this BlueprintWeaponType[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintWeaponTypeReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintWeaponTypeReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
             return result;
         }
 
@@ -4126,36 +4094,7 @@ namespace CodexLib
             result.deserializedGuid = feature.AssetGuid;
             return result;
         }
-        public static BlueprintWeaponEnchantmentReference[] ToRef(this BlueprintWeaponEnchantment[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintWeaponEnchantmentReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintWeaponEnchantmentReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
 
-        public static BlueprintAbilityAreaEffectReference ToRef(this BlueprintAbilityAreaEffect feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintAbilityAreaEffectReference();
-            result.deserializedGuid = feature.AssetGuid;
-            return result;
-        }
-        public static BlueprintAbilityAreaEffectReference[] ToRef(this BlueprintAbilityAreaEffect[] feature)
-        {
-            if (feature == null) return null;
-            var result = new BlueprintAbilityAreaEffectReference[feature.Length];
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = new BlueprintAbilityAreaEffectReference();
-                result[i].deserializedGuid = feature[i].AssetGuid;
-            }
-            return result;
-        }
 
         #endregion
 

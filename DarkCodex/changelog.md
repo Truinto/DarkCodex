@@ -1,9 +1,13 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.23]
 - removed Kinetic Artifact "Catalyst", because it causes bugs I can't seem to fix
 - fixed kinetic fist and energize weapon dealing damage even if burn cannot be paid
 - fixed Blood Kineticist cached damage info
+- fixed Kinetic Whip with 3rd party elements
+- fixed Selective Metakinesis with 3rd party elements
+- added fix for Eldritch Archer Spellstrike
 
 ## [1.3.22]
 - added infusion Kinetic Fist

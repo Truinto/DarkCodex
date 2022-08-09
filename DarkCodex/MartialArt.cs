@@ -125,17 +125,66 @@ namespace DarkCodex
                     ActionsOnInitiator: true,
                     DuelistWeapon: true));
 
+            var bleedbuff1 = Helper.CreateBlueprintBuff(
+                "Panache_BleedingWound_SelfBuff",
+                "Bleeding Wound",
+                "As a free action you can spend 1 panache point to have your next light or one-handed piercing melee weapon attack deal additional bleed damage. The amount of bleed damage dealt is equal to the swashbuckler’s Dexterity modifier."
+                ).SetComponents(
+                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
+                    Helper.CreateActionList(new ContextActionRemoveSelf(), new ContextActionIncreaseBleed(false)),
+                    DuelistWeapon: true),
+                Helper.CreateContextRankConfig(ContextRankBaseValueType.StatBonus, stat: StatType.Dexterity)
+                );
+            var bleed1 = Helper.CreateBlueprintAbility(
+                "Panache_BleedingWound_Ability",
+                actionType: UnitCommand.CommandType.Free
+                ).SetComponents(
+                Helper.MakeRunActionApplyBuff(bleedbuff1),
+                Helper.CreateAbilityResourceLogic(resourcePanache, 1)
+                ).SetUIData(bleedbuff1);
+
+            var bleedbuff2 = Helper.CreateBlueprintBuff(
+                "Panache_GreaterBleedingWound_SelfBuff",
+                "Greater Bleeding Wound",
+                "As a free action you can spend 2 panache point to have your next light or one-handed piercing melee weapon attack deal additional 1d4 points of Constitution bleed damage."
+                ).SetComponents(
+                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
+                    Helper.CreateActionList(new ContextActionRemoveSelf(), Helper.CreateContextActionApplyBuff("f80de2a32fc2a7141b23ec29bc36f395")), //BleedConst1d4Buff
+                    DuelistWeapon: true)
+                );
+            var bleed2 = Helper.CreateBlueprintAbility(
+                "Panache_GreaterBleedingWound_Ability",
+                actionType: UnitCommand.CommandType.Free
+                ).SetComponents(
+                Helper.MakeRunActionApplyBuff(bleedbuff2),
+                Helper.CreateAbilityResourceLogic(resourcePanache, 2)
+                ).SetUIData(bleedbuff2);
+
+            var panache6 = Helper.CreateBlueprintFeature(
+                "Panache_BleedingWound",
+                "Bleeding Wound",
+                "At 11th level, when the swashbuckler hits a living creature with a light or one-handed piercing melee weapon attack, as a free action she can spend 1 panache point to have that attack deal additional bleed damage. The amount of bleed damage dealt is equal to the swashbuckler’s Dexterity modifier. Alternatively, the swashbuckler can spend 2 panache points to deal 1d4 points of Constitution bleed damage instead. Creatures that are immune to sneak attacks are also immune to these types of bleed damage."
+                ).SetComponents(
+                Helper.CreateAddFacts(bleed1, bleed2)
+                );
+
             var f11_panache = Helper.CreateBlueprintFeature(
                 "VirtuousBravoAdvancedDeeds",
                 "Advanced Deeds",
                 "At 11th level, a virtuous bravo gains the following swashbuckler deeds: bleeding wound, evasive, subtle blade, superior feint, swashbuckler’s grace, and targeted strike.\nThis ability replaces aura of justice."
+                ).SetComponents(
+                Helper.CreateAddFacts(panache6, 
+                "576933720c440aa4d8d42b0c54b77e80", //Evasion
+                "3c08d842e802c3e4eb19d15496145709", //UncannyDodge
+                "485a18c05792521459c7d06c63128c79") //ImprovedUncannyDodge
                 );
 
             archetype.SetAddFeatures(
                 Helper.CreateLevelEntry(1, f1_prof),
                 Helper.CreateLevelEntry(1, f1_finesse),
                 Helper.CreateLevelEntry(3, f3_nimble),
-                Helper.CreateLevelEntry(4, f4_panache)
+                Helper.CreateLevelEntry(4, f4_panache),
+                Helper.CreateLevelEntry(11, f11_panache)
                 );
 
             archetype.SetRemoveFeatures(
@@ -158,8 +207,6 @@ namespace DarkCodex
         
         Virtuous Bravo
 
-        *Bleeding Wound (Ex): At 11th level, when the swashbuckler hits a living creature with a light or one-handed piercing melee weapon attack, as a free action she can spend 1 panache point to have that attack deal additional bleed damage. The amount of bleed damage dealt is equal to the swashbuckler’s Dexterity modifier (minimum 1). Alternatively, the swashbuckler can spend 2 panache points to deal 1 point of Strength, Dexterity, or Constitution bleed damage instead (swashbuckler’s choice). Creatures that are immune to sneak attacks are also immune to these types of bleed damage.
-        *Evasive (Ex): At 11th level, while a swashbuckler has at least 1 panache point, she gains the benefits of the evasion, uncanny dodge, and improved uncanny dodge rogue class features. She uses her swashbuckler level as her rogue level for improved uncanny dodge.
         *Subtle Blade (Ex): At 11th level, while a swashbuckler has at least 1 panache point, she is immune to disarm, steal, and sunder combat maneuvers made against a light or one-handed piercing melee weapon she is wielding.
         *Superior Feint (Ex): At 7th level, a swashbuckler with at least 1 panache point can, as a standard action, purposefully miss a creature she could make a melee attack against with a wielded light or one-handed piercing weapon. When she does, the creature is denied its Dexterity bonus to AC until the start of the swashbuckler’s next turn.
         *Swashbuckler’s Grace (Ex): At 7th level, while the swashbuckler has at least 1 panache point, she takes no penalty for moving at full speed when she uses Acrobatics to attempt to move through a threatened area or an enemy’s space.

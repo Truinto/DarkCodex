@@ -33,14 +33,6 @@ namespace DarkCodex
     {
         public static KineticistTree Tree = KineticistTree.Instance;
 
-        public static AbilityRegister Blasts = new(
-            "c4b74e4448b81d04f9df89ed14c38a95",  //MetakinesisQuickenCheaperBuff
-            "f690edc756b748e43bba232e0eabd004",  //MetakinesisQuickenBuff
-            "b8f43f0040155c74abd1bc794dbec320",  //MetakinesisMaximizedCheaperBuff
-            "870d7e67e97a68f439155bdf465ea191",  //MetakinesisMaximizedBuff
-            "f8d0f7099e73c95499830ec0a93e2eeb",  //MetakinesisEmpowerCheaperBuff
-            "f5f3aa17dd579ff49879923fb7bc2adb"); //MetakinesisEmpowerBuff
-
         [PatchInfo(Severity.Create, "Kineticist Background", "regional background: gain +1 Kineticist level for the purpose of feat prerequisites", true)]
         public static void CreateKineticistBackground()
         {
@@ -85,7 +77,7 @@ namespace DarkCodex
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
             var knight = Helper.Get<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
-            var applicable = Blasts.Where(g => g.Get().name.StartsWith("KineticBlade")).ToArray();
+            var applicable = Tree.GetAll(true, true, archetype: true).Select(s => s.Blade.Burn).ToArray();
             Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
             var icon = Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3");
 
@@ -180,6 +172,7 @@ namespace DarkCodex
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
             ability.AvailableMetamagic = Metamagic.Quicken;
+            var abref = ability.ToRef();
 
             var rush = Helper.CreateBlueprintFeature(
                 "KineticBladeRush",
@@ -198,12 +191,18 @@ namespace DarkCodex
                 "Blade Rush — Quicken",
                 "At 13th level as a swift action, a Kinetic Knight can accept 2 points of burn to unleash a kinetic blast with the blade rush infusion."
                 ).SetComponents(
-                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { ability.ToRef() }, AutoMetamagic.AllowedType.KineticistBlast)
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { abref }, AutoMetamagic.AllowedType.KineticistBlast)
                 );
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, rush.ToRef());
             knight.AddFeature(13, quickblade);
-            Blasts.Add(ability);
+
+            foreach (var meta in Tree.MetakinesisBuffs)
+            {
+                var abilities = meta.GetComponent<AutoMetamagic>().Abilities;
+                abilities.Add(abref);
+                meta.GetComponent<AddKineticistBurnModifier>().m_AppliableTo = abilities.ToArray();
+            }
         }
 
         [PatchInfo(Severity.Create, "Mobile Gathering", "basic feat: Mobile Gathering", false)]
@@ -649,32 +648,37 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Fix, "Spell-like Blasts", "makes blasts register as spell like, instead of supernatural", false)]
+        [PatchInfo(Severity.Fix, "Spell-like Blasts", "makes blasts register as spell like, instead of supernatural", false, Priority: 300)]
         public static void FixBlastsAreSpellLike()
         {
-            foreach (var blast in Blasts.GetBaseAndVariants())
-                blast.Get().Type = AbilityType.SpellLike;
+            Main.RunLast("Spell-like Blasts", () =>
+            {
+                foreach (var blast in Tree.GetBlasts(bases: true, variants: true, bladeburn: true))
+                    blast.Type = AbilityType.SpellLike;
+            });
         }
 
         [PatchInfo(Severity.Fix | Severity.Faulty, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
-        public static void FixWallInfusion() // TODO: seems not to work anymore
+        public static void FixWallInfusion()
         {
-            int counter = 0;
-
-            foreach (var ab in Resource.Cache.Ability.Where(w => w.name.StartsWith("Wall")))
+            Main.RunLast("Fix Wall Infusion", () =>
             {
-                var abRun = ab.GetComponent<AbilityEffectRunAction>();
-                if (abRun == null || abRun.Actions.Actions[0] is not ContextActionSpawnAreaEffect area)
-                    continue;
+                int counter = 0;
+                foreach (var ab in Tree.GetBlasts(variants: true).Where(w => w.name.StartsWith("Wall"))) //Resource.Cache.Ability
+                {
+                    var abRun = ab.GetComponent<AbilityEffectRunAction>();
+                    if (abRun == null || abRun.Actions.Actions[0] is not ContextActionSpawnAreaEffect area)
+                        continue;
 
-                var areaRun = area.AreaEffect.GetComponent<AbilityAreaEffectRunAction>();
-                if (areaRun == null)
-                    continue;
+                    var areaRun = area.AreaEffect.GetComponent<AbilityAreaEffectRunAction>();
+                    if (areaRun == null)
+                        continue;
 
-                areaRun.Round = areaRun.UnitEnter;
-                counter++;
-            }
-            Main.Print("Patched Wall Infusions: " + counter);
+                    areaRun.Round = areaRun.UnitEnter;
+                    counter++;
+                }
+                Main.Print("Patched Wall Infusions: " + counter);
+            });
         }
 
         [PatchInfo(Severity.Create, "Selective Metakinesis", "gain selective metakinesis at level 7", true)]
@@ -689,13 +693,6 @@ namespace DarkCodex
             string displayname = "Metakinesis — Selective";
             string description = "At 7th level, by accepting 1 point of burn, a kineticist can adjust her kinetic blast as if using Selective Spell.";
 
-            var applicable = Blasts.GetVariants(
-                g => g.CanTargetPoint
-                  || g.GetComponent<AbilityTargetsAround>() && g.CanTargetFriends
-                  || g.GetComponent<AbilityDeliverChain>());
-
-            Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
-
             BlueprintActivatableAbility ab1 = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisSelectiveAbility",
                 displayname,
@@ -704,9 +701,26 @@ namespace DarkCodex
                 icon: icon
                 );
             buff1.SetComponents(
-                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Metakinesis, Value = 1, m_AppliableTo = applicable.ToArray() },
-                Helper.CreateAutoMetamagic(Metamagic.Selective, applicable, AutoMetamagic.AllowedType.KineticistBlast)
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Metakinesis, Value = 1 },
+                Helper.CreateAutoMetamagic(Metamagic.Selective, null, AutoMetamagic.AllowedType.KineticistBlast)
                 ).Flags(hidden: true, stayOnDeath: true);
+
+            //Tree.MetakinesisBuffs.Register(buff1, g => g.Get() is BlueprintAbility ab &&
+            //    (ab.CanTargetPoint
+            //    || ab.GetComponent<AbilityTargetsAround>() && ab.CanTargetFriends
+            //    || ab.GetComponent<AbilityDeliverChain>()));
+
+            Main.RunLast("Selective Metakinesis", () =>
+            {
+                var applicable = Tree.MetakinesisBuffs.First().GetComponent<AddKineticistBurnModifier>().m_AppliableTo.Where(
+                    g => g.Get() is BlueprintAbility ab &&
+                        (ab.CanTargetPoint
+                        || ab.GetComponent<AbilityTargetsAround>() && ab.CanTargetFriends
+                        || ab.GetComponent<AbilityDeliverChain>())).ToArray();
+
+                buff1.GetComponent<AddKineticistBurnModifier>().m_AppliableTo = applicable;
+                buff1.GetComponent<AutoMetamagic>().Abilities = applicable.ToList();
+            });
 
             var feature1 = Helper.CreateBlueprintFeature(
                 "MetakinesisSelectiveFeature",

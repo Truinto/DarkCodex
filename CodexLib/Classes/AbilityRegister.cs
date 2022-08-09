@@ -1,68 +1,70 @@
-﻿using CodexLib;
-using Kingmaker.Blueprints;
+﻿using Kingmaker.Blueprints;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Class.Kineticist;
-using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DarkCodex
+namespace CodexLib
 {
     /// <summary>
-    /// Add components to "Components" to add new entries automatically.
+    /// Will keep lists of BlueprintAbilityReference updated. 
+    /// Use Register() to add to watchlist and use Add() to add new entries to all registered features.
+    /// May override 3rd party changes.
     /// </summary>
+    [Obsolete]
     public class AbilityRegister : List<BlueprintAbilityReference>
     {
         public AbilityRegister() : base() { }
 
-        public AbilityRegister(IEnumerable<BlueprintAbilityReference> collection, params BlueprintComponent[] comps) : base(collection)
-        {
-            this.Components = comps.ToList();
-            _cache = collection.ToArray();
-        }
-
         /// <param name="guids">Blueprints to update. guids[0] defines starting values.</param>
         public AbilityRegister(params string[] guids)
         {
-            if (guids == null || guids.Length == 0)
-                new ArgumentException("Must supply at least one guid");
-
-            this.Components = new List<BlueprintComponent>();
-            foreach (var guid in guids)
+            if (guids != null)
             {
-                var bp = Helper.Get<BlueprintScriptableObject>(guid);
-                Register(bp);
+                foreach (var guid in guids)
+                    Register(Helper.Get<BlueprintScriptableObject>(guid), null);
             }
 
-            base.AddRange(Get(this.Components[0]));
+            if (this.Components.Count > 0)
+            {
+                base.AddRange(Get(this.Components[0].comp));
+                _cache = base.ToArray();
+            }
+
+            foreach (var comp in this.Components)
+                Set(comp.comp, null);
         }
 
         private BlueprintAbilityReference[] _cache;
 
         /// <summary>Components that contain and should be updated with a list of BlueprintAbility.</summary>
-        public List<BlueprintComponent> Components;
+        public List<(BlueprintComponent comp, Func<BlueprintAbilityReference, bool> pred)> Components = new();
 
         /// <summary>Filter components to keep updated.</summary>
-        public void Register(BlueprintScriptableObject blueprint)
+        public void Register(BlueprintScriptableObject blueprint, Func<BlueprintAbilityReference, bool> pred = null)
         {
             if (blueprint == null)
-                Main.PrintError("AbilityRegister blueprint is null");
+                Helper.PrintError("AbilityRegister blueprint is null");
 
             bool found = false;
             foreach (var comp in blueprint.ComponentsArray)
             {
                 if (Allowed(comp))
                 {
-                    this.Components.Add(comp);
+                    this.Components.Add((comp, pred));
+
+                    if (_cache != null)
+                        Set(comp, pred);
+
                     found = true;
                 }
             }
             if (!found)
-                Main.PrintError("AbilityRegister unsupported blueprint: " + blueprint.name);
+                Helper.PrintError("AbilityRegister unsupported blueprint: " + blueprint.name);
         }
 
         /// <summary>Adds this ability to all components.</summary>
@@ -78,7 +80,7 @@ namespace DarkCodex
             _cache = base.ToArray();
 
             foreach (var comp in this.Components)
-                Set(comp);
+                Set(comp.comp, comp.pred);
         }
 
         private bool Allowed(BlueprintComponent comp)
@@ -86,14 +88,14 @@ namespace DarkCodex
             return comp is AddKineticistBurnModifier || comp is AutoMetamagic;
         }
 
-        private void Set(BlueprintComponent comp)
+        private void Set(BlueprintComponent comp, Func<BlueprintAbilityReference, bool> pred = null)
         {
             if (comp is AddKineticistBurnModifier comp1)
-                comp1.m_AppliableTo = _cache;
+                comp1.m_AppliableTo = pred == null ? _cache : this.Where(pred).ToArray();
             else if (comp is AutoMetamagic comp2)
-                comp2.Abilities = this;
+                comp2.Abilities = pred == null ? this : this.Where(pred).ToList();
             else
-                Main.PrintError("Illegal Set component");
+                Helper.PrintError("Illegal Set component");
         }
 
         private List<BlueprintAbilityReference> Get(BlueprintComponent comp)
@@ -103,8 +105,8 @@ namespace DarkCodex
             else if (comp is AutoMetamagic comp2)
                 return comp2.Abilities;
             else
-                Main.PrintError("Illegal Get component");
-            return null;
+                Helper.PrintError("Illegal Get component");
+            return new();
         }
     }
 }
