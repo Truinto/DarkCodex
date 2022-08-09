@@ -7,4 +7,7 @@ assignees: ''
 
 ---
 
-
+Tips:
+- screenshots
+- combat log
+- game log here: "%appdata%\..\LocalLow\Owlcat Games\Pathfinder Wrath Of The Righteous"
