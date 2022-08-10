@@ -41,6 +41,7 @@ global using System.Collections.Generic;
 global using System.Diagnostics;
 global using System.Linq;
 global using System.Reflection;
+global using System.Reflection.Emit;
 global using UnityEngine;
 using DarkCodex;
 using Kingmaker.UI;

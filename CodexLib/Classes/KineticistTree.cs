@@ -56,7 +56,7 @@ namespace CodexLib
 
             #endregion
 
-            #region Elements
+            #region Elements Basic
 
             Air = new()
             {
@@ -153,6 +153,10 @@ namespace CodexLib
                 },
                 DamageType = GetDamageType(e1: DamageEnergyType.Cold)
             };
+
+            #endregion
+
+            #region Elements Composite
 
             Composite_Metal = new()
             {
@@ -370,7 +374,10 @@ namespace CodexLib
                 DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
             };
 
-            // modded
+            #endregion
+
+            #region Elements Modded
+
             Telekinetic = new()
             {
                 Selection = null,
@@ -423,7 +430,7 @@ namespace CodexLib
 
             Negative = new()
             {
-                Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("2b5ad478d5874bd48cdf7be60e4a92b6"),
+                Selection = Gravity.Selection,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("21b063289b4f4c7783a24b179a0ea3c0"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("b8d46890ceaa4b6c878d9cce68894ff4"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("036de5238a1447a293e4e4749b6724eb"),
@@ -473,7 +480,7 @@ namespace CodexLib
 
             Positive = new()
             {
-                Selection = Helper.ToRef<BlueprintFeatureSelectionReference>("959431c21e414452ada0ce3c45ed49e6"),
+                Selection = Wood.Selection,
                 Progession = Helper.ToRef<BlueprintProgressionReference>("d0d8d2bb86d44473bd24ceb34f0ef6ea"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("e61724bb0727488f97b84164590846cd"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("64e7aabc2b55441d8a2513533fff7eb8"),
@@ -656,7 +663,7 @@ namespace CodexLib
 
             BaseBasic = GetAll(true, false).Select(s => s.BaseAbility).ToArray();
             BaseComposite = GetAll(false, true).Select(s => s.BaseAbility).ToArray();
-            BaseAll = GetAll(true, true).Select(s => s.BaseAbility).ToArray();
+            BaseAll = GetAll(true, true, archetype: true).Select(s => s.BaseAbility).ToArray();
         }
 
         public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)

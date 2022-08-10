@@ -321,7 +321,7 @@ namespace DarkCodex
             var list = new List<GameAction>();
             foreach (var element in t.GetAll(composite: true))
             {
-                if (element.Parent2 != null)
+                if (element.Parent1 != null && element.Parent2 != null)
                 {
                     list.Add(Helper.CreateConditional(
                         new Condition[]
@@ -337,8 +337,11 @@ namespace DarkCodex
             t.CompositeBuff.Get().GetComponent<AddFactContextActions>().Activated.Actions = list.ToArray();
 
             // move CompositeBlastBuff to BlastFeature
-            foreach (var element in t.GetAll(basic: true))
-                element.BlastFeature.Get()?.AddComponents(Helper.CreateAddFeatureOnApply(t.CompositeBuff));
+            Main.RunLast("Expanded Element" + 1, () =>
+            {
+                foreach (var element in t.GetAll(basic: true))
+                    element.BlastFeature.Get()?.AddComponents(Helper.CreateAddFacts(t.CompositeBuff));
+            });
 
             // create new simplified selection
             var expandedElement = Helper.CreateBlueprintFeatureSelection(
@@ -353,20 +356,24 @@ namespace DarkCodex
                 expandedElement.AddComponents(Helper.CreatePrerequisiteNoArchetype(t.ElementalScion, t.Class)); // disallow expanded element for this archetype
             expandedElement.m_DisplayName = t.FocusSecond.Get().m_DisplayName;
 
-            var list2 = new List<BlueprintFeatureReference>();
-            foreach (var element in t.GetAll(basic: true, composite: true))
+            // add all simple and solo composites to said selection
+            Main.RunLast("Expanded Element" + 2, () =>
             {
-                if (element.Parent1 != null && element.Parent2 == null)
+                var list2 = new List<BlueprintFeatureReference>();
+                foreach (var element in t.GetAll(basic: true, composite: true))
                 {
-                    element.BlastFeature.Get()?.AddComponents(Helper.CreatePrerequisiteFeature(element.Parent1.BlastFeature)); // make sure metal and blueflame cannot be taken early
-                    list2.Add(element.BlastFeature);
+                    if (element.Parent1 != null && element.Parent2 == null)
+                    {
+                        element.BlastFeature.Get()?.AddComponents(Helper.CreatePrerequisiteFeature(element.Parent1.BlastFeature)); // make sure metal and blueflame cannot be taken early
+                        list2.Add(element.BlastFeature);
+                    }
+                    else if (element.Parent1 == null)
+                    {
+                        list2.Add(element.BlastFeature);
+                    }
                 }
-                else if (element.Parent1 == null)
-                {
-                    list2.Add(element.BlastFeature);
-                }
-            }
-            expandedElement.m_AllFeatures = list2.ToArray();
+                expandedElement.m_AllFeatures = list2.ToArray();
+            });
 
             t.ExpandedElement.SetReference(expandedElement);
 

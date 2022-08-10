@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.3.24]
+- fixed bug from spellstrike patch
+
 ## [1.3.23]
 - removed Kinetic Artifact "Catalyst", because it causes bugs I can't seem to fix
 - fixed kinetic fist and energize weapon dealing damage even if burn cannot be paid
