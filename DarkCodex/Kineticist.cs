@@ -964,7 +964,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Elemental Scion (3PP)", "new Kineticist archetype", false)]
+        [PatchInfo(Severity.Create, "Elemental Scion (3PP)", "new Kineticist archetype", false)]
         public static void CreateElementalScion()
         {
             var comps = new List<BlueprintComponent>();
@@ -1023,13 +1023,11 @@ namespace DarkCodex
 
             // Focused Element
             comps.Clear();
-            foreach (var element in Tree.GetAll(composite: true))
+            foreach (var focus in Tree.GetFocus())
             {
-                if (element.Parent1 != null)
-                    comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent1.BlastFeature, element.BlastFeature));
-                if (element.Parent2 != null)
-                    comps.Add(Helper.CreateAddFeatureIfHasFact(element.Parent2.BlastFeature, element.BlastFeature));
+                comps.Add(Helper.CreateAddFeatureIfHasFact(focus.First, focus.Composite.BlastFeature));
             }
+            comps.Add(Helper.CreateAddFacts(Tree.CompositeBuff));
             var f7_focusedElement = Helper.CreateBlueprintFeatureSelection(
                 "ElementalScionFocusedElement",
                 "Focused Element",

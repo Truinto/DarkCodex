@@ -54,7 +54,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(bardic_prereq)
                 );
 
-            SetResourceDecreasing(bardic_resource, limitless.ToRef2());
+            SetResourceDecreasing(bardic_resource, limitless);
             Helper.AddMythicTalent(limitless);
 
             // same again for skald raging song
@@ -70,12 +70,12 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(ragesong_prereq)
                 );
 
-            SetResourceDecreasing(ragesong_resource, limitless2.ToRef2());
+            SetResourceDecreasing(ragesong_resource, limitless2);
             Helper.AddMythicTalent(limitless2);
 
             // same again for azata
             var azatasong_resource = BlueprintGuid.Parse("83f8a1c45ed205a4a989b7826f5c0687"); //AzataSongResource
-            var azatasong_prereq = Helper.ToRef<BlueprintFeatureReference>("cb208b98ceacca84baee15dba53b1979"); //Azata Song of Resolve
+            var azatasong_prereq = Helper.ToRef<BlueprintFeatureReference>("02c96331ed2d87d43a4a3509142678b8"); //AzataPerformanceResourceFeature
 
             var limitless3 = Helper.CreateBlueprintFeature(
                 "LimitlessAzataSong",
@@ -86,7 +86,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(azatasong_prereq)
                 );
 
-            SetResourceDecreasing(azatasong_resource, limitless3.ToRef2());
+            SetResourceDecreasing(azatasong_resource, limitless3);
             Helper.AddMythicTalent(limitless3);
         }
 
@@ -175,8 +175,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(incense_prereq, true)
                 );
 
-            SetResourceDecreasing(bomb_resource, limitless.ToRef2());
-            SetResourceDecreasing(incense_resource, limitless.ToRef2());
+            SetResourceDecreasing(bomb_resource, limitless);
+            SetResourceDecreasing(incense_resource, limitless);
 
             Helper.AddMythicTalent(limitless);
         }
@@ -198,8 +198,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(abundant_arcane)
                 );
 
-            SetResourceDecreasing(arcane_resource, limitless.ToRef2(), true);
-            SetResourceDecreasing(arcane_resourceEldritch, limitless.ToRef2(), true);
+            SetResourceDecreasing(arcane_resource, limitless, true);
+            SetResourceDecreasing(arcane_resourceEldritch, limitless, true);
 
             Helper.AddMythicTalent(limitless);
         }
@@ -222,7 +222,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(enforcerer_prereq, true)
                 );
 
-            SetResourceDecreasing(arcane_resource, limitless.ToRef2(), true);
+            SetResourceDecreasing(arcane_resource, limitless, true);
 
             Helper.AddMythicTalent(limitless);
         }
@@ -244,8 +244,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(abundant_ki)
                 );
 
-            SetResourceDecreasing(ki_resource, limitless.ToRef2());
-            SetResourceDecreasing(scaled_resource, limitless.ToRef2());
+            SetResourceDecreasing(ki_resource, limitless);
+            SetResourceDecreasing(scaled_resource, limitless);
 
             Helper.AddMythicTalent(limitless);
         }
@@ -305,7 +305,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(shaman_prereq, true)
                 );
 
-            SetResourceDecreasing(shaman_resource, limitless.ToRef2());
+            SetResourceDecreasing(shaman_resource, limitless);
 
             Helper.AddMythicTalent(limitless);
 
@@ -336,8 +336,8 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteClassLevel(warpriest_prereq, 1)
                 );
 
-            SetResourceDecreasing(weapon_resource, limitless.ToRef2());
-            SetResourceDecreasing(armor_resource, limitless.ToRef2());
+            SetResourceDecreasing(weapon_resource, limitless);
+            SetResourceDecreasing(armor_resource, limitless);
 
             Helper.AddMythicTalent(limitless);
         }
@@ -785,7 +785,7 @@ namespace DarkCodex
 
         #region Helper
 
-        public static void SetResourceDecreasing(BlueprintGuid resource, BlueprintUnitFactReference limitless, bool repeat = false)
+        public static void SetResourceDecreasing(BlueprintGuid resource, AnyRef limitless, bool repeat = false)
         {
             Resource.Cache.Ensure();
             repeat |= Settings.State.reallyFreeCost;

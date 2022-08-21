@@ -355,8 +355,9 @@ namespace CodexLib
         /// <remarks>
         /// End result:
         /// <code>
-        /// if (!func(__instance))
-        ///     return result;
+        /// object __result;
+        /// if (!func(__instance, ref __result))
+        ///     return __result;
         /// </code>
         /// </remarks>
         public static void AddCondition(this List<CodeInstruction> code, ref int index, ILFunctionRet func, ILGenerator generator, Type unbox = null)

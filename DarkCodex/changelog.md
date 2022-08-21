@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+- fixed Limitless Azata Song prerequisite
+- fixed Scion archetype getting all composite blasts
+
 ## [1.3.24]
 - fixed bug from spellstrike patch
 

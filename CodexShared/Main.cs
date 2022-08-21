@@ -178,7 +178,7 @@ namespace Shared
 
                     if (applyNullFinalizer)
                     {
-                        var nullFinalizer = new HarmonyMethod(typeof(Main).GetMethod(nameof(Main.NullFinalizer)));
+                        var nullFinalizer = new HarmonyMethod(AccessTools.Method(typeof(Main), nameof(Main.NullFinalizer)));
                         foreach (var patch in harmony.GetPatchedMethods().ToArray())
                         {
                             if (Harmony.GetPatchInfo(patch).Finalizers.Count == 0)
@@ -503,15 +503,16 @@ namespace Shared
 
         internal static Exception NullFinalizer(Exception __exception)
         {
+#if !DEBUG
+            return null;
+#endif
             if (__exception == null)
                 return null;
-#if DEBUG
             try
             {
                 PrintException(__exception);
             }
             catch (Exception) { }
-#endif
             return null;
         }
 

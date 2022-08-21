@@ -362,7 +362,7 @@ namespace CodexLib
                 Progession = Helper.ToRef<BlueprintProgressionReference>("535a9c4dbe912924396ae50cc7fba8c4"),
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("79b5d7184efe7034a863ae612c429306"),
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ba2113cfed0c2c14b93c20e7625a4c74"),
-                Parent1 = null,
+                Parent1 = Water,
                 Parent2 = null,
                 Blade = new()
                 {
@@ -595,7 +595,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("651570c873e22b84f893f146ce2de502"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("93bd14dd916cfd1429c11ad66adf5e2b"),
                 Element1 = Air,
-                Element2 = Electric
+                Element2 = Electric,
+                Composite = Composite_Thunder
             };
 
             FocusEarth = new()
@@ -605,7 +606,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("c43d9c2d23e56fb428a4eb60da9ba1cb"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("d2a93ab18fcff8c419b03a2c3d573606"),
                 Element1 = Earth,
-                Element2 = null
+                Element2 = null,
+                Composite = Composite_Metal
             };
 
             FocusFire = new()
@@ -615,7 +617,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("56e2fc3abed8f2247a621ac37e75f303"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("d4a2a75d01d1e77489ff692636a538bf"),
                 Element1 = Fire,
-                Element2 = null
+                Element2 = null,
+                Composite = Composite_BlueFlame
             };
 
             FocusWater = new()
@@ -625,7 +628,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("86eff374d040404438ad97fedd7218bc"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("5e839c743c6da6649a43cdeb70b6018f"),
                 Element1 = Water,
-                Element2 = Cold
+                Element2 = Cold,
+                Composite = Composite_Ice
             };
 
             // modded
@@ -636,7 +640,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("ff2e26f01237404f8a820f61212b3917"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("0af9c49df79a469cbfc29fa469d97a64"),
                 Element1 = Telekinetic,
-                Element2 = null
+                Element2 = null,
+                Composite = Composite_Force
             };
 
             FocusVoid = new()
@@ -646,7 +651,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("9f02317d4e5e476ba1678d0ccad13ef9"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("65e6ed019bc742b78e7a203f8ab45aac"),
                 Element1 = Gravity,
-                Element2 = Negative
+                Element2 = Negative,
+                Composite = Composite_Void
             };
 
             FocusWood = new()
@@ -656,7 +662,8 @@ namespace CodexLib
                 Third = Helper.ToRef<BlueprintProgressionReference>("1a48f56f45584e619490210319330d4d"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("ade87cba8c0e4883be35d1b5563f28e1"),
                 Element1 = Wood,
-                Element2 = Positive
+                Element2 = Positive,
+                Composite = Composite_Verdant
             };
 
             #endregion
@@ -771,7 +778,7 @@ namespace CodexLib
                     yield return e;
             }
         }
-        
+
         public IEnumerable<BlueprintFeature> GetInfusionTalents()
         {
             foreach (var talent in SelectionInfusion.Get().m_AllFeatures)
@@ -924,6 +931,7 @@ namespace CodexLib
             public Element Element1;
             /// <summary>can be null (earth, fire)</summary>
             [CanBeNull] public Element Element2;
+            public Element Composite;
         }
 
         public class Blade
