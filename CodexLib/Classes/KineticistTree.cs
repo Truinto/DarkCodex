@@ -973,6 +973,13 @@ namespace CodexLib
             public BlueprintAbilityReference Burn;
         }
 
+        public class Infusion
+        {
+            public BlueprintFeatureReference Feature;
+            /// <summary>can be null (form infusions)</summary>
+            [CanBeNull] public BlueprintBuffReference Buff;
+        }
+
         #region Helper
 
         private DamageTypeDescription[] GetDamageType(PhysicalDamageForm? p1 = null, DamageEnergyType? e2 = null, DamageEnergyType? e1 = null)
