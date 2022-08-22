@@ -698,6 +698,276 @@ namespace CodexLib
 
             #endregion
 
+            #region Infusions
+            BladeWhirlwind = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("80fdf049d396c33408a805d9e21a42e1"),
+                Buff = null
+            };
+            KineticBlade = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"),
+                Buff = null
+            };
+            Bleeding = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("75cbe35e4ada12441a0270d541c12c64"),
+                Buff = Helper.ToRef < BlueprintBuffReference("492a8156ecede6345a8e82475eed85ac")
+            };
+            Cloud = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("3c53ee4965a13d74e81b37ae34f0861b"),
+                Buff = null
+            };
+            Cyclone = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("f2fa7541f18b8af4896fbaf9f2a21dfe"),
+                Buff = null
+            };
+            DeadlyEarth = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("061f5d7e659432b478668b70f6d4caae"),
+                Buff = 
+            };
+            Detonation = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("77c24cc95ce319c44a0e5fc6ff466d5b"),
+                Buff = null
+            };
+            Eruption = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("00f8e4b846c367141afcd133f4a1c816"),
+                Buff = null
+            };
+            ExtendedRange = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("cb2d9e6355dd33940b2bef49e544b0bf"),
+                Buff = null
+            };
+            FanOfFlames = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("fde466d2c24705641bcd97d04a323566"),
+                Buff = null
+            };
+            Fragmentation = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("88ae936abf296894695a282f49214718"),
+                Buff = null
+            };
+            Spindle = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c4f4a62a325f7c14dbcace3ce34782b5"),
+                Buff = null
+            };
+            Spray = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("b5852e8287f12d34ca6f84fcc7019f07"),
+                Buff = null
+            };
+            Torrent = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("2aad85320d0751340a0786de073ee3d5"),
+                Buff = null
+            };
+            Wall = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c684335918896ce4ab13e96cec929796"),
+                Buff = null
+            };
+            Wrack = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("9e7f94f8d42a74240b9329f5e68121ee"),
+                Buff = null
+            };
+            Bowling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("b3bd080eed83a9940abd97e4aa2a7341"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("918b2524af5c3f647b5daa4f4e985411")
+            };
+            Chilling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("6ac87a3af9ccf014787c49745df75e6a"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("49fc69c05ff7c5d46b61745d361a72fb")
+            };
+            Dazzling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("037460f7ae3e21943b237007f2b1a5d5"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("ee8d9f5631c53684d8d627d715eb635c")
+            };
+            Entangling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("607539d018d03454aaac0a2c1522f7ac"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("738120aad01eedb4f891eca5b784646a")
+            };
+            Flash = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("37f3cfca29073e142a80c3b8e7c54b05"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("50cf40b1cb3115546a3e9b44d7687384")
+            };
+            Foxfire = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("ae21c5369252ec74aa1fee89f1bc1b21"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("e671f173fcb75bf4aa78a4078d075792")
+            };
+            Grappling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("e2d70b95e80549b439d30df29a79cb58"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("f69a66c0feaa4374b8ca2732ee91a373")
+            };
+            Magnetic = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("d6b95ac99e3004b499d750835864e053"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("696a0eafc6a21334580174a461079841")
+            };
+            PureFlame = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("1dfd9b8e1439e4a4ab4b6b11f5ea676a"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("1b9f7db78467ff34ab2e1c0f86cdaa77")
+            };
+            Pushing = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("fbb97f35a41b71c4cbc36c5f3995b892"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("f795bede8baefaf4d9d7f404ede960ba")
+            };
+            RareMetal = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("6700ce7f56ddc30488e45b049f4ee475"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("417086d2c99b60f4c911de6712bc76a7")
+            };
+            Synaptic = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("53c80f136f2bf65409d358f28b0c5bb4"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("67fc7492f198c8d4aace14d28e0ad438")
+            };
+            Unraveling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("79339d57d491d824ba0aa4ed0c114b2f"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("cebd08ab72f1baa4eaacdd836207873a")
+            };
+            Vampiric = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("66c71846bbb626a4ab73cef60f1c8bbf"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("e50e653cff511cd49a55b979346699f1")
+            };
+
+            #endregion
+
+            #region Infusions Modded
+            // Modded: DarkCodex
+            BladeRush = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("350b164b8fd942f4a37af9fe31d6b97a"),
+                Buff = null
+            };
+            Whip = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("00df2fabfc3f40a4aaf4a066dcd78b80"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("26983c7ac7f1465fab8ec646f366b9f7")
+            };
+            Chain = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("4b6884729a46432ea9b5e1a873e8efa6"),
+                Buff = null
+            };
+            Impale = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("611f666629f7451c98618d62b16ed62e"),
+                Buff = null
+            };
+            Venom = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("637329bf936244668c55d81985c4eaf8"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("41b2d6e118034bd0bf3edc214a895d70")
+            };
+            VenomGreater = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("e9021412e87847b3b104d4d31bfe5403"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("ec75b0fc5e484c1eabb1fd15eb204b99")
+            };
+            KineticFist = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("5e3db32b4e244abfa642ee03276d88ed"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("07e18f24bda7444a9b34405227b31b60")
+            };
+            EnergizeWeapon = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("fb9fe27f13934807bcd62dfeec477758"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("f5fbde9e5fbe4973bc421315c723d9fe")
+            };
+
+            // Modded: Kineticist Elements Expanded
+            Disintegrating = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("96360bedde8648a8a6762e2de41b60a5"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("321e49800199496e829f6876d34fce47")
+            };
+            ForceHook = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("000706ddb53e468a926a3c36e1889213"),
+                Buff = null
+            };
+            FoeThrow = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("cba7fb8cef0c4160b500850d0c58d1d9"),
+                Buff = null
+            };
+            ManyThrow = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("ae785f510e4c4ed2991b59b421c0a2e5"),
+                Buff = null
+            };
+            Dampening = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("e9cf588e2ef64fb68d0ec8c566e8b294"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("611d7a60d13943249bc706dc965cdce0")
+            };
+            Enervating = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("8662ccb8dd484a2f8139d46621c641fd"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("94fc7da86b1e4049974f46580dbecb9f")
+            };
+            Pulling = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("3ae954ad56a2497b92fada3dc493b4e1"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("28db04531698400a98da7fb965a519e7")
+            };
+            Unnerving = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("e53160d091914d50bfc1d8d4fa482e30"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("d5c72f8725f74109abb4c0ca516da805")
+            };
+            VoidVampire = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c1cdb07b56614ff6acb4416eb90629d1"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("2b306434ee2948a782263f57b7c2ddb5")
+            };
+            Weighing = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("987dc633dbae49b0adc11cd9c5672553"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("98147fa8bb4049ab9e7a6c8b55eb47bf")
+            };
+            Singularity = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("2a8b8823924245aa9c9494679b311866"),
+                Buff = null
+            };
+            Spore = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("1cd0cd60997d4288be1fc85f753e53de"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("dcf5ebb5dbd34f5dbea8c3699ce0054b")
+            };
+            Toxic = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("fdc63fd61b794e40ba3c5446ba8ea1c2"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("d337687cefcb4c7e80898b0008ce4e63")
+            };
+            ToxicGreater = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("848ab4144cb14b4499167bcbfd372796"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("56567887f604473797dc8223c68999da")
+            };
+            #endregion
+
             BaseBasic = GetAll(true, false).Select(s => s.BaseAbility).ToArray();
             BaseComposite = GetAll(false, true).Select(s => s.BaseAbility).ToArray();
             BaseAll = GetAll(true, true, archetype: true).Select(s => s.BaseAbility).ToArray();
@@ -915,6 +1185,63 @@ namespace CodexLib
         public Element Composite_Spring;
         public Element Composite_Summer;
         public Element Composite_Winter;
+
+        public Infusion BladeWhirlwind;
+        public Infusion KineticBlade;
+        public Infusion Bleeding;
+        public Infusion Cloud;
+        public Infusion Cyclone;
+        public Infusion DeadlyEarth;
+        public Infusion Detonation;
+        public Infusion Eruption;
+        public Infusion ExtendedRange;
+        public Infusion FanOfFlames;
+        public Infusion Fragmentation;
+        public Infusion Spindle;
+        public Infusion Spray;
+        public Infusion Torrent;
+        public Infusion Wall;
+        public Infusion Wrack;
+        public Infusion Bowling;
+        public Infusion Chilling;
+        public Infusion Dazzling;
+        public Infusion Entangling;
+        public Infusion Flash;
+        public Infusion Foxfire;
+        public Infusion Grappling;
+        public Infusion Magnetic;
+        public Infusion PureFlame;
+        public Infusion Pushing;
+        public Infusion RareMetal;
+        public Infusion Synaptic;
+        public Infusion Unraveling;
+        public Infusion Vampiric;
+
+        // Modded: DarkCodex
+        public Infusion BladeRush;
+        public Infusion Whip;
+        public Infusion Chain;
+        public Infusion Impale;
+        public Infusion Venom;
+        public Infusion VenomGreater;
+        public Infusion KineticFist;
+        public Infusion EnergizeWeapon;
+
+        // Modded: Kineticist Elements Expanded
+        public Infusion Disintegrating;
+        public Infusion ForceHook;
+        public Infusion FoeThrow;
+        public Infusion ManyThrow;
+        public Infusion Dampening;
+        public Infusion Enervating;
+        public Infusion Pulling;
+        public Infusion Unnerving;
+        public Infusion VoidVampire;
+        public Infusion Weighing;
+        public Infusion Singularity;
+        public Infusion Spore;
+        public Infusion Toxic;
+        public Infusion ToxicGreater;
 
         public class Element : IUIDataProvider
         {
