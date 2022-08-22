@@ -66,6 +66,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0ab1552e2ebdacf44bb7b20f5393366d"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("ccc7583a7cb345a41a33a8e11ddd91b5"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("89acea313b9a9cb4d86bbbca01b90346"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("43ff67143efb86d4f894b10577329050"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("89cc522f2e1444b40ba1757320c58530"),
@@ -82,6 +83,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("45eb571be891c4c4581b6fcddda72bcd"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("55b13ffc1588e4840aaddda7800b85e8"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("b9e9011e24abcab4996e6bd3228bd60b"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("31862bcb47f539649ae59d7e18f8ed11"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("ca608f545b07ec045954aee5ff94640a"),
@@ -98,6 +100,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("e53f34fb268a7964caf1566afb82dadd"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("cfb2ef3aacffde141915a7d5464d3bb3"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("77d9c04214a9bd84bbc1eefabcd98220"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a72c3375b022c124986365d23596bd21"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4fc5cf33da20b5444ad3a96c77af8d20"),
@@ -114,6 +117,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("83d5873f306ac954cad95b6aeeeb2d8c"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("17fc78086533bfd4aa3818317c6210bc"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("41e9a0626aa54824db9293f5de71f23f"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("3ca6bbdb3c1dea541891f0568f52db05"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("6e24958866ac8a9498fa6a7396d87270"),
@@ -130,6 +134,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("d663a8d40be1e57478f34d6477a67270"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("b4f2dc3830fbe6147b701872fbdb87c4"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("70524e9d61b22e948aee1dfe11dc67c8"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6a1bc011f6bbc7745876ce2692ecdfb5"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("92724a6d6a6225d4895b41e35e973599"),
@@ -146,6 +151,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("7980e876b0749fc47ac49b9552e259c1"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("52f6af214e8954149b71bb59a80d222f"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("37c87f140af6166419fe4c1f1305b2b8"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("df849df04cd828b4489f7827dbbf1dcd"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("cb20c297b1db1cd4ea9430578c90246d"),
@@ -168,6 +174,7 @@ namespace CodexLib
                 Parent2 = null,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("360a3adea35bfca4c9bd6dac151705fc"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("ea2b3e7e3b8726d4c94ba58118749742"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("e72caa96c32ca3f4d8b736b97b067f58"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("9cef404da5745314b88f49c1ee9fbab1"),
@@ -186,6 +193,7 @@ namespace CodexLib
                 Parent2 = null,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("f8934aab37bd99f4285cfa1e9d998f23"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("4005fc2cd91860142ba55a369fbbec23"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("5b0f10876af4fe54e989cc4d93bd0545"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("a975a40b710833a468476564fa673cee"),
@@ -204,6 +212,7 @@ namespace CodexLib
                 Parent2 = Fire,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("b947cdebf1c0d3945a138283b22937f2"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("acc31b4666e923b49b3ab85b2304f26c"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("878f68ff160c8fa42b05ade8b2d12ea5"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("fc22c06d63a95154291272577daa0b4d"),
@@ -222,6 +231,7 @@ namespace CodexLib
                 Parent2 = Earth,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("30a92d0b741ac8547a24a4ec2561c6dd"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("dc6f0b906566aca4d8b86729855959cb"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("4934f54691fa90941b04341d457f4f96"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("a41bfd708a7677f46aede02715f3100d"),
@@ -240,6 +250,7 @@ namespace CodexLib
                 Parent2 = Electric,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("785d708a6464709499b9021b53200356"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("287e0c88af08f3e4ba4aca52566f33a7"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a8cd6e691ad7ee44dbdd4a255bf304d8"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("833e3c01a1492d74588430249e6431af"),
@@ -258,6 +269,7 @@ namespace CodexLib
                 Parent2 = Cold,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("3ae835b50a65fe744af4f5f652c3b724"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("55790f1d270297f4a998292e1573a09e"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6f121ff0644a2804d8239d4dfe0ace11"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("027ce0b3842170748a63ea04cb02cab7"),
@@ -276,6 +288,7 @@ namespace CodexLib
                 Parent2 = Water,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("b48284a3a6e71894a8101afe81b3f0b8"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("3f68b8bdd90ccb0428acd38b84934d30"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("a1eee0a2735401546ba2b442e1a9d25d"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("8c8dd4e7c07e468498a6f5ed2c01063f"),
@@ -294,6 +307,7 @@ namespace CodexLib
                 Parent2 = Fire,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("6a442223b7c775647b2f96235ad79e70"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("cf1085900220be5459273282389aa9c2"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("f58bc29b252308242a81b3f84a1d176a"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("c49d2ddf72adf85478d6b3e09f52d32e"),
@@ -312,6 +326,7 @@ namespace CodexLib
                 Parent2 = Water,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("6f0c1a5dd9b25f84e82db651a92c3825"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("5639fadad8b45e2418b356327d072789"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("64885226d77f2bd408dde84fb8ccacc2"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("f82cfcf11b94bef49bf1a8f57aad5c13"),
@@ -330,6 +345,7 @@ namespace CodexLib
                 Parent2 = Water,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("988e3aed25d921144903fbe5a6cc2a8a"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("371b160cbb2ce9c4a8d6c28e61393f6d"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7b413fc4f99050349ab5488f83fe25df"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("ff24a4ac444afeb4bab5699828aa4e77"),
@@ -348,6 +364,7 @@ namespace CodexLib
                 Parent2 = Water,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("e80f7c9cf46be8a47a280c3af51557a5"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("66028030b96875b4c97066525ff75a27"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("2e72609caf23e4843b246bec80550f06"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("77dc27ae2f48ffe4a8ab17154145f1d8"),
@@ -366,6 +383,7 @@ namespace CodexLib
                 Parent2 = null,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("4038e2f9b6cb4144bb017c7b5910ec51"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("98f0da4bf25a34a4caffa6b8a2d33ef6"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("92f9a719ffd652947ab37363266cc0a6"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("0a386b1c2b4ae9b4f81ddf4557155810"),
@@ -386,6 +404,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("ac038f9898ef4ba7b46bfcafdbc77818"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("1f782a21a45a4d73be6068430cfb2e58"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("d3251ffc4e054f3db2c2260fa9ae4fe2"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("45b1ace89f03422199a394089e3dfc8c"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4623d7cc61c34d7190cc315695821e61"),
@@ -404,6 +423,7 @@ namespace CodexLib
                 Parent2 = null,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("9716097909724993811e54ed191429e7"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("2b345c3493964de4affa6cea8327e88a"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("110bb5800599469ebb5f50b400b860d6"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4e2d7b4eebc348b2bdf4968053c76af9"),
@@ -420,6 +440,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("d927b99fb8a946c0831edfb97eb749a4"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("8be447a7330d4c748c38f124d64915a5"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("6d4210715a824d34a283fc5a8ba1d1df"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("f1ae02e54af04cfd802b652816ce4996"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("c545106ff205431fa7936155728f7490"),
@@ -436,6 +457,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("036de5238a1447a293e4e4749b6724eb"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("8d539f95823f4e109a4cac2f0e1e8565"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("dd2f227668514e41a283717bae4517f1"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7f45d4a741ee4ba685b91e4640191de8"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("96e914a61b6948a5baade3290c0260d3"),
@@ -454,6 +476,7 @@ namespace CodexLib
                 Parent2 = null,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("59bc225ce1394ca8a37acfef9829356f"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("8be4ef811d614cac8e9764108457cb68"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("e4fdafb5594e435db1aeb814964fe239"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("506c8ef74b6546c7a44b2547eacdd16d"),
@@ -470,6 +493,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("c7451e98f60f4f4fa46b0a5fedea29c1"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("293c5321fdc44f319ebd2ac34e98e9c9"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("1d89d4f9793e4dbea5ed7cce02757352"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("469e82d66a2e4ece94be280935da805a"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("9040572d07d1402abbcbe095f49b58cc"),
@@ -486,6 +510,7 @@ namespace CodexLib
                 BaseAbility = Helper.ToRef<BlueprintAbilityReference>("64e7aabc2b55441d8a2513533fff7eb8"),
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("83a07f00521f48cfb0f73d81ab089a48"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("378d8d54b21743c3a32f26b95f768d44"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7777b5f1d5c24de4a7a42cb4f7752067"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("53ba7977e3ed44b193c31c7f510c52e2"),
@@ -504,6 +529,7 @@ namespace CodexLib
                 Parent2 = Positive,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("21bf644d6c71430d84b16df14d5fc01d"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("b6732b8fcba545e58b5923710435ac42"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("226251dfa5d54a36a89b754cf9a4adde"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("c7c9e1c2d5b9436fa37111ecf4da3477"),
@@ -522,6 +548,7 @@ namespace CodexLib
                 Parent2 = Air,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("cc5189f4990a43c5a353a68ac8ca54a8"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("64f5bf967b5e440fa8cf648c532479ec"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("5bdbf44b60104461934da737825a09bf"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("a5c899151b4943a0a6d0aeb853e8fc88"),
@@ -540,6 +567,7 @@ namespace CodexLib
                 Parent2 = Fire,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("59f934afdc804d4d9894858905e519ca"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("6958f833102148fe97fc665c607d2372"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6558f16df5b44709b9dc130671c0bb96"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("2ca9d84f2ece4df3951fe0c84879b164"),
@@ -558,6 +586,7 @@ namespace CodexLib
                 Parent2 = Earth,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("b30a4f38cae4459eb0d3d880b0f0de08"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("d37cf8e066b64e4d8437ab2b3805c521"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("2f8dac5035524c08b97d554c9ddee710"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("8186a1b2087b44519791bb059fe43ff8"),
@@ -576,6 +605,7 @@ namespace CodexLib
                 Parent2 = Cold,
                 Blade = new()
                 {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("0e3854a031bf4655ac20e28e592bab7d"),
                     Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("ece22aa5b84b4e60957fdabd494e074f"),
                     Weapon = Helper.ToRef<BlueprintItemWeaponReference>("639d3c53dd1948ff9c503fda59b8ebab"),
                     Damage = Helper.ToRef<BlueprintAbilityReference>("e5945f8fdddc4e0585352a5f12bf1a99"),
@@ -936,6 +966,7 @@ namespace CodexLib
 
         public class Blade
         {
+            public BlueprintFeatureReference Feature;
             public BlueprintActivatableAbilityReference Activatable;
             public BlueprintItemWeaponReference Weapon;
             public BlueprintAbilityReference Damage;
