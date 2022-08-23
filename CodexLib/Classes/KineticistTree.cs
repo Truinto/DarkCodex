@@ -39,7 +39,6 @@ namespace CodexLib
             SelectionWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("5c883ae0cd6d7d5448b7a420f51f8459");
             ExpandedElement = Helper.ToRef<BlueprintFeatureSelectionReference>("acdb730a59e64153964505587b809f93");
             ExtraWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("bd287f6d1c5247da9b81761cab64021c");
-            KineticBlade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787");
             CompositeBuff = Helper.ToRef<BlueprintBuffReference>("cb30a291c75def84090430fbf2b5c05e");
 
             #region Metakinesis
@@ -712,7 +711,7 @@ namespace CodexLib
             Bleeding = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("75cbe35e4ada12441a0270d541c12c64"),
-                Buff = Helper.ToRef < BlueprintBuffReference("492a8156ecede6345a8e82475eed85ac")
+                Buff = Helper.ToRef < BlueprintBuffReference>("492a8156ecede6345a8e82475eed85ac")
             };
             Cloud = new()
             {
@@ -727,7 +726,7 @@ namespace CodexLib
             DeadlyEarth = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("061f5d7e659432b478668b70f6d4caae"),
-                Buff = 
+                Buff = null
             };
             Detonation = new()
             {
@@ -1134,7 +1133,6 @@ namespace CodexLib
         public BlueprintFeatureSelectionReference SelectionWildTalent;
         public BlueprintFeatureSelectionReference ExpandedElement;
         public BlueprintFeatureSelectionReference ExtraWildTalent;
-        public BlueprintFeatureReference KineticBlade;
         public BlueprintBuffReference CompositeBuff;
         public List<BlueprintBuff> MetakinesisBuffs;
 
