@@ -37,7 +37,7 @@ namespace DarkCodex
                         continue;
 
                     var fx = effect.View?.m_SpawnedFx;
-                    if (fx == null || !fx.activeSelf)
+                    if (fx == null || !fx.IsDestroyed)
                         continue;
 
                     //fx.SetActive(false);

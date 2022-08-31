@@ -334,9 +334,9 @@ namespace CodexLib
         public static implicit operator BlueprintDlcRewardReference(AnyRef bp) => ToRef<BlueprintDlcRewardReference>(bp);
         public static implicit operator BlueprintDlcReward(AnyRef bp) => Get<BlueprintDlcReward>(bp);
 
-        public static implicit operator AnyRef(BlueprintDungeonBoonReference bp) => ToAny(bp);
-        public static implicit operator BlueprintDungeonBoonReference(AnyRef bp) => ToRef<BlueprintDungeonBoonReference>(bp);
-        public static implicit operator BlueprintDungeonBoon(AnyRef bp) => Get<BlueprintDungeonBoon>(bp);
+        //public static implicit operator AnyRef(BlueprintDungeonBoonReference bp) => ToAny(bp);
+        //public static implicit operator BlueprintDungeonBoonReference(AnyRef bp) => ToRef<BlueprintDungeonBoonReference>(bp);
+        //public static implicit operator BlueprintDungeonBoon(AnyRef bp) => Get<BlueprintDungeonBoon>(bp);
 
         public static implicit operator AnyRef(BlueprintDungeonLocalizedStringsReference bp) => ToAny(bp);
         public static implicit operator BlueprintDungeonLocalizedStringsReference(AnyRef bp) => ToRef<BlueprintDungeonLocalizedStringsReference>(bp);
@@ -346,9 +346,9 @@ namespace CodexLib
         public static implicit operator BlueprintDungeonRootReference(AnyRef bp) => ToRef<BlueprintDungeonRootReference>(bp);
         public static implicit operator BlueprintDungeonRoot(AnyRef bp) => Get<BlueprintDungeonRoot>(bp);
 
-        public static implicit operator AnyRef(BlueprintDungeonShrineReference bp) => ToAny(bp);
-        public static implicit operator BlueprintDungeonShrineReference(AnyRef bp) => ToRef<BlueprintDungeonShrineReference>(bp);
-        public static implicit operator BlueprintDungeonShrine(AnyRef bp) => Get<BlueprintDungeonShrine>(bp);
+        //public static implicit operator AnyRef(BlueprintDungeonShrineReference bp) => ToAny(bp);
+        //public static implicit operator BlueprintDungeonShrineReference(AnyRef bp) => ToRef<BlueprintDungeonShrineReference>(bp);
+        //public static implicit operator BlueprintDungeonShrine(AnyRef bp) => Get<BlueprintDungeonShrine>(bp);
 
         public static implicit operator AnyRef(BlueprintDynamicMapObjectReference bp) => ToAny(bp);
         public static implicit operator BlueprintDynamicMapObjectReference(AnyRef bp) => ToRef<BlueprintDynamicMapObjectReference>(bp);

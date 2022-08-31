@@ -35,7 +35,7 @@ using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UI;
 using Kingmaker.UI.Log;
-using Kingmaker.UI.Log.CombatLog_ThreadSystem;
+using Kingmaker.UI.Models.Log.CombatLog_ThreadSystem;
 using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
@@ -95,27 +95,27 @@ namespace CodexLib
 
         public static void AttackRollPrint(this RuleAttackRoll attackRoll)
         {
-            if (attackRoll != null)
-            {
-                attackRoll.SuspendCombatLog = false;
-                if (!attackRoll.Initiator.IsInGame || !attackRoll.Target.IsInGame || attackRoll.AutoHit)
-                {
-                    return;
-                }
-                using (GameLogContext.Scope)
-                {
-                    CombatLogMessage combatLogMessage = attackRoll.AttackLogEntry ?? ReportLogMessageBuilderAbstract.Strings.Attack.GetData(attackRoll);
-                    CombatLogMessage combatLogMessage2 = attackRoll.ParryLogEntry ?? ReportLogMessageBuilderAbstract.Strings.Attack.GetParryData(attackRoll);
-                    if (combatLogMessage2 != null)
-                    {
-                        //this.ReportCombatLogManager.ManageCombatMessageData(combatLogMessage2, attackRoll.Initiator, attackRoll.Target);
-                    }
-                    if (combatLogMessage != null && attackRoll.Result != AttackResult.Parried)
-                    {
-                        //this.ReportCombatLogManager.ManageCombatMessageData(combatLogMessage, attackRoll.Initiator, attackRoll.Target);
-                    }
-                }
-            }
+            //if (attackRoll != null)
+            //{
+            //    attackRoll.SuspendCombatLog = false;
+            //    if (!attackRoll.Initiator.IsInGame || !attackRoll.Target.IsInGame || attackRoll.AutoHit)
+            //    {
+            //        return;
+            //    }
+            //    using (GameLogContext.Scope)
+            //    {
+            //        CombatLogMessage combatLogMessage = attackRoll.AttackLogEntry ?? ReportLogMessageBuilderAbstract.Strings.Attack.GetData(attackRoll);
+            //        CombatLogMessage combatLogMessage2 = attackRoll.ParryLogEntry ?? ReportLogMessageBuilderAbstract.Strings.Attack.GetParryData(attackRoll);
+            //        if (combatLogMessage2 != null)
+            //        {
+            //            //this.ReportCombatLogManager.ManageCombatMessageData(combatLogMessage2, attackRoll.Initiator, attackRoll.Target);
+            //        }
+            //        if (combatLogMessage != null && attackRoll.Result != AttackResult.Parried)
+            //        {
+            //            //this.ReportCombatLogManager.ManageCombatMessageData(combatLogMessage, attackRoll.Initiator, attackRoll.Target);
+            //        }
+            //    }
+            //}
             throw new NotImplementedException();
         }
 
@@ -787,7 +787,7 @@ namespace CodexLib
             var tooltipmessage = new TooltipTemplateCombatLogMessage(header ?? text, tooltip);
 
             var message = new CombatLogMessage(text, color, icon, tooltipmessage, true);
-            LogThreadController.Instance.HitDiceRestrictionLogThread.AddMessage(message);
+            LogThreadService.Instance.HitDiceRestrictionLogThread.AddMessage(message);
         }
 
         public static void PrintNotification(string text)

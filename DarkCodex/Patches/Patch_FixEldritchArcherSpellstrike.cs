@@ -16,7 +16,7 @@ using static DarkCodex.Resource;
 namespace DarkCodex
 {
     [HarmonyPatch]
-    [PatchInfo(Severity.Harmony, "Fix Eldritch Archer Spellstrike", "fixes spellstrike not working with swift rays", false)]
+    [PatchInfo(Severity.Harmony | Severity.Faulty | Severity.DefaultOff, "Fix Eldritch Archer Spellstrike", "fixes spellstrike not working with swift rays", false)]
     public class Patch_FixEldritchArcherSpellstrike
     {
         //[HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.Init))]

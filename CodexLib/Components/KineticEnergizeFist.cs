@@ -157,7 +157,7 @@ namespace CodexLib
             var rule = new RuleDealDamage(evt.Initiator, evt.Target, new DirectDamage(DiceFormula.Zero, 0))
             {
                 IsFake = true,
-                DisableBattleLog = true,
+                DisableBattleLogSelf = true,
                 Reason = reason,
             };
 

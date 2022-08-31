@@ -59,7 +59,7 @@ namespace DarkCodex
                 spell.DecorationColorNumber = meta.DecorationColorNumber;
                 spell.m_CachedName = "Spontaneous: " + spell.Name;
 
-                var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1)
+                var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1, __instance)
                 {
                     Spell = spell,
                     Available = true
@@ -84,7 +84,7 @@ namespace DarkCodex
 
                         spell.m_CachedName = "Temporary: " + spell.Name;
 
-                        var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1)
+                        var slot = new SpellSlot(spellLevel, SpellSlotType.Common, -1, __instance)
                         {
                             Spell = spell,
                             Available = true
@@ -167,7 +167,7 @@ namespace DarkCodex
             if (!__instance.m_CachedName.StartsWith("Spontaneous: ") && !__instance.m_CachedName.StartsWith("Temporary: "))
                 return true;
 
-            __result = new SpellSlot(0, SpellSlotType.Common, -1)
+            __result = new SpellSlot(0, SpellSlotType.Common, -1, __instance.Spellbook)
             {
                 Spell = __instance,
                 Available = true

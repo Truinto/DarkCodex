@@ -11,7 +11,6 @@ using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.GameModes;
 using Kingmaker.RuleSystem;
-using Kingmaker.UI.Log.CombatLog_ThreadSystem;
 using Kingmaker.UI.MVVM;
 using Kingmaker.UI.MVVM._VM.CombatLog;
 using Kingmaker.UI.MVVM._VM.InGame;

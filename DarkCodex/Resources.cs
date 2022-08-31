@@ -10,7 +10,6 @@ using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.Items;
 using Kingmaker.Localization;
 using Kingmaker.Modding;
-using Kingmaker.UI.Log.CombatLog_ThreadSystem;
 using Kingmaker.UI.MVVM._VM.Tooltip.Templates;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
