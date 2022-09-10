@@ -25,19 +25,20 @@ using UnityEngine;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Ability logic for chaining spells (Chain Lightning)
+    /// </summary>
     public class AbilityDeliverChainAttack : AbilityDeliverEffect
     {
         public bool TargetDead;
         public float DelayBetweenChain; 
         public ContextValue TargetsCount;
         public TargetType TargetType;
-        public ConditionsChecker Condition;
-        public BlueprintItemWeaponReference Weapon;
-        public BlueprintProjectileReference ProjectileFirst;
+        [CanBeNull] public ConditionsChecker Condition;
+        [CanBeNull] public BlueprintItemWeaponReference Weapon;
+        [CanBeNull] public BlueprintProjectileReference ProjectileFirst;
         public BlueprintProjectileReference Projectile;
         public bool NeedAttackRoll => Weapon != null;
-
-
 
         public override IEnumerator<AbilityDeliveryTarget> Deliver(AbilityExecutionContext context, TargetWrapper target)
         {
@@ -141,7 +142,7 @@ namespace CodexLib
             if ((this.TargetType == TargetType.Enemy && !context.MaybeCaster.IsEnemy(unit)) || (this.TargetType == TargetType.Ally && context.MaybeCaster.IsEnemy(unit)))
                 return false;
 
-            if (this.TargetType == TargetType.Any && context.HasMetamagic(Metamagic.Selective) && !this.Condition.HasIsAllyCondition() && !context.MaybeCaster.IsEnemy(unit))
+            if (this.TargetType == TargetType.Any && context.HasMetamagic(Metamagic.Selective) && this.Condition != null && !this.Condition.HasIsAllyCondition() && !context.MaybeCaster.IsEnemy(unit))
                 return false;
 
             if (unit.State.Features.Blinking && !context.MaybeOwner.Descriptor.IsSeeInvisibility)

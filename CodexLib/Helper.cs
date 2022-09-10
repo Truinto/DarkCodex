@@ -73,6 +73,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityModManagerNet;
+using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 
@@ -299,6 +300,80 @@ namespace CodexLib
             return code.opcode == OpCodes.Ldfld && object.Equals(code.operand, fieldInfo);
         }
 
+        public static bool IsStloc(this CodeInstruction code, int index)
+        {
+            if (!code.IsStloc())
+                return false;
+
+            if (code.operand is LocalBuilder lb)
+                return lb.LocalIndex == index;
+
+            var op = code.opcode;
+            if (op == OpCodes.Stloc_0)
+                return index == 0;
+            if (op == OpCodes.Stloc_1)
+                return index == 1;
+            if (op == OpCodes.Stloc_2)
+                return index == 2;
+            if (op == OpCodes.Stloc_3)
+                return index == 3;
+
+            return false;
+        }
+
+        public static bool IsStloc(this TranspilerData data, Type type)
+        {
+            var code = data.Current;
+            if (!code.IsStloc())
+                return false;
+
+            if (code.operand is LocalBuilder lb)
+                return lb.LocalType == type;
+
+            if (code.opcode == OpCodes.Stloc_0)
+                return data.Locals[0].LocalType == type;
+            if (code.opcode == OpCodes.Stloc_0)
+                return data.Locals[1].LocalType == type;
+            if (code.opcode == OpCodes.Stloc_0)
+                return data.Locals[2].LocalType == type;
+            if (code.opcode == OpCodes.Stloc_0)
+                return data.Locals[3].LocalType == type;
+
+            return false;
+        }
+
+        public static Type GetLocType(this CodeInstruction code, IList<LocalVariableInfo> locals)
+        {
+            if (code.operand is LocalBuilder lb)
+                return lb.LocalType;
+            if (code.operand is Type type)
+                return type;
+
+            if (locals == null)
+                return null;
+
+            var op = code.opcode;
+            if (op == OpCodes.Ldloc_0 || op == OpCodes.Stloc_0)
+                return locals[0].LocalType;
+            if (op == OpCodes.Ldloc_1 || op == OpCodes.Stloc_1)
+                return locals[1].LocalType;
+            if (op == OpCodes.Ldloc_2 || op == OpCodes.Stloc_2)
+                return locals[2].LocalType;
+            if (op == OpCodes.Ldloc_3 || op == OpCodes.Stloc_3)
+                return locals[3].LocalType;
+
+            return null;
+        }
+
+        public static IEnumerable<CodeInstruction> _TestTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        {
+            foreach (var line in instructions)
+            {
+                Console.WriteLine($"{line.opcode} : {line.operand?.GetType()}");
+            }
+            return instructions;
+        }
+
         public static void ReplaceCall(this CodeInstruction code, Type type, string name, Type[] parameters = null, Type[] generics = null)
         {
             var repl = CodeInstruction.Call(type, name, parameters, generics);
@@ -323,6 +398,35 @@ namespace CodexLib
 
                 yield return line;
             }
+        }
+
+        /// <summary>
+        /// Injects function to access local variable. TranspilerData.Current must point to 'Stloc' opcode.
+        /// </summary>
+        /// <param name="func"><b>void Function(object instance, ref T value)</b></param>
+        public static void EditLocal(this TranspilerData data, Delegate func)
+        {
+            // dont't forget ref!
+            // Type.GetElementType()
+            // Type.MakeByRefType()
+
+            // delegate sanity check
+            var mi = func.GetMethodInfo();
+            var parameters = mi.GetParameters();
+            if (parameters.Length != 2 || !parameters[1].ParameterType.IsByRef)
+                throw new ArgumentException("Delegate must have exactly 2 arguments and the second argument must be by ref!");
+
+            var line = data.Current;
+            var type = parameters[1].ParameterType.GetElementType();
+            if (type != line.GetLocType(data.Locals))
+                throw new ArgumentException("CodeInstruction.operand must match delegate by ref type!");
+
+            if (data.IsStatic)
+                data.InsertAfter(OpCodes.Ldnull);
+            else
+                data.InsertAfter(OpCodes.Ldarg_0);
+            data.InsertAfter(OpCodes.Ldloca, line.operand);
+            data.InsertAfter(OpCodes.Call, mi);
         }
 
         /// <summary>
@@ -546,6 +650,11 @@ namespace CodexLib
         public static T[] ToArray<T>(params T[] objs)
         {
             return objs;
+        }
+
+        public static List<T> AsList<T>(this IEnumerable<T> values)
+        {
+            return values as List<T> ?? values.ToList();
         }
 
         /// <summary>Appends objects on array.</summary>
@@ -808,8 +917,9 @@ namespace CodexLib
 
         #region JsonSerializer
 
-        private static JsonSerializerSettings _jsetting = new()
+        public static JsonSerializerSettings _jsetting = new()
         {
+            Converters = DefaultJsonSettings.DefaultSettings.Converters,
             Formatting = Formatting.Indented,
             NullValueHandling = NullValueHandling.Ignore,
             ObjectCreationHandling = ObjectCreationHandling.Replace,
@@ -822,6 +932,7 @@ namespace CodexLib
         public static string Serialize(this object value, bool indent = true, bool type = true, string path = null, bool append = false)
         {
             _jsetting.Formatting = indent ? Formatting.Indented : Formatting.None;
+            _jsetting.TypeNameHandling = type ? TypeNameHandling.Auto : TypeNameHandling.None;
             string result = JsonConvert.SerializeObject(value, _jsetting);
 
             if (path != null)
@@ -865,7 +976,7 @@ namespace CodexLib
             }
 
             if (value != null)
-                return JsonConvert.DeserializeObject(value);
+                return JsonConvert.DeserializeObject(value, _jsetting);
             return null;
         }
 
@@ -880,7 +991,7 @@ namespace CodexLib
             }
 
             if (value != null)
-                return JsonConvert.DeserializeObject<T>(value);
+                return (T)JsonConvert.DeserializeObject(value, typeof(T), _jsetting);
             return default;
         }
 
@@ -2224,6 +2335,22 @@ namespace CodexLib
 
         #endregion
 
+        #region Blueprint Ability
+
+        public static BlueprintAbilityAreaEffectReference GetArea(this BlueprintAbility ability)
+        {
+            var runAction = ability.GetComponent<AbilityEffectRunAction>();
+            if (runAction == null)
+                return null;
+
+            foreach (var action in runAction.Actions.Actions)
+                if (action is ContextActionSpawnAreaEffect spawnarea)
+                    return spawnarea.m_AreaEffect;
+            return null;
+        }
+
+        #endregion
+
         #region Blueprint Weapon
 
         /// <param name="BlueprintWeaponEnchantment">direct type, reference, or string</param>
@@ -2877,6 +3004,11 @@ namespace CodexLib
             var result = new AddMechanicsFeature();
             result.m_Feature = feature;
             return result;
+        }
+
+        public static AddMechanicFeatureCustom CreateAddMechanicsFeature(MechanicFeature feature)
+        {
+            return new AddMechanicFeatureCustom(feature);
         }
 
         public static AbilityTargetHasFact CreateAbilityTargetHasFact(bool inverted, params BlueprintUnitFactReference[] facts)

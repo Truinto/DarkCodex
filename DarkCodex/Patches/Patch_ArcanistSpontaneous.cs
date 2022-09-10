@@ -38,7 +38,7 @@ namespace DarkCodex
 
             var memorizedBlueprints = GetAllMemorizedBlueprints(__instance);
 
-            var list = __result as List<SpellSlot> ?? __result.ToList();
+            var list = __result.AsList();
 
             foreach (var meta in __instance.GetCustomSpells(spellLevel))
             {

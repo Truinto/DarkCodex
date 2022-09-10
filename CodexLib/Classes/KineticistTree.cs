@@ -1098,6 +1098,76 @@ namespace CodexLib
             }
         }
 
+        public IEnumerable<Infusion> GetTalents(bool infusions = true, bool wild = true, bool modded = true)
+        {
+            bool mod1 = modded && UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
+            bool mod2 = modded && UnityModManagerNet.UnityModManager.FindMod("DarkCodex")?.Active == true;
+
+            yield return BladeWhirlwind;
+            yield return KineticBlade;
+            yield return Bleeding;
+            yield return Cloud;
+            yield return Cyclone;
+            yield return DeadlyEarth;
+            yield return Detonation;
+            yield return Eruption;
+            yield return ExtendedRange;
+            yield return FanOfFlames;
+            yield return Fragmentation;
+            yield return Spindle;
+            yield return Spray;
+            yield return Torrent;
+            yield return Wall;
+            yield return Wrack;
+            yield return Bowling;
+            yield return Chilling;
+            yield return Dazzling;
+            yield return Entangling;
+            yield return Flash;
+            yield return Foxfire;
+            yield return Grappling;
+            yield return Magnetic;
+            yield return PureFlame;
+            yield return Pushing;
+            yield return RareMetal;
+            yield return Synaptic;
+            yield return Unraveling;
+            yield return Vampiric;
+
+            // DarkCodex
+            if (mod2)
+            {
+                yield return BladeRush;
+                yield return Whip;
+                yield return Chain;
+                yield return Impale;
+                yield return Venom;
+                yield return VenomGreater;
+                yield return KineticFist;
+                yield return EnergizeWeapon;
+            }
+
+            // Kineticist Elements Expanded
+            if (mod1)
+            {
+                yield return Disintegrating;
+                yield return ForceHook;
+                yield return FoeThrow;
+                yield return ManyThrow;
+                yield return Dampening;
+                yield return Enervating;
+                yield return Pulling;
+                yield return Unnerving;
+                yield return VoidVampire;
+                yield return Weighing;
+                yield return Singularity;
+                yield return Spore;
+                yield return Toxic;
+                yield return ToxicGreater;
+            }
+        }
+
+        /// <summary>Only returns non null values.</summary>
         public IEnumerable<BlueprintAbility> GetBlasts(bool bases = false, bool variants = false, bool bladeburn = false, bool bladedamage = false)
         {
             foreach (var element in GetAll(true, true, archetype: true))
@@ -1106,8 +1176,9 @@ namespace CodexLib
                 if (b == null)
                     continue;
 
-                if (bases)
+                if (bases || variants && !b.HasVariants)
                     yield return b;
+
                 if (variants && b.HasVariants)
                     foreach (var variant in b.AbilityVariants.Variants)
                         yield return variant;

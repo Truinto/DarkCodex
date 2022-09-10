@@ -38,6 +38,9 @@ using Kingmaker.Controllers.Clicks.Handlers;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Ability logic to teleport caster to point and return targets inbetween plus reach
+    /// </summary>
     public class AbilityDeliverTeleportTrample : AbilityDeliverProjectile, IAbilityTargetRestriction //AbilityDeliverEffect
     {
         public BlueprintProjectileReference Projectile;

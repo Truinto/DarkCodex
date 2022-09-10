@@ -1,7 +1,8 @@
 ﻿# Changelog
 
 ## [1.2.0]
-- compiled for 1.4, not final
+- compiled for 1.4
+- fixed serialization issue
 
 ## [1.1.1]
 - added harmony and allowGuidGeneration to Scope settings; old constructors will be removed in future releases

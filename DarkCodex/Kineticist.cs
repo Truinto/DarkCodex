@@ -719,14 +719,21 @@ namespace DarkCodex
 
             Main.RunLast("Selective Metakinesis", () =>
             {
-                var applicable = Tree.MetakinesisBuffs.First().GetComponent<AddKineticistBurnModifier>().m_AppliableTo.Where(
-                    g => g.Get() is BlueprintAbility ab &&
-                        (ab.CanTargetPoint
-                        || ab.GetComponent<AbilityTargetsAround>() && ab.CanTargetFriends
-                        || ab.GetComponent<AbilityDeliverChain>())).ToArray();
+                var list = new List<BlueprintAbilityReference>();
+                foreach (var blast in Tree.GetBlasts(variants: true))
+                {
+                    if (blast.CanTargetPoint
+                        || blast.GetArea()?.Get()?.m_TargetType == BlueprintAbilityAreaEffect.TargetType.Any
+                        || blast.GetComponent<AbilityTargetsAround>() && blast.CanTargetFriends
+                        || blast.GetComponent<AbilityDeliverChain>()?.m_TargetType == TargetType.Any)
+                    {
+                        list.Add(blast.ToReference<BlueprintAbilityReference>());
+                        blast.AvailableMetamagic |= Metamagic.Selective;
+                    }
+                }
 
-                buff1.GetComponent<AddKineticistBurnModifier>().m_AppliableTo = applicable;
-                buff1.GetComponent<AutoMetamagic>().Abilities = applicable.ToList();
+                buff1.GetComponent<AddKineticistBurnModifier>().m_AppliableTo = list.ToArray();
+                buff1.GetComponent<AutoMetamagic>().Abilities = list;
             });
 
             var feature1 = Helper.CreateBlueprintFeature(
@@ -1148,7 +1155,7 @@ namespace DarkCodex
                 ).SetComponents(
                 new KineticExpandedMastery()
                 );
-            mastery.m_AllFeatures = Helper.Append(Tree.SelectionInfusion.Get().m_AllFeatures, Tree.SelectionWildTalent.Get().m_AllFeatures);
+            mastery.m_AllFeatures = Tree.GetTalents().Select(s => s.Feature).ToArray();
 
             foreach (var focus in Tree.GetFocus())
             {

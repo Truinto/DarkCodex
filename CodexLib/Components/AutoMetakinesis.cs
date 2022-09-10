@@ -28,12 +28,14 @@ namespace CodexLib
             KineticistAbilityBurnCost.DecreaseWithPool(burn.InfusionBase + burn.InfusionIncrease - burn.InfusionDecrease, ref pool);
             KineticistAbilityBurnCost.DecreaseWithPool(burn.MetakinesisBase + burn.MetakinesisIncrease - burn.MetakinesisDecrease, ref pool);
 
-            int costmax = evt.Initiator.Descriptor.HasFact(_master_maximize) ? 1 : 2;
-
-            if (pool >= costmax && !evt.HasMetamagic(Metamagic.Maximize))
+            if (evt.Initiator.Progression.GetClassLevel(KineticistTree.Instance.Class) >= 9)
             {
-                evt.AddMetamagic(Metamagic.Maximize);
-                pool -= costmax;
+                int costmax = evt.Initiator.Descriptor.HasFact(_master_maximize) ? 1 : 2;
+                if (pool >= costmax && !evt.HasMetamagic(Metamagic.Maximize))
+                {
+                    evt.AddMetamagic(Metamagic.Maximize);
+                    pool -= costmax;
+                }
             }
 
             if (pool >= 1)

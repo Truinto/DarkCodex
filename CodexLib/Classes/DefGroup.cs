@@ -4,7 +4,9 @@ using Kingmaker.Blueprints.Facts;
 using Kingmaker.UI.MVVM;
 using Kingmaker.UI.UnitSettings;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +24,8 @@ namespace CodexLib
         public string Title;
         [JsonProperty]
         public string Description;
+
+        [JsonConverter(typeof(BlueprintGuidListConverter))]
         [JsonProperty]
         public List<BlueprintGuid> Guids;
 
@@ -125,4 +129,55 @@ namespace CodexLib
             actionbar.OnUpdateHandler();
         }
     }
+
+    /// <summary>
+    /// This really shouldn't be necessary. But BlueprintGuidConverter does not deserialize since 1.4.
+    /// </summary>
+    internal class BlueprintGuidListConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(List<BlueprintGuid>);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            var result = new List<BlueprintGuid>();
+
+            if (reader.TokenType is JsonToken.Null or not JsonToken.StartArray)
+                return result;
+
+            foreach (var val in JToken.Load(reader).ToObject<string[]>())
+            {
+                result.Add(BlueprintGuid.Parse(val));
+            }
+
+            //var jo = JObject.Load(reader);
+            //var ja = JArray.Load(reader);
+            //var jc = JContainer.Load(reader);
+            //var jp = JProperty.Load(reader);
+            //var jt = JToken.Load(reader);
+            //_ = jt[""];
+            //jt.Children();
+
+            return result;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            var list = (List<BlueprintGuid>)value;
+            //writer.WriteStartObject();
+            //writer.WritePropertyName("_v");
+            //writer.WriteValue("Foo");
+            //writer.WritePropertyName("_o");
+            writer.WriteStartArray();
+            foreach (var item in list)
+            {
+                writer.WriteValue(item.ToString());
+            }
+            writer.WriteEndArray();
+            //writer.WriteEndObject();
+        }
+    }
+
 }

@@ -420,6 +420,30 @@ namespace DarkCodex
             }
         }
 
+        [HarmonyPatch(typeof(AreaEffectEntityData), nameof(AreaEffectEntityData.CheckSelective))]
+        public class WatchSelectiveMetamagic
+        {
+            public static void Postfix(AreaEffectEntityData __instance)
+            {
+                var context = __instance.m_Context.SourceAbilityContext;
+                Main.PrintDebug($"Area {__instance.Blueprint.name} selective={!__instance.m_CanAffectAllies} hasContext={context != null} flag={context?.HasMetamagic(Metamagic.Selective)}");
+            }
+        }
+
+        public class SfxAzata : IAreaHandler
+        {
+            // AzataITierTierVisualFeature
+            // AzataITierVisualBuff
+
+            public void OnAreaBeginUnloading()
+            {
+            }
+
+            public void OnAreaDidLoad()
+            {
+            }
+        }
+
         public static void SetSpellDescriptor()
         {
             Main.PrintDebug("Spell Descriptors: " + BlueprintRoot.Instance.LocalizedTexts.SpellDescriptorNames.Entries.Select(s => s.Descriptor + ":" + s.Text).Join());

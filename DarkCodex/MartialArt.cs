@@ -1,6 +1,7 @@
 ﻿using CodexLib;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Designers.Mechanics.Facts;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -224,5 +225,23 @@ namespace DarkCodex
         This ability replaces holy champion.
 
         */
+
+        [PatchInfo(Severity.Create, "Prodigious Two-Weapon Fighting", "combat feat: use STR for TWF and always treat offhand as light", false)]
+        public static void CreateProdigiousTwoWeaponFighting()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "ProdigiousTwoWeaponFighting",
+                "Prodigious Two-Weapon Fighting",
+                "You may fight with a one-handed weapon in your offhand as if it were a light weapon. In addition, you may use your Strength score instead of your Dexterity score for the purpose of qualifying for Two-Weapon Fighting and any feats with Two-Weapon Fighting as a prerequisite."
+                ).SetComponents(
+                Helper.CreatePrerequisiteStatValue(StatType.Strength, 13),
+                Helper.CreateAddMechanicsFeature(MechanicFeature.ProdigiousTWF),
+                new ReplaceStatForPrerequisites { Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.NewStat, OldStat = StatType.Dexterity, NewStat = StatType.Strength }
+                );
+
+            Main.Patch(typeof(Patch_ProdigiousTWF));
+
+            Helper.AddCombatFeat(feat);
+        }
     }
 }

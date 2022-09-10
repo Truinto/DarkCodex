@@ -8,4 +8,6 @@ namespace CodexLib
 {
     public delegate bool ILFunction(object instance);
     public delegate bool ILFunctionRet(object instance, ref object result);
+
+    public delegate void ILFunctionLocal<T>(object instance, ref T value);
 }

@@ -1,10 +1,17 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.4.1]
+- fixed serialization issue
+- fixed auto metakinesis applying maximized before level 9
+- added Prodigious Two-Weapon Fighting feat
+- fixed selective metakinesis not applying to some area blasts and applying to single target blasts
+- fixed missing talents and mastery when picking the same kineticist element focus multiple times
+
 ## [1.4.0]
 - fixed Limitless Azata Song prerequisite
 - fixed Scion archetype getting all composite blasts
-- update for 1.4, not final
+- update for 1.4
 
 ## [1.3.24]
 - fixed bug from spellstrike patch

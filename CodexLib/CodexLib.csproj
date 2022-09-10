@@ -104,6 +104,7 @@
     <Compile Include="Classes\AnyRef.cs" />
     <Compile Include="Classes\CountableFlagArray.cs" />
     <Compile Include="Classes\DefGroup.cs" />
+    <Compile Include="Classes\TranspilerData.cs" />
     <Compile Include="Classes\VariantSelectionWrapperConverter.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
     <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />

@@ -13,5 +13,6 @@ namespace CodexLib
         SummoningNoFullRound,
         ParryUseAttackOfOpportunity,
         NoMaterialComponent,
+        ProdigiousTWF,
     }
 }

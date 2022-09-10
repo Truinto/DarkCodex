@@ -151,7 +151,8 @@ namespace DarkCodex
                 sw.WriteLine("\ttotal=" + __instance.LevelUpActions.Count);
                 foreach (var action in __instance.LevelUpActions)
                 {
-                    var data = Helper.Serialize(action, indent: false);
+                    //var data = Helper.Serialize(action, indent: false);
+                    var data = OwlcatJsonConvert.SerializeObject(action, Formatting.Indented);
                     data = rx.Replace(data, m =>
                     {
                         var ret = Alias.FirstOrDefault(f => f.Value == m.Groups[1].Value).Key;

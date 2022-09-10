@@ -411,6 +411,7 @@ namespace Shared
             // Debug
 #if DEBUG
             PatchSafe(typeof(DEBUG.WatchCalculateParams));
+            PatchSafe(typeof(DEBUG.WatchSelectiveMetamagic));
             PatchSafe(typeof(DEBUG.Settlement1));
             PatchSafe(typeof(DEBUG.Settlement2));
             PatchSafe(typeof(DEBUG.ArmyLeader1));
@@ -418,10 +419,8 @@ namespace Shared
             PatchSafe(typeof(Patch_Prebuilds));
             //PatchSafe(typeof(Patch_SaveExtension));
             PatchSafe(typeof(Patch_FactSelectionParameterized));
+
             LoadSafe(General.CreatePoison);
-
-
-            LoadSafe(Kineticist.FixExpandedElementFocus);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -484,6 +483,9 @@ namespace Shared
             LoadSafe(Spellcasters.FixBloodlineArcane);
             LoadSafe(Spellcasters.PatchArcanistBrownFur);
 
+            // MartialArt
+            LoadSafe(MartialArt.CreateProdigiousTwoWeaponFighting);
+
             // Items
             LoadSafe(Items.PatchArrows);
             LoadSafe(Items.PatchTerendelevScale);
@@ -538,10 +540,11 @@ namespace Shared
             LoadSafe(Kineticist.PatchVarious);
             LoadSafe(Kineticist.FixBloodKineticist);
             LoadSafe(Kineticist.FixBlastsAreSpellLike);
+            LoadSafe(Kineticist.FixExpandedElementFocus);
             LoadSafe(Kineticist.CreateKineticFist);
             LoadSafe(Kineticist.CreateKineticEnergizeWeapon);
+            LoadSafe(Kineticist.CreateSelectiveMetakinesis);
             LoadSafe(Kineticist.CreateVenomInfusion); // keep late
-            LoadSafe(Kineticist.CreateSelectiveMetakinesis); // keep late
 
             // Monk
             LoadSafe(Monk.CreateFeralCombatTraining);

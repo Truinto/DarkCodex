@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    [UsedImplicitly]
     internal class VariantSelectionWrapperConverter : JsonConverter //BlueprintConverter
     {
         public override bool CanConvert(Type objectType)
