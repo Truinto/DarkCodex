@@ -711,7 +711,7 @@ namespace CodexLib
             Bleeding = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("75cbe35e4ada12441a0270d541c12c64"),
-                Buff = Helper.ToRef < BlueprintBuffReference>("492a8156ecede6345a8e82475eed85ac")
+                Buff = Helper.ToRef<BlueprintBuffReference>("492a8156ecede6345a8e82475eed85ac")
             };
             Cloud = new()
             {
@@ -852,6 +852,7 @@ namespace CodexLib
             #endregion
 
             #region Infusions Modded
+
             // Modded: DarkCodex
             BladeRush = new()
             {
@@ -892,6 +893,14 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("fb9fe27f13934807bcd62dfeec477758"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("f5fbde9e5fbe4973bc421315c723d9fe")
+            };
+            HurricaneQueen = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("f90ab62ccb6349a3be43adbdacb34dff")
+            };
+            MindShield = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c15c4e5e91804f2abd19ff7628fc62e2")
             };
 
             // Modded: Kineticist Elements Expanded
@@ -969,7 +978,12 @@ namespace CodexLib
 
             BaseBasic = GetAll(true, false).Select(s => s.BaseAbility).ToArray();
             BaseComposite = GetAll(false, true).Select(s => s.BaseAbility).ToArray();
-            BaseAll = GetAll(true, true, archetype: true).Select(s => s.BaseAbility).ToArray();
+            BaseAll = GetAll(true, true, archetype: true).SelectMany(func1).ToArray();
+            IEnumerable<BlueprintAbilityReference> func1(Element element)
+            {
+                yield return element.BaseAbility;
+                yield return element.Blade.Burn;
+            }
         }
 
         public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)
@@ -1098,72 +1112,103 @@ namespace CodexLib
             }
         }
 
-        public IEnumerable<Infusion> GetTalents(bool infusions = true, bool wild = true, bool modded = true)
+        public IEnumerable<Infusion> GetTalents(bool form = false, bool substance = false, bool wild = false, bool modded = true)
         {
             bool mod1 = modded && UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
             bool mod2 = modded && UnityModManagerNet.UnityModManager.FindMod("DarkCodex")?.Active == true;
 
-            yield return BladeWhirlwind;
-            yield return KineticBlade;
-            yield return Bleeding;
-            yield return Cloud;
-            yield return Cyclone;
-            yield return DeadlyEarth;
-            yield return Detonation;
-            yield return Eruption;
-            yield return ExtendedRange;
-            yield return FanOfFlames;
-            yield return Fragmentation;
-            yield return Spindle;
-            yield return Spray;
-            yield return Torrent;
-            yield return Wall;
-            yield return Wrack;
-            yield return Bowling;
-            yield return Chilling;
-            yield return Dazzling;
-            yield return Entangling;
-            yield return Flash;
-            yield return Foxfire;
-            yield return Grappling;
-            yield return Magnetic;
-            yield return PureFlame;
-            yield return Pushing;
-            yield return RareMetal;
-            yield return Synaptic;
-            yield return Unraveling;
-            yield return Vampiric;
+            if (form)
+            {
+                yield return KineticBlade;
+                yield return BladeWhirlwind;
+                yield return Cloud;
+                yield return Cyclone;
+                yield return DeadlyEarth;
+                yield return Detonation;
+                yield return Eruption;
+                yield return ExtendedRange;
+                yield return FanOfFlames;
+                yield return Fragmentation;
+                yield return Spindle;
+                yield return Spray;
+                yield return Torrent;
+                yield return Wall;
+            }
+            if (substance)
+            {
+                yield return Bleeding;
+                yield return Wrack;
+                yield return Bowling;
+                yield return Chilling;
+                yield return Dazzling;
+                yield return Entangling;
+                yield return Flash;
+                yield return Foxfire;
+                yield return Grappling;
+                yield return Magnetic;
+                yield return PureFlame;
+                yield return Pushing;
+                yield return RareMetal;
+                yield return Synaptic;
+                yield return Unraveling;
+                yield return Vampiric;
+            }
+            if (wild)
+            {
+
+            }
 
             // DarkCodex
             if (mod2)
             {
-                yield return BladeRush;
-                yield return Whip;
-                yield return Chain;
-                yield return Impale;
-                yield return Venom;
-                yield return VenomGreater;
-                yield return KineticFist;
-                yield return EnergizeWeapon;
+                if (form)
+                {
+                    yield return BladeRush;
+                    yield return Whip;
+                    yield return Chain;
+                    yield return Impale;
+                    yield return KineticFist;
+                    yield return EnergizeWeapon;
+                }
+                if (substance)
+                {
+                    yield return Venom;
+                    yield return VenomGreater;
+                }
+                if (wild)
+                {
+                    yield return HurricaneQueen;
+                    yield return MindShield;
+                }
             }
 
             // Kineticist Elements Expanded
             if (mod1)
             {
-                yield return Disintegrating;
-                yield return ForceHook;
-                yield return FoeThrow;
-                yield return ManyThrow;
-                yield return Dampening;
-                yield return Enervating;
-                yield return Pulling;
-                yield return Unnerving;
-                yield return VoidVampire;
-                yield return Weighing;
-                yield return Singularity;
-                yield return Spore;
-                yield return Toxic;
-                yield return ToxicGreater;
+                if (form)
+                {
+                    yield return Singularity;
+                    yield return FoeThrow;
+                    yield return ManyThrow;
+                    yield return ForceHook;
+                }
+                if (substance)
+                {
+                    yield return Disintegrating;
+                    yield return Dampening;
+                    yield return Enervating;
+                    yield return Pulling;
+                    yield return Unnerving;
+                    yield return VoidVampire;
+                    yield return Weighing;
+                    yield return Spore;
+                    yield return Toxic;
+                    yield return ToxicGreater;
+                }
+                if (wild)
+                {
+
+                }
             }
         }
 
@@ -1193,6 +1238,7 @@ namespace CodexLib
 
         public BlueprintCharacterClassReference @Class;
         public BlueprintArchetypeReference ElementalScion;
+        public BlueprintArchetypeReference ElementalAscetic;
         public BlueprintFeatureReference KineticBlast;
         public BlueprintUnitPropertyReference KineticistMainStatProperty;
 
@@ -1295,6 +1341,8 @@ namespace CodexLib
         public Infusion VenomGreater;
         public Infusion KineticFist;
         public Infusion EnergizeWeapon;
+        public Infusion HurricaneQueen;
+        public Infusion MindShield;
 
         // Modded: Kineticist Elements Expanded
         public Infusion Disintegrating;

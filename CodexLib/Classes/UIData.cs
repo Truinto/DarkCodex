@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace CodexLib
 {
-    //UIDataProvider
     public class UIData : IUIDataProvider
     {
         public UIData()

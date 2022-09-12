@@ -3175,6 +3175,15 @@ namespace CodexLib
             return result;
         }
 
+        /// <param name="UnitFact">type: <b>BlueprintUnitFact</b></param>
+        public static AbilityShowIfCasterHasFact CreateAbilityShowIfCasterHasFact(AnyRef UnitFact, bool not = false)
+        {
+            var result = new AbilityShowIfCasterHasFact();
+            result.m_UnitFact = UnitFact;
+            result.Not = not;
+            return result;
+        }
+
         public static AbilityRequirementActionAvailable CreateAbilityRequirementActionAvailable(bool Not, ActionType Action, float Amount = 3f)
         {
             var result = new AbilityRequirementActionAvailable();

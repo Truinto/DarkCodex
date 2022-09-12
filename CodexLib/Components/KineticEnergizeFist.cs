@@ -36,7 +36,7 @@ namespace CodexLib
 
         public Sprite GetIcon()
         {
-            return this.Data.Wrapper.Selected?.Icon;
+            return this.Data.Selected?.Icon;
         }
 
         public void OnEventAboutToTrigger(RuleCalculateWeaponStats evt)
@@ -44,7 +44,7 @@ namespace CodexLib
             if (this.Fact is not ActivatableAbility act || !act.IsOn)
                 return;
 
-            if (this.Data.Wrapper.Selected is not KineticistTree.Element element)
+            if (this.Data.Selected is not KineticistTree.Element element)
                 return;
 
             var wbp = evt.Weapon.Blueprint;
@@ -96,7 +96,7 @@ namespace CodexLib
             if (evt.AttackWithWeapon.IsFirstAttack)
                 kineticist.RemoveBladeActivatedBuff();
 
-            if (this.Data.Wrapper.Selected is not KineticistTree.Element element)
+            if (this.Data.Selected is not KineticistTree.Element element)
                 return;
 
             var wbp = evt.AttackWithWeapon.Weapon.Blueprint;

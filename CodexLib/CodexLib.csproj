@@ -105,7 +105,8 @@
     <Compile Include="Classes\CountableFlagArray.cs" />
     <Compile Include="Classes\DefGroup.cs" />
     <Compile Include="Classes\TranspilerData.cs" />
-    <Compile Include="Classes\VariantSelectionWrapperConverter.cs" />
+    <Compile Include="Classes\UINumber.cs" />
+    <Compile Include="Classes\VariantSelectionDataConverter.cs" />
     <Compile Include="Classes\KineticistTree.cs" />
     <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />
     <Compile Include="Classes\MechanicActionBarSlotPlaceholder.cs" />

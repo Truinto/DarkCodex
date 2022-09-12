@@ -21,12 +21,12 @@ namespace CodexLib
         {
             base.OnClick();
             if (IsActive())
-                this.SelectionData.Wrapper.Selected = null;
+                this.SelectionData.Selected = null;
             else
-                this.SelectionData.Wrapper.Selected = this.Blueprint;
+                this.SelectionData.Selected = this.Blueprint;
         }
 
-        public override bool IsActive() => this.SelectionData.Wrapper.Selected == this.Blueprint;
+        public override bool IsActive() => this.SelectionData.Selected == this.Blueprint;
         public override bool IsBad() => this.Blueprint == null;
         public override bool IsDisabled(int resourceCount) => false;
         public override bool CanUseIfTurnBasedInternal() => true;

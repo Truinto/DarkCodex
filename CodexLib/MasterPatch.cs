@@ -56,7 +56,7 @@ namespace CodexLib
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");
 
-            DefaultJsonSettings.DefaultSettings.Converters.Add(new VariantSelectionWrapperConverter());
+            DefaultJsonSettings.DefaultSettings.Converters.Add(new VariantSelectionDataConverter());
         }
 
         /// <summary>
