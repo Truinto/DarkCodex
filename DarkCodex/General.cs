@@ -36,6 +36,7 @@ using System.IO;
 using CodexLib;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.RuleSystem;
+using Kingmaker.UnitLogic.Parts;
 
 namespace DarkCodex
 {
@@ -255,6 +256,12 @@ namespace DarkCodex
                 .SetComponents(
                 new PropertyAttributeMax { MentalStat = true },
                 new SimplePropertyGetter { Property = UnitProperty.Level, Settings = new() { m_Progression = PropertySettings.Progression.Div2 } });
+
+            // body forms become immune to horrid wilting
+            var resistWilt = new AddSpellImmunity { Type = SpellImmunityType.Specific, m_Exceptions = Helper.ToRef<BlueprintAbilityReference>("08323922485f7e246acb3d2276515526").ObjToArray() }; //HorridWilting
+            Helper.Get<BlueprintBuff>("b574e1583768798468335d8cdb77e94c").AddComponents(resistWilt); //FieryBodyBuff
+            Helper.Get<BlueprintBuff>("a6da7d6a5c9377047a7bd2680912860f").AddComponents(resistWilt); //IceBodyBuff
+            Helper.Get<BlueprintBuff>("2eabea6a1f9a58246a822f207e8ca79e").AddComponents(resistWilt); //IronBodyBuff
         }
 
         [PatchInfo(Severity.Create, "Stop Activatable", "adds ability to stop any activatable immediately", false)] // TODO: playtest

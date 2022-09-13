@@ -453,7 +453,7 @@ namespace CodexLib
         }
 
         /// <summary>
-        /// Original method must return a value. Use unbox, if it's a value type.
+        /// Inserts a check and return block. Method returns, if func returns false (like HarmonyPrefix). Original method must return a value. Use unbox, if it's a value type.
         /// </summary>
         /// <param name="unbox">Type of original return type.</param>
         /// <remarks>

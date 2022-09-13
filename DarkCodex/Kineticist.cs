@@ -781,8 +781,6 @@ namespace DarkCodex
             var windsBuff = Helper.Get<BlueprintBuff>("b803fcd9da7b1564fb52978f08372767"); //EnvelopingWindsBuff
             var windsFeat = Helper.ToRef<BlueprintFeatureReference>("bb0de2047c448bd46aff120be3b39b7a");  //EnvelopingWinds
             var windsEffect = Helper.ToRef<BlueprintUnitFactReference>("bbba1600582cf8446bb515a33bd89af8"); //EnvelopingWindsEffectFeature
-            var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
-            var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
 
             var feat = Helper.CreateBlueprintFeature(
                 "HurricaneQueen",
@@ -790,7 +788,7 @@ namespace DarkCodex
                 "You are one with the hurricane. Your enveloping winds defense wild talent has an additional 25% chance of deflecting ranged attacks, and your total deflection chance can exceed the usual cap of 75%. All wind and weather (including creatures using the whirlwind monster ability) affect you and your attacks only if you wish them to do so; for example, you could shoot arrows directly through a tornado without penalty."
                 ).SetComponents(
                 Helper.CreateAddFacts(windsEffect, windsEffect, windsEffect, windsEffect, windsEffect),
-                Helper.CreatePrerequisiteClassLevel(kineticist_class, 18),
+                Helper.CreatePrerequisiteClassLevel(Tree.Class, 18),
                 Helper.CreatePrerequisiteFeature(windsFeat)
                 );
 
@@ -802,7 +800,8 @@ namespace DarkCodex
             };
             windsBuff.AddComponents(ray);
 
-            Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feat.ToRef());
+            Tree.HurricaneQueen.Feature.SetReference(feat);
+            Helper.AppendAndReplace(ref Tree.SelectionWildTalent.Get().m_AllFeatures, Tree.HurricaneQueen.Feature);
 
             // immune to air-elemental whirlwind
             // bb57c37bfb5982d4bbed8d0fea75e404:WildShapeElementalAirWhirlwindDebuff
@@ -815,7 +814,6 @@ namespace DarkCodex
         public static void CreateMindShield()
         {
             var buff = Helper.Get<BlueprintBuff>("a9e3e785ea41449499b6b5d3d22a0856");  //PsychokineticistBurnBuff
-            var wildtalent_selection = Helper.Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
             var psychokineticist = Helper.ToRef<BlueprintArchetypeReference>("f2847dd4b12fffd41beaa3d7120d27ad");
 
             var feature = Helper.CreateBlueprintFeature(
@@ -833,7 +831,8 @@ namespace DarkCodex
             rank.m_StepLevel = 1;
             rank.m_CustomProperty = property.ToRef();
 
-            Helper.AppendAndReplace(ref wildtalent_selection.m_AllFeatures, feature.ToRef());
+            Tree.MindShield.Feature.SetReference(feature);
+            Helper.AppendAndReplace(ref Tree.SelectionWildTalent.Get().m_AllFeatures, Tree.MindShield.Feature);
         }
 
         [PatchInfo(Severity.Create, "Venom Infusion", "infusion: applies sickened or poisons the target", false)]
@@ -1155,7 +1154,7 @@ namespace DarkCodex
                 ).SetComponents(
                 new KineticExpandedMastery()
                 );
-            mastery.m_AllFeatures = Tree.GetTalents().Select(s => s.Feature).ToArray();
+            mastery.m_AllFeatures = Tree.GetTalents(form: true, substance: true, wild: true).Select(s => s.Feature).ToArray();
 
             foreach (var focus in Tree.GetFocus())
             {
@@ -1167,6 +1166,119 @@ namespace DarkCodex
                     new AddFeatureOnApplyPrerequisite(2, mastery, focus.First, focus.Knight, focus.Second)
                     ).RemoveComponents<PrerequisiteNoFeature>();
             }
+        }
+
+        [PatchInfo(Severity.Create, "Elemental Ascetic", "new Kineticist archetype", false)]
+        public static void CreateElementalAscetic()
+        {
+            var burnFeature = Helper.Get<BlueprintFeature>("57e3577a0eb53294e9d7cc649d5239a3");
+
+            /*
+            Combining the elemental powers of a kineticist with the rigid physical discipline of a monk, an elemental ascetic channels his powers through his body to enhance himself in combat.
+            
+            Elemental Flurry (Su)
+            At 1st level, an elemental ascetic gains Improved Unarmed Strike as a bonus feat. He gains the kinetic fist form infusion and it costs 0 points of burn instead of 1 point of burn. When using the kinetic fist form infusion with a full attack, he can make a flurry of blows as the monk class feature. He must use only his fists to make this flurry, no matter what other abilities he possesses.
+            Like a monk, he can use this ability only when unarmored, not using a shield, and unencumbered. He can’t use his kinetic blast without a form infusion, nor can he ever use his kinetic blast with the chain, extended range, extreme range, foe throw, flurry of blasts, many throw, or snake form infusions, or with any other form infusion that requires a ranged attack roll or ranged touch attack roll.
+            This ability alters kinetic blast and replaces elemental overflow.
+
+            Elemental Wisdom (Su)
+            An elemental ascetic can use his Wisdom modifier instead of his Constitution modifier to determine the DCs of Constitution-based wild talents, the duration of wild talents with a Constitution-based duration, and his bonus on concentration checks for wild talents.
+            This ability alters the key ability scores of wild talents.
+
+            AC Bonus (Ex)
+            At 2nd level, when unarmored, not using a shield, and unencumbered, an elemental ascetic adds his Wisdom bonus (if any) to his AC and his CMD.
+            These bonuses to AC apply even against touch attacks or when the elemental ascetic is flat-footed. He loses these bonuses when he is immobilized or helpless. This bonus increases by 1 for every 4 kineticist levels the elemental ascetic possesses beyond 2nd. The elemental ascetic’s kineticist levels stack with monk levels for the purpose of determining when the bonus increases. An elemental ascetic can never take the expanded defense utility wild talent.
+            This ability replaces elemental defense.
+
+            Powerful Fist (Su)
+            At 5th level, an elemental ascetic can accept 2 additional points of burn when using kinetic fist to increase that infusion’s damage dice from d6s to d8s.
+            At 9th level, he can instead accept 3 additional points of burn to increase the damage dice from d6s to d10s. At 13th level, he can instead accept 4 additional points of burn to increase the damage dice from d6s to d12s. All of these options count as burn from a form infusion and can thus be reduced by infusion specialization.
+            This ability replaces the 5th-, 9th-, and 13th-level infusions.
+             */
+
+            var ascetic = Helper.CreateBlueprintArchetype(
+                "ElementalAsceticArchetype",
+                "Elemental Ascetic",
+                "Combining the elemental powers of a kineticist with the rigid physical discipline of a monk, an elemental ascetic channels his powers through his body to enhance himself in combat."
+                );
+
+            var flurry_feat = Helper.CreateBlueprintFeature(
+                "AsceticElementalFlurry",
+                "Elemental Flurry",
+                "At 1st level, an elemental ascetic gains Improved Unarmed Strike as a bonus feat. He gains the kinetic fist form infusion and it costs 0 points of burn instead of 1 point of burn. When using the kinetic fist form infusion with a full attack, he can make a flurry of blows as the monk class feature. He must use only his fists to make this flurry, no matter what other abilities he possesses.\nLike a monk, he can use this ability only when unarmored, not using a shield, and unencumbered. He can’t use his kinetic blast without a form infusion, nor can he ever use his kinetic blast with the chain, extended range, extreme range, foe throw, flurry of blasts, many throw, or snake form infusions, or with any other form infusion that requires a ranged attack roll or ranged touch attack roll."
+                ).SetComponents(
+                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = new BlueprintAbilityReference[0] }
+                );
+
+            var wisdom_feat = Helper.CreateBlueprintFeature(
+                "AsceticElementalWisdom",
+                "Elemental Wisdom",
+                "An elemental ascetic can use his Wisdom modifier instead of his Constitution modifier to determine the DCs of Constitution-based wild talents, the duration of wild talents with a Constitution-based duration, and his bonus on concentration checks for wild talents.\n"
+                ).SetComponents(
+                burnFeature.GetComponent<AddKineticistPart>().Clone(c => c.MainStat = StatType.Wisdom)
+                );
+
+            var power_feat = Helper.CreateBlueprintFeature(
+                "AsceticPowerfulFist",
+                "Powerful Fist",
+                ""
+                );
+
+            Helper.CreateBlueprintActivatableAbility(
+                "AsceticPowerfulFist1",
+                "",
+                "",
+                out var fist1,
+                icon: Helper.StealIcon("5d7c3a3eed0546a598e3d2a1c7e0026a")
+                );
+            fist1.AddComponents(
+                new KineticBlastDiceIncrease(false),
+                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = 2, m_AppliableTo = Tree.BaseAll }
+                );
+
+            ascetic.SetAddFeatures(
+                Helper.CreateLevelEntry(1, flurry_feat, wisdom_feat, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
+                Helper.CreateLevelEntry(2, "2615c5f87b3d72b42ac0e73b56d895e0"), //MonkACBonusUnlock
+                Helper.CreateLevelEntry(5, power_feat)
+                );
+
+            ascetic.SetRemoveFeatures(
+                Helper.CreateLevelEntry(1, burnFeature, "86beb0391653faf43aec60d5ec05b538"), //ElementalOverflowProgression
+                Helper.CreateLevelEntry(3, "2496916d8465dbb4b9ddeafdf28c67d8"), //ElementalOverflowBonusFeature
+                Helper.CreateLevelEntry(5, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
+                Helper.CreateLevelEntry(9, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
+                Helper.CreateLevelEntry(13, "58d6f8e9eea63f6418b107ce64f315ea") //InfusionSelection
+                );
+
+            Tree.ElementalAscetic.SetReference(ascetic);
+            Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, Tree.ElementalAscetic); // add to character class selection
+
+            // add to monk ac progression
+            var ac = Helper.Get<BlueprintBuff>("f132c4c4279e4646a05de26635941bfe").GetComponents<ContextRankConfig>().First(f => f.m_BaseValueType == ContextRankBaseValueType.SummClassLevelWithArchetype);
+            ac.m_AdditionalArchetypes = Helper.Append(ac.m_AdditionalArchetypes, Tree.ElementalAscetic);
+
+            Main.RunLast("Elemental Flurry", () =>
+            {
+                // disallow all form infusions
+                foreach (var infusion in Tree.GetTalents(form: true))
+                {
+                    var feat = infusion.Feature.Get();
+                    if (feat == null || Tree.KineticFist.Feature.Is(feat))
+                        continue;
+                    feat.AddComponents(Helper.CreatePrerequisiteNoArchetype(ascetic.ToRef(), Tree.Class));
+                }
+
+                // hide base form
+                foreach (var blast in Tree.GetAll(true, true))
+                {
+                    var basic = blast.BaseAbility.Get();
+                    if (basic == null || !basic.HasVariants)
+                        continue;
+
+                    basic.AbilityVariants.Variants.First().AddComponents(Helper.CreateAbilityShowIfCasterHasFact(flurry_feat, true));
+                }
+
+            });
         }
 
         #region Helper

@@ -14,6 +14,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Feral Combat Training", "basic feat: Feral Combat Training", true, Requirement: typeof(Patch_FeralCombat))]
         public static void CreateFeralCombatTraining()
         {
+            Main.Patch(typeof(Patch_FeralCombat));
+
             /*
              Feral Combat Training (Combat)
             You were taught a style of martial arts that relies on the natural weapons from your racial ability or class feature.

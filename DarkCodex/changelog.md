@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+- added 'body forms become immune to horrid wilting' to General: Various Tweaks
+- added Elemental Ascetic: new Kineticist archetype
+
 ## [1.4.1]
 - fixed serialization issue
 - fixed auto metakinesis applying maximized before level 9

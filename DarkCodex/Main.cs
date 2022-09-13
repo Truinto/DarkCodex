@@ -444,8 +444,7 @@ namespace Shared
             PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
             PatchSafe(typeof(Patch_ActivatableOnTurnOn));
             PatchSafe(typeof(Patch_ActivatableTryStart));
-            PatchSafe(typeof(Patch_ResourcefulCaster));
-            PatchSafe(typeof(Patch_FeralCombat));
+            PatchSafe(typeof(Patch_ResourcefulCaster));            
             PatchSafe(typeof(Patch_PreferredSpellMetamagic));
             PatchSafe(typeof(Patch_FixAreaDoubleDamage));
             PatchSafe(typeof(Patch_FixAreaEndOfTurn));
@@ -461,7 +460,7 @@ namespace Shared
             PatchSafe(typeof(Patch_ZippySpellLike));
             PatchSafe(typeof(Patch_AbilityRange));
             PatchSafe(typeof(Patch_FixMisc));
-            PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike));
+            //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early
             LoadSafe(Spells.CreateBladedDash);
