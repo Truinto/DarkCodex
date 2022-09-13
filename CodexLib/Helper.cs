@@ -76,6 +76,7 @@ using UnityModManagerNet;
 using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
+using Kingmaker.UnitLogic.Class.Kineticist;
 
 namespace CodexLib
 {
@@ -3273,9 +3274,9 @@ namespace CodexLib
             return result;
         }
 
-        public static ActivateTrigger CreateActivateTrigger(ConditionsChecker conditions, GameAction[] actions, bool once = false, bool onAreaLoad = false)
+        public static Kingmaker.Designers.EventConditionActionSystem.Events.ActivateTrigger CreateActivateTrigger(ConditionsChecker conditions, GameAction[] actions, bool once = false, bool onAreaLoad = false)
         {
-            var result = new ActivateTrigger();
+            var result = new Kingmaker.Designers.EventConditionActionSystem.Events.ActivateTrigger();
             result.Conditions = conditions;
             result.Actions = CreateActionList(actions);
             result.m_Once = once;
@@ -3283,9 +3284,9 @@ namespace CodexLib
             return result;
         }
 
-        public static HasFact CreateHasFact(UnitEvaluator unit, BlueprintUnitFactReference fact)
+        public static Kingmaker.Designers.EventConditionActionSystem.Conditions.HasFact CreateHasFact(UnitEvaluator unit, BlueprintUnitFactReference fact)
         {
-            var result = new HasFact();
+            var result = new Kingmaker.Designers.EventConditionActionSystem.Conditions.HasFact();
             result.Unit = unit;
             result.m_Fact = fact;
             return result;
@@ -4040,7 +4041,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintProgression CreateBlueprintProgression(string name, string displayname, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0)
+        public static BlueprintProgression CreateBlueprintProgression(string name, string displayname = null, string description = null, Sprite icon = null, FeatureGroup group = 0)
         {
             string guid = GetGuid(name);
 

@@ -21,26 +21,24 @@ namespace CodexLib
             var result = existingValue as VariantSelectionData ?? new VariantSelectionData();
 
             var jt = JToken.Load(reader);
-            if (jt.Type != JTokenType.Object)
-                return result;
+            if (jt.Type == JTokenType.Integer)
+            {
+                result.Selected = UINumber.Get(jt.ToObject<int>());
+            }
+            else if (jt.Type == JTokenType.Object)
+            {
+                var type = jt["type"]?.ToString();
+                var guid = BlueprintGuid.Parse(jt["guid"]?.ToString());
 
-            var type = jt["type"]?.ToString();
-            var guid = BlueprintGuid.Parse(jt["guid"]?.ToString());
-            if (guid == null)
-            {
-                Helper.PrintDebug("VariantSelectionDataConverter no guid");
-            }
-            else if (type == "SimpleBlueprint")
-            {
-                var bp = ResourcesLibrary.TryGetBlueprint(guid);
-                if (bp is IUIDataProvider uibp)
-                    result.Selected = uibp;
-            }
-            else if (type == "KineticistTree+Element")
-            {
-                result.Selected = KineticistTree.Instance.GetAll(true, true, archetype: true).FirstOrDefault(f => f.BlastFeature.deserializedGuid == guid);
-            }
+                if (guid == null)
+                    Helper.PrintDebug("VariantSelectionDataConverter no guid");
 
+                else if (type == "SimpleBlueprint")
+                    result.Selected = ResourcesLibrary.TryGetBlueprint(guid) as IUIDataProvider;
+
+                else if (type == "KineticistTree+Element")
+                    result.Selected = KineticistTree.Instance.GetAll(true, true, archetype: true).FirstOrDefault(f => f.BlastFeature.deserializedGuid == guid);
+            }
             return result;
         }
 
@@ -70,6 +68,10 @@ namespace CodexLib
                 writer.WritePropertyName("guid");
                 writer.WriteValue(element.BlastFeature.deserializedGuid.ToString());
                 writer.WriteEndObject();
+            }
+            else if (value is UINumber num)
+            {
+                writer.WriteValue(num.Value);
             }
 
             //if (value is not VariantSelectionWrapper wrapper 

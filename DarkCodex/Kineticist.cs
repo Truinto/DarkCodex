@@ -1168,7 +1168,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create, "Elemental Ascetic", "new Kineticist archetype", false)]
+        [PatchInfo(Severity.Create | Severity.Faulty, "Elemental Ascetic", "new Kineticist archetype", false)]
         public static void CreateElementalAscetic()
         {
             var burnFeature = Helper.Get<BlueprintFeature>("57e3577a0eb53294e9d7cc649d5239a3");
@@ -1225,13 +1225,13 @@ namespace DarkCodex
                 );
 
             Helper.CreateBlueprintActivatableAbility(
-                "AsceticPowerfulFist1",
+                "AsceticPowerfulFistActivatable",
                 "",
                 "",
                 out var fist1,
                 icon: Helper.StealIcon("5d7c3a3eed0546a598e3d2a1c7e0026a")
                 );
-            fist1.AddComponents(
+            fist1.SetComponents(
                 new KineticBlastDiceIncrease(false),
                 new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = 2, m_AppliableTo = Tree.BaseAll }
                 );
