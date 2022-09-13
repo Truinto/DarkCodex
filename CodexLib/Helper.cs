@@ -2730,6 +2730,13 @@ namespace CodexLib
             return result;
         }
 
+        public static AddClassSkill CreateAddClassSkill(StatType stat)
+        {
+            var result = new AddClassSkill();
+            result.Skill = stat;
+            return result;
+        }
+
         public static RemoveFeatureOnApply CreateRemoveFeatureOnApply(AnyRef blueprintUnitFact)
         {
             var result = new RemoveFeatureOnApply();
@@ -3123,6 +3130,31 @@ namespace CodexLib
             return c;
         }
 
+        public static ContextActionDealDamage CreateContextActionDealForceDamage(ContextDiceValue damage, bool isAoE = false, bool halfIfSaved = false, bool IgnoreCritical = false, bool half = false, bool alreadyHalved = false, AbilitySharedValue sharedValue = 0, bool readShare = false, bool writeShare = false)
+        {
+            // Force damage
+            var c = new ContextActionDealDamage();
+            c.DamageType = new DamageTypeDescription()
+            {
+                Type = DamageType.Force,
+                Energy = DamageEnergyType.Fire,
+                Common = new DamageTypeDescription.CommomData(),
+                Physical = new DamageTypeDescription.PhysicalData()
+            };
+            c.Duration = CreateContextDurationValue();
+            c.Value = damage;
+            c.IsAoE = isAoE;
+            c.HalfIfSaved = halfIfSaved;
+            c.IgnoreCritical = IgnoreCritical;
+            c.Half = half;
+            c.AlreadyHalved = alreadyHalved;
+            c.ReadPreRolledFromSharedValue = readShare;
+            c.PreRolledSharedValue = readShare ? sharedValue : 0;
+            c.WriteResultToSharedValue = writeShare;
+            c.ResultSharedValue = writeShare ? sharedValue : 0;
+            return c;
+        }
+
         public static SpellComponent CreateSpellComponent(SpellSchool school)
         {
             var result = new SpellComponent();
@@ -3241,6 +3273,32 @@ namespace CodexLib
             return result;
         }
 
+        public static ActivateTrigger CreateActivateTrigger(ConditionsChecker conditions, GameAction[] actions, bool once = false, bool onAreaLoad = false)
+        {
+            var result = new ActivateTrigger();
+            result.Conditions = conditions;
+            result.Actions = CreateActionList(actions);
+            result.m_Once = once;
+            result.m_AlsoOnAreaLoad = onAreaLoad;
+            return result;
+        }
+
+        public static HasFact CreateHasFact(UnitEvaluator unit, BlueprintUnitFactReference fact)
+        {
+            var result = new HasFact();
+            result.Unit = unit;
+            result.m_Fact = fact;
+            return result;
+        }
+
+        public static AddFact CreateAddFact(UnitEvaluator unit, BlueprintUnitFactReference fact)
+        {
+            var result = new AddFact();
+            result.Unit = unit;
+            result.m_Fact = fact;
+            return result;
+        }
+
         public static ContextActionRemoveBuff CreateContextActionRemoveBuff(BlueprintBuff buff, bool toCaster = false)
         {
             var result = new ContextActionRemoveBuff();
@@ -3254,6 +3312,20 @@ namespace CodexLib
             var hasBuff = new ContextConditionHasBuff();
             hasBuff.m_Buff = buff.ToRef();
             return hasBuff;
+        }
+
+        public static AbilityAcceptBurnOnCast CreateAbilityAcceptBurnOnCast(int burnValue)
+        {
+            var result = new AbilityAcceptBurnOnCast();
+            result.BurnValue = burnValue;
+            return result;
+        }
+
+        public static RecalculateOnFactsChange CreateRecalculateOnFactsChange(params BlueprintUnitFactReference[] facts)
+        {
+            var result = new RecalculateOnFactsChange();
+            result.m_CheckedFacts = facts;
+            return result;
         }
 
         public static ContextConditionHasFact CreateContextConditionHasFact(AnyRef fact, bool not = false)
@@ -3963,6 +4035,24 @@ namespace CodexLib
             if (notRecommendStat != null) result.NotRecommendedAttributes = notRecommendStat;
 
             //result.m_SignatureAbilities = ;
+
+            AddAsset(result, guid);
+            return result;
+        }
+
+        public static BlueprintProgression CreateBlueprintProgression(string name, string displayname, string description, string guid = null, Sprite icon = null, FeatureGroup group = 0)
+        {
+            string guid = GetGuid(name);
+
+            var result = new BlueprintProgression();
+            result.name = name;
+
+            result.m_DisplayName = displayname.CreateString();
+            result.m_Description = description.CreateString();
+            result.m_Icon = icon;
+            result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
+
+            result.IsClassFeature = true;
 
             AddAsset(result, guid);
             return result;
