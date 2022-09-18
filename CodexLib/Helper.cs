@@ -3779,6 +3779,7 @@ namespace CodexLib
             return result;
         }
 
+        [Obsolete]
         public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
         {
             return CreateBlueprintActivatableAbility(name, out buff, displayName, description, icon, commandType, activationType, group, deactivateImmediately, onByDefault, onlyInCombat, deactivateEndOfCombat, deactivateAfterRound, deactivateWhenStunned, deactivateWhenDead, deactivateOnRest, useWithSpell, groupWeight);

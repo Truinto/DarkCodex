@@ -133,9 +133,9 @@ namespace DarkCodex
                 ).CreateAddAreaEffect();
             var cackle_passiv = Helper.CreateBlueprintActivatableAbility(
                 "WitchHexCacklePassive",
+                out BlueprintBuff cackle_buff,
                 "Cackle (passive)",
                 cackle.m_Description,
-                out BlueprintBuff cackle_buff,
                 icon: cackle.Icon,
                 //activationType: AbilityActivationType.WithUnitCommand,
                 //commandType: CommandType.Move,
@@ -159,9 +159,9 @@ namespace DarkCodex
                 ).CreateAddAreaEffect();
             var chant_passiv = Helper.CreateBlueprintActivatableAbility(
                 "ShamanHexChantPassive",
+                out BlueprintBuff chant_buff,
                 "Chant (passive)",
                 chant.m_Description,
-                out BlueprintBuff chant_buff,
                 icon: chant.Icon,
                 //activationType: AbilityActivationType.WithUnitCommand,
                 //commandType: CommandType.Move,

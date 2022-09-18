@@ -1,180 +1,122 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props" Condition="Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DarkCodex</RootNamespace>
-    <AssemblyName>DarkCodex</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <LangVersion>latest</LangVersion>
-    <ProjectGuid>{1B87B8EA-001B-4FE4-9993-77C33BFFBA87}</ProjectGuid>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-  </PropertyGroup>
-  <Target Name="Publicize" BeforeTargets="Build" AfterTargets="Clean">
-    <ItemGroup>
-      <a1 Include="$(WrathManaged)\Assembly-CSharp.dll" />
-      <a2 Include="$(WrathManaged)\UnityModManager\0Harmony.dll" />
-      <a3 Include="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
-    </ItemGroup>
-    <PublicizeTask InputAssemblies="@(a1);@(a2);@(a3)" OutputDir="$(WrathManaged)\" />
-    <!--<Message Text="Publicizing..." Importance="High" />
-    <Move SourceFiles="$(GameManaged)\Assembly-CSharp_public.dll" DestinationFiles="$(GameManaged)\Assembly-CSharp_publicized.dll" />-->
-  </Target>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
-    <Reference Include="0Harmony_public" HintPath="$(WrathManaged)\0Harmony_public.dll" />
-    <Reference Include="Assembly-CSharp_public" HintPath="$(WrathManaged)\Assembly-CSharp_public.dll" />
-    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
-    <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
-    <Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
-    <Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
-    <Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
-    <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
-    <Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
-    <Reference Include="Owlcat.Runtime.UI_public" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_public.dll" />
-    <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
-    <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
-    <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
-    <Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
-    <Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
-    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
-    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
-    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
-    <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
-    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
-    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
-    <Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DEBUG.cs" />
-    <Compile Include="MartialArt.cs" />
-    <Compile Include="Patches\Event_AreaEffects.cs" />
-    <Compile Include="General.cs" />
-    <Compile Include="Magus.cs" />
-    <Compile Include="Items.cs" />
-    <Compile Include="Kineticist.cs" />
-    <Compile Include="Monk.cs" />
-    <Compile Include="Mythic.cs" />
-    <Compile Include="Patches\Event_RestoreEndOfCombat.cs" />
-    <Compile Include="Patches\Patch_FixEldritchArcherSpellstrike.cs" />
-    <Compile Include="Patches\Patch_AbilityRange.cs" />
-    <Compile Include="Patches\Patch_ArcanistBrownFur.cs" />
-    <Compile Include="Patches\Patch_ArcanistSpontaneous.cs" />
-    <Compile Include="Patches\Patch_BackgroundChecks.cs" />
-    <Compile Include="Patches\Patch_ChangeSpellElement.cs" />
-    <Compile Include="Patches\Patch_DismissAnything.cs" />
-    <Compile Include="Patches\Patch_ActivatableHandleUnitRunCommand.cs" />
-    <Compile Include="Patches\Patch_ActivatableOnNewRound.cs" />
-    <Compile Include="Patches\Patch_ActivatableOnTurnOn.cs" />
-    <Compile Include="Patches\Patch_ActivatableTryStart.cs" />
-    <Compile Include="Patches\Patch_DarkElementalistBurn.cs" />
-    <Compile Include="Patches\Patch_FactSelectionParameterized.cs" />
-    <Compile Include="Patches\Patch_FixItemEnchantments.cs" />
-    <Compile Include="Patches\Patch_FixMisc.cs" />
-    <Compile Include="Patches\Patch_FixQuickenMetamagic.cs" />
-    <Compile Include="Patches\Patch_HexcrafterSpellStrike.cs" />
-    <Compile Include="Patches\Patch_LoadBlueprints.cs" />
-    <Compile Include="Patches\Patch_Prebuilds.cs" />
-    <Compile Include="Patches\Patch_AllowAchievements.cs" />
-    <Compile Include="Patches\Patch_ActivatableAbilityGroup.cs" />
-    <Compile Include="Patches\Patch_EnduringSpells.cs" />
-    <Compile Include="Patches\Patch_FixAreaDoubleDamage.cs" />
-    <Compile Include="Patches\Patch_FixAreaEndOfTurn.cs" />
-    <Compile Include="Patches\Patch_Polymorph.cs" />
-    <Compile Include="Patches\Patch_FixLoadCrash1.cs" />
-    <Compile Include="Patches\Patch_PreferredSpellMetamagic.cs" />
-    <Compile Include="Patches\Patch_ProdigiousTWF.cs" />
-    <Compile Include="Patches\Patch_SaveExtension.cs" />
-    <Compile Include="Patches\Patch_SpellPerfection.cs" />
-    <Compile Include="Patches\Patch_UnlockClassLevels.cs" />
-    <Compile Include="Patches\Patch_AlwaysAChance.cs" />
-    <Compile Include="Patches\Patch_MagicItemAdept.cs" />
-    <Compile Include="Patches\Patch_ResourcefulCaster.cs" />
-    <Compile Include="Patches\Patch_FeralCombat.cs" />
-    <Compile Include="Patches\Patch_EnvelopingWindsCap.cs" />
-    <Compile Include="Patches\Patch_FixPolymorphGather.cs" />
-    <Compile Include="Patches\Patch_KineticistAllowOpportunityAttack.cs" />
-    <Compile Include="Patches\Patch_TrueGatherPowerLevel.cs" />
-    <Compile Include="Patches\Patch_ZippySpellLike.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ranger.cs" />
-    <Compile Include="Resources.cs" />
-    <Compile Include="Rogue.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="Settings\Settings.cs" />
-    <Compile Include="Spellcasters.cs" />
-    <Compile Include="Spells.cs" />
-    <Compile Include="Unlock.cs" />
-    <Compile Include="Witch.cs" />
-    <None Include="..\.editorconfig" Link=".editorconfig" />
-    <None Include="packages.config" />
-    <None Include="Settings\Repository.json" />
-    <None Include="..\README.md" />
-    <None Include="changelog.md" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="info.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CodexLib\CodexLib.csproj">
-      <Project>{c518e346-ddbd-498a-bef9-d50ff314ad38}</Project>
-      <Name>CodexLib</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="..\CodexShared\CodexShared.projitems" Label="Shared" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy /i /e /y /f /d "$(SolutionDir)CodexLib\bin\$(Configuration)\CodexLib.dll" "$(ModFolder)\$(TargetName)\"
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Authors>Truinto</Authors>
+		<Title>DarkCodex</Title>
+		<RepositoryUrl>https://github.com/Truinto/DarkCodex</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RootNamespace>DarkCodex</RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	
+	<!-- Shared Libs -->
+	<Import Project="..\CodexShared\CodexShared.projitems" Label="Shared" />
+	
+	<!-- Nuget Packages -->
+	<ItemGroup>
+	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
+	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.1" ExcludeAssets="runtime" />
+	</ItemGroup>
+
+	<!-- Common References -->
+	<ItemGroup>
+		<Reference Include="System" />
+		<Reference Include="System.Core" />
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Xml.Linq" />
+		<Reference Include="System.Data.DataSetExtensions" />
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Net.Http" />
+	</ItemGroup>
+		
+	<!-- Project References -->
+	<ItemGroup>
+		<Reference Include="0Harmony_public" HintPath="$(WrathManaged)\0Harmony_public.dll" />
+		<Reference Include="Assembly-CSharp_public" HintPath="$(WrathManaged)\Assembly-CSharp_public.dll" />
+		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_public.dll" />
+		
+		<Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
+		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
+		<Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
+		<Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
+		<Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
+		<Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
+		<Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
+		<Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
+		<Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
+		<Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
+		<Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
+		<Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
+		<Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
+		<Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
+		<Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
+		<Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
+		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
+		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
+		
+		<ProjectReference Include="..\CodexLib\CodexLib.csproj" Project="{c518e346-ddbd-498a-bef9-d50ff314ad38}" Name="CodexLib" Private="False" />
+	</ItemGroup>
+
+	<!-- Other Files -->
+	<ItemGroup>
+	  <None Update="changelog.md" CopyToOutputDirectory="PreserveNewest" />
+	  <None Update="info.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<!-- Publicize -->
+	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="Clean">
+		<ItemGroup>
+			<PublicizeInput Include="$(WrathManaged)\Assembly-CSharp.dll" />
+			<PublicizeInput Include="$(WrathManaged)\UnityModManager\0Harmony.dll" />
+			<PublicizeInput Include="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
+		</ItemGroup>
+		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(WrathManaged)\" />
+	</Target>
+
+	<!-- Update build version -->
+	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
+		<ItemGroup>
+			<VersioningInput Include="changelog.md" />
+			<VersioningOutput Include="Properties\AssemblyInfo.cs" />
+			<VersioningOutput Include="info.json" />
+			<VersioningOutput Include="Settings\Repository.json" />
+		</ItemGroup>
+		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningOutput)" RegexInput="\[(?'version'[\d\.]{5,})\]" MaxMatch="3" />
+	</Target>
+
+	<!-- Copy to mod folder -->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<ItemGroup>
+			<_CopyItems Include="$(TargetDir)\*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="$(SolutionDir)CodexLib\bin\$(Configuration)\net472\CodexLib.dll" DestinationFolder="$(ModFolder)\$(TargetName)\" />
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
+		
+		<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;C:\Program Files\7-Zip\7z.exe&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />
+		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />		
+	</Target>
+	
+<!-- 	<PropertyGroup>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<PostBuildEvent>
+xcopy /i /e /y /f /d "$(SolutionDir)CodexLib\bin\$(Configuration)\CodexLib.dll" "$(ModFolder)\$(TargetName)\"
 xcopy /i /e /y /f /d "$(TargetDir)*" "$(ModFolder)\$(TargetName)\"
 
 if "$(Configuration)"=="Release" (
    cd /d "$(ModFolder)\"
    "C:\Program Files\7-Zip\7z.exe" u "-x!*.zip" "$(TargetName)\$(TargetName).zip" @"$(TargetName)\filelist.txt" &gt;NUL
    echo Updated $(TargetName).zip
-)</PostBuildEvent>
-  </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props'))" />
-  </Target>
+)
+		</PostBuildEvent>
+	</PropertyGroup> -->
+
 </Project>

@@ -45,5 +45,31 @@ namespace DarkCodex
 
             Helper.AddFeats(Resource.Cache.FeatureFeralCombat);
         }
+
+        public static void CreateWeaponSelection()
+        {
+            Main.Patch(typeof(Patch_UnitCreateFullAttack));
+
+            var act = Helper.CreateBlueprintActivatableAbility(
+                "BasicSelectWeapon",
+                out var _
+                );
+
+            // idea: have an ability to select which weapon to use in a full attack
+            // this is most relevant when dealing with unarmed strikes and natural attacks
+
+            // fix Flurry of Blows natural attack stacking
+
+            // modes:
+            // - off (use vanilla logic)
+            // - Flurry, mainhand only
+            // - Flurry, offhand only
+            // - Flurry, unarmed only
+            // - Flurry, natural attack only (req. Feral Combat Training)
+            // - Unarmed, then natural attacks
+
+            // CloakOfTheWinterWolfFeature
+            // ManeuverOnAttack / AddInitiatorAttackWithWeaponTrigger
+        }
     }
 }

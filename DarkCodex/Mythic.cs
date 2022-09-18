@@ -717,7 +717,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(feat);
         }
 
-        [PatchInfo(Severity.Extend | Severity.WIP, "Ranging Shots", "doesn't get weaker when hitting", true)]
+        [PatchInfo(Severity.Extend, "Ranging Shots", "doesn't get weaker when hitting", true)]
         public static void PatchRangingShots()
         {
             var feat = Helper.Get<BlueprintFeature>("2b558167862b05d47b8472d176257f82"); //RangingShots

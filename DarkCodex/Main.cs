@@ -523,6 +523,7 @@ namespace Shared
 
             // Kineticist
             LoadSafe(Kineticist.CreateElementalScion);
+            LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixWallInfusion);
             LoadSafe(Kineticist.CreateKineticistBackground);
             LoadSafe(Kineticist.CreateMobileGatheringFeat);

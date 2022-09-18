@@ -1,247 +1,99 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props" Condition="Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CodexLib</RootNamespace>
-    <AssemblyName>CodexLib</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>false</Deterministic>
-    <LangVersion>latest</LangVersion>
-    <ProjectGuid>{C518E346-DDBD-498A-BEF9-D50FF314AD38}</ProjectGuid>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-  <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <Target Name="Publicize" BeforeTargets="Build" AfterTargets="Clean">
-    <ItemGroup>
-      <a1 Include="$(WrathManaged)\Assembly-CSharp.dll" />
-      <a2 Include="$(WrathManaged)\UnityModManager\0Harmony.dll" />
-      <a3 Include="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
-    </ItemGroup>
-    <PublicizeTask InputAssemblies="@(a1);@(a2);@(a3)" OutputDir="$(WrathManaged)\" />
-    <!--<Message Text="Publicizing..." Importance="High" />
-    <Move SourceFiles="$(GameManaged)\Assembly-CSharp_public.dll" DestinationFiles="$(GameManaged)\Assembly-CSharp_publicized.dll" />-->
-  </Target>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
-    <Reference Include="0Harmony_public" HintPath="$(WrathManaged)\0Harmony_public.dll" />
-    <Reference Include="Assembly-CSharp_public" HintPath="$(WrathManaged)\Assembly-CSharp_public.dll" />
-    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
-    <Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
-    <Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
-    <Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
-    <Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
-    <Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
-    <Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
-    <Reference Include="Owlcat.Runtime.UI_public" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_public.dll" />
-    <Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
-    <Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
-    <Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
-    <Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
-    <Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
-    <Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
-    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
-    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
-    <Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
-    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
-    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
-    <Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="changelog.md" />
-    <None Include="packages.config" />
-    <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Classes\AbilityRegister.cs" />
-    <Compile Include="Classes\ActionBarConvertedVMAny.cs" />
-    <Compile Include="Classes\ActionBarSlotVMChild.cs" />
-    <Compile Include="Classes\AnyRef.cs" />
-    <Compile Include="Classes\CountableFlagArray.cs" />
-    <Compile Include="Classes\DefGroup.cs" />
-    <Compile Include="Classes\TranspilerData.cs" />
-    <Compile Include="Classes\UINumber.cs" />
-    <Compile Include="Classes\VariantSelectionDataConverter.cs" />
-    <Compile Include="Classes\KineticistTree.cs" />
-    <Compile Include="Classes\MechanicActionBarSlotGroup.cs" />
-    <Compile Include="Classes\MechanicActionBarSlotPlaceholder.cs" />
-    <Compile Include="Classes\MechanicActionBarSlotSpellGroup.cs" />
-    <Compile Include="Classes\MetamagicExt.cs" />
-    <Compile Include="Classes\PartCustomData.cs" />
-    <Compile Include="Classes\SpellSlotLevel.cs" />
-    <Compile Include="Components\AbilityAcceptBurnOnCast2.cs" />
-    <Compile Include="Components\AbilityAtWill.cs" />
-    <Compile Include="Components\AbilityDeliverChainAttack.cs" />
-    <Compile Include="Components\AbilityDeliverTeleportTrample.cs" />
-    <Compile Include="Components\AbilityRequirementActionAvailable.cs" />
-    <Compile Include="Components\AbilityRequirementBuffs.cs" />
-    <Compile Include="Components\AbilityRequirementBuffTimed.cs" />
-    <Compile Include="Components\AbilityRequirementOnlyCombat.cs" />
-    <Compile Include="Components\AbilityTargetHasFactExcept.cs" />
-    <Compile Include="Components\ActivatableVariants.cs" />
-    <Compile Include="Components\AddAttackBonus.cs" />
-    <Compile Include="Components\AddCasterLevelLimit.cs" />
-    <Compile Include="Components\AddCasterLevelParametrized.cs" />
-    <Compile Include="Components\AddConditionExceptions.cs" />
-    <Compile Include="Components\AddDamageResistancePhysicalImproved.cs" />
-    <Compile Include="Components\AddFactOnlyParty.cs" />
-    <Compile Include="Components\AddFeatureOnApplyPrerequisite.cs" />
-    <Compile Include="Components\AddFeatureSelection.cs" />
-    <Compile Include="Components\AddKnownSpellsAnyClass.cs" />
-    <Compile Include="Components\AddMechanicFeatureCustom.cs" />
-    <Compile Include="Components\AddUndeadCompanion.cs" />
-    <Compile Include="Components\BuffPoisonStatDamageFix.cs" />
-    <Compile Include="Components\ContextSharedBonus.cs" />
-    <Compile Include="Components\CreateAddStatBonusInArmor.cs" />
-    <Compile Include="Components\DirtyFightingBonus.cs" />
-    <Compile Include="Components\FeatureForPrerequisite.cs" />
-    <Compile Include="Components\KineticBlastDiceIncrease.cs" />
-    <Compile Include="Components\ActivatableVariantsExample.cs" />
-    <Compile Include="Components\KineticEnergizeFist.cs" />
-    <Compile Include="Components\KineticExpandedMastery.cs" />
-    <Compile Include="Components\KineticistIncreaseDC.cs" />
-    <Compile Include="Classes\MechanicActionBarSlotVariantSelection.cs" />
-    <Compile Include="Components\PanacheDodge.cs" />
-    <Compile Include="Enums\DamageTypeMix.cs" />
-    <Compile Include="Interfaces\IActionBarDisableDrag.cs" />
-    <Compile Include="Patches\Patch_ActionBarConvert.cs" />
-    <Compile Include="Components\Poison.cs" />
-    <Compile Include="Components\AutoMetakinesis.cs" />
-    <Compile Include="Components\Bleed.cs" />
-    <Compile Include="Components\ButcheringAxeLogic.cs" />
-    <Compile Include="Components\ChangeSpellElementalDamageFix.cs" />
-    <Compile Include="Components\ContextActionCastSpellOnCaster.cs" />
-    <Compile Include="Components\ContextActionChangeRankValue.cs" />
-    <Compile Include="Components\ContextActionMeleeAttackPoint.cs" />
-    <Compile Include="Components\ContextActionStopActivatables.cs" />
-    <Compile Include="Components\ContextActionUndoAction.cs" />
-    <Compile Include="Components\ContextConditionAttackRoll.cs" />
-    <Compile Include="Components\ContextConditionHasFactRank.cs" />
-    <Compile Include="Components\ContextConditionMoreHitDice.cs" />
-    <Compile Include="Components\ContextStatValue.cs" />
-    <Compile Include="Classes\DiceValue.cs" />
-    <Compile Include="Components\ConvertSpellSlots.cs" />
-    <Compile Include="Components\DuplicateSpell.cs" />
-    <Compile Include="Classes\FeatureRank.cs" />
-    <Compile Include="Components\KineticBlastEnhancement.cs" />
-    <Compile Include="Components\KineticistReduceBurnPooled.cs" />
-    <Compile Include="Components\KineticMastery.cs" />
-    <Compile Include="Components\LevelUpAddSelectionHasFact.cs" />
-    <Compile Include="Components\MasterShapeshifterFix.cs" />
-    <Compile Include="Components\MetamagicAdeptFix.cs" />
-    <Compile Include="Components\MetamagicReduceCostParametrized.cs" />
-    <Compile Include="Components\ModifyWeaponSize.cs" />
-    <Compile Include="Components\PrerequisiteSpontaneousCaster.cs" />
-    <Compile Include="Components\PropertyKineticistBurn.cs" />
-    <Compile Include="Components\SacredSummons.cs" />
-    <Compile Include="Components\SpellDescriptorExt.cs" />
-    <Compile Include="Components\SpellPerfection.cs" />
-    <Compile Include="Delegates.cs" />
-    <Compile Include="Enums\EnumPlaceholder.cs" />
-    <Compile Include="Enums\MechanicFeature.cs" />
-    <Compile Include="Interfaces\IActionBarConvert.cs" />
-    <Compile Include="Interfaces\IAfterRule.cs" />
-    <Compile Include="Interfaces\IUpdateCompanion.cs" />
-    <Compile Include="Components\ContextRankBonus.cs" />
-    <Compile Include="Interfaces\IContextBonus.cs" />
-    <Compile Include="Patches\Patch_AbilityAtWill.cs" />
-    <Compile Include="Patches\Patch_ActivatableActionBar.cs" />
-    <Compile Include="Patches\Patch_AOEAttackRolls.cs" />
-    <Compile Include="Patches\Patch_ConditionExemption.cs" />
-    <Compile Include="Patches\Patch_ContextRankBonus.cs" />
-    <Compile Include="Patches\Patch_DebugReport.cs" />
-    <Compile Include="Patches\Patch_DuelistParry.cs" />
-    <Compile Include="Patches\Patch_FixAbilityTargets.cs" />
-    <Compile Include="Patches\Patch_AbilityIsFullRound.cs" />
-    <Compile Include="Patches\Patch_MaterialComponent.cs" />
-    <Compile Include="Patches\Patch_Prerequisite.cs" />
-    <Compile Include="Patches\Patch_RulebookEventBusPriority.cs" />
-    <Compile Include="Components\PreferredSpell.cs" />
-    <Compile Include="Components\PropertyAttributeMax.cs" />
-    <Compile Include="Components\PropertyGetterSneakAttack.cs" />
-    <Compile Include="Components\PropertyMindShield.cs" />
-    <Compile Include="Components\PropertyMythicLevel.cs" />
-    <Compile Include="Components\RestrictionCanGatherPowerAbility.cs" />
-    <Compile Include="Components\RestrictionKineticWhip.cs" />
-    <Compile Include="Components\RuleAttackRoll2.cs" />
-    <Compile Include="Components\ScalingCMBonus.cs" />
-    <Compile Include="Components\TurnBasedBuffMovementSpeed.cs" />
-    <Compile Include="Classes\UIData.cs" />
-    <Compile Include="Components\UnitConditionExceptionsFromBuff.cs" />
-    <Compile Include="Const.cs" />
-    <Compile Include="Helper.cs" />
-    <Compile Include="Interfaces\IMechanicGroup.cs" />
-    <Compile Include="Interfaces\IBeforeRule.cs" />
-    <Compile Include="MasterPatch.cs" />
-    <Compile Include="Patches\Patch_ContextStatValue.cs" />
-    <Compile Include="Patches\Patch_GetTargetProjectileFix.cs" />
-    <Compile Include="Patches\Patch_RuleSpendCharge.cs" />
-    <Compile Include="Patches\Patch_SpellSelectionParametrized.cs" />
-    <Compile Include="Patches\Patch_WeaponCategory.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rules\RuleSpendCharge.cs" />
-    <Compile Include="Scope.cs" />
-    <Compile Include="using.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if "$(Configuration)"=="Release" (
-xcopy /i /e /y /f /d "$(TargetDir)\CodexLib.dll" "$(SolutionDir)CodexLib\"
-)
-    </PostBuildEvent>
-  </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\AssemblyPublicizer.1.0.2\build\AssemblyPublicizer.props'))" />
-  </Target>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Authors>Truinto</Authors>
+		<RepositoryUrl>https://github.com/Truinto/DarkCodex/tree/master/CodexLib</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RootNamespace>CodexLib</RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+
+	<!-- Nuget Packages -->
+	<ItemGroup>
+	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
+	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.1" ExcludeAssets="runtime" />
+	</ItemGroup>
+
+	<!-- Common References -->
+	<ItemGroup>
+		<Reference Include="System" />
+		<Reference Include="System.Core" />
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Xml.Linq" />
+		<Reference Include="System.Data.DataSetExtensions" />
+		<Reference Include="Microsoft.CSharp" />
+		<Reference Include="System.Data" />
+		<Reference Include="System.Net.Http" />
+	</ItemGroup>
+	
+	<!-- Project References -->
+	<ItemGroup>		
+		<Reference Include="0Harmony_public" HintPath="$(WrathManaged)\0Harmony_public.dll" />
+		<Reference Include="Assembly-CSharp_public" HintPath="$(WrathManaged)\Assembly-CSharp_public.dll" />
+		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_public.dll" />
+		
+		<Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
+		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
+		<Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
+		<Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
+		<Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
+		<Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
+		<Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
+		<Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
+		<Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
+		<Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
+		<Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
+		<Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
+		<Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
+		<Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
+		<Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
+		<Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
+		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
+		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
+	</ItemGroup>
+	
+	<!-- Other Files -->
+	<ItemGroup>
+	  <EmbeddedResource Include="Resources\Num0.png" />
+	  <EmbeddedResource Include="Resources\Num1.png" />
+	  <EmbeddedResource Include="Resources\Num2.png" />
+	  <EmbeddedResource Include="Resources\Num3.png" />
+	  <EmbeddedResource Include="Resources\Num4.png" />
+	  <EmbeddedResource Include="Resources\Num5.png" />
+	  <EmbeddedResource Include="Resources\Num6.png" />
+	  <EmbeddedResource Include="Resources\Num7.png" />
+	  <EmbeddedResource Include="Resources\Num8.png" />
+	  <EmbeddedResource Include="Resources\Num9.png" />
+	</ItemGroup>
+	
+	<!-- Publicize -->
+	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="Clean">
+		<ItemGroup>
+			<PublicizeInput Include="$(WrathManaged)\Assembly-CSharp.dll" />
+			<PublicizeInput Include="$(WrathManaged)\UnityModManager\0Harmony.dll" />
+			<PublicizeInput Include="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
+		</ItemGroup>
+		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(WrathManaged)\" />
+	</Target>
+
+	<!-- Increase build version -->
+	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
+		<ItemGroup>
+			<VersioningInput Include="Properties\AssemblyInfo.cs" />
+		</ItemGroup>
+		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningInput)" AutoIncrease="true" MaxMatch="3" />
+	</Target>
+
+	<!-- Copy to solution folder -->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
+		<Copy Condition="'$(Configuration)'=='Release'" SourceFiles="$(TargetDir)\CodexLib.dll" DestinationFolder="$(SolutionDir)CodexLib\" />
+	</Target>
+
 </Project>

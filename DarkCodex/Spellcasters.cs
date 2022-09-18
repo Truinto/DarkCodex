@@ -54,9 +54,9 @@ namespace DarkCodex
                 classes: new BlueprintCharacterClassReference[] { sorcerer, scion });
             var adept = Helper.CreateBlueprintActivatableAbility(
                 "MetamagicAdeptActivatable",
+                out var buff,
                 "Metamagic Adept",
                 descAdept,
-                out var buff,
                 icon: adeptFeat.m_Icon
                 ).SetComponents(
                 Helper.CreateActivatableAbilityResourceLogic(resource, ActivatableAbilityResourceLogic.ResourceSpendType.Never)

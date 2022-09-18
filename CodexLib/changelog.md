@@ -3,6 +3,8 @@
 ## [1.2.0]
 - compiled for 1.4
 - fixed serialization issue
+- added new helpers
+- expanded VariantSelectionData; added UINumber
 
 ## [1.1.1]
 - added harmony and allowGuidGeneration to Scope settings; old constructors will be removed in future releases

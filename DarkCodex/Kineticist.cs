@@ -83,9 +83,9 @@ namespace DarkCodex
 
             var ability = Helper.CreateBlueprintActivatableAbility(
                 "KineticWhipActivatable",
+                out BlueprintBuff buff,
                 "Kinetic Whip",
                 "Element: universal\nType: form infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou form a long tendril of energy or elemental matter. While active, your kinetic blade increases its reach by 5 feet and you can make attacks of opportunity with your kinetic blade.",
-                out BlueprintBuff buff,
                 icon: icon
                 ).SetComponents(
                 new RestrictionKineticWhip()
@@ -665,7 +665,7 @@ namespace DarkCodex
             });
         }
 
-        [PatchInfo(Severity.Fix | Severity.Faulty, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
+        [PatchInfo(Severity.Fix, "Fix Wall Infusion", "fix Wall Infusion not dealing damage while standing inside", false)]
         public static void FixWallInfusion()
         {
             Main.RunLast("Fix Wall Infusion", () =>
@@ -702,9 +702,9 @@ namespace DarkCodex
 
             BlueprintActivatableAbility ab1 = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisSelectiveAbility",
+                out BlueprintBuff buff1,
                 displayname,
                 description,
-                out BlueprintBuff buff1,
                 icon: icon
                 );
             buff1.SetComponents(
@@ -758,9 +758,9 @@ namespace DarkCodex
 
             var auto = Helper.CreateBlueprintActivatableAbility(
                 "MetakinesisAutoAbility",
+                out BlueprintBuff autobuff,
                 "Metakinesis — Empower/Maximize (Automatic)",
                 "Apply Empower and Maxmize automatically depending on leftover gather power burn.",
-                out BlueprintBuff autobuff,
                 icon: Helper.StealIcon("45d94c6db453cfc4a9b99b72d6afe6f6"),
                 onByDefault: true
                 );
@@ -853,9 +853,9 @@ namespace DarkCodex
             // venom infusion
             var ab = Helper.CreateBlueprintActivatableAbility(
                 "VenomInfusionActivatable",
+                out var buff,
                 "Venom Infusion",
                 "Element: any\nType: substance infusion\nLevel: 3\nBurn: 2\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nAll of your blasts are mildly toxic. Creatures that take damage from your blast are sickened for 1 round.",
-                out var buff,
                 group: ActivatableAbilityGroup.SubstanceInfusion,
                 icon: Helper.StealIcon("1f788b54e93751d43923596b8e09035d")
                 );
@@ -872,9 +872,9 @@ namespace DarkCodex
             // venom infusion, greater
             var ab_greater = Helper.CreateBlueprintActivatableAbility(
                 "VenomInfusionGreaterActivatable",
+                out var buff_greater,
                 "Venom Infusion, Greater",
                 "Element: any\nType: substance infusion\nLevel: 6\nBurn: 3\nAssociated Blasts: all\n{g|Encyclopedia:Saving_Throw}Saving Throw{/g}: Fortitude negates\nYour plant toxin is more virulent. Each time you use this infusion, choose a physical ability score (only constitution). Creatures that take damage from your blast are exposed to your poison and are sickended for its duration.\n\nBlast—injury; save Fort; frequency 1/round for 6 rounds; effect 1d2 constitution damage or dexterity if undead; cure 2 consecutive saves; sickened while poisoned.",
-                out var buff_greater,
                 group: ActivatableAbilityGroup.SubstanceInfusion,
                 icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")
                 );
@@ -1168,7 +1168,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create | Severity.Faulty, "Elemental Ascetic", "new Kineticist archetype", false)]
+        [PatchInfo(Severity.Create, "Elemental Ascetic", "new Kineticist archetype", false)]
         public static void CreateElementalAscetic()
         {
             var burnFeature = Helper.Get<BlueprintFeature>("57e3577a0eb53294e9d7cc649d5239a3");
@@ -1218,32 +1218,33 @@ namespace DarkCodex
                 burnFeature.GetComponent<AddKineticistPart>().Clone(c => c.MainStat = StatType.Wisdom)
                 );
 
-            var power_feat = Helper.CreateBlueprintFeature(
-                "AsceticPowerfulFist",
+            var pfist = Helper.CreateBlueprintActivatableAbility(
+                "AsceticPowerfulFistActivatable",
+                out var _,
                 "Powerful Fist",
-                ""
+                "At 5th level, an elemental ascetic can accept 2 additional points of burn when using kinetic fist to increase that infusion’s damage dice from d6s to d8s.\nAt 9th level, he can instead accept 3 additional points of burn to increase the damage dice from d6s to d10s. At 13th level, he can instead accept 4 additional points of burn to increase the damage dice from d6s to d12s. All of these options count as burn from a form infusion and can thus be reduced by infusion specialization.",
+                icon: Helper.StealIcon("5d7c3a3eed0546a598e3d2a1c7e0026a")
+                ).SetComponents(
+                new KineticistPowerfulFist()
                 );
 
-            Helper.CreateBlueprintActivatableAbility(
-                "AsceticPowerfulFistActivatable",
-                "",
-                "",
-                out var fist1,
-                icon: Helper.StealIcon("5d7c3a3eed0546a598e3d2a1c7e0026a")
-                );
-            fist1.SetComponents(
-                new KineticBlastDiceIncrease(false),
-                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = 2, m_AppliableTo = Tree.BaseAll }
+            var power_feat = Helper.CreateBlueprintFeature(
+                "AsceticPowerfulFist"
+                ).SetUIData(
+                pfist
+                ).SetComponents(
+                Helper.CreateAddFacts(pfist)
                 );
 
             ascetic.SetAddFeatures(
-                Helper.CreateLevelEntry(1, flurry_feat, wisdom_feat, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
+                Helper.CreateLevelEntry(1, Tree.KineticFist.Feature, flurry_feat, wisdom_feat, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
                 Helper.CreateLevelEntry(2, "2615c5f87b3d72b42ac0e73b56d895e0"), //MonkACBonusUnlock
                 Helper.CreateLevelEntry(5, power_feat)
                 );
 
             ascetic.SetRemoveFeatures(
                 Helper.CreateLevelEntry(1, burnFeature, "86beb0391653faf43aec60d5ec05b538"), //ElementalOverflowProgression
+                Helper.CreateLevelEntry(2, "bb0de2047c448bd46aff120be3b39b7a", "8ad77685e64842c45a6f5b19f9086c6c", "a275b35f282601944a97e694f6bc79f8", "29ec36fa2a5b8b94ebce170bd369083a"), //all the defense talents // TODO: fix this
                 Helper.CreateLevelEntry(3, "2496916d8465dbb4b9ddeafdf28c67d8"), //ElementalOverflowBonusFeature
                 Helper.CreateLevelEntry(5, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
                 Helper.CreateLevelEntry(9, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
