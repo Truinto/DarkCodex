@@ -60,6 +60,9 @@ namespace DarkCodex
                 if (!Settings.State.saveMetadata)
                     return true;
 
+                if (__instance.SlotType != SaveSlotType.Load)
+                    return true;
+
                 if (Main.restart)
                 {
                     Helper.ShowMessageBox("Patch settings were changed recently. Restart game to apply new patches.", yesLabel: "Ignore this time", noLabel: "I understand",

@@ -59,7 +59,7 @@ namespace DarkCodex
                 accursed_strike_variants[0].m_Icon,
                 FeatureGroup.WitchHex
                 ).SetComponents(
-                Helper.CreatePrerequisiteArchetypeLevel(hexcrafter, 1),
+                Helper.CreatePrerequisiteArchetypeLevel(hexcrafter, 1, characterClass: Helper.ToRef<BlueprintCharacterClassReference>("45a4607686d96a1498891b3286121780")),
                 Helper.CreateAddFacts(accursed_strike_ab.ToRef2()),
                 Helper.CreateAddKnownSpell(baleful.ToRef(), 5, archetype: hexcrafter)
                 );

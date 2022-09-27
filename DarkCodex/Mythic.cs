@@ -717,6 +717,37 @@ namespace DarkCodex
             Helper.AddMythicTalent(feat);
         }
 
+        [PatchInfo(Severity.Create, "Mythic Animal Companion", "mythic feat: unlocks companion equipment slots", true)]
+        public static void CreateMythicCompanion()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "MythicAnimalCompanionInventory",
+                "Mythic Animal Companion",
+                "Your animal companion can don any type of equipment."
+                ).SetComponents(
+                new RemoveFeatureOnApplyToPet("75bb2b3c41c99e041b4743fdb16a4289") //AnimalCompanionSlotFeature
+                );
+
+            Helper.AddMythicFeat(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Not A Chance", "mythic ability: immunity to crits", true)]
+        public static void CreateNotAChance()
+        {
+            Main.Patch(typeof(Patch_NotAChance));
+
+            var feat = Helper.CreateBlueprintFeature(
+                "NotAChanceFeat",
+                "Not A Chance",
+                "You bring misfortune to those that oppose you. Benefit: Attack rolls against you don't automatically succeed on a natural 20. You become immune to critical hits."
+                ).SetComponents(
+                new AddMechanicFeatureCustom(MechanicFeature.NotAChance),
+                Helper.CreateAddFacts("ced0f4e5d02d5914a9f9ff74acacf26d") //ImmunityToCritical
+                );
+
+            Helper.AddMythicTalent(feat);
+        }
+
         [PatchInfo(Severity.Extend, "Ranging Shots", "doesn't get weaker when hitting", true)]
         public static void PatchRangingShots()
         {
@@ -774,12 +805,19 @@ namespace DarkCodex
             Main.Patch(typeof(Patch_AlwaysAChance));
         }
 
-        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport", true)]
+        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, allow Elemental Barrage on any damage", true)]
         public static void PatchVarious()
         {
             // allow quicken metamagic on demon teleport
             Helper.Get<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
                 .AvailableMetamagic |= Metamagic.Quicken;
+
+            // allow Elemental Barrage on any damage trigger
+            foreach (var comp in Helper.Get<BlueprintFeature>("da56a1b21032a374783fdf46e1a92adb").ComponentsArray) //ElementalBarrage
+            {
+                if (comp is AddOutgoingDamageTrigger trigger)
+                    trigger.CheckAbilityType = false;
+            }
         }
 
         #region Helper

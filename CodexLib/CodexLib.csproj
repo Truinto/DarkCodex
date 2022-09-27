@@ -16,7 +16,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.1" ExcludeAssets="runtime" />
+	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.3" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Common References -->
@@ -88,7 +88,7 @@
 		<ItemGroup>
 			<VersioningInput Include="Properties\AssemblyInfo.cs" />
 		</ItemGroup>
-		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningInput)" AutoIncrease="true" MaxMatch="3" />
+		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningInput)" AutoIncrease="true" MaxMatch="3" TouchFiles="false" />
 	</Target>
 
 	<!-- Copy to solution folder -->

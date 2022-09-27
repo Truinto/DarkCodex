@@ -821,7 +821,7 @@ namespace DarkCodex
                 "Mind Shield",
                 "Reduce the penalties of Mind Burn by 1."
                 ).SetComponents(
-                Helper.CreatePrerequisiteArchetypeLevel(psychokineticist));
+                Helper.CreatePrerequisiteArchetypeLevel(psychokineticist, characterClass: Tree.Class));
             Resource.Cache.FeatureMindShield.SetReference(feature);
 
             var property = Helper.CreateBlueprintUnitProperty("PsychokineticistMindPropertyGetter")

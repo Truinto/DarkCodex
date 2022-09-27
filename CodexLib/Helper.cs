@@ -1955,18 +1955,20 @@ namespace CodexLib
 
         private static BlueprintFeatureSelection _basicfeats1;
         private static BlueprintFeatureSelection _basicfeats2;
+        private static BlueprintFeatureSelection _basicfeats3;
         private static BlueprintFeatureSelection _combatfeats1;
         private static BlueprintFeatureSelection _combatfeats2;
         private static BlueprintFeatureSelection _combatfeats3;
         public static void AddFeats(params BlueprintFeature[] feats)
         {
-            if (_basicfeats1 == null) //BasicFeatSelection
-                _basicfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45");
+            _basicfeats1 ??= Get<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45"); //BasicFeatSelection
             AppendAndReplace(ref _basicfeats1.m_AllFeatures, feats.ToRef());
 
-            if (_basicfeats2 == null) //ExtraFeatMythicFeat
-                _basicfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
+            _basicfeats2 ??= Get<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b"); //ExtraFeatMythicFeat
             AppendAndReplace(ref _basicfeats2.m_AllFeatures, feats.ToRef());
+
+            _basicfeats3 ??= Get<BlueprintFeatureSelection>("a21acdafc0169f5488a9bd3256e2e65b"); //DragonLevel2FeatSelection
+            AppendAndReplace(ref _basicfeats3.m_AllFeatures, feats.ToRef());
         }
         public static void AddCombatFeat(BlueprintFeature feats)
         {
@@ -3537,6 +3539,7 @@ namespace CodexLib
             return result;
         }
 
+        public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(AnyRef @class, int level, bool any = false) => CreatePrerequisiteClassLevel((BlueprintCharacterClassReference)@class, level, any);
         public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(BlueprintCharacterClassReference @class, int level, bool any = false)
         {
             var result = new PrerequisiteClassLevel();
@@ -3561,6 +3564,20 @@ namespace CodexLib
             var result = new PrerequisiteNoArchetype();
             result.m_Archetype = m_Archetype;
             result.m_CharacterClass = m_CharacterClass ?? m_Archetype.Get().GetParentClass().ToRef();
+            return result;
+        }
+
+        /// <param name="feature">type: <b>BlueprintFeature</b></param>
+        /// <param name="spell">type: <b>BlueprintAbility</b></param>
+        public static PrerequisiteParametrizedFeature CreatePrerequisiteParametrizedFeature(AnyRef feature, WeaponCategory weaponCategory = 0, SpellSchool spellSchool = 0, AnyRef spell = null, bool any = false)
+        {
+            var result = new PrerequisiteParametrizedFeature();
+            result.m_Feature = feature;
+            result.WeaponCategory = weaponCategory;
+            result.SpellSchool = spellSchool;
+            result.m_Spell = spell;
+            result.ParameterType = spell != null ? FeatureParameterType.SpellSpecialization : spellSchool != 0 ? FeatureParameterType.SpellSpecialization : FeatureParameterType.WeaponCategory;
+            result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
             return result;
         }
 

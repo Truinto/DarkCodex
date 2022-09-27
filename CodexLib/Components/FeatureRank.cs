@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class FeatureRank
+    public class FeatureRank : BlueprintComponent
     {
         public int Rank;
 

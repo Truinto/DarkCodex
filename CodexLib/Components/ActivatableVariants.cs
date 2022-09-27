@@ -11,17 +11,19 @@ namespace CodexLib
     /// <summary>
     /// Component to add foldable to any BlueprintAbility or BlueprintActivatableAbility. Takes priority over existing conversions, if any.
     /// </summary>
+    [AllowedOn(typeof(BlueprintActivatableAbility))]
     public class ActivatableVariants : UnitFactComponentDelegate<VariantSelectionData>, IActionBarConvert
     {
         public bool NeedFact = true;
         public BlueprintUnitFactReference[] Facts;
 
+        /// <param name="facts">type: <b>BlueprintUnitFact</b></param>
         public ActivatableVariants(params AnyRef[] facts)
         {
             this.Facts = facts.ToRef<BlueprintUnitFactReference>();
         }
 
-        public List<MechanicActionBarSlot> GetConverts()
+        public virtual List<MechanicActionBarSlot> GetConverts()
         {
             var data = this.Data;
 
@@ -35,9 +37,23 @@ namespace CodexLib
             return list;
         }
 
-        public Sprite GetIcon()
+        public virtual Sprite GetIcon()
         {
             return this.Data.Selected?.Icon;
+        }
+
+        public bool IsOn => this.Fact is ActivatableAbility act && act.IsOn;
+
+        public BlueprintUnitFact Selected => this.Data.Selected as BlueprintUnitFact;
+
+        /// <summary>Example</summary>
+        private void OnEventAboutToTrigger()
+        {
+            if (this.Fact is not ActivatableAbility act || !act.IsOn)
+                return;
+
+            if (this.Data.Selected is not BlueprintUnitFact feature)
+                return;
         }
     }
 

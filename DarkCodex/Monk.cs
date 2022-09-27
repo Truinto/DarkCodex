@@ -38,7 +38,7 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(unarmedstrike),
                 Helper.CreatePrerequisiteFeature(weaponfocus),
-                Helper.CreatePrerequisiteNoArchetype(zenarcher)
+                Helper.CreatePrerequisiteNoArchetype(zenarcher, Helper.ToRef<BlueprintCharacterClassReference>("e8f21e5b58e0569468e420ebea456124"))
                 );
 
             Resource.Cache.FeatureFeralCombat.SetReference(feature);

@@ -1,5 +1,6 @@
 ﻿using CodexLib;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.Mechanics.Facts;
 using Shared;
 using System;
@@ -169,12 +170,41 @@ namespace DarkCodex
                 Helper.CreateAddFacts(bleed1, bleed2)
                 );
 
+            var panache7 = Helper.CreateBlueprintFeature(
+                "Panache_SubtleBlade",
+                "Subtle Blade",
+                "At 11th level, while a swashbuckler has at least 1 panache point, she is immune to disarm, steal, and sunder combat maneuvers made against a light or one-handed piercing melee weapon she is wielding."
+                ).SetComponents(
+                new AddCombatManeuverImmunity(CombatManeuver.Disarm)
+                );
+
+            var feint_buff = Helper.CreateBlueprintBuff(
+                "SuperiorFeintBuff",
+                "Feinted",
+                "You got tricked by a feint and are denied your Dexterity bonus to AC until next round."
+                ).SetComponents(
+                new FlatFootedForced()
+                );
+            var feint_ab = Helper.CreateBlueprintAbility(
+                "SuperiorFeintAbility",
+                "Superior Feint",
+                "At 7th level, a swashbuckler with at least 1 panache point can, as a standard action, purposefully miss a creature she could make a melee attack against with a wielded light or one-handed piercing weapon. When she does, the creature is denied its Dexterity bonus to AC until the start of the swashbuckler’s next turn.",
+                icon: Helper.StealIcon("dda92ebaf6a03f84387f7104fd597c2e")
+                ).SetComponents(
+                Helper.MakeRunActionApplyBuff(feint_buff, Helper.CreateContextDurationValue(bonus: 1))
+                );
+            var panache8 = Helper.CreateBlueprintFeature(
+                "Panache_SuperiorFeint"
+                ).SetComponents(
+                Helper.CreateAddFacts(feint_ab)
+                ).SetUIData(feint_ab);
+
             var f11_panache = Helper.CreateBlueprintFeature(
                 "VirtuousBravoAdvancedDeeds",
                 "Advanced Deeds",
                 "At 11th level, a virtuous bravo gains the following swashbuckler deeds: bleeding wound, evasive, subtle blade, superior feint, swashbuckler’s grace, and targeted strike.\nThis ability replaces aura of justice."
                 ).SetComponents(
-                Helper.CreateAddFacts(panache6, 
+                Helper.CreateAddFacts(panache6, panache7, panache8,
                 "576933720c440aa4d8d42b0c54b77e80", //Evasion
                 "3c08d842e802c3e4eb19d15496145709", //UncannyDodge
                 "485a18c05792521459c7d06c63128c79") //ImprovedUncannyDodge
@@ -198,18 +228,26 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref paladin.Get().m_Archetypes, archetype.ToRef());
         }
 
+        public static void CreateBladedBrush()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "BladedBrushFeat",
+                "Bladed Brush",
+                "You can use the Weapon Finesse feat to apply your Dexterity modifier instead of your Strength modifier to attack rolls with a glaive sized for you, even though it isn’t a light weapon. When wielding a glaive, you can treat it as a one-handed piercing or slashing melee weapon and as if you were not making attacks with your off-hand for all feats and class abilities that require such a weapon (such as a duelist’s or swashbuckler’s precise strike)."
+                ).SetComponents(
+                new AddDuelistWeapon(WeaponCategory.Glaive),
+                new AttackStatReplacement { ReplacementStat = StatType.Dexterity, CheckWeaponTypes = true, m_WeaponTypes = Helper.ToRef<BlueprintWeaponTypeReference>("7a14a1b224cd173449cb7ffc77d5f65c").ObjToArray() }, //Glaive
+                Helper.CreatePrerequisiteParametrizedFeature("1e1f627d26ad36f43bbd26cc2bf8ac7e", WeaponCategory.Glaive), //WeaponFocus
+                Helper.CreatePrerequisiteFeature("b382afa31e4287644b77a8b30ed4aa0b") //Deity ShelynFeature
+                );
+
+            Helper.AddCombatFeat(feat);
+        }
+
         /*
-        Bladed Brush (Combat)
-        Note: This is associated with a specific deity.
-        You know how to balance a polearm perfectly, striking with artful, yet deadly precision.
-        Prerequisite(s): Weapon Focus (glaive), must be a worshiper of the associated deity.
-        Benefit(s): You can use the Weapon Finesse feat to apply your Dexterity modifier instead of your Strength modifier to attack rolls with a glaive sized for you, even though it isn’t a light weapon. When wielding a glaive, you can treat it as a one-handed piercing or slashing melee weapon and as if you were not making attacks with your off-hand for all feats and class abilities that require such a weapon (such as a duelist’s or swashbuckler’s precise strike).
-        As a move action, you can shorten your grip on the glaive, treating it as though it lacked the reach weapon property. You can adjust your grip to grant the weapon the reach property as a move action.
         
         Virtuous Bravo
 
-        *Subtle Blade (Ex): At 11th level, while a swashbuckler has at least 1 panache point, she is immune to disarm, steal, and sunder combat maneuvers made against a light or one-handed piercing melee weapon she is wielding.
-        *Superior Feint (Ex): At 7th level, a swashbuckler with at least 1 panache point can, as a standard action, purposefully miss a creature she could make a melee attack against with a wielded light or one-handed piercing weapon. When she does, the creature is denied its Dexterity bonus to AC until the start of the swashbuckler’s next turn.
         *Swashbuckler’s Grace (Ex): At 7th level, while the swashbuckler has at least 1 panache point, she takes no penalty for moving at full speed when she uses Acrobatics to attempt to move through a threatened area or an enemy’s space.
         *Targeted Strike (Ex): At 7th level, as a full-round action the swashbuckler can spend 1 panache point to make an attack with a single light or one-handed piercing melee weapon that cripples part of a foe’s body. The swashbuckler chooses a part of the body to target. If the attack succeeds, in addition to the attack’s normal damage, the target suffers one of the following effects based on the part of the body targeted. If a creature doesn’t have one of the listed body locations, that body part cannot be targeted. Creatures that are immune to sneak attacks are also immune to targeted strikes. Items or abilities that protect a creature from critical hits also protect a creature from targeted strikes.
             *Arms: The target takes no damage from the attack, but it drops one carried item of the swashbuckler’s choice, even if the item is wielded with two hands. Items held in a locked gauntlet cannot be chosen.

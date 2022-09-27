@@ -24,6 +24,7 @@ using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using Kingmaker.Designers.Mechanics.Facts;
 using Shared;
 using CodexLib;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 
 namespace DarkCodex
 {
@@ -45,7 +46,7 @@ namespace DarkCodex
                 group: FeatureGroup.WitchHex
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(witch_class, 1, true),
-                Helper.CreatePrerequisiteArchetypeLevel(hexcrafter_class, 1, true)
+                Helper.CreatePrerequisiteArchetypeLevel(hexcrafter_class, 1, true, characterClass: Helper.ToRef<BlueprintCharacterClassReference>("45a4607686d96a1498891b3286121780"))
                 );
             witch_extra.Ranks = 10;
             witch_extra.m_AllFeatures = witch_selection.m_AllFeatures;
@@ -70,43 +71,76 @@ namespace DarkCodex
             /*
             Chanting and cursing, you put a hex on your enemy as part of your unarmed strike.
             Prerequisite: Hex class feature, Improved Unarmed Strike.
-            Benefit: When you gain this feat, choose one hex that you can use to affect no more than one opponent. If you make a successful unarmed strike against an opponent, in addition to dealing your unarmed strike damage, you can use a swift action to deliver the effects of the chosen hex to that opponent. Doing so does not provoke attacks of opportunity.
-            Special: You can take this feat multiple times. Each time you take it, you apply it to a different qualifying hex.
-             */
-        }
-
-        [PatchInfo(Severity.Create | Severity.Faulty, "Split Hex", "basic feat: Split Hex", false)]
-        public static void CreateSplitHex()
-        {
-            /*
-            You can split the effect of one of your targeted hexes, affecting another creature you can see.
-            Prerequisites: Witch level 10th.
-            Benefit: When you use one of your hexes (not a major hex or a grand hex) that targets a single creature, you can choose another creature within 30 feet of the first target to also be targeted by the hex.
+            Benefit: Choose one hex that you can use to affect no more than one opponent. If you make a successful unarmed strike against an opponent, in addition to dealing your unarmed strike damage, you can use a swift action to deliver the effects of the chosen hex to that opponent. Doing so does not provoke attacks of opportunity.
              */
 
-            /*
-            You can split the effect of one of your targeted hexes, affecting another creature you can see.
-            Prerequisites: Split hex, caster level 18th.
-            Benefit: When you use one of your major hexes (not a grand hex) that targets a creature, you can choose another creature within 30 feet of the first target to also be targeted by the major hex. 
-             */
+            var act = Helper.CreateBlueprintActivatableAbility(
+                "HexStrikeActivatable",
+                out var _, 
+                "Hex Strike",
+                "Chanting and cursing, you put a hex on your enemy as part of your unarmed strike. Benefit: Choose one hex that you can use to affect no more than one opponent. If you make a successful unarmed strike against an opponent, in addition to dealing your unarmed strike damage, you can use a swift action to deliver the effects of the chosen hex to that opponent. Doing so does not provoke attacks of opportunity.",
+                icon: Helper.StealIcon("85067a04a97416949b5d1dbf986d93f3")
+                ).SetComponents(
+                new HexStrike()
+                );
 
             var feat = Helper.CreateBlueprintFeature(
+                "HexStrike"
+                ).SetUIData(act);
+        }
+
+        [PatchInfo(Severity.Create | Severity.WIP, "Split Hex", "basic feat: Split Hex, Split Major Hex", false)]
+        public static void CreateSplitHex()
+        {
+            var major = Helper.ToRef<BlueprintFeatureReference>("8ac781b33e380c84aa578f1b006dd6c5"); //WitchMajorHex
+            var grand = Helper.ToRef<BlueprintFeatureReference>("d24c2467804ce0e4497d9978bafec1f9"); //WitchGrandHex
+
+            var splitHex = Helper.CreateBlueprintFeature(
                 "SplitHex",
                 "Split Hex",
                 "When you use one of your hexes (not a major hex or a grand hex) that targets a single creature, you can choose another creature within 30 feet of the first target to also be targeted by the hex.",
                 group: FeatureGroup.Feat
                 ).SetComponents(
-                Helper.CreateDuplicateSpell(f => !f.IsAOE && f.Blueprint.SpellDescriptor.HasFlag(SpellDescriptor.Hex))
+                Helper.CreateDuplicateSpell(f => !f.IsAOE && f.Blueprint.SpellDescriptor.HasFlag(SpellDescriptor.Hex) && f.IsRank(max: 0)),
+                Helper.CreatePrerequisiteFeature(major)
                 );
 
-            // TODO: exclude major and grand
-            //foreach (var ab in Resource.Cache.Ability) 
-            //{
-            //}
+            var splitMajorHex = Helper.CreateBlueprintFeature(
+                "SplitMajorHex",
+                "Split Major Hex",
+                "When you use one of your major hexes (not a grand hex) that targets a creature, you can choose another creature within 30 feet of the first target to also be targeted by the major hex.",
+                group: FeatureGroup.Feat
+                ).SetComponents(
+                Helper.CreateDuplicateSpell(f => !f.IsAOE && f.Blueprint.SpellDescriptor.HasFlag(SpellDescriptor.Hex) && f.IsRank(min: 1, max: 1, ifEmpty: false)),
+                Helper.CreatePrerequisiteFeature(grand),
+                Helper.CreatePrerequisiteFeature(splitHex)
+                );
 
-#if DEBUG
-            Helper.AddFeats(feat); // TODO: bugtest split hex
-#endif
+            Helper.AddFeats(splitHex, splitMajorHex);
+
+            Main.RunLast("SplitHex", () =>
+            {
+                foreach (var feat in Resource.Cache.Feature)
+                {
+                    var preq = feat.GetComponent<PrerequisiteFeature>();
+                    if (preq == null)
+                        continue;
+
+                    int rank = preq.m_Feature == major ? 1 : preq.m_Feature == grand ? 2 : 0;
+                    if (rank == 0)
+                        continue;
+
+                    var addfacts = feat.GetComponent<AddFacts>();
+                    if (addfacts == null)
+                        continue;
+
+                    foreach (var fact in addfacts.m_Facts)
+                    {
+                        if (fact.Get() is BlueprintAbility ab)
+                            ab.AddComponents(new FeatureRank(rank));
+                    }
+                }
+            });
         }
 
         [PatchInfo(Severity.Create, "Cackle Activatable", "Cackle/Chant can be toggled to use move action passively", Requirement: typeof(Patch_ActivatableOnNewRound))]

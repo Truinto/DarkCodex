@@ -484,6 +484,7 @@ namespace Shared
 
             // MartialArt
             LoadSafe(MartialArt.CreateProdigiousTwoWeaponFighting);
+            LoadSafe(MartialArt.CreateBladedBrush);
 
             // Items
             LoadSafe(Items.PatchArrows);
@@ -510,6 +511,8 @@ namespace Shared
             LoadSafe(Mythic.CreateDemonLord);
             LoadSafe(Mythic.CreateMetamagicAdept);
             LoadSafe(Mythic.CreateMythicEschewMaterials);
+            LoadSafe(Mythic.CreateMythicCompanion);
+            LoadSafe(Mythic.CreateNotAChance);
             LoadSafe(Mythic.PatchKineticOvercharge);
             LoadSafe(Mythic.PatchLimitlessDemonRage);
             LoadSafe(Mythic.PatchUnstoppable);
@@ -520,10 +523,11 @@ namespace Shared
             LoadSafe(Mythic.PatchJudgementAura);
             LoadSafe(Mythic.PatchAscendantSummons);
             LoadSafe(Mythic.PatchVarious);
+            LoadSafe(Mythic.PatchAlwaysAChance);
 
             // Kineticist
             LoadSafe(Kineticist.CreateElementalScion);
-            LoadSafe(Kineticist.CreateElementalAscetic);
+            //LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixWallInfusion);
             LoadSafe(Kineticist.CreateKineticistBackground);
             LoadSafe(Kineticist.CreateMobileGatheringFeat);

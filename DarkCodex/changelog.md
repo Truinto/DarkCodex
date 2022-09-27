@@ -1,8 +1,15 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.4.2]
 - added 'body forms become immune to horrid wilting' to General: Various Tweaks
-- added Elemental Ascetic: new Kineticist archetype
+- added Bladed Brush: new combat feat #87
+- extended Mythic.PatchVarious with: allow Elemental Barrage on any damage trigger #136
+- included feats in gold dragon bonus feat
+- added Mythic Animal Companion, mythic feat: unlocks companion equipment slots #134
+- added Not A Chance: mythic ability: immunity to crits #133
+- fixed PatchAlwaysAChance not being called #137
+- added Split Hex
 
 ## [1.4.1]
 - fixed serialization issue

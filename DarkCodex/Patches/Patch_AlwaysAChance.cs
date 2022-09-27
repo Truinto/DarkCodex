@@ -6,6 +6,9 @@ using Shared;
 
 namespace DarkCodex
 {
+    /// <summary>
+    /// Patches to improve Always A Chance.
+    /// </summary>
     [HarmonyPatch]
     public class Patch_AlwaysAChance
     {

@@ -14,5 +14,6 @@ namespace CodexLib
         ParryUseAttackOfOpportunity,
         NoMaterialComponent,
         ProdigiousTWF,
+        NotAChance,
     }
 }
