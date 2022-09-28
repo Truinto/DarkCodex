@@ -464,6 +464,7 @@ namespace Shared
 
             // Spells - early
             LoadSafe(Spells.CreateBladedDash);
+            LoadSafe(Spells.PatchVarious);
 
             // General
             LoadSafe(General.CreatePreferredSpell);

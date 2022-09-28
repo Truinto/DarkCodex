@@ -5,9 +5,9 @@ How to add to your project
 -----------
 * Add CodexLib reference to your project.
 * Important! Set local copy to <b>false</b>. Manual copy CodexLib.dll into your mod folder. \
-![example group](../resources/localcopyfalse.png) \
+![example group](../resources/localcopyfalse.png)
 * In your entry method, make sure to call EnsureCodexLib() like so:
-```
+```csharp
 public static bool Load(UnityModManager.ModEntry modEntry)
 {
     try
@@ -25,30 +25,44 @@ public static bool Load(UnityModManager.ModEntry modEntry)
 private static void EnsureCodexLib(string modPath)
 {
     if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("CodexLib, ")))
+    {
+        PrintDebug("CodexLib already loaded.");
         return;
+    }
 
     string path = null;
     Version version = null;
+    modPath = new DirectoryInfo(modPath).Parent.FullName;
+    PrintDebug("Looking for CodexLib in " + modPath);
 
-    foreach (string cPath in Directory.GetFiles(Directory.GetParent(modPath).FullName, "CodexLib.dll"))
+    foreach (string cPath in Directory.GetFiles(modPath, "CodexLib.dll", SearchOption.AllDirectories))
     {
-        var cVersion = new Version(FileVersionInfo.GetVersionInfo(cPath).FileVersion);
-        if (version == null || cVersion > version)
+        try
         {
-            path = cPath;
-            version = cVersion;
+            var cVersion = new Version(FileVersionInfo.GetVersionInfo(cPath).FileVersion);
+            PrintDebug($"Found: newer={version == null || cVersion > version} version={cVersion} @ {cPath}");
+            if (version == null || cVersion > version)
+            {
+                path = cPath;
+                version = cVersion;
+            }
         }
+        catch (Exception) { }
     }
 
     if (path != null)
     {
-        Print("Loading CodexLib " + path);
-        AppDomain.CurrentDomain.Load(File.ReadAllBytes(path));
+        try
+        {
+            Print("Loading CodexLib " + path);
+            AppDomain.CurrentDomain.Load(File.ReadAllBytes(path));
+        }
+        catch (Exception) { }
     }
 }
 ```
 * Important! Before patching blueprints set the scope to your project. This is where guids will be resolved. If you use CodexLib's components, you should also run MasterPatch.
-```
+```csharp
 using var scope = new Scope(modPath: Main.ModPath, logger: Main.logger, harmony: Main.harmony, allowGuidGeneration: false);
 MasterPatch.Run();
 ```

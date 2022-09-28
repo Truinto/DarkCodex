@@ -98,5 +98,15 @@ namespace DarkCodex
             normal.Add(2, "4d72e1e7bd6bc4f4caaea7aa43a14639", "25a5013493bdcf74bb2424532214d0c8"); // Magus, Bard
             greater.Add(5, "4d72e1e7bd6bc4f4caaea7aa43a14639", "25a5013493bdcf74bb2424532214d0c8"); // Magus, Bard
         }
+
+        [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]
+        public static void PatchVarious()
+        {
+            // life bubble is AOE again
+            var bubble = Helper.Get<BlueprintAbility>("265582bc494c4b12b5860b508a2f89a2"); //LifeBubble
+            bubble.Range = AbilityRange.Personal;
+            if (bubble.GetComponent<AbilityTargetsAround>() == null)
+                bubble.AddComponents(new AbilityTargetsAround { m_Radius = 20.Feet(), m_TargetType = TargetType.Ally, m_Condition = new() });
+        }
     }
 }

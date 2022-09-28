@@ -2637,42 +2637,42 @@ namespace CodexLib
             switch (dataprovider)
             {
                 case BlueprintUnitFact bp:
-                    bp.m_DisplayName = displayname;
-                    bp.m_Description = description;
-                    bp.m_Icon = icon;
+                    bp.m_DisplayName = displayname ?? bp.m_DisplayName;
+                    bp.m_Description = description ?? bp.m_Description;
+                    bp.m_Icon = icon ?? bp.m_Icon;
                     break;
                 case BlueprintAbilityResource bp:
-                    bp.LocalizedName = displayname;
-                    bp.LocalizedDescription = description;
-                    bp.m_Icon = icon;
+                    bp.LocalizedName = displayname ?? bp.LocalizedName;
+                    bp.LocalizedDescription = description ?? bp.LocalizedDescription;
+                    bp.m_Icon = icon ?? bp.m_Icon;
                     break;
                 case BlueprintCharacterClass bp:
-                    bp.LocalizedName = displayname;
-                    bp.LocalizedDescription = description;
-                    bp.m_Icon = icon;
+                    bp.LocalizedName = displayname ?? bp.LocalizedName;
+                    bp.LocalizedDescription = description ?? bp.LocalizedDescription;
+                    bp.m_Icon = icon ?? bp.m_Icon;
                     break;
                 case BlueprintItem bp:
-                    bp.m_DisplayNameText = displayname;
-                    bp.m_DescriptionText = description;
-                    bp.m_Icon = icon;
+                    bp.m_DisplayNameText = displayname ?? bp.m_DisplayNameText;
+                    bp.m_DescriptionText = description ?? bp.m_DescriptionText;
+                    bp.m_Icon = icon ?? bp.m_Icon;
                     break;
                 case BlueprintArchetype bp:
-                    bp.LocalizedName = displayname;
-                    bp.LocalizedDescription = description;
-                    bp.m_Icon = icon;
+                    bp.LocalizedName = displayname ?? bp.LocalizedName;
+                    bp.LocalizedDescription = description ?? bp.LocalizedDescription;
+                    bp.m_Icon = icon ?? bp.m_Icon;
                     break;
                 case BlueprintSpellbook bp:
-                    bp.Name = displayname;
+                    bp.Name = displayname ?? bp.Name;
                     break;
                 case BlueprintWeaponType bp:
-                    bp.m_DefaultNameText = displayname;
-                    bp.m_DescriptionText = description;
-                    bp.m_Icon = icon;
+                    bp.m_DefaultNameText = displayname ?? bp.m_DefaultNameText;
+                    bp.m_DescriptionText = description ?? bp.m_DescriptionText;
+                    bp.m_Icon = icon ?? bp.m_Icon;
                     break;
                 case BlueprintKingdomBuff bp:
-                    bp.DisplayName = displayname;
-                    bp.Description = description;
-                    bp.Icon = icon;
+                    bp.DisplayName = displayname ?? bp.DisplayName;
+                    bp.Description = description ?? bp.Description;
+                    bp.Icon = icon ?? bp.Icon;
                     break;
                 default:
                     PrintDebug($"unknown DataProvider: {dataprovider.GetType().FullName}");

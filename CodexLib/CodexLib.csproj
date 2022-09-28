@@ -16,7 +16,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.3" ExcludeAssets="runtime" />
+	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Common References -->

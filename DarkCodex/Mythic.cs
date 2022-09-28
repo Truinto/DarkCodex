@@ -805,7 +805,7 @@ namespace DarkCodex
             Main.Patch(typeof(Patch_AlwaysAChance));
         }
 
-        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, allow Elemental Barrage on any damage", true)]
+        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, allow Elemental Barrage on any damage, Elemental Rampage works with Limitless Rage", true)]
         public static void PatchVarious()
         {
             // allow quicken metamagic on demon teleport
@@ -818,6 +818,13 @@ namespace DarkCodex
                 if (comp is AddOutgoingDamageTrigger trigger)
                     trigger.CheckAbilityType = false;
             }
+
+            // elemental rampage works with limitless rage
+            Helper.AppendAndReplace(
+                ref Helper.Get<BlueprintFeature>("5cb58e6e406525342842a073fb70d068").GetComponent<PrerequisiteFeaturesFromList>().m_Features, //LimitlessRage
+                Helper.ToRef<BlueprintFeatureReference>("64c5dfe0ba664dd38b7e914ef0912a1c")); //ElementalRampagerRampageFeature
+            Helper.Get<BlueprintActivatableAbility>("5814af7966274c2f9f0456c5f4ab271c").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint 
+                = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
         }
 
         #region Helper

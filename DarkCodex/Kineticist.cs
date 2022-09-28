@@ -1207,16 +1207,16 @@ namespace DarkCodex
                 "Elemental Flurry",
                 "At 1st level, an elemental ascetic gains Improved Unarmed Strike as a bonus feat. He gains the kinetic fist form infusion and it costs 0 points of burn instead of 1 point of burn. When using the kinetic fist form infusion with a full attack, he can make a flurry of blows as the monk class feature. He must use only his fists to make this flurry, no matter what other abilities he possesses.\nLike a monk, he can use this ability only when unarmored, not using a shield, and unencumbered. He can’t use his kinetic blast without a form infusion, nor can he ever use his kinetic blast with the chain, extended range, extreme range, foe throw, flurry of blasts, many throw, or snake form infusions, or with any other form infusion that requires a ranged attack roll or ranged touch attack roll."
                 ).SetComponents(
-                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = new BlueprintAbilityReference[0] }
+                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1 }
                 );
 
-            var wisdom_feat = Helper.CreateBlueprintFeature(
-                "AsceticElementalWisdom",
-                "Elemental Wisdom",
+            var wisdom_feat = burnFeature.Clone(
+                "AsceticElementalWisdom"
+                ).SetUIData(
+                "Elemental Wisdom", 
                 "An elemental ascetic can use his Wisdom modifier instead of his Constitution modifier to determine the DCs of Constitution-based wild talents, the duration of wild talents with a Constitution-based duration, and his bonus on concentration checks for wild talents.\n"
-                ).SetComponents(
-                burnFeature.GetComponent<AddKineticistPart>().Clone(c => c.MainStat = StatType.Wisdom)
                 );
+            wisdom_feat.GetComponent<AddKineticistPart>().MainStat = StatType.Wisdom;
 
             var pfist = Helper.CreateBlueprintActivatableAbility(
                 "AsceticPowerfulFistActivatable",
@@ -1237,7 +1237,7 @@ namespace DarkCodex
                 );
 
             ascetic.SetAddFeatures(
-                Helper.CreateLevelEntry(1, Tree.KineticFist.Feature, flurry_feat, wisdom_feat, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
+                Helper.CreateLevelEntry(1, wisdom_feat, flurry_feat, Tree.KineticFist.Feature, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
                 Helper.CreateLevelEntry(2, "2615c5f87b3d72b42ac0e73b56d895e0"), //MonkACBonusUnlock
                 Helper.CreateLevelEntry(5, power_feat)
                 );

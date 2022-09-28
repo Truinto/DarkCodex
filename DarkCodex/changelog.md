@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.4.3]
+- extended Mythic.PatchVarious with: elemental rampage works with limitless rage #138
+- fixed issue with loading CodexLib
+- fixed life bubble is AOE again
+
 ## [1.4.2]
 - added 'body forms become immune to horrid wilting' to General: Various Tweaks
 - added Bladed Brush: new combat feat #87

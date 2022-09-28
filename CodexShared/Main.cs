@@ -86,25 +86,39 @@ namespace Shared
         private static void EnsureCodexLib(string modPath)
         {
             if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("CodexLib, ")))
+            {
+                PrintDebug("CodexLib already loaded.");
                 return;
+            }
 
             string path = null;
             Version version = null;
+            modPath = new DirectoryInfo(modPath).Parent.FullName;
+            PrintDebug("Looking for CodexLib in " + modPath);
 
-            foreach (string cPath in Directory.GetFiles(Directory.GetParent(modPath).FullName, "CodexLib.dll"))
+            foreach (string cPath in Directory.GetFiles(modPath, "CodexLib.dll", SearchOption.AllDirectories))
             {
-                var cVersion = new Version(FileVersionInfo.GetVersionInfo(cPath).FileVersion);
-                if (version == null || cVersion > version)
+                try
                 {
-                    path = cPath;
-                    version = cVersion;
+                    var cVersion = new Version(FileVersionInfo.GetVersionInfo(cPath).FileVersion);
+                    PrintDebug($"Found: newer={version == null || cVersion > version} version={cVersion} @ {cPath}");
+                    if (version == null || cVersion > version)
+                    {
+                        path = cPath;
+                        version = cVersion;
+                    }
                 }
+                catch (Exception) { }
             }
 
             if (path != null)
             {
-                Print("Loading CodexLib " + path);
-                AppDomain.CurrentDomain.Load(File.ReadAllBytes(path));
+                try
+                {
+                    Print("Loading CodexLib " + path);
+                    AppDomain.CurrentDomain.Load(File.ReadAllBytes(path));
+                }
+                catch (Exception) { }
             }
         }
 

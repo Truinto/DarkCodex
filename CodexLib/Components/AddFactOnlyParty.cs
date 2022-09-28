@@ -30,7 +30,7 @@ namespace CodexLib
 
         public override void OnActivate()
         {
-            if (!(Game.Instance.Player?.Party?.Any() ?? false))
+            if (!(Game.Instance.Player?.Party?.Any() ?? false) || this.Owner == null)
                 return;
 
             bool isParty = this.Owner.IsPet || this.Owner.IsMainCharacter || this.Owner.IsCustomCompanion() || this.Owner.IsStoryCompanion();
