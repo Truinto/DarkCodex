@@ -20,6 +20,7 @@ global using Kingmaker.Localization;
 global using Kingmaker.PubSubSystem;
 global using Kingmaker.RuleSystem;
 global using Kingmaker.RuleSystem.Rules;
+global using Kingmaker.RuleSystem.Rules.Damage;
 global using Kingmaker.UnitLogic;
 global using Kingmaker.UnitLogic.Abilities;
 global using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -48,6 +49,7 @@ using Kingmaker.UI;
 using Kingmaker.UI.Common;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using UnityModManagerNet;
 
 namespace Shared
@@ -424,7 +426,7 @@ namespace Shared
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
-            PatchSafe(typeof(Patch_FixLoadCrash1));
+            //PatchSafe(typeof(Patch_FixLoadCrash1));
             LoadSafe(General.CreateBardStopSong);
 
             // Cache
@@ -444,7 +446,7 @@ namespace Shared
             PatchSafe(typeof(Patch_ActivatableHandleUnitRunCommand));
             PatchSafe(typeof(Patch_ActivatableOnTurnOn));
             PatchSafe(typeof(Patch_ActivatableTryStart));
-            PatchSafe(typeof(Patch_ResourcefulCaster));            
+            PatchSafe(typeof(Patch_ResourcefulCaster));
             PatchSafe(typeof(Patch_PreferredSpellMetamagic));
             PatchSafe(typeof(Patch_FixAreaDoubleDamage));
             PatchSafe(typeof(Patch_FixAreaEndOfTurn));
@@ -606,11 +608,56 @@ namespace Shared
             patchInfos.Update();
 #if DEBUG
             PrintDebug("Running in debug. " + Main.IsInGame);
+            ExportContent();
             Helper.ExportStrings();
 #endif
         }
 
         #endregion
+
+        private static void ExportContent()
+        {
+            try
+            {
+                string path = Path.Combine(Main.ModPath, "readme.link");
+                if (!File.Exists(path))
+                    return;
+                path = File.ReadAllText(Path.Combine(Main.ModPath, "readme.link"));
+                path = path.Trim();
+                if (!File.Exists(path))
+                    return;
+
+                var org = File.ReadAllLines(path).ToList();
+                var res = new List<string>(org.Count + 10);
+
+                for (int i = 0; i < org.Count; i++)
+                {
+                    res.Add(org[i]);
+                    if (org[i] == "Content")
+                    {
+                        res.Add("-----------");
+                        res.Add("| Option | Description | HB | Status |");
+                        res.Add("|--------|-------------|----|--------|");
+
+                        foreach (var info in patchInfos)
+                            if (!info.IsEvent && !info.IsHidden)
+                                res.Add($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
+
+                        res.Add("");
+
+                        for (; i < org.Count; i++) // skip forward until empty line is found
+                            if (org[i] == "")
+                                break;
+                    }
+                }
+
+                if (org.Count != res.Count || !org.SequenceEqual(res))
+                {
+                    File.WriteAllLines(path, res);
+                }
+            }
+            catch (Exception e) { PrintException(e); }
+        }
 
         private static void ExportPlayerData()
         {

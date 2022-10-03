@@ -635,7 +635,7 @@ namespace DarkCodex
             soulability.AddComponents(new AbilityRequirementOnlyCombat { Not = true });
         }
 
-        [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast, apply PsychokineticistStat setting", true)]
+        [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast, apply PsychokineticistStat setting, fixed Negative Energy Mastery", true)]
         public static void PatchVarious()
         {
             // allow bowling infusion on sandblasts
@@ -653,6 +653,11 @@ namespace DarkCodex
                 var presource = Helper.Get<BlueprintAbilityResource>("4b8b95612529a8640bb6e07c580b947b"); //PsychokineticistBurnResource
                 presource.m_MaxAmount.ResourceBonusStat = pstat;
             }
+
+            // fixed Negative Energy Mastery
+            var negativeEnergy = Helper.Get<BlueprintBuff>("c02841956a5744741a68af974789d06d").GetComponent<AdditionalDiceOnAttack>();
+            negativeEnergy.DamageType.Type = DamageType.Energy;
+            negativeEnergy.DamageType.Energy = DamageEnergyType.NegativeEnergy;
         }
 
         [PatchInfo(Severity.Fix, "Spell-like Blasts", "makes blasts register as spell like, instead of supernatural", false, Priority: 300)]
@@ -1260,6 +1265,7 @@ namespace DarkCodex
 
             Main.RunLast("Elemental Flurry", () =>
             {
+                // TODO: only disallow form infusions with ranged attack roll; specify applicable in flurry_feat
                 // disallow all form infusions
                 foreach (var infusion in Tree.GetTalents(form: true))
                 {

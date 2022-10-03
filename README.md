@@ -41,6 +41,7 @@ Content
 |General.CreateHeritage|adds Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity|:house:|:heavy_check_mark:|
 |General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
 |General.CreateOpportuneParry|combat feat: duelist parry by expending Attack of Opportunities|:house:|:heavy_check_mark:|
+|General.CreatePoison|WIP|:house:|:construction:|
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
 |General.CreateSacredSummons|basic feat: requires Channel Energy, summons act immediately|:book:|:heavy_check_mark:|
 |General.CreateSpellPerfection|basic feat: Spell Perfection|:book:|:heavy_check_mark:|
@@ -52,13 +53,12 @@ Content
 |General.FixSpellElementChange|fixes Elemental Bloodline and Spell Focus interaction|:book:|:heavy_check_mark:|
 |Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:construction:|
 |Items.CreateImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|
-|Items.CreateKineticArtifact|new weapon for Kineticists|:house:|:heavy_check_mark:|
 |Items.PatchArrows|will pick up non-magical arrows after combat|:book:|:heavy_check_mark:|
 |Items.PatchTerendelevScale|make the revive scale usable once per day|:house:|:heavy_check_mark:|
 |Kineticist.CreateAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:book:|:heavy_check_mark:|
 |Kineticist.CreateBladeRushInfusion|infusion: Blade Rush, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Kineticist.CreateChainInfusion|infusion: Chain|:book:|:heavy_check_mark:|
-|Kineticist.CreateElementalScion|new Kineticist archetype|:book:|:construction:|
+|Kineticist.CreateElementalScion|new Kineticist archetype|:book:|:heavy_check_mark:|
 |Kineticist.CreateExpandedElement|basic feat: select extra elements|:house:|:heavy_check_mark:|
 |Kineticist.CreateExtraWildTalentFeat|basic feat: Extra Wild Talent; required by other kineticist features!|:book:|:heavy_check_mark:|
 |Kineticist.CreateHurricaneQueen|Wild Talent: Hurricane Queen|:book:|:heavy_check_mark:|
@@ -71,16 +71,18 @@ Content
 |Kineticist.CreateSelectiveMetakinesis|gain selective metakinesis at level 7|:house:|:heavy_check_mark:|
 |Kineticist.CreateVenomInfusion|infusion: applies sickened or poisons the target|:book:|:heavy_check_mark:|
 |Kineticist.CreateWhipInfusion|infusion: Kinetic Whip, expands Kinetic Knight|:book:|:heavy_check_mark:|
+|Kineticist.FixExpandedElementFocus|fix missing talents and mastery when picking the same element focus multiple times|:book:|:heavy_check_mark:|
 |Kineticist.PatchDarkElementalist|faster animation and use anywhere, but only out of combat|:house:|:heavy_check_mark:|
 |Kineticist.PatchDemonCharge|Demon Charge also gathers power|:house:|:heavy_check_mark:|
 |Kineticist.PatchGatherPower|Kineticist Gather Power can be used manually|:book:|:heavy_check_mark:|
-|Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting|:house:|:heavy_check_mark:|
+|Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting, fixed Negative Energy Mastery|:house:|:heavy_check_mark:|
 |Kineticist.FixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
 |Kineticist.FixBloodKineticist|seeks to fix bugs in Blood Kineticist|:book:|:construction:|
-|Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:x:|
+|Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:heavy_check_mark:|
 |Magus.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
 |Magus.FixHexcrafterProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Magus.PatchSwordSaint|allow Sword Saint to pick any weapon focus|:house:|:heavy_check_mark:|
+|MartialArt.CreateProdigiousTwoWeaponFighting|combat feat: use STR for TWF and always treat offhand as light|:book:|:heavy_check_mark:|
 |Monk.CreateFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
 |Mythic.CreateDemonLord|adds features of Demon Lords to the mythic Demon progression: teleport at will, ...|:house:|:construction:|
 |Mythic.CreateDemonMastery|mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect|:house:|:heavy_check_mark:|
@@ -98,7 +100,9 @@ Content
 |Mythic.CreateLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:house:|:heavy_check_mark:|
 |Mythic.CreateMagicItemAdept|mythic feat: trinket items use character level as caster level|:house:|:heavy_check_mark:|
 |Mythic.CreateMetamagicAdept|mythic feat: allow spontaneous spellcasters to apply metamagic without casting time penalty|:house:|:heavy_check_mark:|
+|Mythic.CreateMythicCompanion|mythic feat: unlocks companion equipment slots|:house:|:heavy_check_mark:|
 |Mythic.CreateMythicEschewMaterials|mythic ability: you cast spells without expending material components|:house:|:heavy_check_mark:|
+|Mythic.CreateNotAChance|mythic ability: immunity to crits|:house:|:heavy_check_mark:|
 |Mythic.CreateResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
@@ -108,22 +112,24 @@ Content
 |Mythic.PatchJudgementAura|Everlasting Judgement also applies to Judgement Aura|:house:|:heavy_check_mark:|
 |Mythic.PatchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:house:|:heavy_check_mark:|
 |Mythic.PatchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:house:|:heavy_check_mark:|
-|Mythic.PatchRangingShots|doesn't get weaker when hitting|:house:|:construction:|
+|Mythic.PatchRangingShots|doesn't get weaker when hitting|:house:|:heavy_check_mark:|
 |Mythic.PatchUnstoppable|Unstoppable works against more conditions like stun, daze, and confusion|:house:|:heavy_check_mark:|
-|Mythic.PatchVarious|allow quicken on Demon Teleport|:house:|:heavy_check_mark:|
+|Mythic.PatchVarious|allow quicken on Demon Teleport, allow Elemental Barrage on any damage, Elemental Rampage works with Limitless Rage|:house:|:heavy_check_mark:|
 |Mythic.PatchWanderingHex|can swap hex at will|:house:|:heavy_check_mark:|
+|Mythic.PatchAlwaysAChance|'Always A Chance' succeeds on a natural one and applies to most d20 rolls|:house:|:heavy_check_mark:|
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
+|Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
-|Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:construction:|
+|Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:heavy_check_mark:|
 |Witch.CreateCackleActivatable|Cackle/Chant can be toggled to use move action passively|:house:|:heavy_check_mark:|
 |Witch.CreateExtraHex|basic feat: Extra Hex|:book:|:heavy_check_mark:|
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
-|Witch.CreateSplitHex|basic feat: Split Hex|:book:|:x:|
+|Witch.CreateSplitHex|basic feat: Split Hex, Split Major Hex|:book:|:construction:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
 |Patch.Patch_AbilityRange|bonus spell range equal to 5 feet per 2 caster levels|:house:|:heavy_check_mark:|
 |Patch.Patch_ActivatableHandleUnitRunCommand|fixes move actions disabling the activatable (since we have 2 of them)|:book:|:heavy_check_mark:|

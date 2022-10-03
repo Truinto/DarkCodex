@@ -58,7 +58,7 @@ namespace CodexLib
 
         public void OnEventDidTrigger(RuleHealDamage evt)
         {
-            if (evt.Value > 0 && evt.HealFormula != DiceFormula.Zero)
+            if (evt.Value > 0 && evt.HealFormula.BaseFormula != DiceFormula.Zero)
                 this.Owner.Buffs.RemoveFact(this.Buff);
         }
 

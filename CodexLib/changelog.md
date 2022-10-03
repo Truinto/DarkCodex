@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.3.0]
+- fixes for 2.0 release
+
 ## [1.2.0]
 - compiled for 1.4
 - fixed serialization issue

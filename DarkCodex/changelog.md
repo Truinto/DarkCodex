@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.0]
+- fixed Feral Combat with Elemental Fist
+- extended Kineticist.PatchVarious with: fixed Negative Energy Mastery #140
+- fixes for 2.0 release
+
 ## [1.4.3]
 - extended Mythic.PatchVarious with: elemental rampage works with limitless rage #138
 - fixed issue with loading CodexLib

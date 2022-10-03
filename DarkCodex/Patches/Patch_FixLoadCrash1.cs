@@ -5,8 +5,8 @@ using Shared;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Hidden | Severity.Harmony, "Patch: Fix Load Crash", "removes trap data during save load to prevent a specific crash; toggle with debug flag 2", false)]
-    [HarmonyPatch(typeof(AreaDataStash), nameof(AreaDataStash.GetJsonForArea))]
+    //[PatchInfo(Severity.Hidden | Severity.Harmony, "Patch: Fix Load Crash", "removes trap data during save load to prevent a specific crash; toggle with debug flag 2", false)]
+    //[HarmonyPatch(typeof(AreaDataStash), nameof(AreaDataStash.GetJsonForArea))]
     public class Patch_FixLoadCrash1
     {
         public static void Postfix(ref string __result)

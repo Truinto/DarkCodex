@@ -60,6 +60,34 @@ namespace CodexLib
             return this;
         }
 
+        public TranspilerData Seek(Type type, string name)
+        {
+            var mi = type.GetMethod(name, Helper.BindingAll) ?? type.GetProperty(name, Helper.BindingAll).GetMethod;
+
+            if (mi != null)
+            {
+                while (Index < Code.Count)
+                {
+                    ++Index;
+                    if (Code[Index].Calls(mi))
+                        return this;
+                }
+            }
+
+            var fi = type.GetField(name, Helper.BindingAll);
+            if (fi != null)
+            {
+                while (Index < Code.Count)
+                {
+                    ++Index;
+                    if (Code[Index].Calls(fi))
+                        return this;
+                }
+            }
+
+            return this;
+        }
+
         public TranspilerData First()
         {
             Index = 0;

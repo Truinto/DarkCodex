@@ -63,21 +63,13 @@ namespace CodexLib
             for (int i = 0; i < bundles.Count; i++)
             {
                 var dmg = bundles[i].Dice;
-                var dice = dmg.m_Dice;
+                var baseValue = dmg.ModifiedValue;
 
-                for (int j = 0; i < num.Value; j++)
-                {
-                    if (dice == DiceType.D6)
-                        dice = DiceType.D8;
-                    else if (dice == DiceType.D8)
-                        dice = DiceType.D10;
-                    else if (dice == DiceType.D10)
-                        dice = DiceType.D12;
-                    else
-                        break;
-                }
+                int value = (int)baseValue.m_Dice;
+                if (value < 6)
+                    continue;
 
-                bundles[i].ReplaceDice(dmg);
+                dmg.Modify(new(baseValue.m_Rolls, (value + num.Value * 2).ToDiceType()), this.Fact);
             }
         }
 

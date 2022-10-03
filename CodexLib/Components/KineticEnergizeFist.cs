@@ -145,9 +145,9 @@ namespace CodexLib
                         continue;
 
                     if (empower)
-                        chunks[i].EmpowerBonus = 1.5f;
+                        chunks[i].EmpowerBonus.Set(1.5f, act);
                     if (maximize)
-                        chunks[i].CalculationType = DamageCalculationType.Maximized;
+                        chunks[i].CalculationType.Set(DamageCalculationType.Maximized, act);
                 }
             }
 

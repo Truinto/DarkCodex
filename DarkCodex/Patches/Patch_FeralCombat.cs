@@ -33,7 +33,7 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), new Type[] { typeof(RuleAttackWithWeapon) })]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
         {
             List<CodeInstruction> list = instr.ToList();
             MethodInfo reference = AccessTools.PropertyGetter(typeof(BlueprintItemWeapon), "Category");
@@ -137,6 +137,25 @@ namespace DarkCodex
             __result = true;
             return false;
 
+        }
+
+        [HarmonyPatch(typeof(AdditionalDiceOnAttack), nameof(AdditionalDiceOnAttack.CheckCondition), typeof(RuleAttackRoll))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // elemental fist
+        {
+            return Transpiler1(instructions);
+            //var data = new TranspilerData(instructions, generator, original);
+            //data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
+            //data.Index += 2;
+            //data.InsertBefore(Call);
+            //return data.Code;
+        }
+
+        [HarmonyPatch(typeof(AdditionalDiceOnAttack), nameof(AdditionalDiceOnAttack.CheckCondition), typeof(RuleAttackWithWeapon))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler6(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // elemental fist
+        {
+            return Transpiler1(instructions);
         }
 
     }

@@ -20,7 +20,7 @@ namespace CodexLib
 
         public PhysicalDamage GetPhysical()
         {
-            return new PhysicalDamage(new DiceFormula(Dice, DiceType), Bonus, PhysicalDamageForm.Slashing);
+            return new PhysicalDamage(new(new DiceFormula(Dice, DiceType)), Bonus, PhysicalDamageForm.Slashing);
         }
 
         public DirectDamage GetDirect()

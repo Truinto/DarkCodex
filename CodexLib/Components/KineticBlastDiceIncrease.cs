@@ -35,21 +35,21 @@ namespace CodexLib
             for (int i = 0; i < bundles.Count; i++)
             {
                 var dmg = bundles[i].Dice;
-                switch (dmg.m_Dice)
+                var baseValue = dmg.ModifiedValue;
+                switch (baseValue.Dice)
                 {
                     case DiceType.D6:
-                        dmg.m_Dice = DiceType.D8;
+                        dmg.Modify(new(baseValue.Rolls, DiceType.D8), this.Fact);
                         break;
                     case DiceType.D8:
-                        dmg.m_Dice = DiceType.D10;
+                        dmg.Modify(new(baseValue.Rolls, DiceType.D10), this.Fact);
                         break;
                     case DiceType.D10:
-                        dmg.m_Dice = DiceType.D12;
+                        dmg.Modify(new(baseValue.Rolls, DiceType.D12), this.Fact);
                         break;
                     default:
                         continue;
                 }
-                bundles[i].ReplaceDice(dmg);
             }
         }
 

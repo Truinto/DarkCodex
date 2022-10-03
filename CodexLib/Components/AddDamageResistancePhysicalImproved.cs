@@ -16,7 +16,7 @@ namespace CodexLib
     /// </summary>
     public class AddDamageResistancePhysicalImproved : AddDamageResistancePhysical
     {
-        private static PhysicalDamage physical = new(new DiceFormula(0, 0), 0);
+        private static PhysicalDamage physical = new(new(new DiceFormula(0, 0)), 0, 0);
 
         public override int CalculateValue(ComponentRuntime runtime)
         {

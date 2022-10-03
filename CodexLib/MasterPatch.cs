@@ -44,12 +44,13 @@ namespace CodexLib
         /// </summary>
         public static void Run()
         {
-            if (PatchList == null)
+            if (PatchList == null || PatchList.Count == 0)
                 return;
 
             var harmony = new Harmony("CodexLib");
             foreach (var patch in PatchList)
                 PatchSafe(harmony, patch);
+            PatchList.Clear();
             PatchList = null;
             harmony = null;
 

@@ -4191,6 +4191,24 @@ namespace CodexLib
             stats.m_WeaponCache[num] = localized;
         }
 
+        public static DiceType ToDiceType(this int value)
+        {
+            switch (value)
+            {
+                case <= 0: return DiceType.Zero;
+                case 1: return DiceType.One;
+                case 2: return DiceType.D2;
+                case 3: return DiceType.D3;
+                case <= 5: return DiceType.D4;
+                case <= 7: return DiceType.D6;
+                case <= 9: return DiceType.D8;
+                case <= 11: return DiceType.D10;
+                case <= 19: return DiceType.D12;
+                case <= 50: return DiceType.D20;
+                default: return DiceType.D100;
+            }
+        }
+
         #endregion
 
         #region ToReference
