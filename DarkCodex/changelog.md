@@ -1,6 +1,14 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.1]
+- fixed Bladed Brush for Spell Combat, Duelist Parry, and Duelist's Deflect Arrows #144
+- split boundless healing and boundless injury into separate feats #143
+- added fix for fortune hex
+- added background: Fate’s Favored #146
+- fixed ice tomb DC stacking, added to winter witch selection #149
+- fixed Patch_ChangeSpellElement overwriting channel energy #148
+
 ## [1.5.0]
 - fixed Feral Combat with Elemental Fist
 - extended Kineticist.PatchVarious with: fixed Negative Energy Mastery #140

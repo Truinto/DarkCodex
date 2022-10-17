@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("CodexLib")]
 [assembly: AssemblyDescription("A shared library")]
 
-[assembly: AssemblyVersion("1.3.0.2")]
-[assembly: AssemblyFileVersion("1.3.0.2")]
+[assembly: AssemblyVersion("1.3.0.6")]
+[assembly: AssemblyFileVersion("1.3.0.6")]
 [assembly: ComVisible(false)]
 [assembly: Guid("aaa3ac08-6a5c-495f-b997-3a3b3bc4fc84")]

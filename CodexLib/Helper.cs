@@ -77,6 +77,8 @@ using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using static Kingmaker.UnitLogic.Commands.Base.UnitCommand;
 using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCastSpell;
 using Kingmaker.UnitLogic.Class.Kineticist;
+using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.Controllers.Dialog;
 
 namespace CodexLib
 {
@@ -322,27 +324,6 @@ namespace CodexLib
             return false;
         }
 
-        public static bool IsStloc(this TranspilerData data, Type type)
-        {
-            var code = data.Current;
-            if (!code.IsStloc())
-                return false;
-
-            if (code.operand is LocalBuilder lb)
-                return lb.LocalType == type;
-
-            if (code.opcode == OpCodes.Stloc_0)
-                return data.Locals[0].LocalType == type;
-            if (code.opcode == OpCodes.Stloc_0)
-                return data.Locals[1].LocalType == type;
-            if (code.opcode == OpCodes.Stloc_0)
-                return data.Locals[2].LocalType == type;
-            if (code.opcode == OpCodes.Stloc_0)
-                return data.Locals[3].LocalType == type;
-
-            return false;
-        }
-
         public static Type GetLocType(this CodeInstruction code, IList<LocalVariableInfo> locals)
         {
             if (code.operand is LocalBuilder lb)
@@ -399,35 +380,6 @@ namespace CodexLib
 
                 yield return line;
             }
-        }
-
-        /// <summary>
-        /// Injects function to access local variable. TranspilerData.Current must point to 'Stloc' opcode.
-        /// </summary>
-        /// <param name="func"><b>void Function(object instance, ref T value)</b></param>
-        public static void EditLocal(this TranspilerData data, Delegate func)
-        {
-            // dont't forget ref!
-            // Type.GetElementType()
-            // Type.MakeByRefType()
-
-            // delegate sanity check
-            var mi = func.GetMethodInfo();
-            var parameters = mi.GetParameters();
-            if (parameters.Length != 2 || !parameters[1].ParameterType.IsByRef)
-                throw new ArgumentException("Delegate must have exactly 2 arguments and the second argument must be by ref!");
-
-            var line = data.Current;
-            var type = parameters[1].ParameterType.GetElementType();
-            if (type != line.GetLocType(data.Locals))
-                throw new ArgumentException("CodeInstruction.operand must match delegate by ref type!");
-
-            if (data.IsStatic)
-                data.InsertAfter(OpCodes.Ldnull);
-            else
-                data.InsertAfter(OpCodes.Ldarg_0);
-            data.InsertAfter(OpCodes.Ldloca, line.operand);
-            data.InsertAfter(OpCodes.Call, mi);
         }
 
         /// <summary>
@@ -1884,12 +1836,6 @@ namespace CodexLib
             }
 
             return result;
-
-            //var result = Activator.CreateInstance<T>();
-            //var fields = typeof(T).GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-            //foreach (var field in fields)
-            //    field.SetValue(result, field.GetValue(obj));
-            //return result;
         }
 
         /// <summary>
@@ -2043,16 +1989,14 @@ namespace CodexLib
         private static BlueprintFeatureSelection _shamanhexes;
         private static BlueprintFeatureSelection _hexcrafterhexes;
         private static BlueprintFeatureSelection _tricksterhexes;
+        private static BlueprintFeatureSelection _winterhexes;
         public static void AddHex(BlueprintFeature hex, bool allowShaman = true)
         {
-            if (_witchhexes == null)
-                _witchhexes = Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
-            if (_shamanhexes == null)
-                _shamanhexes = Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7");
-            if (_hexcrafterhexes == null)
-                _hexcrafterhexes = Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf");
-            if (_tricksterhexes == null)
-                _tricksterhexes = Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452");
+            _witchhexes ??= Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f");
+            _shamanhexes ??= Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7");
+            _hexcrafterhexes ??= Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf");
+            _tricksterhexes ??= Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452");
+            _winterhexes ??= Get<BlueprintFeatureSelection>("b921af3627142bd4d9cf3aefb5e2610a");
 
             var reference = hex.ToRef();
 
@@ -2061,6 +2005,7 @@ namespace CodexLib
                 AppendAndReplace(ref _shamanhexes.m_AllFeatures, reference);
             AppendAndReplace(ref _hexcrafterhexes.m_AllFeatures, reference);
             AppendAndReplace(ref _tricksterhexes.m_AllFeatures, reference);
+            AppendAndReplace(ref _winterhexes.m_AllFeatures, reference);
         }
 
         private static BlueprintFeatureSelection _infusions;
@@ -2528,15 +2473,36 @@ namespace CodexLib
             _fieldRuleReasonAbility.SetValue(reason, abilityData);
         }
 
+        public static RuleType ToRuleType(this RulebookEvent rule)
+        {
+            if (rule is RuleAttackRoll)
+                return RuleType.AttackRoll;
+            if (rule is RuleSkillCheck)
+                return RuleType.SkillCheck;
+            if (rule is RuleInitiativeRoll)
+                return RuleType.Initiative;
+            if (rule is RuleCombatManeuver)
+                return RuleType.Maneuver;
+            if (rule is RuleSpellResistanceCheck)
+                return RuleType.SpellResistance;
+            if (rule is RuleDispelMagic)
+                return RuleType.DispelMagic;
+            if (rule is RuleCheckConcentration)
+                return RuleType.Concentration;
+            return 0;
+        }
+
         #endregion
 
         #region Spells
 
+        private static BlueprintParametrizedFeature[] _spells1;
         public static void Add(this BlueprintSpellList spellList, BlueprintAbility spell, int level)
         {
             if (level < 0 || level > 10)
                 throw new ArgumentOutOfRangeException();
 
+            // ensure spell list has enough levels
             if (spellList.SpellsByLevel.Length <= level)
             {
                 var spells = new SpellLevelList[11];
@@ -2545,22 +2511,29 @@ namespace CodexLib
                 spellList.SpellsByLevel = spells;
             }
 
-            spellList.SpellsByLevel[level].m_Spells.Add(spell.ToRef());
+            // add new spell to spell list
+            spellList.SpellsByLevel[level].m_Spells.Add(spell.ToReference<BlueprintAbilityReference>());
 
+            // attach spell list to new spell
             spell.AddComponents(
                 CreateSpellListComponent(spellList.ToReference<BlueprintSpellListReference>(), level)
                 );
 
-            // TODO: cache blueprints
-            var specializationFirst = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35");  //SpellSpecializationFirst
-            AppendAndReplace(ref specializationFirst.BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
-
-            var spellSelection = Helper.Get<BlueprintFeatureSelection>("fe67bc3b04f1cd542b4df6e28b6e0ff5"); // SpellSpecializationSelection
-            foreach (var feature in spellSelection.m_AllFeatures)
+            // add new spell to feature's spell selections
+            if (_spells1 == null)
             {
-                if (feature.Get() is BlueprintParametrizedFeature specialization)
-                    specialization.BlueprintParameterVariants = specializationFirst.BlueprintParameterVariants;
+                _list.Add(Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35")); //SpellSpecializationFirst
+                foreach (var feature in Helper.Get<BlueprintFeatureSelection>("fe67bc3b04f1cd542b4df6e28b6e0ff5").m_AllFeatures) //SpellSpecializationSelection
+                    if (feature.Get() is BlueprintParametrizedFeature specialization)
+                        _list.Add(specialization);
+
+                _spells1 = new BlueprintParametrizedFeature[_list.Count];
+                _list.CopyTo(_spells1);
+                _list.Clear();
             }
+            var newAllSpells = Append(_spells1[0].BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
+            for (int i = 0; i < _spells1.Length; i++)
+                _spells1[i].BlueprintParameterVariants = newAllSpells;
         }
 
         public static void Add(this BlueprintAbility spell, int level, params AnyRef[] blueprintSpellList)
@@ -4209,6 +4182,29 @@ namespace CodexLib
             }
         }
 
+        public static DamageTypeMix ToDamageTypeMix(this IEnumerable<BaseDamage> bundle)
+        {
+            var result = DamageTypeMix.None;
+            foreach (var dmg in bundle)
+            {
+                if (dmg is PhysicalDamage physical)
+                {
+                    result |= (DamageTypeMix)(int)physical.Form;
+                    result |= (DamageTypeMix)((int)physical.m_Materials << 22);
+                }
+                else if (dmg is EnergyDamage energy)
+                    result |= (DamageTypeMix)(1 << ((int)energy.EnergyType + 3));
+                else if (dmg is ForceDamage)
+                    result |= DamageTypeMix.Force;
+                else if (dmg is DirectDamage)
+                    result |= DamageTypeMix.Direct;
+                else if (dmg is UntypedDamage)
+                    result |= DamageTypeMix.Untyped;
+            }
+
+            return result;
+        }
+
         #endregion
 
         #region ToReference
@@ -4238,40 +4234,6 @@ namespace CodexLib
         }
 
         private static List<object> _list = new();
-
-        private static void AppendAndReplace<T>(ref T[] orig, params object[] objs) where T : BlueprintReferenceBase, new()
-        {
-            // TODO:
-        }
-
-        private static void AppendAndReplace<T>(ref T[] orig, object obj) where T : BlueprintReferenceBase, new()
-        {
-            // TODO:
-            T t;
-            var list = new List<object>();
-
-            list.AddRange(orig);
-
-            if (obj is IEnumerable<object> range)
-            {
-                foreach (var sub in range)
-                {
-                    t = ToRef<T>(sub);
-                    if (t != null)
-                        list.Add(t);
-                }
-            }
-            else
-            {
-
-            }
-
-
-
-            T[] result = new T[list.Count];
-            list.CopyTo(result);
-            orig = result;
-        }
 
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
         {

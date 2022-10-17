@@ -72,7 +72,7 @@
 	</ItemGroup>
 
 	<!-- Publicize -->
-	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="Clean">
+	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
 		<ItemGroup>
 			<PublicizeInput Include="$(WrathManaged)\Assembly-CSharp.dll" />
 			<PublicizeInput Include="$(WrathManaged)\UnityModManager\0Harmony.dll" />

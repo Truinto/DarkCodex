@@ -5,6 +5,7 @@ global using Kingmaker;
 global using Kingmaker.Blueprints;
 global using Kingmaker.Blueprints.Classes;
 global using Kingmaker.Blueprints.Classes.Selection;
+global using Kingmaker.Blueprints.Classes.Spells;
 global using Kingmaker.Blueprints.Facts;
 global using Kingmaker.Blueprints.Items.Armors;
 global using Kingmaker.Blueprints.Root;
@@ -45,11 +46,11 @@ global using System.Reflection;
 global using System.Reflection.Emit;
 global using UnityEngine;
 using DarkCodex;
+using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.UI;
 using Kingmaker.UI.Common;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text;
 using UnityModManagerNet;
 
 namespace Shared
@@ -421,8 +422,9 @@ namespace Shared
             PatchSafe(typeof(Patch_Prebuilds));
             //PatchSafe(typeof(Patch_SaveExtension));
             PatchSafe(typeof(Patch_FactSelectionParameterized));
-
             LoadSafe(General.CreatePoison);
+            LoadSafe(Kineticist.CreateElementalAscetic);
+            //DefaultJsonSettings.DefaultSettings.Converters.Add(new LocalizedStringConverter());
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -525,8 +527,9 @@ namespace Shared
             LoadSafe(Mythic.PatchWanderingHex);
             LoadSafe(Mythic.PatchJudgementAura);
             LoadSafe(Mythic.PatchAscendantSummons);
-            LoadSafe(Mythic.PatchVarious);
             LoadSafe(Mythic.PatchAlwaysAChance);
+            LoadSafe(Mythic.PatchElementalBarrage);
+            LoadSafe(Mythic.PatchVarious);
 
             // Kineticist
             LoadSafe(Kineticist.CreateElementalScion);
@@ -560,6 +563,7 @@ namespace Shared
             LoadSafe(Witch.CreateIceTomb);
             LoadSafe(Witch.CreateSplitHex);
             LoadSafe(Witch.FixBoundlessHealing);
+            LoadSafe(Witch.FixFortuneHex);
 
             // Magus
             LoadSafe(Magus.CreateAccursedStrike);
@@ -607,9 +611,10 @@ namespace Shared
             patchInfos.Sort(); // sort info list for GUI
             patchInfos.Update();
 #if DEBUG
-            PrintDebug("Running in debug. " + Main.IsInGame);
+            PrintDebug("Running in debug.");
             ExportContent();
             Helper.ExportStrings();
+            KineticistTree.Instance.Validate();
 #endif
         }
 

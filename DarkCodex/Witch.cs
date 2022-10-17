@@ -255,6 +255,7 @@ namespace DarkCodex
                 Helper.CreateAbilityTargetHasFact(true, icetomb_cooldown.ToRef2()),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Hex | SpellDescriptor.Cold | SpellDescriptor.Paralysis)
                 ).TargetEnemy();
+            SetHexParams(icetomb_ab);
 
             var icetomb = Helper.CreateBlueprintFeature(
                 "WitchHexIceTombFeature",
@@ -282,5 +283,54 @@ namespace DarkCodex
             auto.Add(heal2);
             Helper.AppendAndReplace(ref boundless.GetComponent<AddUnlimitedSpell>().m_Abilities, heal1, heal2);
         }
+
+        [PatchInfo(Severity.Fix, "Fix Fortune Hex", "Fortune hex will only trigger once per type of roll and per round", false)]
+        public static void FixFortuneHex()
+        {
+            // note: Normally this triggers with every check. RAW it should trigger only once per round.
+            // But since selecting which roll is most important is near impossible during gameplay, a compromise is made.
+            // With this it triggeres once per round for each of the different types of rolls. For a maximum of 4 times:
+            // AttackRoll, Maneuver, SavingThrow, SkillCheck
+
+            var buff = Helper.Get<BlueprintBuff>("9121b87785f37f94e861b03a103d03e2"); //WitchHexFortuneBuff
+            buff.SetComponents(
+                new ModifyD20Once(buff.GetComponent<ModifyD20>())
+                );
+            buff.m_Description.CreateString("The witch can grant a creature within 30 feet a bit of good luck for 1 {g|Encyclopedia:Combat_Round}round{/g}. The target can call upon this good luck, allowing him to {g|Encyclopedia:Dice}reroll{/g}, taking the better result.\nThis works once per round for each of these types of checks:\n- {g|Encyclopedia:Attack}attack rolls{/g}\n- {g|Encyclopedia:Combat_Maneuvers}combat maneuvers{/g}\n- {g|Encyclopedia:Skills}skill{/g} or {g|Encyclopedia:Ability_Scores}ability checks{/g}\n- {g|Encyclopedia:Saving_Throw}saving throws{/g}\nAt 8th level and 16th level, the duration of this hex is extended by 1 round. Once a creature has benefited from the fortune hex, it cannot benefit from it again for 24 hours.");
+
+            buff = Helper.Get<BlueprintBuff>("32ba2d292233b7a4cbcc3884496a68f4"); //ShamanHexFortuneBuff
+            buff.SetComponents(
+                new ModifyD20Once(buff.GetComponent<ModifyD20>())
+                );
+            buff.m_Description.CreateString("The shaman can grant a creature within 30 feet a bit of good luck for 1 {g|Encyclopedia:Combat_Round}round{/g}. The target can call upon this good luck, allowing him to {g|Encyclopedia:Dice}reroll{/g}, taking the better result.\nThis works once per round for each of these types of checks:\n- {g|Encyclopedia:Attack}attack rolls{/g}\n- {g|Encyclopedia:Combat_Maneuvers}combat maneuvers{/g}\n- {g|Encyclopedia:Skills}skill{/g} or {g|Encyclopedia:Ability_Scores}ability checks{/g}\n- {g|Encyclopedia:Saving_Throw}saving throws{/g}\nAt 8th level and 16th level, the duration of this hex is extended by 1 round. Once a creature has benefited from the fortune hex, it cannot benefit from it again for 24 hours.");
+        }
+
+        #region Helper
+
+        private static void SetHexParams(BlueprintAbility hex)
+        {
+            hex.AddComponents(new ContextSetAbilityParams
+            {
+                DC = new ContextValue
+                {
+                    ValueType = ContextValueType.CasterCustomProperty,
+                    m_CustomProperty = Helper.ToRef<BlueprintUnitPropertyReference>("bdc230ce338f427ba74de65597b0d57a")
+                },
+                CasterLevel = new ContextValue
+                {
+                    ValueType = ContextValueType.CasterCustomProperty,
+                    m_CustomProperty = Helper.ToRef<BlueprintUnitPropertyReference>("2d2243f4f3654512bdda92e80ef65b6d")
+                },
+                SpellLevel = new ContextValue
+                {
+                    ValueType = ContextValueType.CasterCustomProperty,
+                    m_CustomProperty = Helper.ToRef<BlueprintUnitPropertyReference>("75efe8b64a3a4cd09dda28cef156cfb5")
+                },
+                Concentration = -1,
+            });
+        }
+
+        #endregion
+
     }
 }

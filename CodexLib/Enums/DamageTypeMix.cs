@@ -17,6 +17,7 @@ namespace CodexLib
         Slashing = 1 << 2,
 
         Energy = Fire | Cold | Sonic | Electricity | Acid | NegativeEnergy | PositiveEnergy | Holy | Unholy | Divine | Magic,
+        EnergyPrimary = Fire | Cold | Sonic | Electricity | Acid,
         Fire = 1 << 3,
         Cold = 1 << 4,
         Sonic = 1 << 5,
@@ -40,9 +41,11 @@ namespace CodexLib
         Direct = 1 << 20,
         Untyped = 1 << 21,
 
-        _23 = 1 << 22,
-        _24 = 1 << 23,
-        _25 = 1 << 24,
+        Material = ColdIron | Silver | Adamantite,
+        ColdIron = 1 << 22,
+        Silver = 1 << 23,
+        Adamantite = 1 << 24,
+
         _26 = 1 << 25,
         _27 = 1 << 26,
         _28 = 1 << 27,

@@ -76,12 +76,12 @@ namespace DarkCodex
         public static bool Prefix3(RuleCalculateAbilityParams evt, IncreaseSpellDescriptorCasterLevel __instance)
         {
             if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
-                return false;
+                return true;
 
-            if (evt.TryGetCustomData<SpellDescriptor>(Const.KeyChangeElement, out var descriptor))
-                descriptor = (evt.Spell.SpellDescriptor & ~AnyElement) | descriptor;
-            else
-                descriptor = evt.Spell.SpellDescriptor;
+            if (!evt.TryGetCustomData<SpellDescriptor>(Const.KeyChangeElement, out var descriptor))
+                return true;
+
+            descriptor = (evt.Spell.SpellDescriptor & ~AnyElement) | descriptor;
 
             if (descriptor.HasAnyFlag(__instance.Descriptor))
                 evt.AddBonusCasterLevel(__instance.BonusCasterLevel, __instance.ModifierDescriptor);

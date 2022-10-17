@@ -1,4 +1,5 @@
-﻿using Kingmaker.Blueprints.Classes.Prerequisites;
+﻿using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -309,8 +310,9 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Expanded Element", "basic feat: select extra elements", true, Priority: 300)]
-        public static void CreateExpandedElement() // TODO: compositebuff grant admixture if both wood/void features are picked
+        public static void CreateExpandedElement()
         {
+            // note: maybe make compositebuff grant admixture if both wood/void features are picked
             var t = Kineticist.Tree;
 
             // make sure progression always grants blast feature (basic only)
@@ -381,14 +383,18 @@ namespace DarkCodex
             Helper.AddFeats(expandedElement);
 
             // change prerequisites of wild talents, check for blasts instead of elemental focus since Expanded Element doesn't grant focus
-            foreach (var talent in t.GetWildTalents())
+            foreach (var talent in t.GetTalents(utility: true))
             {
-                var fromlist = talent.GetComponent<PrerequisiteFeaturesFromList>()?.m_Features;
+                var talent2 = talent.Feature.Get();
+                if (talent2 == null)
+                    continue;
+
+                var fromlist = talent2.GetComponent<PrerequisiteFeaturesFromList>()?.m_Features;
                 if (fromlist != null)
                     for (int i = 0; i < fromlist.Length; i++)
                         swap(ref fromlist[i]);
 
-                foreach (var preq in talent.GetComponents<PrerequisiteFeature>())
+                foreach (var preq in talent2.GetComponents<PrerequisiteFeature>())
                     swap(ref preq.m_Feature);
 
                 void swap(ref BlueprintFeatureReference original)
@@ -1124,6 +1130,7 @@ namespace DarkCodex
                 );
 
             Helper.AddInfusion(feat);
+            Tree.KineticFist.Feature.SetReference(feat);
         }
 
         [PatchInfo(Severity.Create, "Energize Weapon", "infusion", false)]
@@ -1147,6 +1154,7 @@ namespace DarkCodex
                 );
 
             Helper.AddInfusion(feat);
+            Tree.EnergizeWeapon.Feature.SetReference(feat);
         }
 
         [PatchInfo(Severity.Create, "Fix Expanded Element", "fix missing talents and mastery when picking the same element focus multiple times", false, Priority: 300)]
@@ -1159,7 +1167,7 @@ namespace DarkCodex
                 ).SetComponents(
                 new KineticExpandedMastery()
                 );
-            mastery.m_AllFeatures = Tree.GetTalents(form: true, substance: true, wild: true).Select(s => s.Feature).ToArray();
+            mastery.m_AllFeatures = Tree.GetTalents(form: true, substance: true, utility: true).Select(s => s.Feature).ToArray();
 
             foreach (var focus in Tree.GetFocus())
             {
@@ -1173,7 +1181,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create, "Elemental Ascetic", "new Kineticist archetype", false)]
+        [PatchInfo(Severity.Create | Severity.WIP | Severity.Hidden, "Elemental Ascetic", "new Kineticist archetype", false)]
         public static void CreateElementalAscetic()
         {
             var burnFeature = Helper.Get<BlueprintFeature>("57e3577a0eb53294e9d7cc649d5239a3");
@@ -1212,13 +1220,13 @@ namespace DarkCodex
                 "Elemental Flurry",
                 "At 1st level, an elemental ascetic gains Improved Unarmed Strike as a bonus feat. He gains the kinetic fist form infusion and it costs 0 points of burn instead of 1 point of burn. When using the kinetic fist form infusion with a full attack, he can make a flurry of blows as the monk class feature. He must use only his fists to make this flurry, no matter what other abilities he possesses.\nLike a monk, he can use this ability only when unarmored, not using a shield, and unencumbered. He can’t use his kinetic blast without a form infusion, nor can he ever use his kinetic blast with the chain, extended range, extreme range, foe throw, flurry of blasts, many throw, or snake form infusions, or with any other form infusion that requires a ranged attack roll or ranged touch attack roll."
                 ).SetComponents(
-                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1 }
+                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = Tree.DefaultAbility.Variants.ToArray() }
                 );
 
             var wisdom_feat = burnFeature.Clone(
                 "AsceticElementalWisdom"
                 ).SetUIData(
-                "Elemental Wisdom", 
+                "Elemental Wisdom",
                 "An elemental ascetic can use his Wisdom modifier instead of his Constitution modifier to determine the DCs of Constitution-based wild talents, the duration of wild talents with a Constitution-based duration, and his bonus on concentration checks for wild talents.\n"
                 );
             wisdom_feat.GetComponent<AddKineticistPart>().MainStat = StatType.Wisdom;
@@ -1265,26 +1273,28 @@ namespace DarkCodex
 
             Main.RunLast("Elemental Flurry", () =>
             {
-                // TODO: only disallow form infusions with ranged attack roll; specify applicable in flurry_feat
-                // disallow all form infusions
+                // disallow all form infusions with ranged attack rolls
                 foreach (var infusion in Tree.GetTalents(form: true))
                 {
-                    var feat = infusion.Feature.Get();
-                    if (feat == null || Tree.KineticFist.Feature.Is(feat))
+                    if (!infusion.RequiresRangedAttackRoll)
                         continue;
-                    feat.AddComponents(Helper.CreatePrerequisiteNoArchetype(ascetic.ToRef(), Tree.Class));
+
+                    var feat = infusion.Feature.Get();
+                    if (feat == null)
+                        continue;
+
+                    feat.AddComponents(Helper.CreatePrerequisiteNoArchetype(Tree.ElementalAscetic, Tree.Class));
                 }
 
                 // hide base form
-                foreach (var blast in Tree.GetAll(true, true))
+                foreach (var variant in Tree.DefaultAbility.Variants)
                 {
-                    var basic = blast.BaseAbility.Get();
-                    if (basic == null || !basic.HasVariants)
+                    var ab = variant.Get();
+                    if (ab == null)
                         continue;
 
-                    basic.AbilityVariants.Variants.First().AddComponents(Helper.CreateAbilityShowIfCasterHasFact(flurry_feat, true));
+                    ab.AddComponents(Helper.CreateAbilityShowIfCasterHasFact(flurry_feat, true));
                 }
-
             });
         }
 

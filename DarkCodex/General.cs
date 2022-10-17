@@ -330,9 +330,11 @@ namespace DarkCodex
             fright.AddComponents(Helper.CreateSpellDescriptorComponent(SpellDescriptor.Polymorph));
         }
 
-        [PatchInfo(Severity.Create, "Backgrounds", "basic feat: Additional Traits\ntraits: Magical Lineage, Metamagic Master", false)]
+        [PatchInfo(Severity.Create, "Backgrounds", "basic feat: Additional Traits\ntraits: Magical Lineage, Metamagic Master, Fate’s Favored", false)]
         public static void CreateBackgrounds()
         {
+            var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
+
             /*
 
             Magical Knack: Magic Traits
@@ -355,8 +357,11 @@ namespace DarkCodex
             Inspired by Greatness: Campaign Trait
             Choose one spell you can cast. From now on, you always cast this spell at +1 caster level.
 
+            Fate’s Favored: Faith Trait
+            The fates watch over you.
+            Benefit: Whenever you are under the effect of a luck bonus of any kind, that bonus increases by 1.
+
             */
-            var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
 
             var scholarMetamagic = Helper.CreateBlueprintParametrizedFeature(
                 "BackgroundScholarMagicalLineage",
@@ -383,9 +388,23 @@ namespace DarkCodex
                 new MetamagicReduceCostParametrized() { Reduction = 2 }
                 );
 
+            var faithTrait1 = Helper.CreateBlueprintFeature(
+                "BackgroundFate’s Favored",
+                "Fate’s Favored",
+                "The fates watch over you.\nBenefit: Whenever you are under the effect of a luck bonus of any kind, that bonus increases by 1."
+                ).SetComponents(
+                new IncreaseModifierBonus(1, ModifierDescriptor.Luck)
+                );
+
+            // Magic Traits
             var scholar = Helper.Get<BlueprintFeatureSelection>("273fab44409035f42a7e2af0858a463d"); //BackgroundsScholarSelection
             scholar.Add(scholarMetamagic, scholarMetamagic2);
 
+            // Faith Traits
+            var faith = Helper.Get<BlueprintFeatureSelection>("c25021c31f302c6449ecdbc978822507"); //BackgroundsOblateSelection
+            faith.Add(faithTrait1);
+
+            // disallow picking the same group twice
             var backgroundSelection = Helper.Get<BlueprintFeatureSelection>("f926dabeee7f8a54db8f2010b323383c");    //BackgroundsBaseSelection
             foreach (var feat in backgroundSelection.m_AllFeatures)
             {
@@ -523,7 +542,7 @@ namespace DarkCodex
             Helper.AddCombatFeat(feat);
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Poisons", "WIP", true)]
+        [PatchInfo(Severity.Create | Severity.WIP | Severity.Hidden, "Poisons", "WIP", true)]
         public static void CreatePoison()
         {
             // Ability "Coat Weapon" -> applies Enchantment with fixed DC, stickiness -> on RuleDealDamage apply poison buff (bonus DC if already poisoned)

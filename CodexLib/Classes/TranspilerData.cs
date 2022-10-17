@@ -100,6 +100,117 @@ namespace CodexLib
             return this;
         }
 
+        public bool IsStloc(Type type)
+        {
+            var code = Current;
+            if (!code.IsStloc())
+                return false;
+
+            if (code.operand is LocalBuilder lb)
+                return lb.LocalType == type;
+
+            if (code.opcode == OpCodes.Stloc_0)
+                return Locals[0].LocalType == type;
+            if (code.opcode == OpCodes.Stloc_0)
+                return Locals[1].LocalType == type;
+            if (code.opcode == OpCodes.Stloc_0)
+                return Locals[2].LocalType == type;
+            if (code.opcode == OpCodes.Stloc_0)
+                return Locals[3].LocalType == type;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Injects function to access local variable. TranspilerData.Current must point to 'Stloc' opcode.
+        /// </summary>
+        /// <param name="func"><b>void Function(object instance, ref T value)</b></param>
+        public void EditLocal(Delegate func)
+        {
+            // dont't forget ref!
+            // Type.GetElementType()
+            // Type.MakeByRefType()
+
+            // delegate sanity check
+            var mi = func.GetMethodInfo();
+            var parameters = mi.GetParameters();
+            if (parameters.Length != 2 || !parameters[1].ParameterType.IsByRef)
+                throw new ArgumentException("Delegate must have exactly 2 arguments and the second argument must be by ref!");
+
+            var line = Current;
+            var type = parameters[1].ParameterType.GetElementType();
+            if (type != line.GetLocType(Locals))
+                throw new ArgumentException("CodeInstruction.operand must match delegate by ref type!");
+
+            if (IsStatic)
+                InsertAfter(OpCodes.Ldnull);
+            else
+                InsertAfter(OpCodes.Ldarg_0);
+            InsertAfter(OpCodes.Ldloca, line.operand);
+            InsertAfter(OpCodes.Call, mi);
+        }
+
+        public void NextJumpAlways()
+        {
+            for (; Index < Code.Count; Index++)
+            {
+                var line = Code[Index];
+
+                if (line.opcode.FlowControl != FlowControl.Cond_Branch)
+                    continue;
+
+                Helper.PrintDebug($"Transpiler NextJumpAlways {line.opcode} @{Index}");
+
+                if (line.opcode.OperandType == OperandType.InlineBrTarget)
+                    Code.Insert(++Index, new CodeInstruction(OpCodes.Br, line.operand));
+
+                else if (line.opcode.OperandType == OperandType.ShortInlineBrTarget)
+                    Code.Insert(++Index, new CodeInstruction(OpCodes.Br_S, line.operand));
+
+                else
+                    throw new Exception("Did not expect this OpCode");
+
+                return;
+            }
+        }
+
+        public void NextJumpNever()
+        {
+            for (; Index < Code.Count; Index++)
+            {
+                var line = Code[Index];
+
+                if (line.opcode.FlowControl != FlowControl.Cond_Branch)
+                    continue;
+
+                Helper.PrintDebug($"Transpiler NextJumpNever {line.opcode} @{Index}");
+
+                if (line.opcode.StackBehaviourPush != StackBehaviour.Push0)
+                    throw new Exception("Cond_Branch should not push onto stack");
+
+                var num = line.opcode.StackBehaviourPop.GetStackChange();
+                if (num == 0)
+                {
+                    line.opcode = OpCodes.Nop;
+                    line.operand = null;
+                }
+                else if (num == -1)
+                {
+                    line.opcode = OpCodes.Pop;
+                    line.operand = null;
+                }
+                else if (num == -2)
+                {
+                    line.opcode = OpCodes.Pop;
+                    line.operand = null;
+                    Code.Insert(Index++, new CodeInstruction(OpCodes.Pop));
+                }
+                else
+                    throw new Exception("Cond_Branch should not pop more than 2");
+
+                return;
+            }
+        }
         public CodeInstruction Current => Code[Index];
         public CodeInstruction Next => Index + 1 < Code.Count ? Code[Index + 1] : null;
         public CodeInstruction Previous => Index > 0 ? Code[Index - 1] : null;

@@ -106,13 +106,15 @@ namespace CodexLib
             if (wbp.FighterGroup == 0)
                 return;
 
-            var abilityData = new AbilityData(element.BaseAbility, evt.Initiator);
+            // get default blast for burn calculation
+            var ability = element.BaseAbility.Get()?.AbilityVariants?.m_Variants.FirstOrDefault()?.Get();
+            var abilityData = new AbilityData(ability, evt.Initiator);
 
             // handle burn
             if (!kineticist.IsBladeActivated)
             {
                 var cost = new KineticistAbilityBurnCost(blast: element.IsComposite ? 2 : 0, infusion: 1, metakinesis: 0, wildTalent: 0);
-                EventBus.RaiseEvent<IKineticistCalculateAbilityCostHandler>(h => h.HandleKineticistCalculateAbilityCost(evt.Initiator, element.BaseAbility, ref cost), true);
+                EventBus.RaiseEvent<IKineticistCalculateAbilityCostHandler>(h => h.HandleKineticistCalculateAbilityCost(evt.Initiator, ability, ref cost), true);
                 int total = cost.Total;
 
                 // if burn cannot be paid, remove damage and return

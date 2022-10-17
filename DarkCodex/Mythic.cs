@@ -635,13 +635,13 @@ namespace DarkCodex
                     7,
                 }
             });
+
+            feat.m_Description.CreateString(feat.m_Description + "\nGain cure wound bonus spells to your spellbooks.");
         }
 
-        [PatchInfo(Severity.Extend, "Boundless Injury", "Boundless Healing also applies to inflict wound spells and grants those to spellbooks", true)]
+        [PatchInfo(Severity.Extend, "Boundless Injury", "mythic ability: like Boundless Injury but for harm spells", true)]
         public static void PatchBoundlessInjury()
         {
-            var feat = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
-
             var addKnownSpells = new AddKnownSpellsAnyClass()
             {
                 Spells = new BlueprintAbilityReference[] {
@@ -654,7 +654,7 @@ namespace DarkCodex
                     Helper.ToRef<BlueprintAbilityReference>("820170444d4d2a14abc480fcbdb49535"), //7: InflictSeriousWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("5ee395a2423808c4baf342a4f8395b19"), //8: InflictCriticalWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("cc09224ecc9af79449816c45bc5be218"), //6: HarmCast
-                    //Helper.ToRef<BlueprintAbilityReference>("867524328b54f25488d371214eea0d90"), //9: HealMass
+                    //Helper.ToRef<BlueprintAbilityReference>(""), //9: HarmMass
                 },
                 Levels = new int[] {
                     1, //1: InflictLightWoundsCast
@@ -666,12 +666,27 @@ namespace DarkCodex
                     7,
                     8,
                     6, //6: HarmCast
-                    //9, //9: HealMass
+                    //9, //9: HarmMass
                 }
             };
-            feat.AddComponents(addKnownSpells);
-            feat.GetComponent<AutoMetamagic>().Abilities.AddRange(addKnownSpells.Spells);
-            Helper.AppendAndReplace(ref feat.GetComponent<AddUnlimitedSpell>().m_Abilities, addKnownSpells.Spells.StickyResolve());
+
+            //var feat = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
+            //feat.AddComponents(addKnownSpells);
+            //feat.GetComponent<AutoMetamagic>().Abilities.AddRange(addKnownSpells.Spells);
+            //Helper.AppendAndReplace(ref feat.GetComponent<AddUnlimitedSpell>().m_Abilities, addKnownSpells.Spells.StickyResolve());
+            //return;
+
+            var feat2 = Helper.CreateBlueprintFeature(
+                "BoundlessInjury",
+                "Boundless Injury",
+                "Your negative energy is no longer affected by common limitations.\nBenefit: Whenever you cast an inflict wounds {g|Encyclopedia:Spell}spell{/g} or another harming spell, it becomes {g|Encyclopedia:Reach}reach{/g} as though using the Reach Spell {g|Encyclopedia:Feat}feat{/g}. Also, the amount of {g|Encyclopedia:HP}hit points{/g} it now restores depends entirely on your {g|Encyclopedia:Caster_Level}caster level{/g} and disregards any limits in the original spell.\nReach Spell: You can alter a spell with a range of {g|Encyclopedia:TouchAttack}touch{/g}, close, or medium to increase its range by one range category, using the following order: touch, close, medium, and long.\nGain inflict wound bonus spells to your spellbooks."
+                ).SetComponents(
+                addKnownSpells,
+                Helper.CreateAutoMetamagic(Metamagic.Reach, addKnownSpells.Spells.ToList(), AutoMetamagic.AllowedType.SpellOnly),
+                new AddUnlimitedSpell { m_Abilities = addKnownSpells.Spells.StickyResolve() }
+                );
+
+            Helper.AddMythicTalent(feat2);
         }
 
         [PatchInfo(Severity.Create, "Resourceful Caster", "mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws", true, Requirement: typeof(Patch_ResourcefulCaster))]
@@ -805,19 +820,23 @@ namespace DarkCodex
             Main.Patch(typeof(Patch_AlwaysAChance));
         }
 
-        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, allow Elemental Barrage on any damage, Elemental Rampage works with Limitless Rage", true)]
-        public static void PatchVarious()
+        [PatchInfo(Severity.Extend | Severity.DefaultOff, "Elemental Barrage", "reverse patch, trigger of weapon attacks again", true)]
+        public static void PatchElementalBarrage()
         {
-            // allow quicken metamagic on demon teleport
-            Helper.Get<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
-                .AvailableMetamagic |= Metamagic.Quicken;
-
             // allow Elemental Barrage on any damage trigger
             foreach (var comp in Helper.Get<BlueprintFeature>("da56a1b21032a374783fdf46e1a92adb").ComponentsArray) //ElementalBarrage
             {
                 if (comp is AddOutgoingDamageTrigger trigger)
                     trigger.CheckAbilityType = false;
             }
+        }
+
+        [PatchInfo(Severity.Extend, "Various Tweaks", "allow quicken on Demon Teleport, allow Elemental Barrage on any damage, Elemental Rampage works with Limitless Rage", true)]
+        public static void PatchVarious()
+        {
+            // allow quicken metamagic on demon teleport
+            Helper.Get<BlueprintAbility>("b3e8e307811b2a24387c2c9226fb4c10") //DemonTeleport
+                .AvailableMetamagic |= Metamagic.Quicken;
 
             // elemental rampage works with limitless rage
             Helper.AppendAndReplace(

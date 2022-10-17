@@ -242,6 +242,8 @@ namespace DarkCodex
                 );
 
             Helper.AddCombatFeat(feat);
+
+            Main.Patch(typeof(Patch_BladedBrush));
         }
 
         /*

@@ -4,6 +4,7 @@ global using Kingmaker;
 global using Kingmaker.Blueprints;
 global using Kingmaker.Blueprints.Classes;
 global using Kingmaker.Blueprints.Classes.Selection;
+global using Kingmaker.Blueprints.Classes.Spells;
 global using Kingmaker.Blueprints.Facts;
 global using Kingmaker.Blueprints.Items.Armors;
 global using Kingmaker.Blueprints.Root;

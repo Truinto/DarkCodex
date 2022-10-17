@@ -35,13 +35,12 @@ Content
 |DEBUG.Enchantments|makes enchantments visible for items that don't usually display them|:book:|:construction:|
 |Enchantments.NameAll|gives all enchantments a name and description|:book:|:construction:|
 |General.CreateAbilityFocus|basic feat: Ability Focus, increase DC of one ability by +2|:book:|:x:|
-|General.CreateBackgrounds|basic feat: Additional Traits traits: Magical Lineage, Metamagic Master|:book:|:heavy_check_mark:|
+|General.CreateBackgrounds|basic feat: Additional Traits traits: Magical Lineage, Metamagic Master, Fate’s Favored|:book:|:heavy_check_mark:|
 |General.CreateBardStopSong|adds ability to stop any activatable immediately|:book:|:heavy_check_mark:|
 |General.CreateDirtyFighting|basic feat: Dirty Fighting; you don't suffer an attack of opportunity but incure a -4 penalty if you are not flanking and don't have the right maneuver feat|:book:|:heavy_check_mark:|
 |General.CreateHeritage|adds Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity|:house:|:heavy_check_mark:|
 |General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
 |General.CreateOpportuneParry|combat feat: duelist parry by expending Attack of Opportunities|:house:|:heavy_check_mark:|
-|General.CreatePoison|WIP|:house:|:construction:|
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
 |General.CreateSacredSummons|basic feat: requires Channel Energy, summons act immediately|:book:|:heavy_check_mark:|
 |General.CreateSpellPerfection|basic feat: Spell Perfection|:book:|:heavy_check_mark:|
@@ -108,7 +107,8 @@ Content
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.PatchAscendantSummons|buffed Ascendant Summons by +4 stats and DR 10|:house:|:heavy_check_mark:|
 |Mythic.PatchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:house:|:heavy_check_mark:|
-|Mythic.PatchBoundlessInjury|Boundless Healing also applies to inflict wound spells and grants those to spellbooks|:house:|:heavy_check_mark:|
+|Mythic.PatchBoundlessInjury|mythic ability: like Boundless Injury but for harm spells|:house:|:heavy_check_mark:|
+|Mythic.PatchElementalBarrage|reverse patch, trigger of weapon attacks again|:house:|:heavy_check_mark:|
 |Mythic.PatchJudgementAura|Everlasting Judgement also applies to Judgement Aura|:house:|:heavy_check_mark:|
 |Mythic.PatchKineticOvercharge|Kinetic Overcharge works always, not only while gathering power|:house:|:heavy_check_mark:|
 |Mythic.PatchLimitlessDemonRage|Limitless Rage also applies to Demon Rage|:house:|:heavy_check_mark:|
@@ -131,6 +131,7 @@ Content
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
 |Witch.CreateSplitHex|basic feat: Split Hex, Split Major Hex|:book:|:construction:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
+|Witch.FixFortuneHex|Fortune hex will only trigger once per type of roll and per round|:book:|:heavy_check_mark:|
 |Patch.Patch_AbilityRange|bonus spell range equal to 5 feet per 2 caster levels|:house:|:heavy_check_mark:|
 |Patch.Patch_ActivatableHandleUnitRunCommand|fixes move actions disabling the activatable (since we have 2 of them)|:book:|:heavy_check_mark:|
 |Patch.Patch_ActivatableOnNewRound|uses up move action when triggered; deactivates activatable if no action left|:book:|:heavy_check_mark:|
@@ -143,7 +144,7 @@ Content
 |Patch.Patch_DismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|
 |Patch.Patch_EnduringSpells|allows Enduring Spell to apply to spells from any source; fix for Magic Weapon|:book:|:heavy_check_mark:|
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
-|Patch.Patch_FeralCombat|collection of patches for Feral Combat Training|:book:|:heavy_check_mark:|
+|Patch.Patch_FactSelectionParameterized|what does this do? hide abilities unit doesn't have?|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaDoubleDamage|fixes area effects triggering twice when cast|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaEndOfTurn|in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round|:book:|:heavy_check_mark:|
 |Patch.Patch_FixPolymorphGather|makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade|:book:|:heavy_check_mark:|
