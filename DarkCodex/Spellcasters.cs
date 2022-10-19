@@ -2,6 +2,7 @@
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.ElementsSystem;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
@@ -21,7 +22,7 @@ namespace DarkCodex
         /// Known issues:
         /// - Seeker archetype gets too many charges of arcane adept (won't fix)
         /// </summary>
-        [PatchInfo(Severity.Fix, "Fix Bloodline: Arcane", "Arcane Apotheosis ignores metamagic casting time penalty", false)]
+        [PatchInfo(Severity.Create, "Fix Bloodline: Arcane", "Arcane Apotheosis ignores metamagic casting time penalty", false)]
         public static void FixBloodlineArcane()
         {
             var sorcerer = Helper.ToRef<BlueprintCharacterClassReference>("b3a505fb61437dc4097f43c3f8f9a4cf"); //SorcererClass
@@ -90,6 +91,49 @@ namespace DarkCodex
             trigger2.Range = AbilityRange.Personal;
             trigger2.CheckAbilityType = true;
             trigger2.Type = AbilityType.Spell;
+        }
+
+        [PatchInfo(Severity.Create, "Purifying Channel", "basic feat: channel positive energy deals fire damage", false)]
+        public static void CreatePurifyingChannel()
+        {
+            AnyRef feat = Helper.CreateBlueprintFeature(
+                "PurifyingChannel",
+                "Purifying Channel",
+                "When you channel positive energy to heal, one creature that you exclude from your channeling takes an amount of fire damage equal to the die result you roll for healing, and is dazzled for 1 round by the light of these flames. A successful saving throw against your channel energy halves the fire damage and negates the dazzled effect."
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature("fd30c69417b434d47b6b03b9c1f568ff"), //SelectiveChannel
+                Helper.CreatePrerequisiteStatValue(StatType.Charisma, 15)
+                );
+
+            var action = Helper.CreateConditional(
+                new Condition[] {
+                    new ContextConditionCasterHasFact { m_Fact = feat },
+                    new ContextConditionIsEnemy(),
+                    new ContextConditionSharedValueHigher { SharedValue = AbilitySharedValue.Duration, HigherOrEqual = 1, Not = true }
+                },
+                ifTrue: new GameAction[] {
+                    new ContextActionSavingThrow {
+                        Type = SavingThrowType.Will,
+                        Actions = Helper.CreateActionList(
+                            Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.CreateContextDiceValue(DiceType.Zero, 0, Helper.CreateContextValue(AbilitySharedValue.Heal)), false, true),
+                            Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionApplyBuff("df6d1025da07524429afbae248845ecc", Helper.CreateContextDurationValue(bonus: 1))), //DazzledBuff
+                            new ContextActionSpawnFx { PrefabLink = Helper.GetPrefabLink("61602c5b0ac793d489c008e9cb58f631") },
+                            new ContextActionChangeSharedValue { SharedValue = AbilitySharedValue.Duration, AddValue = 1 })
+                    },
+                });
+
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("f5fc9a1a2a3c1a946a31b320d1dd31b2").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("6670f0f21a1d7f04db2b8b115e8e6abf").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyPaladinHeal
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("574cf074e8b65e84d9b69a8c6f1af27b").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyEmpyrealHeal
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("0c0cf7fcb356d2448b7d57f2c4db3c0c").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyHospitalerHeal
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("b5cf6b80e65ea724d99dc9f4f8874fc3").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WarpriestChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("0fb4bb4eae14fe84e8b45d8ea207c4e1").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ShamanLifeSpiritChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("6bcaf7636388f2a40bce263372735eef").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WarpriestShieldbearerChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("d470eb6b3b31fde4bb44ec753de0b862").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WitchDoctorChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("75edd403e824aa048ab5d4827b803b08").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //HexChannelerChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("b9eca127dd82f554fb2ccd804de86cf6").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //OracleRevelationChannelAbility
+
+            Helper.AddFeats(feat);
         }
     }
 }

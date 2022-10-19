@@ -9,11 +9,34 @@ namespace CodexLib
 {
     public class TranspilerData
     {
+        #region Fields
+
         public List<CodeInstruction> Code;
         public int Index;
         public ILGenerator Generator;
         public MethodBase Original;
         public IList<LocalVariableInfo> Locals;
+
+        #endregion
+
+        #region Properties
+
+        public CodeInstruction Current => Code[Index];
+        public CodeInstruction Next => Index < Code.Count - 1 ? Code[Index + 1] : null;
+        public CodeInstruction Previous => Index > 0 ? Code[Index - 1] : null;
+        public bool IsStatic => Original.IsStatic;
+        public bool IsFirst => Index == 0;
+        public bool IsLast => Index >= Code.Count - 1;
+
+        public CodeInstruction this[int index]
+        {
+            get => Code[index];
+            set => Code[index] = value;
+        }
+
+        #endregion
+
+        #region Constructors
 
         public TranspilerData(IEnumerable<CodeInstruction> code, ILGenerator generator, MethodBase original) : this(code as List<CodeInstruction> ?? code.ToList(), generator, original)
         {
@@ -28,65 +51,9 @@ namespace CodexLib
             this.Locals = original.GetMethodBody()?.LocalVariables;
         }
 
-        public void InsertBefore(OpCode opcode, object operand = null)
-        {
-            Code.Insert(Index++, new CodeInstruction(opcode, operand));
-        }
+        #endregion
 
-        public void InsertAfter(OpCode opcode, object operand = null)
-        {
-            Code.Insert(++Index, new CodeInstruction(opcode, operand));
-        }
-
-        public TranspilerData Seek(Func<TranspilerData, bool> pred)
-        {
-            while (Index < Code.Count)
-            {
-                ++Index;
-                if (pred(this))
-                    break;
-            }
-            return this;
-        }
-
-        public TranspilerData Rewind(Func<TranspilerData, bool> pred)
-        {
-            while (Index >= 0)
-            {
-                --Index;
-                if (pred(this))
-                    break;
-            }
-            return this;
-        }
-
-        public TranspilerData Seek(Type type, string name)
-        {
-            var mi = type.GetMethod(name, Helper.BindingAll) ?? type.GetProperty(name, Helper.BindingAll).GetMethod;
-
-            if (mi != null)
-            {
-                while (Index < Code.Count)
-                {
-                    ++Index;
-                    if (Code[Index].Calls(mi))
-                        return this;
-                }
-            }
-
-            var fi = type.GetField(name, Helper.BindingAll);
-            if (fi != null)
-            {
-                while (Index < Code.Count)
-                {
-                    ++Index;
-                    if (Code[Index].Calls(fi))
-                        return this;
-                }
-            }
-
-            return this;
-        }
+        #region Positioning/Search
 
         public TranspilerData First()
         {
@@ -100,10 +67,108 @@ namespace CodexLib
             return this;
         }
 
+        public TranspilerData Offset(int offset)
+        {
+            Index += offset;
+            if (Index < 0)
+                Index = 0;
+            if (Index >= Code.Count)
+                Index = Code.Count - 1;
+            return this;
+        }
+
+        public TranspilerData Seek(Func<TranspilerData, bool> pred)
+        {
+            while (Index < Code.Count - 1)
+            {
+                ++Index;
+                if (pred(this))
+                    break;
+            }
+            return this;
+        }
+
+        public TranspilerData Rewind(Func<TranspilerData, bool> pred)
+        {
+            while (Index > 0)
+            {
+                --Index;
+                if (pred(this))
+                    break;
+            }
+            return this;
+        }
+
+        public TranspilerData Seek(Type type, string name)
+        {
+            var member = Helper.GetMemberInfo(type, name);
+            while (Index < Code.Count - 1)
+            {
+                ++Index;
+                if (Code[Index].Calls(member))
+                    return this;
+            }
+
+            return this;
+        }
+
+        public TranspilerData Rewind(Type type, string name)
+        {
+            var member = Helper.GetMemberInfo(type, name);
+            while (Index > 0)
+            {
+                --Index;
+                if (Code[Index].Calls(member))
+                    return this;
+            }
+
+            return this;
+        }
+
+        /// <summary>Seeks predicates in order.</summary>
+        /// <param name="onStart">True: place at first match<br/>False: place at last match</param>
+        /// <exception cref="ArgumentException">If no match found.</exception>
+        public TranspilerData Seek(bool onStart, params Func<TranspilerData, bool>[] pred)
+        {
+            int start = Index;
+
+            while (true)
+            {
+            lStart:
+                Seek(pred[0]);
+                if (Index >= Code.Count - 1)
+                    throw new ArgumentException("IsLast");
+
+                for (int i = 1; i < pred.Length; i++)
+                {
+                    ++Index;
+                    if (!pred[i](this))
+                    {
+                        Index = ++start;
+                        goto lStart;
+                    }
+                }
+
+                if (onStart)
+                    Index = start;
+                return this;
+            }
+        }
+
+        #endregion
+
+        #region Check
+
+        public bool Is(OpCode op) => Current.opcode == op;
+
+        public bool Is(OpCode op, object operand) => Current.opcode == op && Current.operand == operand;
+
+        public bool Calls(Type type, string name) => Helper.Calls(Current, _memberCache.Get(type, name));
+
         public bool IsStloc(Type type)
         {
             var code = Current;
-            if (!code.IsStloc())
+            if (!CodeInstructionExtensions.IsStloc(code))
                 return false;
 
             if (code.operand is LocalBuilder lb)
@@ -111,14 +176,28 @@ namespace CodexLib
 
             if (code.opcode == OpCodes.Stloc_0)
                 return Locals[0].LocalType == type;
-            if (code.opcode == OpCodes.Stloc_0)
+            if (code.opcode == OpCodes.Stloc_1)
                 return Locals[1].LocalType == type;
-            if (code.opcode == OpCodes.Stloc_0)
+            if (code.opcode == OpCodes.Stloc_2)
                 return Locals[2].LocalType == type;
-            if (code.opcode == OpCodes.Stloc_0)
+            if (code.opcode == OpCodes.Stloc_3)
                 return Locals[3].LocalType == type;
 
             return false;
+        }
+
+        #endregion
+
+        #region Manipulation
+
+        public void InsertBefore(OpCode opcode, object operand = null)
+        {
+            Code.Insert(Index++, new CodeInstruction(opcode, operand));
+        }
+
+        public void InsertAfter(OpCode opcode, object operand = null)
+        {
+            Code.Insert(++Index, new CodeInstruction(opcode, operand));
         }
 
         /// <summary>
@@ -156,6 +235,12 @@ namespace CodexLib
             {
                 var line = Code[Index];
 
+                if (line.opcode.FlowControl == FlowControl.Branch)
+                {
+                    Helper.PrintDebug("warning: unexpected branch");
+                    return;
+                }
+
                 if (line.opcode.FlowControl != FlowControl.Cond_Branch)
                     continue;
 
@@ -179,6 +264,12 @@ namespace CodexLib
             for (; Index < Code.Count; Index++)
             {
                 var line = Code[Index];
+
+                if (line.opcode.FlowControl == FlowControl.Branch)
+                {
+                    Helper.PrintDebug("warning: unexpected branch");
+                    return;
+                }
 
                 if (line.opcode.FlowControl != FlowControl.Cond_Branch)
                     continue;
@@ -211,16 +302,10 @@ namespace CodexLib
                 return;
             }
         }
-        public CodeInstruction Current => Code[Index];
-        public CodeInstruction Next => Index + 1 < Code.Count ? Code[Index + 1] : null;
-        public CodeInstruction Previous => Index > 0 ? Code[Index - 1] : null;
-        public bool IsStatic => Original.IsStatic;
 
-        public CodeInstruction this[int index]
-        {
-            get => Code[index];
-            set => Code[index] = value;
-        }
+        #endregion
+
+        #region Statics
 
         public static TranspilerData operator ++(TranspilerData a)
         {
@@ -233,5 +318,9 @@ namespace CodexLib
             a.Index--;
             return a;
         }
+
+        private static CacheData<MemberInfo> _memberCache = new(a => Helper.GetMemberInfo((Type)a[0], (string)a[1]));
+
+        #endregion
     }
 }

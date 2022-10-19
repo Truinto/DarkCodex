@@ -389,7 +389,7 @@ namespace DarkCodex
                 );
 
             var faithTrait1 = Helper.CreateBlueprintFeature(
-                "BackgroundFate’s Favored",
+                "BackgroundFate’s Favored", // TODO: remove space and special characters
                 "Fate’s Favored",
                 "The fates watch over you.\nBenefit: Whenever you are under the effect of a luck bonus of any kind, that bonus increases by 1."
                 ).SetComponents(

@@ -410,6 +410,7 @@ namespace Shared
             MasterPatch.Run();
             Print("Loading Dark Codex");
             patchInfos = new(Settings.State);
+            Resource.Cache.Ensure();
 
             // Debug
 #if DEBUG
@@ -464,6 +465,7 @@ namespace Shared
             PatchSafe(typeof(Patch_ZippySpellLike));
             PatchSafe(typeof(Patch_AbilityRange));
             PatchSafe(typeof(Patch_FixMisc));
+            PatchSafe(typeof(Patch_ParryAlways));
             //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early
@@ -486,6 +488,7 @@ namespace Shared
             // Spellcasters
             LoadSafe(Spellcasters.FixBloodlineArcane);
             LoadSafe(Spellcasters.PatchArcanistBrownFur);
+            LoadSafe(Spellcasters.CreatePurifyingChannel);
 
             // MartialArt
             LoadSafe(MartialArt.CreateProdigiousTwoWeaponFighting);

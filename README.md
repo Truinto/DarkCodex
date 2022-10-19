@@ -120,8 +120,9 @@ Content
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
-|Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
+|Spellcasters.CreatePurifyingChannel|basic feat: channel positive energy deals fire damage|:book:|:heavy_check_mark:|
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
+|Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
 |Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
@@ -152,6 +153,7 @@ Content
 |Patch.Patch_HexcrafterSpellStrike|hexes with touch range can be used with Spell Strike|:house:|:heavy_check_mark:|
 |Patch.Patch_KineticistAllowOpportunityAttack|allows Attack of Opportunities with anything but standard Kinetic Blade; so that Kinetic Whip works; also allows natural attacks to be used, if Whip isn't available|:book:|:heavy_check_mark:|
 |Patch.Patch_MagicItemAdept|patches for Magic Item Adept|:house:|:heavy_check_mark:|
+|Patch.Patch_ParryAlways|use parry even if attack would have missed anyway|:book:|:heavy_check_mark:|
 |Patch.Patch_Polymorph|allows debug flags to keep inventory or model during polymorph|:book:|:heavy_check_mark:|
 |Patch.Patch_PreferredSpellMetamagic|necessary patches for Preferred Spell|:book:|:heavy_check_mark:|
 |Patch.Patch_ResourcefulCaster|patches for Resourceful Caster|:house:|:heavy_check_mark:|

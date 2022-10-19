@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## [1.3.1]
+- !signature change Helper.Calls(CodeInstruction, FieldInfo) to Helper.Calls(CodeInstruction, MemberInfo)
+- removed redudant Helper.IsStloc
+
 ## [1.3.0]
 - fixes for 2.0 release
 

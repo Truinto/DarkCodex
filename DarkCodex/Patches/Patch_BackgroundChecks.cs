@@ -1,6 +1,8 @@
 ﻿using HarmonyLib;
 using Kingmaker.EntitySystem.Stats;
+using Kingmaker.QA;
 using Kingmaker.UnitLogic;
+using Owlcat.Runtime.Core.Logging;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -23,7 +25,7 @@ namespace DarkCodex
             return true;
         }
 
-        [HarmonyPatch(typeof(ModifiableValueSkill), nameof(ModifiableValueSkill.AddBackgroundSkillSource))]
+        [HarmonyPatch(typeof(ModifiableValueSkill), nameof(ModifiableValueSkill.RemoveBackgroundSkillSource))]
         [HarmonyPrefix]
         public static bool Prefix2(UnitFact fact, ModifiableValueSkill __instance)
         {
@@ -31,5 +33,25 @@ namespace DarkCodex
                 return false;
             return true;
         }
+
+        [HarmonyPatch(typeof(ModifiableValueSkill), nameof(ModifiableValueSkill.AddBackgroundSkillSource))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
+        {
+            var original = AccessTools.Method(typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), new Type[] { typeof(LogChannel), typeof(string), typeof(object[]) });
+
+            foreach (var line in instr)
+            {
+                if (line.Calls(original))
+                    line.ReplaceCall(Empty);
+                yield return line;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModifiableValueSkill), nameof(ModifiableValueSkill.RemoveBackgroundSkillSource))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instr) => Transpiler1(instr);
+
+        public static void Empty(LogChannel channel, string msgFormat, params object[] @params) { }
     }
 }

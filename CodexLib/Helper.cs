@@ -298,30 +298,14 @@ namespace CodexLib
             return null;
         }
 
-        public static bool Calls(this CodeInstruction code, FieldInfo fieldInfo)
+        public static bool Calls(this CodeInstruction code, MemberInfo member)
         {
-            return code.opcode == OpCodes.Ldfld && object.Equals(code.operand, fieldInfo);
-        }
+            if (member is MethodInfo mi)
+                return (code.opcode == OpCodes.Call || code.opcode == OpCodes.Callvirt) && object.Equals(code.operand, mi);
+            if (member is FieldInfo fi)
+                return code.opcode == OpCodes.Ldfld && object.Equals(code.operand, fi);
 
-        public static bool IsStloc(this CodeInstruction code, int index)
-        {
-            if (!code.IsStloc())
-                return false;
-
-            if (code.operand is LocalBuilder lb)
-                return lb.LocalIndex == index;
-
-            var op = code.opcode;
-            if (op == OpCodes.Stloc_0)
-                return index == 0;
-            if (op == OpCodes.Stloc_1)
-                return index == 1;
-            if (op == OpCodes.Stloc_2)
-                return index == 2;
-            if (op == OpCodes.Stloc_3)
-                return index == 3;
-
-            return false;
+            throw new ArgumentException($"could not find anything for type={member.GetType()} name={member.Name}");
         }
 
         public static Type GetLocType(this CodeInstruction code, IList<LocalVariableInfo> locals)
@@ -345,6 +329,19 @@ namespace CodexLib
                 return locals[3].LocalType;
 
             return null;
+        }
+
+        public static MemberInfo GetMemberInfo(Type type, string name)
+        {
+            var mi = type.GetMethod(name, Helper.BindingAll) ?? type.GetProperty(name, Helper.BindingAll).GetMethod;
+            if (mi != null)
+                return mi;
+
+            var fi = type.GetField(name, Helper.BindingAll);
+            if (fi != null)
+                return fi;
+
+            throw new ArgumentException($"could not find anything for type={type} name={name}");
         }
 
         public static IEnumerable<CodeInstruction> _TestTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)

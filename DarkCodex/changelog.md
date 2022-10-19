@@ -1,6 +1,12 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.2]
+- added Purifying Channel feat: channel positive energy deals fire damage #150
+- added Patch Parry Always: use parry even if attack would have missed anyway default=off #156
+- changed Patch_BackgroundChecks which should fix #151
+- fixed internal blueprint cache #155
+
 ## [1.5.1]
 - fixed Bladed Brush for Spell Combat, Duelist Parry, and Duelist's Deflect Arrows #144
 - split boundless healing and boundless injury into separate feats #143
