@@ -1959,6 +1959,25 @@ namespace CodexLib
         {
             try
             {
+                #region fields
+
+                var fields = typeof(KineticistTree).GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var field in fields)
+                {
+                    object value = field.GetValue(this);
+                    if (value is null)
+                        Helper.PrintDebug($"KineticistTree.Validate field is null '{field.Name}'");
+                    else if (value is Element element && !GetAll(true, true, archetype: true).Contains(element))
+                        Helper.PrintDebug($"KineticistTree.Validate field missing in GetAll '{field.Name}'");
+                    else if (value is Focus focus && !GetFocus().Contains(focus))
+                        Helper.PrintDebug($"KineticistTree.Validate field missing in GetFocus '{field.Name}'");
+                    else if (value is Infusion infusion && !GetTalents(true, true, true).Contains(infusion))
+                        Helper.PrintDebug($"KineticistTree.Validate field missing in GetTalents '{field.Name}'");
+                }
+
+                #endregion
+
                 #region check form infusions
 
                 // REGEX    log file to variant references
@@ -1994,7 +2013,6 @@ namespace CodexLib
                 }
 
                 Helper.PrintDebug("KineticistTree.Validate check DefaultAbility");
-
                 // check missing variants
                 foreach (var blast in GetBlasts(variants: true).Where(a => a.GetComponent<AbilityShowIfCasterHasFact>() == null))
                 {

@@ -20,19 +20,19 @@ namespace DarkCodex
     {
         public const SpellDescriptor AnyElement = SpellDescriptor.Fire | SpellDescriptor.Acid | SpellDescriptor.Cold | SpellDescriptor.Electricity | SpellDescriptor.Sonic;
 
-        [HarmonyPatch(typeof(IncreaseSpellDescriptorDC), nameof(IncreaseSpellDescriptorDC.OnEventAboutToTrigger))]
+        [HarmonyPatch(typeof(IncreaseSpellDescriptorDC), nameof(IncreaseSpellDescriptorDC.OnEventAboutToTrigger), typeof(RuleCalculateAbilityParams))]
         [HarmonyPriority(Priority.High)]
         [HarmonyPrefix]
         public static bool Prefix1(RuleCalculateAbilityParams evt, IncreaseSpellDescriptorDC __instance)
         {
             if (evt.Spell == null)
-                return false;
+                return true;
 
             if (__instance.SpellsOnly && evt.Spellbook == null && evt.Spell.Type != AbilityType.Spell && evt.Spell.Type != AbilityType.SpellLike)
-                return false;
+                return true;
 
             if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
-                return false;
+                return true;
 
             if (evt.TryGetCustomData<SpellDescriptor>(Const.KeyChangeElement, out var descriptor))
                 descriptor = (evt.Spell.SpellDescriptor & ~AnyElement) | descriptor;
@@ -45,19 +45,19 @@ namespace DarkCodex
             return false;
         }
 
-        [HarmonyPatch(typeof(IncreaseSpellContextDescriptorDC), nameof(IncreaseSpellContextDescriptorDC.OnEventAboutToTrigger))]
+        [HarmonyPatch(typeof(IncreaseSpellContextDescriptorDC), nameof(IncreaseSpellContextDescriptorDC.OnEventAboutToTrigger), typeof(RuleCalculateAbilityParams))]
         [HarmonyPriority(Priority.High)]
         [HarmonyPrefix]
         public static bool Prefix2(RuleCalculateAbilityParams evt, IncreaseSpellContextDescriptorDC __instance)
         {
             if (evt.Spell == null)
-                return false;
+                return true;
 
             if (__instance.SpellsOnly && evt.Spellbook == null && evt.Spell.Type != AbilityType.Spell && evt.Spell.Type != AbilityType.SpellLike)
-                return false;
+                return true;
 
             if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
-                return false;
+                return true;
 
             if (evt.TryGetCustomData<SpellDescriptor>(Const.KeyChangeElement, out var descriptor))
                 descriptor = (evt.Spell.SpellDescriptor & ~AnyElement) | descriptor;
@@ -70,7 +70,7 @@ namespace DarkCodex
             return false;
         }
 
-        [HarmonyPatch(typeof(IncreaseSpellDescriptorCasterLevel), nameof(IncreaseSpellDescriptorCasterLevel.OnEventAboutToTrigger))]
+        [HarmonyPatch(typeof(IncreaseSpellDescriptorCasterLevel), nameof(IncreaseSpellDescriptorCasterLevel.OnEventAboutToTrigger), typeof(RuleCalculateAbilityParams))]
         [HarmonyPriority(Priority.High)]
         [HarmonyPrefix]
         public static bool Prefix3(RuleCalculateAbilityParams evt, IncreaseSpellDescriptorCasterLevel __instance)

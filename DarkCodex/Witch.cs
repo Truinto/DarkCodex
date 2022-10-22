@@ -122,13 +122,12 @@ namespace DarkCodex
             {
                 foreach (var feat in Resource.Cache.Feature)
                 {
-                    var preq = feat.GetComponent<PrerequisiteFeature>();
-                    if (preq == null)
-                        continue;
-
-                    int rank = preq.m_Feature == major ? 1 : preq.m_Feature == grand ? 2 : 0;
+                    var preq = feat.GetComponents<PrerequisiteFeature>();
+                    int rank = preq.Any(a => a.m_Feature.Equals(major)) ? 1 : preq.Any(a => a.m_Feature.Equals(grand)) ? 2 : 0;
                     if (rank == 0)
                         continue;
+
+                    Main.PrintDebug($"{feat.name} has rank {rank}");
 
                     var addfacts = feat.GetComponent<AddFacts>();
                     if (addfacts == null)
@@ -137,7 +136,10 @@ namespace DarkCodex
                     foreach (var fact in addfacts.m_Facts)
                     {
                         if (fact.Get() is BlueprintAbility ab)
+                        {
                             ab.AddComponents(new FeatureRank(rank));
+                            Main.PrintDebug($"adding rank {rank} to {ab.name}");
+                        }
                     }
                 }
             });

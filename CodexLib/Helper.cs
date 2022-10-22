@@ -1304,7 +1304,7 @@ namespace CodexLib
                 if (comp.OwnerBlueprint == null)
                     comp.OwnerBlueprint = obj;
                 else if (comp.OwnerBlueprint != obj)
-                    PrintDebug("Warning: reused BlueprintComponent " + comp.name);
+                    PrintDebug($"Warning: reused BlueprintComponent {comp.name} which is attached to {comp.OwnerBlueprint} instead of {obj}");
             }
 
             return obj;
@@ -1334,7 +1334,7 @@ namespace CodexLib
                 if (comp.OwnerBlueprint == null)
                     comp.OwnerBlueprint = obj;
                 else if (comp.OwnerBlueprint != obj)
-                    PrintDebug("Warning: reused BlueprintComponent " + comp.name);
+                    PrintDebug($"Warning: reused BlueprintComponent {comp.name} which is attached to {comp.OwnerBlueprint} instead of {obj}");
             }
 
             obj.Components = components;
@@ -1352,7 +1352,7 @@ namespace CodexLib
                     if (replacement.OwnerBlueprint == null)
                         replacement.OwnerBlueprint = obj;
                     else if (replacement.OwnerBlueprint != obj)
-                        PrintDebug("Warning: reused BlueprintComponent " + replacement.name);
+                    PrintDebug($"Warning: reused BlueprintComponent {replacement.name} which is attached to {replacement.OwnerBlueprint} instead of {obj}");
                     break;
                 }
             }

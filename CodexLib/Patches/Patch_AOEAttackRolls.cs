@@ -10,6 +10,7 @@ namespace CodexLib.Patches
     /// Logic for ContextConditionAttackRoll to make AOE attack rolls.
     /// </summary>
     [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
+    [HarmonyPriority(380)]
     public class Patch_AOEAttackRolls
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)

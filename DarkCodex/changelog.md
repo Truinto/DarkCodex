@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.3]
+- fixed Patch_NotAChance making all attacks miss #159
+- fixed Patch_ChangeSpellElement ambiguous match
+- fixed split hex working on some major/grand hexes
+
 ## [1.5.2]
 - added Purifying Channel feat: channel positive energy deals fire damage #150
 - added Patch Parry Always: use parry even if attack would have missed anyway default=off #156

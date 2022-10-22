@@ -12,13 +12,14 @@ namespace DarkCodex
     public class Patch_ParryAlways
     {
         [HarmonyPatch(typeof(RuleAttackRoll), nameof(RuleAttackRoll.OnTrigger))]
+        [HarmonyPriority(390)]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerData(instructions, generator, original);
 
-            data.Seek(true, f => f.Calls(typeof(RuleAttackRoll), "Parry"), f => f.Is(OpCodes.Brfalse_S));
-            data.Rewind(typeof(RuleAttackRoll), "IsHit");
+            data.Seek(true, f => f.Calls(typeof(RuleAttackRoll), nameof(RuleAttackRoll.Parry)), f => f.Is(OpCodes.Brfalse_S));
+            data.Rewind(typeof(RuleAttackRoll), nameof(RuleAttackRoll.IsHit));
             data.NextJumpNever();
 
             return data.Code;
