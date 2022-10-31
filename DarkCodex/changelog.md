@@ -1,10 +1,16 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.4]
+- added Kitsune Foxfire: magical tail also grants Foxfire Bolt #161
+- added Bestow Hope: basic feat channel energy reduces fear #160
+- added Patch: Azata Favorable Magic, include saving throws from auras (does not work with TableTopTweaks Azata.FavorableMagic enabled) #162
+- fixed Purifying Channel hitting all enemies #150
+
 ## [1.5.3]
 - fixed Patch_NotAChance making all attacks miss #159
 - fixed Patch_ChangeSpellElement ambiguous match
-- fixed split hex working on some major/grand hexes
+- fixed split hex working on some major/grand hexes #157
 
 ## [1.5.2]
 - added Purifying Channel feat: channel positive energy deals fire damage #150

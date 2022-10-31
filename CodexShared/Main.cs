@@ -519,7 +519,7 @@ namespace Shared
         {
 #if !DEBUG
             return null;
-#endif
+#else
             if (__exception == null)
                 return null;
             try
@@ -528,6 +528,7 @@ namespace Shared
             }
             catch (Exception) { }
             return null;
+#endif
         }
 
         #endregion

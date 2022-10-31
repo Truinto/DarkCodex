@@ -39,6 +39,7 @@ Content
 |General.CreateBardStopSong|adds ability to stop any activatable immediately|:book:|:heavy_check_mark:|
 |General.CreateDirtyFighting|basic feat: Dirty Fighting; you don't suffer an attack of opportunity but incure a -4 penalty if you are not flanking and don't have the right maneuver feat|:book:|:heavy_check_mark:|
 |General.CreateHeritage|adds Orc-Atavism; Kindred-Raised Half-Elf regain Elven Immunity|:house:|:heavy_check_mark:|
+|General.CreateKitsuneFoxfire|magical tail also grants Foxfire Bolt|:house:|:heavy_check_mark:|
 |General.CreateMadMagic|combat feat: allows spell casting during a rage|:book:|:heavy_check_mark:|
 |General.CreateOpportuneParry|combat feat: duelist parry by expending Attack of Opportunities|:house:|:heavy_check_mark:|
 |General.CreatePreferredSpell|basic feat: Preferred Spell, spontaneously cast a specific spell|:book:|:heavy_check_mark:|
@@ -120,6 +121,7 @@ Content
 |Ranger.CreateImprovedHuntersBond|combat feat: Improved Hunter's Bond|:book:|:heavy_check_mark:|
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
+|Spellcasters.CreateBestowHope|basic feat: channel energy reduces fear|:book:|:heavy_check_mark:|
 |Spellcasters.CreatePurifyingChannel|basic feat: channel positive energy deals fire damage|:book:|:heavy_check_mark:|
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
@@ -140,6 +142,7 @@ Content
 |Patch.Patch_ActivatableTryStart|fixes activatable not starting the second time, while being outside of combat|:book:|:heavy_check_mark:|
 |Patch.Patch_AllowAchievements|clears the 'has used mods before' flag and also pretends that no mods are active|:book:|:heavy_check_mark:|
 |Patch.Patch_ArcanistSpontaneous|allows arcanist to use non memorized metamagic, but increases casting time|:book:|:heavy_check_mark:|
+|Patch.Patch_AzataFavorableMagic|include saving throws from auras (does not work with TableTopTweaks Azata.FavorableMagic enabled)|:house:|:heavy_check_mark:|
 |Patch.Patch_BackgroundChecks|prevents identical background skills from causing an error|:book:|:heavy_check_mark:|
 |Patch.Patch_DarkElementalistBurn|for Wild Talents your current amount of burn includes the number of successful Soul Power uses|:house:|:heavy_check_mark:|
 |Patch.Patch_DismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|

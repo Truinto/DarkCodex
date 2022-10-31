@@ -48,7 +48,7 @@ namespace CodexLib
             this.Index = 0;
             this.Generator = generator;
             this.Original = original;
-            this.Locals = original.GetMethodBody()?.LocalVariables;
+            this.Locals = original?.GetMethodBody()?.LocalVariables;
         }
 
         #endregion
@@ -125,8 +125,51 @@ namespace CodexLib
             return this;
         }
 
+        public TranspilerData Seek(OpCode op)
+        {
+            while (Index < Code.Count - 1)
+            {
+                ++Index;
+                if (Current.opcode == op)
+                    break;
+            }
+            return this;
+        }
+
+        public TranspilerData Rewind(OpCode op)
+        {
+            while (Index > 0)
+            {
+                --Index;
+                if (Current.opcode == op)
+                    break;
+            }
+            return this;
+        }
+        public TranspilerData Seek(OpCode op, object operand)
+        {
+            while (Index < Code.Count - 1)
+            {
+                ++Index;
+                if (Current.opcode == op && Current.operand == operand)
+                    break;
+            }
+            return this;
+        }
+
+        public TranspilerData Rewind(OpCode op, object operand)
+        {
+            while (Index > 0)
+            {
+                --Index;
+                if (Current.opcode == op && Current.operand == operand)
+                    break;
+            }
+            return this;
+        }
+
         /// <summary>Seeks predicates in order.</summary>
-        /// <param name="onStart">True: place at first match<br/>False: place at last match</param>
+        /// <param name="onStart">True: place at start of match<br/>False: place at end of match</param>
         /// <exception cref="ArgumentException">If no match found.</exception>
         public TranspilerData Seek(bool onStart, params Func<TranspilerData, bool>[] pred)
         {
@@ -213,9 +256,12 @@ namespace CodexLib
             // delegate sanity check
             var mi = func.GetMethodInfo();
             var parameters = mi.GetParameters();
-            if (parameters.Length != 2 || !parameters[1].ParameterType.IsByRef)
-                throw new ArgumentException("Delegate must have exactly 2 arguments and the second argument must be by ref!");
-
+            if (parameters.Length != 2)
+                throw new ArgumentException("Delegate must have exactly 2 arguments!");
+            if (!IsStatic && !parameters[0].ParameterType.IsAssignableFrom(Original.DeclaringType))
+                throw new ArgumentException("Delegate first argument must be object or declaring class!");
+            if (!parameters[1].ParameterType.IsByRef)
+                throw new ArgumentException("Delegate second argument must be by ref!");
             var line = Current;
             var type = parameters[1].ParameterType.GetElementType();
             if (type != line.GetLocType(Locals))
@@ -227,6 +273,27 @@ namespace CodexLib
                 InsertAfter(OpCodes.Ldarg_0);
             InsertAfter(OpCodes.Ldloca, line.operand);
             InsertAfter(OpCodes.Call, mi);
+        }
+
+        /// <summary>
+        /// Injects function to access stack variable. Call is injected before TranspilerData.Current.
+        /// </summary>
+        /// <param name="func"><b>void Function(T value, object instance)</b></param>
+        public void EditStack(Delegate func)
+        {
+            // delegate sanity check
+            var mi = func.GetMethodInfo();
+            var parameters = mi.GetParameters();
+            if (parameters.Length != 2)
+                throw new ArgumentException("Delegate must have exactly 2 arguments!");
+            if (!IsStatic && !parameters[1].ParameterType.IsAssignableFrom(Original.DeclaringType))
+                throw new ArgumentException("Delegate second argument must be object or declaring class!");
+
+            if (IsStatic)
+                InsertBefore(OpCodes.Ldnull);
+            else
+                InsertBefore(OpCodes.Ldarg_0);
+            InsertBefore(OpCodes.Call, mi);
         }
 
         public void NextJumpAlways()

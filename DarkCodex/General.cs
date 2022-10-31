@@ -389,8 +389,8 @@ namespace DarkCodex
                 );
 
             var faithTrait1 = Helper.CreateBlueprintFeature(
-                "BackgroundFate’s Favored", // TODO: remove space and special characters
-                "Fate’s Favored",
+                "BackgroundFatesFavored",
+                "Fate's Favored",
                 "The fates watch over you.\nBenefit: Whenever you are under the effect of a luck bonus of any kind, that bonus increases by 1."
                 ).SetComponents(
                 new IncreaseModifierBonus(1, ModifierDescriptor.Luck)
@@ -502,6 +502,9 @@ namespace DarkCodex
                 ).Add(minusInt, minusWis, minusCha);
             orc.Add(atavism);
             Helper.AppendAndReplace(ref mythicRaces.m_Features, atavism.ToRef());
+
+            // remove resource limit on KitsuneMageLight
+            Helper.Get<BlueprintAbility>("1fa738778f4811247befeaa9b19da91f").RemoveComponents<AbilityResourceLogic>();
         }
 
         [PatchInfo(Severity.Create, "Sacred Summons", "basic feat: requires Channel Energy, summons act immediately", false)]
@@ -691,6 +694,37 @@ namespace DarkCodex
                 );
 
             Helper.AddCombatFeat(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Kitsune Foxfire", "magical tail also grants Foxfire Bolt", true)]
+        public static void CreateKitsuneFoxfire()
+        {
+            var magictail = Helper.Get<BlueprintFeature>("5114829572da5a04f896a8c5b67be413"); //MagicalTail1
+            var firebolt = Helper.Get<BlueprintAbility>("4ecdf240d81533f47a5279f5075296b9"); //FireDomainBaseAbility
+
+            AnyRef resource = Helper.CreateBlueprintAbilityResource(
+                "KitsuneFoxfireResource",
+                baseValue: 2,
+                stat: StatType.Charisma
+                );
+
+            AnyRef foxfire_ab = firebolt.Clone(
+                "KitsuneFoxfireAbility"
+                ).SetUIData(
+                "Foxfire Bolt",
+                "As a standard action, you can unleash a scorching bolt of foxfire from your outstretched hand, and target any single foe within 30 feet as a ranged touch attack. If you hit the foe, the foxfire bolt deals 1d6 points of fire damage + 1 point for every two character levels you possess. You can use this ability a number of times er day equal to 2 + your Charisma modifier + once for each magical tail feat you possess."
+                );
+
+            foxfire_ab.GetComponent<AbilityResourceLogic>().m_RequiredResource = resource;
+            foxfire_ab.GetComponent<ContextRankConfig>().m_BaseValueType = ContextRankBaseValueType.CharacterLevel;
+
+            magictail.AddComponents(
+                Helper.CreateAddAbilityResources(resource),
+                new IncreaseResourceAmountPlus(resource, 1, magictail, "c032f65c0bd9f6048a927fb07fc0195d", "d5050e13742d9b64da20921aaf7c2b2a", "342b6aed6b2eaab4786de243f0bcbcb8", "044cd84818c36854abf61064ade542a1", "053e37697a0d20547b06c3dbd8b71702", "041f91c25586d48469dce6b4575053f6", "df186ef345849d149bdbf4ddb45aee35")
+                );
+
+            magictail.m_Description.CreateString(magictail.m_Description + "\nAdditionally, as a standard action, you can unleash a scorching bolt of foxfire from your outstretched hand, and target any single foe within 30 feet as a ranged touch attack. If you hit the foe, the foxfire bolt deals 1d6 points of fire damage + 1 point for every two character levels you possess. You can use this ability a number of times er day equal to 2 + your Charisma modifier + once for each magical tail feat you possess.");
+            Helper.AppendAndReplace(ref magictail.GetComponent<AddFacts>().m_Facts, foxfire_ab);
         }
 
         #region General Resources and Stuff

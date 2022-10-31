@@ -26,13 +26,13 @@ namespace CodexLib
         public bool IgnoreAoO;
         public bool ShareD20 = true;
         public bool ApplyBladedBonus;
+        public bool CanBeRanged;
 
-        public ContextConditionAttackRoll() { }
-
-        public ContextConditionAttackRoll([CanBeNull] BlueprintItemWeaponReference weapon, bool ignoreAoO = true)
+        public ContextConditionAttackRoll(AnyRef weapon = null, bool ignoreAoO = true, bool canBeRanged = true)
         {
             this.Weapon = weapon;
             this.IgnoreAoO = ignoreAoO;
+            this.CanBeRanged = canBeRanged;
         }
 
         public override string GetConditionCaption()
@@ -46,7 +46,7 @@ namespace CodexLib
             if (caster == null)
                 return false;
 
-            var weapon = Weapon?.Get()?.CreateEntity<ItemEntityWeapon>() ?? caster.GetThreatHandMelee()?.Weapon;
+            var weapon = this.Weapon?.Get()?.CreateEntity<ItemEntityWeapon>() ?? (this.CanBeRanged ? caster.GetFirstWeapon() : caster.GetThreatHandMelee()?.MaybeWeapon);
             if (weapon == null)
                 return false;
 
@@ -82,11 +82,6 @@ namespace CodexLib
 
                 return attackRoll.IsHit;
             }
-        }
-
-        public static GameAction GameAction(BlueprintItemWeaponReference weapon = null, bool ignoreAoO = true)
-        {
-            return Helper.CreateConditional(new ContextConditionAttackRoll(weapon, ignoreAoO));
         }
     }
 }

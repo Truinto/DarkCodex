@@ -1,10 +1,12 @@
 ﻿using CodexLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.ElementsSystem;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Alignments;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
 using Shared;
@@ -109,17 +111,65 @@ namespace DarkCodex
                 new Condition[] {
                     new ContextConditionCasterHasFact { m_Fact = feat },
                     new ContextConditionIsEnemy(),
-                    new ContextConditionSharedValueHigher { SharedValue = AbilitySharedValue.DurationSecond, HigherOrEqual = 1, Not = true }
+                    Helper.CreateContextConditionSharedValueHigher(AbilitySharedValue.DurationSecond, 0, Equality.LowerOrEqual)
                 },
                 ifTrue: new GameAction[] {
-                    new ContextActionChangeSharedValue { SharedValue = AbilitySharedValue.DurationSecond, AddValue = 1 },
-                    new ContextActionSavingThrow {
+                    Helper.CreateContextActionChangeSharedValue(AbilitySharedValue.DurationSecond, add: 1),
+                                        new ContextActionSavingThrow {
                         Type = SavingThrowType.Will,
                         Actions = Helper.CreateActionList(
                             Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.CreateContextDiceValue(DiceType.Zero, 0, Helper.CreateContextValue(AbilitySharedValue.Heal)), false, true),
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionApplyBuff("df6d1025da07524429afbae248845ecc", Helper.CreateContextDurationValue(bonus: 1))), //DazzledBuff
                             new ContextActionSpawnFx { PrefabLink = Helper.GetPrefabLink("61602c5b0ac793d489c008e9cb58f631") })
                     },
+                });
+
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("f5fc9a1a2a3c1a946a31b320d1dd31b2").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("6670f0f21a1d7f04db2b8b115e8e6abf").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyPaladinHeal
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("574cf074e8b65e84d9b69a8c6f1af27b").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyEmpyrealHeal
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("0c0cf7fcb356d2448b7d57f2c4db3c0c").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyHospitalerHeal
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("b5cf6b80e65ea724d99dc9f4f8874fc3").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WarpriestChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("0fb4bb4eae14fe84e8b45d8ea207c4e1").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ShamanLifeSpiritChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("6bcaf7636388f2a40bce263372735eef").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WarpriestShieldbearerChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("d470eb6b3b31fde4bb44ec753de0b862").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WitchDoctorChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("75edd403e824aa048ab5d4827b803b08").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //HexChannelerChannelEnergy
+            Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("b9eca127dd82f554fb2ccd804de86cf6").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //OracleRevelationChannelAbility
+
+            Helper.AddFeats(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Bestow Hope", "basic feat: channel energy reduces fear", false)]
+        public static void CreateBestowHope()
+        {
+            var shaken = Helper.ToRef<BlueprintBuffReference>("25ec6cb6ab1845c48a95f9c20b034220"); //Shaken
+            var frightend = Helper.ToRef<BlueprintBuffReference>("f08a7239aa961f34c8301518e71d4cdf"); //Frightened
+
+            var deities = Helper.Get<BlueprintFeatureSelection>("59e7a76987fe3b547b9cce045f4db3e4").m_AllFeatures.Where(w => //DeitySelection
+            {
+                var preq = w.Get()?.GetComponent<PrerequisiteAlignment>();
+                if (preq == null)
+                    return false;
+
+                return (preq.Alignment & AlignmentMaskType.Evil) == 0;
+            }).Select(s => s.ToRef<BlueprintFeatureReference>()).ToArray();
+
+            AnyRef feat = Helper.CreateBlueprintFeature(
+                "BestowHope",
+                "Bestow Hope",
+                "When you heal a creature by channeling positive energy, you also relieve its fear. If a creature you heal is shaken, that condition ends. If the creature is frightened, it becomes shaken instead. If the creature is panicked, it becomes frightened instead."
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature("a79013ff4bcd4864cb669622a29ddafb"), //ChannelEnergyFeature
+                Helper.CreatePrerequisiteFeaturesFromList(false, deities)
+                );
+
+            var action = Helper.CreateConditional(
+                new Condition[] {
+                    new ContextConditionCasterHasFact { m_Fact = feat },
+                    new ContextConditionIsAlly()
+                },
+                ifTrue: new GameAction[] {
+                    Helper.CreateContextActionRemoveBuff(shaken),
+                    new ContextActionSubstituteBuff(frightend, shaken, true)
                 });
 
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("f5fc9a1a2a3c1a946a31b320d1dd31b2").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergy

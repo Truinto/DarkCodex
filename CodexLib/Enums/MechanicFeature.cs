@@ -15,5 +15,6 @@ namespace CodexLib
         NoMaterialComponent,
         ProdigiousTWF,
         NotAChance,
+        MobilityAtFullSpeed,
     }
 }

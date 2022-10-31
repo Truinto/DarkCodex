@@ -416,6 +416,7 @@ namespace Shared
 #if DEBUG
             PatchSafe(typeof(DEBUG.WatchCalculateParams));
             PatchSafe(typeof(DEBUG.WatchSelectiveMetamagic));
+            //PatchSafe(typeof(DEBUG.WatchSharedValue));
             PatchSafe(typeof(DEBUG.Settlement1));
             PatchSafe(typeof(DEBUG.Settlement2));
             PatchSafe(typeof(DEBUG.ArmyLeader1));
@@ -425,11 +426,9 @@ namespace Shared
             PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
-            //DefaultJsonSettings.DefaultSettings.Converters.Add(new LocalizedStringConverter());
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
-            //PatchSafe(typeof(Patch_FixLoadCrash1));
             LoadSafe(General.CreateBardStopSong);
 
             // Cache
@@ -466,6 +465,7 @@ namespace Shared
             PatchSafe(typeof(Patch_AbilityRange));
             PatchSafe(typeof(Patch_FixMisc));
             PatchSafe(typeof(Patch_ParryAlways));
+            PatchSafe(typeof(Patch_AzataFavorableMagic));
             //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early
@@ -484,11 +484,13 @@ namespace Shared
             LoadSafe(General.PatchVarious);
             LoadSafe(General.CreateDirtyFighting);
             LoadSafe(General.CreateOpportuneParry);
+            LoadSafe(General.CreateKitsuneFoxfire);
 
             // Spellcasters
             LoadSafe(Spellcasters.FixBloodlineArcane);
             LoadSafe(Spellcasters.PatchArcanistBrownFur);
             LoadSafe(Spellcasters.CreatePurifyingChannel);
+            LoadSafe(Spellcasters.CreateBestowHope);
 
             // MartialArt
             LoadSafe(MartialArt.CreateProdigiousTwoWeaponFighting);

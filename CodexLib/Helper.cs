@@ -1193,7 +1193,12 @@ namespace CodexLib
         /// </summary>
         public static void CreateString(this LocalizedString localizedString, string newString)
         {
-            CreateString(newString, localizedString?.m_Key ?? localizedString?.Shared?.String?.m_Key);
+            if (localizedString.m_Key != null && localizedString.m_Key != "")
+                CreateString(newString, localizedString.m_Key);
+            else if (localizedString?.Shared?.String?.m_Key != null && localizedString.Shared.String.m_Key != "")
+                CreateString(newString, localizedString?.Shared?.String?.m_Key);
+            else
+                PrintDebug("Warning: CreateString failed since m_Key is empty");
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
@@ -1290,6 +1295,13 @@ namespace CodexLib
                 if (comp is T t && pred(t))
                     yield return t;
             }
+        }
+
+        public static T GetComponent<T>(this AnyRef any) where T : BlueprintComponent
+        {
+            if (any?.GetBlueprint() is BlueprintScriptableObject bso)
+                return bso.GetComponent<T>();
+            return null;
         }
 
         public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
@@ -2692,6 +2704,7 @@ namespace CodexLib
             return result;
         }
 
+        /// <param name="BlueprintAbilityResource">type: <b>BlueprintAbilityResource</b></param>
         public static AddAbilityResources CreateAddAbilityResources(AnyRef BlueprintAbilityResource)
         {
             var result = new AddAbilityResources();
@@ -3128,6 +3141,60 @@ namespace CodexLib
             return c;
         }
 
+        public static ContextActionChangeSharedValue CreateContextActionChangeSharedValue(AbilitySharedValue sharedValue, ContextValue add = null, ContextValue set = null, ContextValue mult = null)
+        {
+            var result = new ContextActionChangeSharedValue();
+
+            result.SharedValue = sharedValue;
+
+            if (add != null)
+            {
+                result.AddValue = add;
+                result.Type = SharedValueChangeType.Add;
+            }
+
+            if (set != null)
+            {
+                if (result.Type != 0) throw new ArgumentException();
+                result.AddValue = add;
+                result.Type = SharedValueChangeType.Set;
+            }
+
+            if (mult != null)
+            {
+                if (result.Type != 0) throw new ArgumentException();
+                result.MultiplyValue = add;
+                result.Type = SharedValueChangeType.Multiply;
+            }
+
+            return result;
+        }
+
+        public static ContextConditionSharedValueHigher CreateContextConditionSharedValueHigher(AbilitySharedValue sharedValue, int value, Equality equality = Equality.HigherOrEqual)
+        {
+            var result = new ContextConditionSharedValueHigher();
+
+            switch (equality)
+            {
+                case Equality.HigherThan:
+                    result.HigherOrEqual = value + 1;
+                    break;
+                case Equality.HigherOrEqual:
+                    result.HigherOrEqual = value;
+                    break;
+                case Equality.LowerThan:
+                    result.HigherOrEqual = value - 1;
+                    result.Inverted = true;
+                    break;
+                case Equality.LowerOrEqual:
+                    result.HigherOrEqual = value;
+                    result.Inverted = true;
+                    break;
+            }
+
+            return result;
+        }
+
         public static SpellComponent CreateSpellComponent(SpellSchool school)
         {
             var result = new SpellComponent();
@@ -3466,7 +3533,7 @@ namespace CodexLib
             return result;
         }
 
-        public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(bool any = false, params BlueprintFeatureReference[] features)
+        public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(bool any, params BlueprintFeatureReference[] features)
         {
             var result = new PrerequisiteFeaturesFromList();
             result.m_Features = features;
@@ -3475,12 +3542,12 @@ namespace CodexLib
             return result;
         }
 
-        public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(IEnumerable<AnyRef> blueprintFeature, int amount, bool any = false)
+        public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(IEnumerable<AnyRef> blueprintFeature = null, int amount = 1, bool any = false)
         {
             var result = new PrerequisiteFeaturesFromList();
-            result.m_Features = blueprintFeature.ToRef<BlueprintFeatureReference>();
+            result.m_Features = blueprintFeature?.ToRef<BlueprintFeatureReference>();
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
-            result.Amount = amount;
+            result.Amount = blueprintFeature == null ? 0 : amount;
             return result;
         }
 
@@ -4260,11 +4327,14 @@ namespace CodexLib
         public static T[] ToRef<T>(params object[] source) where T : BlueprintReferenceBase, new() => ToRef<T>((IEnumerable<object>)source);
 
         /// <summary>
-        /// Converts a collection of strings, references, and blueprints into a specified reference type.
+        /// Converts a collection of strings, references, and blueprints into a specified reference type.<br/>
         /// Can handle multiple different types and will recursively resolve collections.
         /// </summary>
         public static T[] ToRef<T>(this IEnumerable<object> source) where T : BlueprintReferenceBase, new()
         {
+            if (source is null)
+                return new T[0];
+
             recursiveToRef(source);
 
             var result = new T[_list.Count];
@@ -4285,14 +4355,21 @@ namespace CodexLib
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AnyRef ToAny(this object obj) => AnyRef.ToAny(obj);
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AnyRef[] ToAny(params object[] source) => ToAny((IEnumerable<object>)source);
 
+        /// <summary>
+        /// Converts a collection of strings, references, and blueprints into a AnyRef reference type.<br/>
+        /// Can handle multiple different types and will recursively resolve collections.
+        /// </summary>
         public static AnyRef[] ToAny(this IEnumerable<object> source)
         {
+            if (source is null)
+                return new AnyRef[0];
+
             recursiveToAny(source);
 
             var result = new AnyRef[_list.Count];

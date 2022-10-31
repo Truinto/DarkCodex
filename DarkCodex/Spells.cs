@@ -54,7 +54,7 @@ namespace DarkCodex
                 Helper.CreateAbilityEffectRunAction(
                     condition: new Condition[] {
                         Helper.CreateContextConditionIsEnemy(),
-                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true }
+                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
                     },
                     ifTrue: new GameAction[] {
                         new ContextActionDealWeaponDamage()
@@ -86,7 +86,7 @@ namespace DarkCodex
                 Helper.CreateAbilityEffectRunAction(
                     condition: new Condition[] {
                         Helper.CreateContextConditionIsEnemy(),
-                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true }
+                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
                     },
                     ifTrue: new GameAction[] {
                         new ContextActionDealWeaponDamage()

@@ -31,11 +31,13 @@ namespace CodexLib
             typeof(Patch_DuelistParry),
             typeof(Patch_FixAbilityTargets),
             typeof(Patch_GetTargetProjectileFix),
+            typeof(Patch_LevelUp),
             typeof(Patch_MaterialComponent),
             typeof(Patch_Prerequisite),
             typeof(Patch_RulebookEventBusPriority),
             typeof(Patch_RuleSpendCharge),
             typeof(Patch_SpellSelectionParametrized),
+            typeof(Patch_SuppressError),
             typeof(Patch_WeaponCategory),
         };
 

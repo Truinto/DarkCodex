@@ -118,7 +118,7 @@ namespace DarkCodex
 
             Helper.AddFeats(splitHex, splitMajorHex);
 
-            Main.RunLast("SplitHex", () =>
+            Main.RunLast("Split Hex", () =>
             {
                 foreach (var feat in Resource.Cache.Feature)
                 {

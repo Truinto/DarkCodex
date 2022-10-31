@@ -430,6 +430,24 @@ namespace DarkCodex
             }
         }
 
+        [HarmonyPatch]
+        public class WatchSharedValue
+        {
+            [HarmonyPatch(typeof(ContextActionChangeSharedValue), nameof(ContextActionChangeSharedValue.RunAction))]
+            [HarmonyPostfix]
+            public static void Postfix1(ContextActionChangeSharedValue __instance)
+            {
+                Main.PrintDebug($"change shared DurationSecond={__instance.Context[AbilitySharedValue.DurationSecond]} 2={__instance.AbilityContext[AbilitySharedValue.DurationSecond]}");
+            }
+
+            [HarmonyPatch(typeof(ContextConditionSharedValueHigher), nameof(ContextConditionSharedValueHigher.CheckCondition))]
+            [HarmonyPostfix]
+            public static void Postfix2(ContextConditionSharedValueHigher __instance)
+            {
+                Main.PrintDebug($"is shared DurationSecond={__instance.Context[AbilitySharedValue.DurationSecond]} 2={__instance.AbilityContext[AbilitySharedValue.DurationSecond]}");
+            }
+        }
+
         public class SfxAzata : IAreaHandler
         {
             // AzataITierTierVisualFeature

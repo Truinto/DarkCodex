@@ -2,6 +2,7 @@
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.ElementsSystem;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -139,7 +140,10 @@ namespace DarkCodex
                 );
             var bleed1 = Helper.CreateBlueprintAbility(
                 "Panache_BleedingWound_Ability",
-                actionType: UnitCommand.CommandType.Free
+                type: AbilityType.Extraordinary,
+                actionType: UnitCommand.CommandType.Free,
+                range: AbilityRange.Personal
+                ).TargetSelf(
                 ).SetComponents(
                 Helper.MakeRunActionApplyBuff(bleedbuff1),
                 Helper.CreateAbilityResourceLogic(resourcePanache, 1)
@@ -156,7 +160,10 @@ namespace DarkCodex
                 );
             var bleed2 = Helper.CreateBlueprintAbility(
                 "Panache_GreaterBleedingWound_Ability",
-                actionType: UnitCommand.CommandType.Free
+                type: AbilityType.Extraordinary,
+                actionType: UnitCommand.CommandType.Free,
+                range: AbilityRange.Personal
+                ).TargetSelf(
                 ).SetComponents(
                 Helper.MakeRunActionApplyBuff(bleedbuff2),
                 Helper.CreateAbilityResourceLogic(resourcePanache, 2)
@@ -189,7 +196,10 @@ namespace DarkCodex
                 "SuperiorFeintAbility",
                 "Superior Feint",
                 "At 7th level, a swashbuckler with at least 1 panache point can, as a standard action, purposefully miss a creature she could make a melee attack against with a wielded light or one-handed piercing weapon. When she does, the creature is denied its Dexterity bonus to AC until the start of the swashbuckler’s next turn.",
-                icon: Helper.StealIcon("dda92ebaf6a03f84387f7104fd597c2e")
+                icon: Helper.StealIcon("dda92ebaf6a03f84387f7104fd597c2e"),
+                type: AbilityType.Extraordinary,
+                range: AbilityRange.Weapon
+                ).TargetEnemy(
                 ).SetComponents(
                 Helper.MakeRunActionApplyBuff(feint_buff, Helper.CreateContextDurationValue(bonus: 1))
                 );
@@ -199,12 +209,64 @@ namespace DarkCodex
                 Helper.CreateAddFacts(feint_ab)
                 ).SetUIData(feint_ab);
 
+            var panache9 = Helper.CreateBlueprintFeature(
+                "Panache_SwashbucklersGrace",
+                "Swashbuckler’s Grace",
+                "At 7th level, while the swashbuckler has at least 1 panache point, she takes no penalty for moving at full speed when she uses Acrobatics to attempt to move through a threatened area or an enemy’s space."
+                ).SetComponents(
+                new AddMechanicFeatureCustom(MechanicFeature.MobilityAtFullSpeed)
+                );
+
+            var disarm_ab = Helper.CreateBlueprintAbility(
+                "TargetedStrikeDisarm",
+                "Targeted Strike: Disarm",
+                "Arms: The target takes no damage from the attack, but you disarm it. If successful, the target cannot use his weapons for 1 {g|Encyclopedia:Combat_Round}round{/g}. For every 5 by which your {g|Encyclopedia:Attack}attack{/g} exceeds your opponent's {g|Encyclopedia:AC}AC{/g}, the disarmed condition lasts 1 additional round.",
+                icon: null,
+                type: AbilityType.Extraordinary,
+                range: AbilityRange.Touch
+                ).TargetEnemy(
+                ).SetComponents(
+                Helper.CreateAbilityResourceLogic(resourcePanache, 1),
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    new ContextActionCombatManeuverWithWeapon(CombatManeuver.Disarm, false, true)
+                    )
+                );
+            var confuse_ab = Helper.CreateBlueprintAbility(
+                "TargetedStrikeConfuse",
+                "Targeted Strike: Confuse",
+                "Head: The target is confused for 1 round. This is a mind-affecting effect.",
+                icon: null,
+                type: AbilityType.Extraordinary,
+                range: AbilityRange.Touch
+                ).TargetEnemy(
+                ).SetComponents(
+                Helper.CreateAbilityResourceLogic(resourcePanache, 1),
+                Helper.CreateAbilityEffectRunAction( // TODO: restrict duelist weapon
+                    SavingThrowType.Unknown,
+                    Helper.CreateConditional(
+                        condition: new Condition[] {
+                            new ContextConditionAttackRoll(canBeRanged: false), },
+                            //new ContextConditionDuelistWeapon() },
+                        ifTrue: new GameAction[] {
+                            new ContextActionDealWeaponDamage { CanBeRanged = false },
+                            Helper.CreateContextActionApplyBuff("886c7407dc629dc499b9f1465ff382df", Helper.CreateContextDurationValue(1), dispellable: false) }) //Confusion
+                    )
+                );
+            var panache10 = Helper.CreateBlueprintFeature(
+                "Panache_TargetedStrike",
+                "Targeted Strike",
+                "WIP"
+                ).SetComponents(
+                Helper.CreateAddFacts(disarm_ab)
+                );
+
             var f11_panache = Helper.CreateBlueprintFeature(
                 "VirtuousBravoAdvancedDeeds",
                 "Advanced Deeds",
                 "At 11th level, a virtuous bravo gains the following swashbuckler deeds: bleeding wound, evasive, subtle blade, superior feint, swashbuckler’s grace, and targeted strike.\nThis ability replaces aura of justice."
                 ).SetComponents(
-                Helper.CreateAddFacts(panache6, panache7, panache8,
+                Helper.CreateAddFacts(panache6, panache7, panache8, panache9, panache10,
                 "576933720c440aa4d8d42b0c54b77e80", //Evasion
                 "3c08d842e802c3e4eb19d15496145709", //UncannyDodge
                 "485a18c05792521459c7d06c63128c79") //ImprovedUncannyDodge
@@ -224,6 +286,8 @@ namespace DarkCodex
                 Helper.CreateLevelEntry(11, "9f13fdd044ccb8a439f27417481cb00e"), //AuraOfJusticeFeature
                 Helper.CreateLevelEntry(20, "eff3b63f744868845a2f511e9929f0de") //HolyChampion
                 );
+
+            Main.Patch(typeof(Patch_VirtuousBravo));
 
             Helper.AppendAndReplace(ref paladin.Get().m_Archetypes, archetype.ToRef());
         }
@@ -250,9 +314,7 @@ namespace DarkCodex
         
         Virtuous Bravo
 
-        *Swashbuckler’s Grace (Ex): At 7th level, while the swashbuckler has at least 1 panache point, she takes no penalty for moving at full speed when she uses Acrobatics to attempt to move through a threatened area or an enemy’s space.
         *Targeted Strike (Ex): At 7th level, as a full-round action the swashbuckler can spend 1 panache point to make an attack with a single light or one-handed piercing melee weapon that cripples part of a foe’s body. The swashbuckler chooses a part of the body to target. If the attack succeeds, in addition to the attack’s normal damage, the target suffers one of the following effects based on the part of the body targeted. If a creature doesn’t have one of the listed body locations, that body part cannot be targeted. Creatures that are immune to sneak attacks are also immune to targeted strikes. Items or abilities that protect a creature from critical hits also protect a creature from targeted strikes.
-            *Arms: The target takes no damage from the attack, but it drops one carried item of the swashbuckler’s choice, even if the item is wielded with two hands. Items held in a locked gauntlet cannot be chosen.
             *Head: The target is confused for 1 round. This is a mind-affecting effect.
             *Legs: The target is knocked prone. Creatures with four or more legs or that are immune to trip attacks are immune to this effect.
             *Torso or Wings: The target is staggered for 1 round.
