@@ -1,4 +1,5 @@
-﻿using Kingmaker.EntitySystem.Entities;
+﻿using Kingmaker.ElementsSystem;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums.Damage;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
@@ -12,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// A simplified ContextDiceValue without context.
+    /// </summary>
     public class DiceValue
     {
         public int Dice;
@@ -28,21 +32,28 @@ namespace CodexLib
             return new DirectDamage(new DiceFormula(Dice, DiceType), Bonus);
         }
 
-        public DiceValue Increase(ContextDiceValue value, MechanicsContext context)
+        public int Roll()
         {
-            this.Dice += value.DiceCountValue.Calculate(context);
+            return RulebookEvent.Dice.D(new DiceFormula(this.Dice, this.DiceType)) + this.Bonus;
+        }
+        
+        public DiceValue Increase(ContextDiceValue value, MechanicsContext context) => Increase(Get(value, context));
+        public DiceValue Increase(DiceValue value)
+        {
+            this.Dice += value.Dice;
             if (this.DiceType < value.DiceType)
                 this.DiceType = value.DiceType;
-            this.Bonus += value.BonusValue.Calculate(context);
+            this.Bonus += value.Bonus;
             return this;
         }
 
-        public DiceValue Max(ContextDiceValue value, MechanicsContext context)
+        public DiceValue Max(ContextDiceValue value, MechanicsContext context) => Max(Get(value, context));
+        public DiceValue Max(DiceValue value)
         {
-            this.Dice = Math.Max(this.Dice, value.DiceCountValue.Calculate(context));
+            this.Dice = Math.Max(this.Dice, value.Dice);
             if (this.DiceType < value.DiceType)
                 this.DiceType = value.DiceType;
-            this.Bonus = Math.Max(this.Bonus, value.BonusValue.Calculate(context));
+            this.Bonus = Math.Max(this.Bonus, value.Bonus);
             return this;
         }
 
@@ -53,6 +64,23 @@ namespace CodexLib
             result.DiceType = value.DiceType;
             result.Bonus = value.BonusValue.Calculate(context);
             return result;
+        }
+
+        public override string ToString()
+        {
+            return $"{Dice}d{(int)DiceType}+{Bonus}";
+        }
+
+        public static implicit operator DiceValue(ContextDiceValue value)
+        {
+            var context = ContextData<MechanicsContext.Data>.Current?.Context;
+            if (context == null)
+            {
+                Helper.PrintException(new ExceptionDebug("DiceValue missing Context"));
+                return new();
+            }
+
+            return Get(value, context);
         }
     }
 }

@@ -10,7 +10,6 @@ namespace DarkCodex
     [HarmonyPatch]
     public class Patch_ProdigiousTWF
     {
-        // Excellent Transpiler Example
         [HarmonyPatch(typeof(TwoWeaponFightingAttackPenalty), nameof(TwoWeaponFightingAttackPenalty.OnEventAboutToTrigger), typeof(RuleCalculateAttackBonusWithoutTarget))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)

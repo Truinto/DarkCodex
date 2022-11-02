@@ -854,6 +854,50 @@ namespace CodexLib
             EventBus.RaiseEvent<IWarningNotificationUIHandler>(h => h.HandleWarning(text, false));
         }
 
+        internal static Exception SetStackTrace(this Exception target) => _SetStackTrace(target, new StackTrace(true));
+
+        /// <summary>Source: https://stackoverflow.com/a/63685720</summary>
+        private static readonly Func<Exception, StackTrace, Exception> _SetStackTrace = new Func<Func<Exception, StackTrace, Exception>>(() =>
+        {
+            // https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/
+            // Exception Set(Exception ex, StackTrace stack)
+            // {
+            //      ex._stackTraceString = stack.ToString(TraceFormat.Normal);
+            // }
+
+            ParameterExpression target = Expression.Parameter(typeof(Exception));
+            ParameterExpression stack = Expression.Parameter(typeof(StackTrace));
+            Type traceFormatType = typeof(StackTrace).GetNestedType("TraceFormat", BindingFlags.NonPublic);
+            MethodInfo toString = typeof(StackTrace).GetMethod("ToString", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { traceFormatType }, null);
+            object normalTraceFormat = Enum.GetValues(traceFormatType).GetValue(0); // Enum.ToObject(traceFormatType, 0);
+            FieldInfo stackTraceStringField = typeof(Exception).GetField("_stackTraceString", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            MethodCallExpression stackTraceString = Expression.Call(stack, toString, Expression.Constant(normalTraceFormat, traceFormatType));
+            BinaryExpression assign = Expression.Assign(Expression.Field(target, stackTraceStringField), stackTraceString);
+            return Expression.Lambda<Func<Exception, StackTrace, Exception>>(Expression.Block(assign, target), target, stack).Compile();
+        })();
+
+        //private static Exception SetStackTrace2(this Exception target) => _SetStackTrace2(target);
+        //private static readonly Func<Exception, Exception> _SetStackTrace2 = new Func<Func<Exception, Exception>>(() =>
+        //{
+        //    // Exception Set(Exception ex)
+        //    // {
+        //    //      ex._stackTraceString = new StackTrace(true).ToString(TraceFormat.Normal);
+        //    // }
+        //    //
+        //    ParameterExpression target = Expression.Parameter(typeof(Exception));
+        //    Type traceFormatType = typeof(StackTrace).GetNestedType("TraceFormat", BindingFlags.NonPublic);
+        //    MethodInfo toString = typeof(StackTrace).GetMethod("ToString", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { traceFormatType }, null);
+        //    object normalTraceFormat = Enum.GetValues(traceFormatType).GetValue(0); // Enum.ToObject(traceFormatType, 0);
+        //    FieldInfo stackTraceStringField = typeof(Exception).GetField("_stackTraceString", BindingFlags.NonPublic | BindingFlags.Instance);
+        //    ConstructorInfo newStackInfo = typeof(StackTrace).GetConstructor(new Type[] { typeof(bool) });
+        //    //
+        //    NewExpression newStack = Expression.New(newStackInfo, Expression.Constant(false, typeof(bool)));
+        //    MethodCallExpression stackTraceString = Expression.Call(newStack, toString, Expression.Constant(normalTraceFormat, traceFormatType));
+        //    BinaryExpression assign = Expression.Assign(Expression.Field(target, stackTraceStringField), stackTraceString);
+        //    return Expression.Lambda<Func<Exception, Exception>>(Expression.Block(assign, target), target).Compile();
+        //})();
+
         #endregion
 
         #region Keyboard
@@ -3174,6 +3218,8 @@ namespace CodexLib
         {
             var result = new ContextConditionSharedValueHigher();
 
+            result.SharedValue = sharedValue;
+
             switch (equality)
             {
                 case Equality.HigherThan:
@@ -3190,6 +3236,8 @@ namespace CodexLib
                     result.HigherOrEqual = value;
                     result.Inverted = true;
                     break;
+                default:
+                    throw new ArgumentException();
             }
 
             return result;
@@ -3560,6 +3608,7 @@ namespace CodexLib
             return result;
         }
 
+        /// <param name="feat">type: <b>BlueprintFeature</b></param>
         public static PrerequisiteFeature CreatePrerequisiteFeature(this AnyRef feat, bool any = false)
         {
             var result = new PrerequisiteFeature();
@@ -3576,6 +3625,7 @@ namespace CodexLib
             return result;
         }
 
+        /// <param name="class">type: <b>BlueprintCharacterClass</b></param>
         public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(AnyRef @class, int level, bool any = false) => CreatePrerequisiteClassLevel((BlueprintCharacterClassReference)@class, level, any);
         public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(BlueprintCharacterClassReference @class, int level, bool any = false)
         {
@@ -4135,6 +4185,11 @@ namespace CodexLib
                 Print($"ERROR: invalid conversion {sb.name} : {guid}");
 
             return null;
+        }
+
+        public static SimpleBlueprint Get(string guid)
+        {
+            return ResourcesLibrary.TryGetBlueprint(BlueprintGuid.Parse(guid));
         }
 
         #endregion

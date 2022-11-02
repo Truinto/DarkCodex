@@ -144,15 +144,29 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(abundant_smite, true),
                 Helper.CreatePrerequisiteFeature(abundant_smitechaos, true)
-                );
+                ).ToRef<BlueprintUnitFactReference>();
 
-            smite_evil.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
-            smite_chaos.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
-            mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
+            smite_evil.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
+            smite_chaos.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
+            mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
             if (Settings.State.reallyFreeCost)
-                mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2());
+                mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
 
-            Helper.AddMythicTalent(limitless);
+            Helper.AddMythicTalent(limitless.ToRef<BlueprintFeatureReference>());
+
+            // MicroscopicContentExpansion
+            if (Helper.Get("09a8551df5e041b4a872bd33f67d70a3") is BlueprintAbility smite_good //AntipaladinSmiteGoodAbility
+                && Helper.Get("8939eff25a0a4b77ad1ab6be4c760a6c") is BlueprintCharacterClass antipaladin) //AntipaladinClass
+            {
+                smite_good.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
+                limitless.Get().AddComponents(Helper.CreatePrerequisiteClassLevel(antipaladin, 1, true));
+            }
+            if (Helper.Get("0ee0605a1c9342a0b635956a3755fa35") is BlueprintAbility mark_of_injustice) //AntipaladinAuraofVengeanceAbility
+            {
+                mark_of_injustice.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
+                if (Settings.State.reallyFreeCost)
+                    mark_of_injustice.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
+            }
         }
 
         [PatchInfo(Severity.Create, "Limitless Bombs", "mythic ability: infinite alchemist bombs and incenses", true)]
@@ -309,9 +323,8 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
 
             // TableTopTweaks
-            var ttt_feature = Helper.Get<BlueprintFeature>("22731cf358814278b18e6ab4e741e988"); //WarriorSpiritFeature
-            var ttt_ability = Helper.Get<BlueprintAbility>("55929e3504f84f5095dd60ad0fbb1c29"); //WarriorSpiritToggleAbility
-            if (ttt_feature != null && ttt_ability != null)
+            if (Helper.Get("22731cf358814278b18e6ab4e741e988") is BlueprintFeature ttt_feature //WarriorSpiritFeature
+                && Helper.Get("55929e3504f84f5095dd60ad0fbb1c29") is BlueprintAbility ttt_ability) //WarriorSpiritToggleAbility
             {
                 limitless.AddComponents(Helper.CreatePrerequisiteFeature(ttt_feature.ToRef(), true));
                 ttt_ability.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts?.Add(limitless.ToRef2());
@@ -842,7 +855,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(
                 ref Helper.Get<BlueprintFeature>("5cb58e6e406525342842a073fb70d068").GetComponent<PrerequisiteFeaturesFromList>().m_Features, //LimitlessRage
                 Helper.ToRef<BlueprintFeatureReference>("64c5dfe0ba664dd38b7e914ef0912a1c")); //ElementalRampagerRampageFeature
-            Helper.Get<BlueprintActivatableAbility>("5814af7966274c2f9f0456c5f4ab271c").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint 
+            Helper.Get<BlueprintActivatableAbility>("5814af7966274c2f9f0456c5f4ab271c").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint
                 = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
         }
 

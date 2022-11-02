@@ -115,7 +115,7 @@ namespace DarkCodex
                 },
                 ifTrue: new GameAction[] {
                     Helper.CreateContextActionChangeSharedValue(AbilitySharedValue.DurationSecond, add: 1),
-                                        new ContextActionSavingThrow {
+                    new ContextActionSavingThrow {
                         Type = SavingThrowType.Will,
                         Actions = Helper.CreateActionList(
                             Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.CreateContextDiceValue(DiceType.Zero, 0, Helper.CreateContextValue(AbilitySharedValue.Heal)), false, true),

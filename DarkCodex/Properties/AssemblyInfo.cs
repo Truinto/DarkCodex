@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("DarkCodex")]
 [assembly: AssemblyDescription("Mod for Pathfinder: Wrath of the Righteous")]
 
-[assembly: AssemblyVersion("1.5.4")]
-[assembly: AssemblyFileVersion("1.5.4")]
+[assembly: AssemblyVersion("1.5.5")]
+[assembly: AssemblyFileVersion("1.5.5")]
 [assembly: ComVisible(false)]
 [assembly: Guid("1b87b8ea-001b-4fe4-9993-77c33bffba87")]

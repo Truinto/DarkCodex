@@ -442,9 +442,9 @@ namespace DarkCodex
 
             [HarmonyPatch(typeof(ContextConditionSharedValueHigher), nameof(ContextConditionSharedValueHigher.CheckCondition))]
             [HarmonyPostfix]
-            public static void Postfix2(ContextConditionSharedValueHigher __instance)
+            public static void Postfix2(bool __result, ContextConditionSharedValueHigher __instance)
             {
-                Main.PrintDebug($"is shared DurationSecond={__instance.Context[AbilitySharedValue.DurationSecond]} 2={__instance.AbilityContext[AbilitySharedValue.DurationSecond]}");
+                Main.PrintDebug($"is shared DurationSecond={__instance.Context[AbilitySharedValue.DurationSecond]} 2={__instance.AbilityContext[AbilitySharedValue.DurationSecond]} r={__result}");
             }
         }
 

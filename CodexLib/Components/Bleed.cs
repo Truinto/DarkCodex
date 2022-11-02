@@ -44,7 +44,7 @@ namespace CodexLib
                 return;
 
             var ruleDamage = new RuleDealDamage(this.Owner, this.Owner, damage);
-            this.Context.TriggerRule(ruleDamage);
+            Rulebook.Trigger(ruleDamage);
 
             Helper.PrintDebug($"BleedBuff.OnNewRound result={ruleDamage.Result}");
 
@@ -62,33 +62,26 @@ namespace CodexLib
                 this.Owner.Buffs.RemoveFact(this.Buff);
         }
 
-        public void Apply(ContextDiceValue newValue, bool isStacking, bool isFlensing)
+        public void Apply(UnitEntityData caster, UnitEntityData target, DiceValue dice, bool isStacking, bool isFlensing)
         {
-            var caster = this.Context.MaybeCaster;
-            var target = this.Owner;
-
             if (caster == null || target == null)
                 return;
 
-            //this.Context[AbilityRankType.Default] = caster.Stats.SneakAttack.ModifiedValue;
-            int rank = this.Context[AbilityRankType.Default];
-            int sneak = caster.Stats.SneakAttack.ModifiedValue;
-
-            var data = this.Data;
             DiceValue bleedValue;
+            var data = this.Data;
             if (data.Value == null)
-                bleedValue = data.Value = DiceValue.Get(newValue, this.Context);
+                bleedValue = data.Value = dice;
             else if (isStacking)
-                bleedValue = data.Value.Increase(newValue, this.Context);
+                bleedValue = data.Value.Increase(dice);
             else
-                bleedValue = data.Value.Max(newValue, this.Context);
+                bleedValue = data.Value.Max(dice);
 
             var damage = bleedValue.GetDirect(); // maybe use physical, if still conflicting with energy attacks
             var ruleDamage = new RuleDealDamage(caster, target, damage);
-            this.Context.TriggerRule(ruleDamage);
+            Rulebook.Trigger(ruleDamage);
 
-            Helper.PrintDebug($"BleedBuff.Apply {newValue.DiceCountValue}d{(int)newValue.DiceType}+{newValue.BonusValue} rank={rank} sneak={sneak} result={ruleDamage.Result} caster={caster}");
-            
+            Helper.PrintDebug($"BleedBuff.Apply {dice} result={ruleDamage.Result}");
+
             if (isFlensing)
             {
                 var ac = target.Stats.GetStat(StatType.AC);
@@ -96,7 +89,7 @@ namespace CodexLib
                 natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorEnhancement);
                 natural += ac.GetDescriptorBonus(ModifierDescriptor.NaturalArmorForm);
                 natural = Math.Max(0, natural);
-                int value = newValue.Calculate(this.Context);
+                int value = dice.Roll();
                 int malus = Math.Min(natural, value);
 
                 Helper.PrintDebug($" -flensing natural={natural} value={value} malus={malus}");
@@ -106,9 +99,15 @@ namespace CodexLib
                     var modifier = this.Buff.m_StoredMods?.FirstOrDefault();
                     if (modifier == null)
                     {
-                        modifier = ac.AddModifier(-malus, ModifierDescriptor.NaturalArmor);
-                        modifier.StackMode = ModifiableValue.StackMode.ForceStack;
-                        this.Buff.StoreModifier(modifier);
+                        this.Buff.StoreModifier(ac.AddModifier(new ModifiableValue.Modifier
+                        {
+                            ModValue = -malus,
+                            ModDescriptor = ModifierDescriptor.NaturalArmor,
+                            StackMode = ModifiableValue.StackMode.ForceStack,
+                            AppliedTo = ac,
+                            Source = this.Fact,
+                            SourceComponent = this.name
+                        }));
                     }
                     else
                     {
@@ -119,11 +118,8 @@ namespace CodexLib
             }
         }
 
-        //public DiceValue Value { get => this.Data.Value; set => this.Data.Value = value; }
-
         public class RuntimeData
         {
-            [JsonProperty]
             public DiceValue Value;
         }
 
@@ -147,8 +143,8 @@ namespace CodexLib
                 );
 
             BuffBleed.Set(result);
-            Helper.AddAsset(result, BuffBleed.deserializedGuid);
         }
+
     }
 
     public class ContextActionIncreaseBleed : ContextAction
@@ -161,7 +157,7 @@ namespace CodexLib
         {
         }
 
-        public ContextActionIncreaseBleed(bool flensing)
+        public ContextActionIncreaseBleed(bool flensing = false)
         {
             this.IsFlensing = flensing;
             this.Value = new ContextDiceValue()
@@ -176,17 +172,16 @@ namespace CodexLib
 
         public override void RunAction()
         {
-            var context = this.Context;
-            if (context == null)
-                return;
-
             Buff buff = this.Target.Unit.Buffs.GetBuff(BleedBuff.BuffBleed);
             if (buff == null)
-                buff = this.Target.Unit.Descriptor.AddBuff(BleedBuff.BuffBleed, context);
+                buff = this.Target.Unit.Descriptor.AddBuff(BleedBuff.BuffBleed, this.Context);
             if (buff == null)
                 return;
 
-            buff.CallComponents<BleedBuff>(c => c.Apply(this.Value, this.IsStacking, this.IsFlensing));
+            Helper.PrintDebug($"ContextActionIncreaseBleed {this.Value} rank={this.Context[AbilityRankType.Default]} sneak={this.Context.MaybeCaster.Stats.SneakAttack.ModifiedValue}");
+
+            buff.CallComponents<BleedBuff>(c => c.Apply(this.Context.MaybeCaster, this.Target.Unit, this.Value, this.IsStacking, this.IsFlensing));
+
             //ApplyBleed(buff, bleed);
             //buff.Owner.Buffs.UpdateNextEvent();
         }
