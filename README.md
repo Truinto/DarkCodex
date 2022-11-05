@@ -84,6 +84,7 @@ Content
 |Magus.PatchSwordSaint|allow Sword Saint to pick any weapon focus|:house:|:heavy_check_mark:|
 |MartialArt.CreateProdigiousTwoWeaponFighting|combat feat: use STR for TWF and always treat offhand as light|:book:|:heavy_check_mark:|
 |Monk.CreateFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
+|Monk.PatchSoheiRapidShot|disallow rapid shot for Sohei|:house:|:heavy_check_mark:|
 |Mythic.CreateDemonLord|adds features of Demon Lords to the mythic Demon progression: teleport at will, ...|:house:|:construction:|
 |Mythic.CreateDemonMastery|mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect|:house:|:heavy_check_mark:|
 |Mythic.CreateExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:house:|:heavy_check_mark:|
@@ -122,10 +123,12 @@ Content
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
 |Spellcasters.CreateBestowHope|basic feat: channel energy reduces fear|:book:|:heavy_check_mark:|
+|Spellcasters.CreateEnergyChannel|basic feat: channel energy through weapon attacks|:book:|:heavy_check_mark:|
 |Spellcasters.CreatePurifyingChannel|basic feat: channel positive energy deals fire damage|:book:|:heavy_check_mark:|
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
+|Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
 |Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
 |Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:heavy_check_mark:|

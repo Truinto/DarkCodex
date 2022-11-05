@@ -1319,8 +1319,8 @@ namespace DarkCodex
                 list.Add(Helper.CreateContextActionDealDamage(p, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, writeShare: isComposite));
             if (e != (DamageEnergyType)255)
                 list.Add(Helper.CreateContextActionDealDamage(e, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, readShare: isComposite));
-
-            var runaction = Helper.CreateAbilityEffectRunAction(save, list.ToArray());
+            
+            var runaction = Helper.CreateAbilityEffectRunAction(save, ifFalse: list.ToArray());
             actions = runaction.Actions;
             return runaction;
         }

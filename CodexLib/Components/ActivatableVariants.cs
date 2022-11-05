@@ -12,6 +12,7 @@ namespace CodexLib
     /// Component to add foldable to any BlueprintAbility or BlueprintActivatableAbility. Takes priority over existing conversions, if any.
     /// </summary>
     [AllowedOn(typeof(BlueprintActivatableAbility))]
+    [AllowedOn(typeof(BlueprintAbility))]
     public class ActivatableVariants : UnitFactComponentDelegate<VariantSelectionData>, IActionBarConvert
     {
         public bool NeedFact = true;

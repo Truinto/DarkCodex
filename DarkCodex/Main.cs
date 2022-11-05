@@ -470,6 +470,7 @@ namespace Shared
 
             // Spells - early
             LoadSafe(Spells.CreateBladedDash);
+            LoadSafe(Spells.CreateHealingFlames);
             LoadSafe(Spells.PatchVarious);
 
             // General
@@ -491,6 +492,7 @@ namespace Shared
             LoadSafe(Spellcasters.PatchArcanistBrownFur);
             LoadSafe(Spellcasters.CreatePurifyingChannel);
             LoadSafe(Spellcasters.CreateBestowHope);
+            LoadSafe(Spellcasters.CreateEnergyChannel);
 
             // MartialArt
             LoadSafe(MartialArt.CreateProdigiousTwoWeaponFighting);
@@ -563,6 +565,7 @@ namespace Shared
 
             // Monk
             LoadSafe(Monk.CreateFeralCombatTraining);
+            LoadSafe(Monk.PatchSoheiRapidShot);
 
             // Witch
             LoadSafe(Witch.CreateIceTomb);

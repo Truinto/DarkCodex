@@ -12,7 +12,7 @@ namespace CodexLib
     /// This is an example on how to get the variant data from a buff applied from activatable ability.
     /// </summary>
     [AllowedOn(typeof(BlueprintBuff))]
-    public class ActivatableVariantsExample : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleAttackWithWeapon>
+    public class ActivatableVariantsBuffExample : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleAttackWithWeapon>
     {
         public void OnEventAboutToTrigger(RuleAttackWithWeapon evt)
         {

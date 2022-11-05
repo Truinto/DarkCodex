@@ -713,6 +713,12 @@ namespace DarkCodex
 
             public const string PreStart_Electric = "a0b5b95a9a139944c965c593a0a77ff7";
             public const string Start_Electric = "4daa50efa21f9564fb3c5cd35d022cbf";
+
+            public const string Burst10_Flamestrike = "d4d5d1e3ca05da444a969ecb217d8f15";
+            public const string Burst10_Fire = "a4464254a634f9f41a91a37cb8ef48fd";
+            public const string Burst10_Magma = "0e2c7eccf4456fb4285ceff4c2dae0fa";
+            public const string Burst15_Holy = "94708cc80dd5eb14a9a5ec04365a1fdc";
+            public const string Burst30_Holy = "d58c16961298c6f4490ed4c158c142e6";
         }
     }
 }

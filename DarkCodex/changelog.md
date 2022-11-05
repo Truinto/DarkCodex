@@ -1,6 +1,13 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.6]
+- fixed Bestow Hope only working on cleric channel
+- added Energy Channel: basic feat channel energy through weapon attacks #168
+- added spell Healing Flames #169
+- fixed Patch_ParryAlways #156
+- changed bleeding logic
+
 ## [1.5.5]
 - added limitless smite to antipaladin #166
 - fixed Purifying Channel hitting all enemies #150

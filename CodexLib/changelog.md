@@ -2,7 +2,9 @@
 
 ## [1.3.1]
 - !signature change Helper.Calls(CodeInstruction, FieldInfo) to Helper.Calls(CodeInstruction, MemberInfo)
+- changed logic in CreateAbilityEffectRunAction
 - removed redudant Helper.IsStloc
+- fixed morphing bug in Helper.Clone
 
 ## [1.3.0]
 - fixes for 2.0 release

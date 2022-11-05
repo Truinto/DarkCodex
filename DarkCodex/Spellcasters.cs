@@ -158,7 +158,7 @@ namespace DarkCodex
                 "Bestow Hope",
                 "When you heal a creature by channeling positive energy, you also relieve its fear. If a creature you heal is shaken, that condition ends. If the creature is frightened, it becomes shaken instead. If the creature is panicked, it becomes frightened instead."
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature("a79013ff4bcd4864cb669622a29ddafb"), //ChannelEnergyFeature
+                Helper.Get<BlueprintFeature>("fd30c69417b434d47b6b03b9c1f568ff").GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any), //SelectiveChannel
                 Helper.CreatePrerequisiteFeaturesFromList(false, deities)
                 );
 
@@ -182,6 +182,74 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("d470eb6b3b31fde4bb44ec753de0b862").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //WitchDoctorChannelEnergy
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("75edd403e824aa048ab5d4827b803b08").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //HexChannelerChannelEnergy
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("b9eca127dd82f554fb2ccd804de86cf6").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //OracleRevelationChannelAbility
+
+            Helper.AddFeats(feat);
+        }
+
+        [PatchInfo(Severity.Create, "Energy Channel", "basic feat: channel energy through weapon attacks", false)]
+        public static void CreateEnergyChannel()
+        {
+            AnyRef buff = Helper.CreateBlueprintBuff(
+                "EnergyChannelBuff"
+                ).SetComponents(
+                new EnergyChannel()
+                );
+
+            var acid = Helper.CreateBlueprintAbility(
+                "EnergyChannelAbilityAcid",
+                "Energy Channel – Acid",
+                "As a swift action, you can expend one use of channel energy to grant your weapon attacks a bonus on damage rolls equal to twice the number of dice rolled for your channel energy. This additional damage is of an energy type determined by your domain or blessing: acid (Earth), cold (Water), electricity (Air), or fire (Fire).",
+                icon: Helper.StealIcon("0c852a2405dd9f14a8bbcfaf245ff823"),
+                type: AbilityType.Supernatural,
+                actionType: UnitCommand.CommandType.Swift,
+                range: AbilityRange.Personal
+                ).TargetSelf(
+                ).SetComponents(
+                new ActivatableVariants(
+                    "279447a6bf2d3544d93a0a39c3b8e91d", //ChannelPositiveHarm
+                    "89df18039ef22174b81052e2e419c728", //ChannelNegativeEnergy
+                    "d899a34f7d39170449120d155199ab2d", //PurifierSacredScourgeAbility
+                    "ab0635df6b4674e4e96809bd718cab89", //OracleRevelationChannelHarmAbility
+                    "cc17243b2185f814aa909ac6b6599eaa", //ChannelEnergyHospitalerHarm
+                    "4937473d1cfd7774a979b625fb833b47", //ChannelEnergyPaladinHarm
+                    "17e5f3fa4754bba4391c02fba1142465", //SpiritWardenChannelPositiveHarm
+                    "193cef80f7287e648874d3df1eb81159", //WitchDoctorChannelPositiveHarm
+                    "0fb4bb4eae14fe84e8b45d8ea207c4e1", //ShamanLifeSpiritChannelEnergy
+                    "e1536ee240c5d4141bf9f9485a665128", //ChannelEnergyEmpyrealHarm
+                    "023bd78a3b068e84aad2b1fd273daae1", //WarpriestChannelNegativeEnergy
+                    "fd5d66b9b64cca6499d4d17af0f5577c", //WarpriestChannelPositiveHarm
+                    "894e20539c353c74ab2733a056351947", //WarpriestShieldbearerChannelPositiveHarm
+                    "d5f525a9c5efa634d843d5c35f074f02", //WarpriestShieldbearerChannelNegativeEnergy
+                    "fb917ad147d846e42ad22c8e14f44b79", //HexChannelerChannelPositiveHarm
+                    "fb2df4978dd4fd745a7aaecfd1068512", //HexChannelerChannelNegativeEnergy
+                    "a087951516895d64dbae77434f4967bd"),//LichChannelNegativeHarm
+                new EnergyChannelApplyEffect(buff, DamageEnergyType.Acid),
+                Helper.CreateAbilityShowIfCasterHasFact("08bbcbfe5eb84604481f384c517ac800") //EarthDomain
+                );
+            var cold = acid.Clone("EnergyChannelAbilityCold").SetUIData(displayname: "Energy Channel – Cold", icon: Helper.StealIcon("403bcf42f08ca70498432cf62abee434"));
+            cold.GetComponent<EnergyChannelApplyEffect>().Element = DamageEnergyType.Cold;
+            cold.GetComponent<AbilityShowIfCasterHasFact>().m_UnitFact = Helper.ToRef<BlueprintUnitFactReference>("e63d9133cebf2cf4788e61432a939084"); //WaterDomain
+            var electricity = acid.Clone("EnergyChannelAbilityElectricity").SetUIData(displayname: "Energy Channel – Electricity", icon: Helper.StealIcon("d2cff9243a7ee804cb6d5be47af30c73"));
+            electricity.GetComponent<EnergyChannelApplyEffect>().Element = DamageEnergyType.Electricity;
+            electricity.GetComponent<AbilityShowIfCasterHasFact>().m_UnitFact = Helper.ToRef<BlueprintUnitFactReference>("750bfcd133cd52f42acbd4f7bc9cc365"); //AirDomain
+            var fire = acid.Clone("EnergyChannelAbilityFire").SetUIData(displayname: "Energy Channel – Fire", icon: Helper.StealIcon("cdb106d53c65bbc4086183d54c3b97c7"));
+            fire.GetComponent<EnergyChannelApplyEffect>().Element = DamageEnergyType.Fire;
+            fire.GetComponent<AbilityShowIfCasterHasFact>().m_UnitFact = Helper.ToRef<BlueprintUnitFactReference>("881b2137a1779294c8956fe5b497cc35"); //FireDomain
+
+            var feat = Helper.CreateBlueprintFeature(
+                "EnergyChannelFeature",
+                "Energy Channel",
+                "You distill your channeled energy into your weapon to empower it.\nBenefit: As a swift action, you can expend one use of channel energy to grant your weapon attacks a bonus on damage rolls equal to twice the number of dice rolled for your channel energy. This additional damage is of an energy type determined by your domain or blessing: acid (Earth), cold (Water), electricity (Air), or fire (Fire). This effect lasts for 3 minutes, but each time you use this effect, reduce the remaining duration by 1 minute."
+                ).SetComponents(
+                Helper.CreateAddFacts(acid, cold, electricity, fire),
+                Helper.Get<BlueprintFeature>("fd30c69417b434d47b6b03b9c1f568ff").GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any), //SelectiveChannel
+                Helper.CreatePrerequisiteFeaturesFromList(new AnyRef[] {
+                    "08bbcbfe5eb84604481f384c517ac800", //EarthDomain
+                    "e63d9133cebf2cf4788e61432a939084", //WaterDomain
+                    "750bfcd133cd52f42acbd4f7bc9cc365", //AirDomain
+                    "881b2137a1779294c8956fe5b497cc35", //FireDomain
+                    })
+                );
 
             Helper.AddFeats(feat);
         }

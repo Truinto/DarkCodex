@@ -10,7 +10,11 @@ namespace CodexLib.Patches
         [HarmonyPostfix]
         public static void SetMechanicSlot(ActionBarSlotVM __instance)
         {
-            if (__instance.MechanicActionBarSlot.GetContentData() is UnitFact fact)
+            object obj = __instance.MechanicActionBarSlot.GetContentData();
+            if (obj is AbilityData ability)
+                obj = ability.m_Fact;
+
+            if (obj is UnitFact fact)
             {
                 fact.CallComponents<IActionBarConvert>(a =>
                 {
@@ -39,12 +43,22 @@ namespace CodexLib.Patches
             if (__instance.ConvertedVm.Value != null && !__instance.ConvertedVm.Value.IsDisposed)
                 return true;
 
-            if (__instance.MechanicActionBarSlot.GetContentData() is not UnitFact fact)
+            object obj = __instance.MechanicActionBarSlot.GetContentData();
+            if (obj is AbilityData ability)
+                obj = ability.m_Fact;
+
+            if (obj is not UnitFact fact)
                 return true;
 
-            fact.CallComponents<IActionBarConvert>(a => __instance.ConvertedVm.Value = new ActionBarConvertedVMAny(__instance, a.GetConverts(), __instance.CloseConvert));
+            bool hasConvert = false;
+            fact.CallComponents<IActionBarConvert>(a =>
+            {
+                if (!hasConvert)
+                    __instance.ConvertedVm.Value = new ActionBarConvertedVMAny(__instance, a.GetConverts(), __instance.CloseConvert);
+                hasConvert = true;
+            });
 
-            return false;
+            return !hasConvert;
         }
 
         [HarmonyPatch(typeof(ActionBarSlotPCView), "UnityEngine.EventSystems.IEndDragHandler.OnEndDrag")]

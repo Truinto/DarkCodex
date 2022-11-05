@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using CodexLib;
+using Kingmaker.Designers.Mechanics.Recommendations;
 
 namespace DarkCodex
 {
@@ -44,6 +45,15 @@ namespace DarkCodex
             Resource.Cache.FeatureFeralCombat.SetReference(feature);
 
             Helper.AddFeats(Resource.Cache.FeatureFeralCombat);
+        }
+
+        [PatchInfo(Severity.Fix, "Sohei Rapid Shot", "disallow rapid shot for Sohei")]
+        public static void PatchSoheiRapidShot()
+        {
+            Main.Patch(typeof(Patch_MonkRapidShot));
+
+            var rapidshot = Helper.Get<BlueprintFeature>("9c928dc570bb9e54a9649b3ebfe47a41"); //RapidShotFeature
+            Helper.AppendAndReplace(ref rapidshot.GetComponent<RecommendationNoFeatFromGroup>().m_Features, "332362f3bd39ebe46a740a36960fdcb4"); //FlurryOfBlows
         }
 
         public static void CreateMasterOfManyStyles()

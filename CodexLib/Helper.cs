@@ -79,6 +79,7 @@ using static Kingmaker.Visual.Animation.Kingmaker.Actions.UnitAnimationActionCas
 using Kingmaker.UnitLogic.Class.Kineticist;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.Controllers.Dialog;
+using Kingmaker.Designers.EventConditionActionSystem.Conditions;
 
 namespace CodexLib
 {
@@ -444,7 +445,7 @@ namespace CodexLib
             {
                 if (code[i].Calls(mi))
                 {
-                    PrintDebug($"Transpiler RemoveMethods {mi.Name} @{i}");
+                    PrintDebug($"Transpiler RemoveMethods @{i} {mi.Name}");
 
                     code[i].opcode = OpCodes.Nop;
                     code[i++].operand = null;
@@ -487,7 +488,7 @@ namespace CodexLib
                 if (line.opcode.FlowControl != FlowControl.Cond_Branch)
                     continue;
 
-                PrintDebug($"Transpiler NextJumpAlways {line.opcode} @{index}");
+                PrintDebug($"Transpiler NextJumpAlways @{index} {line.opcode}");
 
                 if (line.opcode.OperandType == OperandType.InlineBrTarget)
                     code.Insert(++index, new CodeInstruction(OpCodes.Br, line.operand));
@@ -511,7 +512,7 @@ namespace CodexLib
                 if (line.opcode.FlowControl != FlowControl.Cond_Branch)
                     continue;
 
-                PrintDebug($"Transpiler NextJumpNever {line.opcode} @{index}");
+                PrintDebug($"Transpiler NextJumpNever @{index} {line.opcode}");
 
                 if (line.opcode.StackBehaviourPush != StackBehaviour.Push0)
                     throw new Exception("Cond_Branch should not push onto stack");
@@ -670,6 +671,20 @@ namespace CodexLib
             orig = result;
         }
 
+        public static void AppendAndReplace<T>(ref T[] orig, params AnyRef[] objs) where T : BlueprintReferenceBase, new()
+        {
+            if (orig == null) orig = new T[0];
+            if (objs == null) objs = new AnyRef[0];
+
+            int i, j;
+            T[] result = new T[orig.Length + objs.Length];
+            for (i = 0; i < orig.Length; i++)
+                result[i] = orig[i];
+            for (j = 0; i < result.Length; i++)
+                result[i] = objs[j++].ToRef<T>();
+            orig = result;
+        }
+
         public static void InsertAt<T>(ref T[] orig, T obj, int index = -1)
         {
             if (orig == null) orig = new T[0];
@@ -754,14 +769,30 @@ namespace CodexLib
                     yield return result;
         }
 
-        public static SpellSchool Merge(this IEnumerable<SpellSchool> array)
-        {
-            if (array == null)
-                return default;
+        private static readonly List<object> _list = new();
 
-            SpellSchool result = default;
-            foreach (var value in array)
-                result |= value;
+        /// <summary>
+        /// Gets a static list object. Do not save reference.
+        /// Call <b>Flush&lt;T&gt;()</b> to receive output.
+        /// </summary>
+        public static List<object> GetList()
+        {
+            if (_list.Count != 0)
+            {
+                PrintDebug("Warning: List wasn't flushed!");
+                _list.Clear();
+            }
+            return _list;
+        }
+
+        /// <summary>
+        /// Use when finished with <b>GetList()</b>
+        /// </summary>
+        public static T[] Flush<T>() where T : class
+        {
+            var result = new T[_list.Count];
+            _list.CopyTo(result);
+            _list.Clear();
             return result;
         }
 
@@ -1368,7 +1399,7 @@ namespace CodexLib
 
         public static T AddComponents<T>(this T obj, params object[] components) where T : BlueprintScriptableObject
         {
-            var list = new List<BlueprintComponent>();
+            var list = GetList();
 
             foreach (var comp in components)
             {
@@ -1376,9 +1407,11 @@ namespace CodexLib
                     list.Add(c1);
                 else if (comp is IEnumerable<BlueprintComponent> c2)
                     list.AddRange(c2);
+                else
+                    throw new ArgumentException($"Illegal type {comp?.GetType()}");
             }
 
-            return obj.AddComponents(list.ToArray());
+            return obj.AddComponents(Flush<BlueprintComponent>());
         }
 
         public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
@@ -1397,6 +1430,23 @@ namespace CodexLib
             return obj;
         }
 
+        public static T SetComponents<T>(this T obj, params object[] components) where T : BlueprintScriptableObject
+        {
+            var list = GetList();
+
+            foreach (var comp in components)
+            {
+                if (comp is BlueprintComponent c1)
+                    list.Add(c1);
+                else if (comp is IEnumerable<BlueprintComponent> c2)
+                    list.AddRange(c2);
+                else
+                    throw new ArgumentException($"Illegal type {comp?.GetType()}");
+            }
+
+            return obj.SetComponents(Flush<BlueprintComponent>());
+        }
+
         public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig original, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
         {
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
@@ -1408,7 +1458,7 @@ namespace CodexLib
                     if (replacement.OwnerBlueprint == null)
                         replacement.OwnerBlueprint = obj;
                     else if (replacement.OwnerBlueprint != obj)
-                    PrintDebug($"Warning: reused BlueprintComponent {replacement.name} which is attached to {replacement.OwnerBlueprint} instead of {obj}");
+                        PrintDebug($"Warning: reused BlueprintComponent {replacement.name} which is attached to {replacement.OwnerBlueprint} instead of {obj}");
                     break;
                 }
             }
@@ -1788,6 +1838,43 @@ namespace CodexLib
 
         #region Context Values
 
+        public static readonly ContextValue ContextDefault = CreateContextValue(AbilityRankType.Default);
+        public static readonly ContextValue ContextDamageDice = CreateContextValue(AbilityRankType.DamageDice);
+        public static readonly ContextValue ContextDamageBonus = CreateContextValue(AbilityRankType.DamageBonus);
+        public static readonly ContextValue ContextProjectiles = CreateContextValue(AbilityRankType.ProjectilesCount);
+        public static readonly ContextValue ContextDamageAlt = CreateContextValue(AbilityRankType.DamageDiceAlternative);
+        public static readonly ContextValue ContextStatBonus = CreateContextValue(AbilityRankType.StatBonus);
+        public static readonly ContextValue ContextSpeedBonus = CreateContextValue(AbilityRankType.SpeedBonus);
+
+        public static readonly ContextValue SharedDamage = CreateContextValue(AbilitySharedValue.Damage);
+        public static readonly ContextValue SharedHeal = CreateContextValue(AbilitySharedValue.Heal);
+        public static readonly ContextValue SharedDuration = CreateContextValue(AbilitySharedValue.Duration);
+        public static readonly ContextValue SharedDurationSecond = CreateContextValue(AbilitySharedValue.DurationSecond);
+        public static readonly ContextValue SharedStatBonus = CreateContextValue(AbilitySharedValue.StatBonus);
+        public static readonly ContextValue SharedDamageBonus = CreateContextValue(AbilitySharedValue.DamageBonus);
+        public static readonly ContextValue SharedDungeon = CreateContextValue(AbilitySharedValue.DungeonBoonValue);
+
+        public static readonly ContextDiceValue ContextDiceDefault = ContextDefault.ToDice();
+        public static readonly ContextDiceValue ContextDiceDamageDice = ContextDamageDice.ToDice();
+        public static readonly ContextDiceValue ContextDiceDamageBonus = ContextDamageBonus.ToDice();
+        public static readonly ContextDiceValue ContextDiceProjectiles = ContextProjectiles.ToDice();
+        public static readonly ContextDiceValue ContextDiceDamageAlt = ContextDamageAlt.ToDice();
+        public static readonly ContextDiceValue ContextDiceStatBonus = ContextStatBonus.ToDice();
+        public static readonly ContextDiceValue ContextDiceSpeedBonus = ContextSpeedBonus.ToDice();
+
+        public static readonly ContextDiceValue SharedDiceDamage = SharedDamage.ToDice();
+        public static readonly ContextDiceValue SharedDiceHeal = SharedHeal.ToDice();
+        public static readonly ContextDiceValue SharedDiceDuration = SharedDuration.ToDice();
+        public static readonly ContextDiceValue SharedDiceDurationSecond = SharedDurationSecond.ToDice();
+        public static readonly ContextDiceValue SharedDiceStatBonus = SharedStatBonus.ToDice();
+        public static readonly ContextDiceValue SharedDiceDamageBonus = SharedDamageBonus.ToDice();
+        public static readonly ContextDiceValue SharedDiceDungeon = SharedDungeon.ToDice();
+
+        public static ContextDiceValue ToDice(this ContextValue value)
+        {
+            return CreateContextDiceValue(DiceType.Zero, 0, value);
+        }
+
         public static ContextStatValue CreateContextStatValue(StatType stat, ModifierDescriptor specificModifier = ModifierDescriptor.None, bool raw = false)
         {
             return new ContextStatValue
@@ -1811,6 +1898,27 @@ namespace CodexLib
         public static ContextValue CreateContextValue(AbilitySharedValue value)
         {
             return new ContextValue() { ValueType = ContextValueType.Shared, ValueShared = value };
+        }
+
+        public static ContextDiceValue CreateContextDiceValue(DiceType dice, ContextValue diceCount = null, ContextValue bonus = null)
+        {
+            return new ContextDiceValue()
+            {
+                DiceType = dice,
+                DiceCountValue = diceCount ?? CreateContextValue(),
+                BonusValue = bonus ?? 0
+            };
+        }
+
+
+        public static ContextDiceValue CreateContextDiceValue(DiceType dice, AbilityRankType dicecount, AbilityRankType bonus)
+        {
+            return new ContextDiceValue()
+            {
+                DiceType = dice,
+                DiceCountValue = CreateContextValue(dicecount),
+                BonusValue = CreateContextValue(bonus)
+            };
         }
 
         public static ContextDurationValue CreateContextDurationValue(ContextValue diceCount = null, DiceType dice = DiceType.Zero, ContextValue bonus = null, DurationRate rate = DurationRate.Rounds)
@@ -1870,9 +1978,12 @@ namespace CodexLib
 
             if (result is BlueprintScriptableObject bp)
             {
-                for (int i = 0; i < bp.ComponentsArray.Length; i++)
+                var compsSource = bp.ComponentsArray;
+                var compsTarget = bp.ComponentsArray = new BlueprintComponent[compsSource.Length];
+
+                for (int i = 0; i < compsSource.Length; i++)
                 {
-                    var comp = bp.ComponentsArray[i] = bp.ComponentsArray[i].Clone();
+                    var comp = compsTarget[i] = compsSource[i].Clone();
                     comp.name = $"${comp.GetType().Name}${obj.AssetGuid}${i}";
                     comp.OwnerBlueprint = bp;
                 }
@@ -2176,6 +2287,17 @@ namespace CodexLib
                 Succeed = CreateActionList(succeed),
                 Failed = CreateActionList(failed)
             });
+            return result;
+        }
+
+        /// <summary>
+        /// Use MakeContextActionSavingThrow instead, if you want to inline ContextActionConditionalSaved.
+        /// </summary>
+        public static ContextActionSavingThrow CreateContextActionSavingThrow(SavingThrowType savingthrow, params GameAction[] actions)
+        {
+            var result = new ContextActionSavingThrow();
+            result.Type = savingthrow;
+            result.Actions = CreateActionList(actions);
             return result;
         }
 
@@ -2575,14 +2697,13 @@ namespace CodexLib
             // add new spell to feature's spell selections
             if (_spells1 == null)
             {
-                _list.Add(Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35")); //SpellSpecializationFirst
+                var list = GetList();
+                list.Add(Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35")); //SpellSpecializationFirst
                 foreach (var feature in Helper.Get<BlueprintFeatureSelection>("fe67bc3b04f1cd542b4df6e28b6e0ff5").m_AllFeatures) //SpellSpecializationSelection
                     if (feature.Get() is BlueprintParametrizedFeature specialization)
-                        _list.Add(specialization);
+                        list.Add(specialization);
 
-                _spells1 = new BlueprintParametrizedFeature[_list.Count];
-                _list.CopyTo(_spells1);
-                _list.Clear();
+                _spells1 = Flush<BlueprintParametrizedFeature>();
             }
             var newAllSpells = Append(_spells1[0].BlueprintParameterVariants, spell.ToReference<AnyBlueprintReference>());
             for (int i = 0; i < _spells1.Length; i++)
@@ -3091,24 +3212,13 @@ namespace CodexLib
             return result;
         }
 
-        public static ContextDiceValue CreateContextDiceValue(DiceType dice, ContextValue diceCount = null, ContextValue bonus = null)
+        public static ContextCalculateSharedValue CreateContextCalculateSharedValue(AbilitySharedValue ValueType = AbilitySharedValue.Damage, DiceType diceType = DiceType.Zero, ContextValue diceCount = null, ContextValue bonus = null, double Modifier = 1.0)
         {
-            return new ContextDiceValue()
-            {
-                DiceType = dice,
-                DiceCountValue = diceCount ?? CreateContextValue(),
-                BonusValue = bonus ?? 0
-            };
-        }
-
-        public static ContextDiceValue CreateContextDiceValue(DiceType dice, AbilityRankType dicecount, AbilityRankType bonus)
-        {
-            return new ContextDiceValue()
-            {
-                DiceType = dice,
-                DiceCountValue = CreateContextValue(dicecount),
-                BonusValue = CreateContextValue(bonus)
-            };
+            var result = new ContextCalculateSharedValue();
+            result.ValueType = ValueType;
+            result.Value = CreateContextDiceValue(diceType, diceCount, bonus);
+            result.Modifier = Modifier;
+            return result;
         }
 
         public static ContextActionDealDamage CreateContextActionDealDamage(PhysicalDamageForm physical, ContextDiceValue damage, bool isAoE = false, bool halfIfSaved = false, bool IgnoreCritical = false, bool half = false, bool alreadyHalved = false, AbilitySharedValue sharedValue = 0, bool readShare = false, bool writeShare = false)
@@ -3185,6 +3295,15 @@ namespace CodexLib
             return c;
         }
 
+        public static ContextActionHealTarget CreateContextActionHealTarget(DiceType diceType = DiceType.Zero, ContextValue diceCount = null, ContextValue bonus = null)
+        {
+            var result = new ContextActionHealTarget();
+
+            result.Value = CreateContextDiceValue(diceType, diceCount, bonus);
+
+            return result;
+        }
+
         public static ContextActionChangeSharedValue CreateContextActionChangeSharedValue(AbilitySharedValue sharedValue, ContextValue add = null, ContextValue set = null, ContextValue mult = null)
         {
             var result = new ContextActionChangeSharedValue();
@@ -3239,6 +3358,19 @@ namespace CodexLib
                 default:
                     throw new ArgumentException();
             }
+
+            return result;
+        }
+
+        /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        public static ContextActionReduceBuffDuration CreateContextActionReduceBuffDuration(AnyRef buff, int duration, DurationRate rate = DurationRate.Rounds, bool increase = false, bool toTarget = false)
+        {
+            var result = new ContextActionReduceBuffDuration();
+
+            result.m_TargetBuff = buff;
+            result.ToTarget = toTarget;
+            result.Increase = increase;
+            result.DurationValue = Helper.CreateContextDurationValue(bonus: duration, rate: rate);
 
             return result;
         }
@@ -3313,6 +3445,9 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Runs actions when ability hits. Waits for projectiles. Processes targets. If not 'SavingThrowType.Unknown', will run actions only at failed saving throw.
+        /// </summary>
         public static AbilityEffectRunAction CreateAbilityEffectRunAction(SavingThrowType save = SavingThrowType.Unknown, params GameAction[] actions)
         {
             if (actions == null || actions[0] == null) throw new ArgumentNullException();
@@ -3325,20 +3460,29 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Runs in conditional or with saving throw. Cannot process both at the same time.
+        /// </summary>
         public static AbilityEffectRunAction CreateAbilityEffectRunAction(SavingThrowType save = SavingThrowType.Unknown, Condition[] condition = null, GameAction[] ifTrue = null, GameAction[] ifFalse = null)
         {
             var result = new AbilityEffectRunAction();
             result.SavingThrowType = save;
-            if (condition != null)
+
+            if (condition != null && save != SavingThrowType.Unknown)
+                throw new ArgumentException("Cannot set both saving throw and condition at the same time.");
+            else if (condition != null)
                 result.Actions = CreateActionList(CreateConditional(condition, ifTrue, ifFalse));
             else if (save != SavingThrowType.Unknown)
                 result.Actions = CreateActionList(CreateContextActionConditionalSaved(succeed: ifTrue, failed: ifFalse));
             else
-                throw new ArgumentNullException();
+                result.Actions = CreateActionList(ifTrue ?? ifFalse);
 
             return result;
         }
 
+        /// <summary>
+        /// Runs action before ability is cast. Does not wait for sfx or projectiles. Does not process targets.
+        /// </summary>
         public static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(params GameAction[] actions)
         {
             var result = new AbilityExecuteActionOnCast();
@@ -3347,11 +3491,33 @@ namespace CodexLib
             return result;
         }
 
+        [Obsolete]
         public static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(GameAction[] actions, Condition[] conditions = null, Operation operation = Operation.And)
         {
             var result = new AbilityExecuteActionOnCast();
             result.Actions = CreateActionList(actions);
             result.Conditions = new ConditionsChecker() { Operation = operation, Conditions = conditions ?? Array.Empty<Condition>() };
+            return result;
+        }
+
+        public static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(Condition[] conditions, GameAction[] actions, Operation operation = Operation.And)
+        {
+            var result = new AbilityExecuteActionOnCast();
+            result.Actions = CreateActionList(actions);
+            result.Conditions = new ConditionsChecker() { Operation = operation, Conditions = conditions ?? Array.Empty<Condition>() };
+            return result;
+        }
+
+        public static AbilityTargetsAround CreateAbilityTargetsAround(Feet radius, TargetType targetType = TargetType.Any, Feet? spread = null, bool includedDead = false, Condition[] conditions = null)
+        {
+            var result = new AbilityTargetsAround();
+
+            result.m_TargetType = targetType;
+            result.m_Radius = radius;
+            result.m_SpreadSpeed = spread ?? 25.Feet();
+            result.m_IncludeDead = includedDead;
+            result.m_Condition = new ConditionsChecker { Conditions = conditions };
+
             return result;
         }
 
@@ -3400,6 +3566,14 @@ namespace CodexLib
             var hasBuff = new ContextConditionHasBuff();
             hasBuff.m_Buff = buff.ToRef();
             return hasBuff;
+        }
+
+        public static AlignmentCheck CreateContextConditionAlignment(AlignmentComponent alignment, bool not = false)
+        {
+            var result = new AlignmentCheck();
+            result.Alignment = alignment;
+            result.Not = not;
+            return result;
         }
 
         public static AbilityAcceptBurnOnCast CreateAbilityAcceptBurnOnCast(int burnValue)
@@ -4352,8 +4526,6 @@ namespace CodexLib
             reference.Cached = bp;
         }
 
-        private static List<object> _list = new();
-
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
         {
             return new T { deserializedGuid = BlueprintGuid.Parse(guid) };
@@ -4390,12 +4562,11 @@ namespace CodexLib
             if (source is null)
                 return new T[0];
 
+            var list = GetList();
+
             recursiveToRef(source);
 
-            var result = new T[_list.Count];
-            _list.CopyTo(result);
-            _list.Clear();
-            return result;
+            return Flush<T>();
 
             void recursiveToRef(IEnumerable<object> range)
             {
@@ -4405,7 +4576,7 @@ namespace CodexLib
                     if (sub is IEnumerable<object> range2)
                         recursiveToRef(range2);
                     else if ((t = ToRef<T>(sub)) != null)
-                        _list.Add(t);
+                        list.Add(t);
                 }
             }
         }
@@ -4425,12 +4596,11 @@ namespace CodexLib
             if (source is null)
                 return new AnyRef[0];
 
+            var list = GetList();
+
             recursiveToAny(source);
 
-            var result = new AnyRef[_list.Count];
-            _list.CopyTo(result);
-            _list.Clear();
-            return result;
+            return Flush<AnyRef>();
 
             void recursiveToAny(IEnumerable<object> range)
             {
@@ -4440,7 +4610,7 @@ namespace CodexLib
                     if (sub is IEnumerable<object> range2)
                         recursiveToAny(range2);
                     else if ((any = AnyRef.ToAny(sub)) != null)
-                        _list.Add(any);
+                        list.Add(any);
                 }
             }
         }

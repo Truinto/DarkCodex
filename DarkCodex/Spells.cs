@@ -99,6 +99,63 @@ namespace DarkCodex
             greater.Add(5, "4d72e1e7bd6bc4f4caaea7aa43a14639", "25a5013493bdcf74bb2424532214d0c8"); // Magus, Bard
         }
 
+        [PatchInfo(Severity.Create, "Healing Flames", "spell: Healing Flames", false)]
+        public static void CreateHealingFlames()
+        {
+            /*
+            Healing Flames
+            School conjuration (healing) [fire, good]; Level cleric 4, inquisitor 4, oracle 4, paladin 4, warpriest 4
+            Casting Time 1 standard action
+            Area 10-ft.-radius burst, centered on you
+            Duration instantaneous
+            Saving Throw Reflex half; see text; Spell Resistance yes
+
+            You unleash a blast of holy flames that washes over all creatures in the area in a glorious display of divine power. This deals damage to evil creatures and heals good creatures in the area. The amount of damage dealt and the number of hit points restored in each case is 1d8 points per 2 caster levels (maximum 5d8).
+            Half of the damage this spell deals to evil creatures is fire damage, and half of the damage is pure divine power that is therefore not subject to reduction by energy resistance to fire-based attacks.
+            Neutral enemies within the spell’s area of effect also take the fire damage, but do not take the divine damage. Neutral allies within the area are healed by half as much as good creatures. A successful Reflex saving throw halves the damage taken in all cases.
+            */
+
+            var ab = Helper.CreateBlueprintAbility(
+                "HealingFlames",
+                "Healing Flames",
+                "You unleash a blast of holy flames that washes over all creatures in the area in a glorious display of divine power. This deals damage to evil creatures and heals good creatures in the area. The amount of damage dealt and the number of hit points restored in each case is 1d8 points per 2 caster levels (maximum 5d8).\nHalf of the damage this spell deals to evil creatures is fire damage, and half of the damage is pure divine power that is therefore not subject to reduction by energy resistance to fire-based attacks.\nNeutral enemies within the spell’s area of effect also take the fire damage, but do not take the divine damage. Neutral allies within the area are healed like good creatures. A successful Reflex saving throw halves the damage taken in all cases.",
+                icon: Helper.StealIcon("f5fc9a1a2a3c1a946a31b320d1dd31b2"),
+                type: AbilityType.Spell,
+                range: AbilityRange.Personal
+                ).TargetSelf(
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateConditional(
+                        Helper.CreateContextConditionAlignment(AlignmentComponent.Good),
+                        ifTrue: Helper.CreateContextActionHealTarget(bonus: Helper.SharedHeal),
+                        ifFalse: Helper.CreateConditional(
+                            Helper.CreateContextConditionAlignment(AlignmentComponent.Evil),
+                            ifTrue: Helper.CreateContextActionSavingThrow(SavingThrowType.Reflex, 
+                                Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.SharedDiceHeal, halfIfSaved: true, half: true), 
+                                Helper.CreateContextActionDealDamage(DamageEnergyType.Holy, Helper.SharedDiceHeal, halfIfSaved: true, half: true)),
+                            ifFalse: Helper.CreateConditional(
+                                Helper.CreateContextConditionIsAlly(),
+                                ifTrue: Helper.CreateContextActionHealTarget(bonus: Helper.SharedHeal),
+                                ifFalse: Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.SharedDiceHeal, halfIfSaved: true, half: true)
+                                )))),
+                Helper.CreateContextRankConfig(ContextRankBaseValueType.CasterLevel, ContextRankProgression.Div2, max: 5),
+                Helper.CreateContextCalculateSharedValue(AbilitySharedValue.Heal, DiceType.D8, Helper.ContextDefault),
+                Helper.CreateAbilityTargetsAround(13.Feet()),
+                Helper.CreateAbilitySpawnFx(Resource.Sfx.Burst10_Fire, anchor: AbilitySpawnFxAnchor.Caster),
+                Helper.CreateSpellComponent(SpellSchool.Conjuration),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Good),
+                Helper.CreateCraftInfoComponent()
+                );
+
+            ab.Add(4,
+                "8443ce803d2d31347897a3d85cc32f53", //ClericSpellList +Oracle
+                "57c894665b7895c499b3dce058c284b3", //InquisitorSpellList
+                "9f5be2f7ea64fe04eb40878347b147bc", //PaladinSpellList
+                "c5a1b8df32914d74c9b44052ba3e686a"  //WarpriestSpelllist
+                );
+        }
+
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]
         public static void PatchVarious()
         {

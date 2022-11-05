@@ -1968,6 +1968,8 @@ namespace CodexLib
                     object value = field.GetValue(this);
                     if (value is null)
                         Helper.PrintDebug($"KineticistTree.Validate field is null '{field.Name}'");
+                    else if (object.ReferenceEquals(value, DefaultAbility))
+                    { }
                     else if (value is Element element && !GetAll(true, true, archetype: true).Contains(element))
                         Helper.PrintDebug($"KineticistTree.Validate field missing in GetAll '{field.Name}'");
                     else if (value is Focus focus && !GetFocus().Contains(focus))

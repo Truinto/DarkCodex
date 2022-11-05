@@ -79,93 +79,108 @@ namespace CodexLib
 
         public TranspilerData Seek(Func<TranspilerData, bool> pred)
         {
-            while (Index < Code.Count - 1)
+            while (true)
             {
+                if (Index >= Code.Count - 1)
+                    throw new ArgumentException("IsLast");
+
                 ++Index;
                 if (pred(this))
-                    break;
+                    return this;
             }
-            return this;
         }
 
         public TranspilerData Rewind(Func<TranspilerData, bool> pred)
         {
-            while (Index > 0)
+            while (true)
             {
+                if (Index <= 0)
+                    throw new ArgumentException("IsFirst");
+
                 --Index;
                 if (pred(this))
-                    break;
+                    return this;
             }
-            return this;
         }
 
         public TranspilerData Seek(Type type, string name)
         {
             var member = Helper.GetMemberInfo(type, name);
-            while (Index < Code.Count - 1)
+            while (true)
             {
+                if (Index >= Code.Count - 1)
+                    throw new ArgumentException("IsLast");
+
                 ++Index;
                 if (Code[Index].Calls(member))
                     return this;
             }
-
-            return this;
         }
 
         public TranspilerData Rewind(Type type, string name)
         {
             var member = Helper.GetMemberInfo(type, name);
-            while (Index > 0)
+            while (true)
             {
+                if (Index <= 0)
+                    throw new ArgumentException("IsFirst");
+
                 --Index;
                 if (Code[Index].Calls(member))
                     return this;
             }
-
-            return this;
         }
 
         public TranspilerData Seek(OpCode op)
         {
-            while (Index < Code.Count - 1)
+            while (true)
             {
+                if (Index >= Code.Count - 1)
+                    throw new ArgumentException("IsLast");
+
                 ++Index;
                 if (Current.opcode == op)
-                    break;
+                    return this;
             }
-            return this;
         }
 
         public TranspilerData Rewind(OpCode op)
         {
-            while (Index > 0)
+            while (true)
             {
+                if (Index <= 0)
+                    throw new ArgumentException("IsFirst");
+
                 --Index;
                 if (Current.opcode == op)
-                    break;
+                    return this;
             }
-            return this;
         }
+
         public TranspilerData Seek(OpCode op, object operand)
         {
-            while (Index < Code.Count - 1)
+            while (true)
             {
+                if (Index >= Code.Count - 1)
+                    throw new ArgumentException("IsLast");
+
                 ++Index;
                 if (Current.opcode == op && Current.operand == operand)
-                    break;
+                    return this;
             }
-            return this;
         }
 
         public TranspilerData Rewind(OpCode op, object operand)
         {
-            while (Index > 0)
+            while (true)
             {
+                if (Index <= 0)
+                    throw new ArgumentException("IsFirst");
+
                 --Index;
                 if (Current.opcode == op && Current.operand == operand)
-                    break;
+                    return this;
             }
-            return this;
         }
 
         /// <summary>Seeks predicates in order.</summary>
@@ -173,27 +188,32 @@ namespace CodexLib
         /// <exception cref="ArgumentException">If no match found.</exception>
         public TranspilerData Seek(bool onStart, params Func<TranspilerData, bool>[] pred)
         {
-            int start = Index;
 
             while (true)
             {
             lStart:
                 Seek(pred[0]);
-                if (Index >= Code.Count - 1)
-                    throw new ArgumentException("IsLast");
+                int start = Index;
+                Helper.PrintDebug($"@{Index} start");
 
                 for (int i = 1; i < pred.Length; i++)
                 {
+                    Helper.PrintDebug($"@{Index} loop={i}");
+                    if (Index >= Code.Count - 1)
+                        throw new ArgumentException("IsLast");
                     ++Index;
                     if (!pred[i](this))
                     {
-                        Index = ++start;
+                        Index = start;
                         goto lStart;
                     }
                 }
 
+                Helper.PrintDebug($"@{Index} end OnStart={start}");
+
                 if (onStart)
                     Index = start;
+                Helper.PrintDebug($"Transpiler Seek:pred[] @{Index} {Current.opcode}");
                 return this;
             }
         }
@@ -238,9 +258,53 @@ namespace CodexLib
             Code.Insert(Index++, new CodeInstruction(opcode, operand));
         }
 
+        /// <summary>
+        /// Injects call.
+        /// </summary>
+        /// <param name="func"><b>[T] Function([object instance])</b></param>
+        public void InsertBefore(Delegate func)
+        {
+            var mi = func.GetMethodInfo();
+            var parameters = mi.GetParameters();
+            if (parameters.Length <= 0)
+            { }
+            else if (parameters.Length > 1)
+                throw new ArgumentException("Delegate must have 1 or no arguments!");
+            else if (!parameters[0].ParameterType.IsAssignableFrom(Original.DeclaringType))
+                throw new ArgumentException("Delegate first argument must be object or declaring class!");
+            else if (IsStatic)
+                InsertBefore(OpCodes.Ldnull);
+            else
+                InsertBefore(OpCodes.Ldarg_0);
+
+            InsertBefore(OpCodes.Call, mi);
+        }
+
         public void InsertAfter(OpCode opcode, object operand = null)
         {
             Code.Insert(++Index, new CodeInstruction(opcode, operand));
+        }
+
+        /// <summary>
+        /// Injects call.
+        /// </summary>
+        /// <param name="func"><b>[T] Function([object instance])</b></param>
+        public void InsertAfter(Delegate func)
+        {
+            var mi = func.GetMethodInfo();
+            var parameters = mi.GetParameters();
+            if (parameters.Length <= 0)
+            { }
+            else if (parameters.Length > 1)
+                throw new ArgumentException("Delegate must have 1 or no arguments!");
+            else if (!parameters[0].ParameterType.IsAssignableFrom(Original.DeclaringType))
+                throw new ArgumentException("Delegate first argument must be object or declaring class!");
+            else if (IsStatic)
+                InsertAfter(OpCodes.Ldnull);
+            else
+                InsertAfter(OpCodes.Ldarg_0);
+
+            InsertAfter(OpCodes.Call, mi);
         }
 
         /// <summary>
@@ -311,7 +375,7 @@ namespace CodexLib
                 if (line.opcode.FlowControl != FlowControl.Cond_Branch)
                     continue;
 
-                Helper.PrintDebug($"Transpiler NextJumpAlways {line.opcode} @{Index}");
+                Helper.PrintDebug($"Transpiler NextJumpAlways @{Index} {line.opcode}");
 
                 if (line.opcode.OperandType == OperandType.InlineBrTarget)
                     Code.Insert(++Index, new CodeInstruction(OpCodes.Br, line.operand));
@@ -341,7 +405,7 @@ namespace CodexLib
                 if (line.opcode.FlowControl != FlowControl.Cond_Branch)
                     continue;
 
-                Helper.PrintDebug($"Transpiler NextJumpNever {line.opcode} @{Index}");
+                Helper.PrintDebug($"Transpiler NextJumpNever @{Index} {line.opcode}");
 
                 if (line.opcode.StackBehaviourPush != StackBehaviour.Push0)
                     throw new Exception("Cond_Branch should not push onto stack");

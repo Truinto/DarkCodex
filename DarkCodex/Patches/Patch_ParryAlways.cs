@@ -18,7 +18,9 @@ namespace DarkCodex
         {
             var data = new TranspilerData(instructions, generator, original);
 
-            data.Seek(true, f => f.Calls(typeof(RuleAttackRoll), nameof(RuleAttackRoll.Parry)), f => f.Is(OpCodes.Brfalse_S));
+            //data.Seek(true, f => f.Calls(typeof(RuleAttackRoll), nameof(RuleAttackRoll.Parry)), f => f.Is(OpCodes.Brfalse_S));
+            data.Last();
+            data.Rewind(typeof(RuleAttackRoll.ParryData), nameof(RuleAttackRoll.ParryData.Trigger));
             data.Rewind(typeof(RuleAttackRoll), nameof(RuleAttackRoll.IsHit));
             data.NextJumpNever();
 
