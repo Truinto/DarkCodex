@@ -515,6 +515,7 @@ namespace Shared
             LoadSafe(Mythic.CreateLimitlessDomain);
             LoadSafe(Mythic.CreateLimitlessShaman);
             LoadSafe(Mythic.CreateLimitlessWarpriest);
+            LoadSafe(Mythic.CreateLimitlessWarpriestBlessing);
             LoadSafe(Mythic.CreateKineticMastery);
             LoadSafe(Mythic.CreateMagicItemAdept);
             LoadSafe(Mythic.CreateResourcefulCaster);

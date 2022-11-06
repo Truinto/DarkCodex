@@ -17,11 +17,11 @@ namespace CodexLib
             if (!evt.AttackRoll.IsHit)
                 return;
 
-            int dice = this.Context[AbilitySharedValue.Damage];
+            int damage = this.Context[AbilitySharedValue.Damage];
             int bonus = this.Context[AbilitySharedValue.DamageBonus];
             var element = (DamageEnergyType)this.Context[AbilitySharedValue.StatBonus];
 
-            evt.Damage.m_DamageBundle.m_Chunks.Add(new EnergyDamage(new DiceFormula(dice, DiceType.D6), bonus, element) { SourceFact = this.Fact });
+            evt.Damage.m_DamageBundle.m_Chunks.Add(new EnergyDamage(new DiceFormula(damage * 2, DiceType.One), bonus, element) { SourceFact = this.Fact });
 
             buff.ReduceDuration(10.Rounds().Seconds);
         }

@@ -98,6 +98,7 @@ Content
 |Mythic.CreateLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessSmite|mythic ability: infinite Smites (chaotic and evil), requires Abundant Smite|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessWarpriest|mythic ability: infinite scared weapon uses|:house:|:heavy_check_mark:|
+|Mythic.CreateLimitlessWarpriestBlessing|mythic ability: use blessing powers at will|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessWitchHexes|mythic ability: Hexes ignore their cooldown|:house:|:heavy_check_mark:|
 |Mythic.CreateMagicItemAdept|mythic feat: trinket items use character level as caster level|:house:|:heavy_check_mark:|
 |Mythic.CreateMetamagicAdept|mythic feat: allow spontaneous spellcasters to apply metamagic without casting time penalty|:house:|:heavy_check_mark:|

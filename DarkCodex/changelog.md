@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.7]
+- fixed damage calculation of Energy Channel
+- fixed Healing Flames alignment checks
+- added Limitless Warpriest Blessing: mythic ability use blessing powers at will #170
+
 ## [1.5.6]
 - fixed Bestow Hope only working on cleric channel
 - added Energy Channel: basic feat channel energy through weapon attacks #168

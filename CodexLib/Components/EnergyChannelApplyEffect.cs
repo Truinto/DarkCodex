@@ -36,8 +36,8 @@ namespace CodexLib
             context.MaybeCaster.Resources.Spend(resource, 1);
 
             // set context values equal to source ability
-            context[AbilitySharedValue.Damage] = sourceAbility.GetComponent<ContextRankConfig>(f => f.Type == AbilityRankType.Default).GetValue(context) * 2;
-            context[AbilitySharedValue.DamageBonus] = sourceAbility.GetComponent<ContextRankConfig>(f => f.Type == AbilityRankType.DamageBonus).GetValue(context) * 2;
+            context[AbilitySharedValue.Damage] = sourceAbility.GetComponent<ContextRankConfig>(f => f.Type == AbilityRankType.Default).GetValue(context);
+            context[AbilitySharedValue.DamageBonus] = sourceAbility.GetComponent<ContextRankConfig>(f => f.Type == AbilityRankType.DamageBonus).GetValue(context);
             context[AbilitySharedValue.StatBonus] = (int)this.Element;
 
             // apply buff

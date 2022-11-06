@@ -29,6 +29,7 @@ namespace CodexLib
             EnabledElementsExpanded = UnityModManagerNet.UnityModManager.FindMod("KineticistElementsExpanded")?.Active == true;
 
             @Class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391");
+            KineticKnight = Helper.ToRef<BlueprintArchetypeReference>("7d61d9b2250260a45b18c5634524a8fb");
             ElementalScion = Helper.ToRef<BlueprintArchetypeReference>("180c6e3574aa4c938e73952cb02d1535");
             ElementalAscetic = Helper.ToRef<BlueprintArchetypeReference>("33780145192140a38a72665b9f877328");
             KineticBlast = Helper.ToRef<BlueprintFeatureReference>("93efbde2764b5504e98e6824cab3d27c");
@@ -1686,6 +1687,7 @@ namespace CodexLib
         public bool EnabledElementsExpanded;
 
         public BlueprintCharacterClassReference @Class;
+        public BlueprintArchetypeReference KineticKnight;
         public BlueprintArchetypeReference ElementalScion;
         public BlueprintArchetypeReference ElementalAscetic;
         public BlueprintFeatureReference KineticBlast;

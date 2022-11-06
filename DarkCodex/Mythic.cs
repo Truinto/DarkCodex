@@ -336,7 +336,7 @@ namespace DarkCodex
         {
             var weapon_resource = BlueprintGuid.Parse("cc700ef06c6fec449ab085cbcd74709c"); //SacredWeaponEnchantResource
             var armor_resource = BlueprintGuid.Parse("04af200173fafb94381b33e8fe3146e7"); //SacredArmorEnchantResource
-            var warpriest_prereq = Helper.ToRef<BlueprintCharacterClassReference>("30b5e47d47a0e37438cc5a80c96cfb99"); //WarpriestClass.
+            var warpriest_prereq = Helper.ToRef<BlueprintCharacterClassReference>("30b5e47d47a0e37438cc5a80c96cfb99"); //WarpriestClass
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessWarpriest",
@@ -350,6 +350,26 @@ namespace DarkCodex
 
             SetResourceDecreasing(weapon_resource, limitless);
             SetResourceDecreasing(armor_resource, limitless);
+
+            Helper.AddMythicTalent(limitless);
+        }
+
+        [PatchInfo(Severity.Create, "Limitless Warpriest Blessing", "mythic ability: use blessing powers at will", true)]
+        public static void CreateLimitlessWarpriestBlessing()
+        {
+            var blessing_resource = BlueprintGuid.Parse("d128a6332e4ea7c4a9862b9fdb358cca"); //BlessingResource
+            var warpriest_prereq = Helper.ToRef<BlueprintCharacterClassReference>("30b5e47d47a0e37438cc5a80c96cfb99"); //WarpriestClass
+
+            var limitless = Helper.CreateBlueprintFeature(
+                "LimitlessWarpriestBlessing",
+                "Limitless Warpriest Blessings",
+                "You are chosen by your deity.\nBenefit: You can use the abilities of your blessings at will.",
+                group: FeatureGroup.MythicAbility
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel(warpriest_prereq, 1)
+                );
+
+            SetResourceDecreasing(blessing_resource, limitless);
 
             Helper.AddMythicTalent(limitless);
         }

@@ -3568,10 +3568,11 @@ namespace CodexLib
             return hasBuff;
         }
 
-        public static AlignmentCheck CreateContextConditionAlignment(AlignmentComponent alignment, bool not = false)
+        public static ContextConditionAlignment CreateContextConditionAlignment(AlignmentComponent alignment, bool not = false, bool checkCaster = false)
         {
-            var result = new AlignmentCheck();
+            var result = new ContextConditionAlignment();
             result.Alignment = alignment;
+            result.CheckCaster = checkCaster;
             result.Not = not;
             return result;
         }

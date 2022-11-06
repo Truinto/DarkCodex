@@ -549,7 +549,8 @@ namespace DarkCodex
                 FeatureGroup.KineticBlastInfusion
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeaturesFromList(true, electric_blast),
-                Helper.CreatePrerequisiteClassLevel(kineticist_class, 8)
+                Helper.CreatePrerequisiteClassLevel(kineticist_class, 8),
+                Helper.CreatePrerequisiteNoArchetype(Tree.KineticKnight, Tree.Class)
                 );
 
             // electric ability
