@@ -20,10 +20,7 @@ namespace CodexLib
             this.OnlyDuelistWeapon = onlyDuelistWeapon;
         }
 
-        public override string GetCaption()
-        {
-            return "Weapon Maneuver";
-        }
+        public override string GetCaption() => nameof(ContextActionCombatManeuverWithWeapon);
 
         public override void RunAction()
         {

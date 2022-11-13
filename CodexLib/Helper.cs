@@ -80,6 +80,7 @@ using Kingmaker.UnitLogic.Class.Kineticist;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.Controllers.Dialog;
 using Kingmaker.Designers.EventConditionActionSystem.Conditions;
+using Kingmaker.Designers.Mechanics.Buffs;
 
 namespace CodexLib
 {
@@ -145,6 +146,38 @@ namespace CodexLib
         public static bool HasInterface(this Type type, Type @interface)
         {
             return type != @interface && @interface.IsAssignableFrom(type);
+        }
+
+        /// <summary>
+        /// Returns string sufficient for <b>Type.GetType(string)</b>, without version, culture, or token.
+        /// </summary>
+        public static string GetFullName(this Type type)
+        {
+            string full = type.AssemblyQualifiedName;
+
+            int i1 = full.IndexOf(',');
+            if (i1 < 0 || i1 + 1 >= full.Length)
+                return full;
+            int i2 = full.IndexOf(',', i1 + 1);
+            if (i2 < 0)
+                return full;
+
+            return full.Substring(0, i2);
+        }
+
+        /// <summary>
+        /// Returns max stat value or null.
+        /// </summary>
+        public static ModifiableValue GetStat(this UnitEntityData unit, params StatType[] types)
+        {
+            ModifiableValue max = null;
+            foreach (var type in types)
+            {
+                var stat = unit.Descriptor.Stats.GetStat(type);
+                if (max == null || stat > max)
+                    max = stat;
+            }
+            return max;
         }
 
         private static void GetTTT()
@@ -334,7 +367,7 @@ namespace CodexLib
 
         public static MemberInfo GetMemberInfo(Type type, string name)
         {
-            var mi = type.GetMethod(name, Helper.BindingAll) ?? type.GetProperty(name, Helper.BindingAll).GetMethod;
+            var mi = type.GetMethod(name, Helper.BindingAll) ?? type.GetProperty(name, Helper.BindingAll)?.GetMethod;
             if (mi != null)
                 return mi;
 
@@ -741,12 +774,6 @@ namespace CodexLib
             }
         }
 
-        //public static void Deconstruct<K, V>(this KeyValuePair<K, V> pair, out K key, out V val) // using Kingmaker.Utility;
-        //{
-        //    key = pair.Key;
-        //    val = pair.Value;
-        //}
-
         /// <summary>
         /// Get dictionary by key and create new value with standard constructor, if it did not exist.
         /// </summary>
@@ -756,6 +783,14 @@ namespace CodexLib
             if (dic.TryGetValue(key, out value))
                 return false;
             dic[key] = value = new();
+            return true;
+        }
+
+        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value, Type type)
+        {
+            if (dic.TryGetValue(key, out value))
+                return false;
+            dic[key] = value = (TValue)Activator.CreateInstance(type);
             return true;
         }
 
@@ -1451,8 +1486,10 @@ namespace CodexLib
         {
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
             {
-                if (obj.Components[i] is TOrig)
+                if (original == null && obj.Components[i] is TOrig || ReferenceEquals(original, obj.Components[i]))
                 {
+                    if (original != null)
+                        original.OwnerBlueprint = null;
                     obj.Components[i] = replacement;
                     replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}${i}";
                     if (replacement.OwnerBlueprint == null)
@@ -1870,6 +1907,10 @@ namespace CodexLib
         public static readonly ContextDiceValue SharedDiceDamageBonus = SharedDamageBonus.ToDice();
         public static readonly ContextDiceValue SharedDiceDungeon = SharedDungeon.ToDice();
 
+        public static readonly ContextDurationValue DurationMinutesPerLevel = CreateContextDurationValue(bonus: CreateContextValue(AbilityParameterType.Level), rate: DurationRate.Minutes);
+        public static readonly ContextDurationValue DurationOneRound = CreateContextDurationValue(bonus: 1);
+        public static readonly ContextDurationValue DurationOneDay = CreateContextDurationValue(bonus: 1, rate: DurationRate.Days);
+
         public static ContextDiceValue ToDice(this ContextValue value)
         {
             return CreateContextDiceValue(DiceType.Zero, 0, value);
@@ -1898,6 +1939,11 @@ namespace CodexLib
         public static ContextValue CreateContextValue(AbilitySharedValue value)
         {
             return new ContextValue() { ValueType = ContextValueType.Shared, ValueShared = value };
+        }
+
+        public static ContextValue CreateContextValue(AbilityParameterType abilityParameter)
+        {
+            return new ContextValue() { ValueType = ContextValueType.AbilityParameter, m_AbilityParameter = abilityParameter };
         }
 
         public static ContextDiceValue CreateContextDiceValue(DiceType dice, ContextValue diceCount = null, ContextValue bonus = null)
@@ -2215,7 +2261,7 @@ namespace CodexLib
 
         public static BlueprintBuff Flags(this BlueprintBuff buff, bool? hidden = null, bool? stayOnDeath = null, bool? isFromSpell = null, bool? harmful = null)
         {
-            if (hidden != null)
+            if (hidden != null && !Scope.AllowGuidGeneration)
             {
                 if (hidden.Value)
                     buff.m_Flags |= BlueprintBuff.Flags.HiddenInUi;
@@ -2278,7 +2324,7 @@ namespace CodexLib
             return result;
         }
 
-        public static ContextActionSavingThrow MakeContextActionSavingThrow(SavingThrowType savingthrow, [CanBeNull] GameAction succeed, [CanBeNull] GameAction failed)
+        public static ContextActionSavingThrow MakeContextActionSavingThrow(SavingThrowType savingthrow, GameAction succeed = null, GameAction failed = null)
         {
             var result = new ContextActionSavingThrow();
             result.Type = savingthrow;
@@ -3063,6 +3109,19 @@ namespace CodexLib
             return result;
         }
 
+        public static AddStatBonusIfHasFact CreateAddStatBonusIfHasFact(StatType statType, ModifierDescriptor descriptor, ContextValue value, bool invert = false, bool all = false, params AnyRef[] facts)
+        {
+            return new AddStatBonusIfHasFact
+            {
+                Descriptor = descriptor,
+                Stat = statType,
+                Value = value,
+                InvertCondition = invert,
+                RequireAllFacts = all,
+                m_CheckedFacts = facts.ToRef<BlueprintUnitFactReference>()
+            };
+        }
+
         public static AddContextStatBonus CreateAddContextStatBonus(ContextValue value, StatType stat, ModifierDescriptor descriptor = ModifierDescriptor.UntypedStackable)
         {
             var result = new AddContextStatBonus();
@@ -3219,6 +3278,27 @@ namespace CodexLib
             result.Value = CreateContextDiceValue(diceType, diceCount, bonus);
             result.Modifier = Modifier;
             return result;
+        }
+
+        public static DamageTypeDescription CreateDamageTypeDescription(PhysicalDamageForm physical, PhysicalDamageMaterial material = 0)
+        {
+            return new DamageTypeDescription()
+            {
+                Type = DamageType.Physical,
+                Common = new DamageTypeDescription.CommomData(),
+                Physical = new DamageTypeDescription.PhysicalData() { Form = physical, Material = material }
+            };
+        }
+
+        public static DamageTypeDescription CreateDamageTypeDescription(DamageEnergyType energy)
+        {
+            return new DamageTypeDescription()
+            {
+                Type = DamageType.Energy,
+                Energy = energy,
+                Common = new DamageTypeDescription.CommomData(),
+                Physical = new DamageTypeDescription.PhysicalData()
+            };
         }
 
         public static ContextActionDealDamage CreateContextActionDealDamage(PhysicalDamageForm physical, ContextDiceValue damage, bool isAoE = false, bool halfIfSaved = false, bool IgnoreCritical = false, bool half = false, bool alreadyHalved = false, AbilitySharedValue sharedValue = 0, bool readShare = false, bool writeShare = false)
@@ -3566,6 +3646,16 @@ namespace CodexLib
             var hasBuff = new ContextConditionHasBuff();
             hasBuff.m_Buff = buff.ToRef();
             return hasBuff;
+        }
+
+        /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        public static ContextConditionHasBuff CreateContextConditionHasBuff(AnyRef buff, bool not = false)
+        {
+            return new ContextConditionHasBuff()
+            {
+                m_Buff = buff,
+                Not = not,
+            };
         }
 
         public static ContextConditionAlignment CreateContextConditionAlignment(AlignmentComponent alignment, bool not = false, bool checkCaster = false)
@@ -4181,7 +4271,12 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, BlueprintWeaponTypeReference weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, int price = 1000)
+        [Obsolete]
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string i, string a = null, string b = null, BlueprintWeaponTypeReference c = null, DiceFormula? d = null, DamageTypeDescription e = null, BlueprintItemWeaponReference f = null, bool g = false, int h = 1000)
+         => CreateBlueprintItemWeapon(i, a, b, c, d, e, f, g, h, null, null);
+
+        /// <param name="cloneVisuals">type: <b>BlueprintWeaponType</b></param>
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, BlueprintWeaponTypeReference weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, int price = 1000, AnyRef cloneVisuals = null, BlueprintWeaponEnchantmentReference[] enchantments = null)
         {
             string guid = GetGuid(name);
 
@@ -4218,12 +4313,17 @@ namespace CodexLib
             result.m_NonIdentifiedDescriptionText = "".CreateString();
             result.m_Icon = null; //can be null
 
-            result.m_Enchantments = Array.Empty<BlueprintWeaponEnchantmentReference>();
+            result.m_Enchantments = enchantments ?? Array.Empty<BlueprintWeaponEnchantmentReference>();
 
             // not sure
-            result.OnEnableWithLibrary();
-            result.m_VisualParameters.m_Projectiles = Array.Empty<BlueprintProjectileReference>();
-            result.m_VisualParameters.m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>();
+            if (cloneVisuals != null)
+                result.m_VisualParameters = cloneVisuals.Get<BlueprintWeaponType>()?.m_VisualParameters;
+            if (result.m_VisualParameters == null)
+            {
+                result.OnEnableWithLibrary();
+                result.m_VisualParameters.m_Projectiles = Array.Empty<BlueprintProjectileReference>();
+                result.m_VisualParameters.m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>();
+            }
 
             AddAsset(result, guid);
             return result;
@@ -4476,26 +4576,40 @@ namespace CodexLib
             }
         }
 
+        public static DamageTypeMix ToDamageTypeMix(this PhysicalDamageForm physical)
+        {
+            return (DamageTypeMix)(int)physical;
+        }
+
+        public static DamageTypeMix ToDamageTypeMix(this DamageEnergyType energy)
+        {
+            return (DamageTypeMix)(1 << ((int)energy + 3));
+        }
+
+        public static DamageTypeMix ToDamageTypeMix(this BaseDamage dmg)
+        {
+            var result = DamageTypeMix.None;
+            if (dmg is PhysicalDamage physical)
+            {
+                result |= (DamageTypeMix)(int)physical.Form;
+                result |= (DamageTypeMix)((int)physical.m_Materials << 22);
+            }
+            else if (dmg is EnergyDamage energy)
+                result |= (DamageTypeMix)(1 << ((int)energy.EnergyType + 3));
+            else if (dmg is ForceDamage)
+                result |= DamageTypeMix.Force;
+            else if (dmg is DirectDamage)
+                result |= DamageTypeMix.Direct;
+            else if (dmg is UntypedDamage)
+                result |= DamageTypeMix.Untyped;
+            return result;
+        }
+
         public static DamageTypeMix ToDamageTypeMix(this IEnumerable<BaseDamage> bundle)
         {
             var result = DamageTypeMix.None;
             foreach (var dmg in bundle)
-            {
-                if (dmg is PhysicalDamage physical)
-                {
-                    result |= (DamageTypeMix)(int)physical.Form;
-                    result |= (DamageTypeMix)((int)physical.m_Materials << 22);
-                }
-                else if (dmg is EnergyDamage energy)
-                    result |= (DamageTypeMix)(1 << ((int)energy.EnergyType + 3));
-                else if (dmg is ForceDamage)
-                    result |= DamageTypeMix.Force;
-                else if (dmg is DirectDamage)
-                    result |= DamageTypeMix.Direct;
-                else if (dmg is UntypedDamage)
-                    result |= DamageTypeMix.Untyped;
-            }
-
+                result |= dmg.ToDamageTypeMix();
             return result;
         }
 

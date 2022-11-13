@@ -5,6 +5,7 @@
 - changed logic in CreateAbilityEffectRunAction
 - removed redudant Helper.IsStloc
 - fixed morphing bug in Helper.Clone
+- changed CreateBlueprintItemWeapon
 
 ## [1.3.0]
 - fixes for 2.0 release

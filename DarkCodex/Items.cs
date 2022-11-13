@@ -140,39 +140,27 @@ namespace DarkCodex
 
             var standard = Helper.CreateBlueprintItemWeapon(
                 "ButcheringAxeStandard",
-                "",
-                "",
-                butcherType,
+                 weaponType: butcherType,
                 price: 65);
             var plus1 = Helper.CreateBlueprintItemWeapon(
                  "ButcheringAxePlus1",
-                 "",
-                 "",
-                 butcherType,
+                 weaponType: butcherType,
                  price: Resource.WeaponPrice[1]).SetEnchantment("d42fc23b92c640846ac137dc26e000d4"); //Enhancement1
             var plus2 = Helper.CreateBlueprintItemWeapon(
                  "ButcheringAxePlus2",
-                 "",
-                 "",
-                 butcherType,
+                 weaponType: butcherType,
                  price: Resource.WeaponPrice[2]).SetEnchantment("eb2faccc4c9487d43b3575d7e77ff3f5"); //Enhancement2
             var plus3 = Helper.CreateBlueprintItemWeapon(
                  "ButcheringAxePlus3",
-                 "",
-                 "",
-                 butcherType,
+                 weaponType: butcherType,
                  price: Resource.WeaponPrice[3]).SetEnchantment("80bb8a737579e35498177e1e3c75899b"); //Enhancement3
             var plus4 = Helper.CreateBlueprintItemWeapon(
                  "ButcheringAxePlus4",
-                 "",
-                 "",
-                 butcherType,
+                 weaponType: butcherType,
                  price: Resource.WeaponPrice[4]).SetEnchantment("783d7d496da6ac44f9511011fc5f1979"); //Enhancement4
             var plus5 = Helper.CreateBlueprintItemWeapon(
                  "ButcheringAxePlus5",
-                 "",
-                 "",
-                 butcherType,
+                 weaponType: butcherType,
                  price: Resource.WeaponPrice[5]).SetEnchantment("bdba267e951851449af552aa9f9e3992"); //Enhancement5
 
             Helper.AddExoticVendorItem(standard.ToReference<BlueprintItemReference>(), 3);

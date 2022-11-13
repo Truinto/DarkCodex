@@ -67,6 +67,8 @@ namespace CodexLib
             AddDelayedPatch(action);
         }
 
+        public SimpleBlueprint Value { get => this; set => Set(value); }
+
         public void AddDelayedPatch(Action<BlueprintScriptableObject> action)
         {
             if (this.Cached is BlueprintScriptableObject obj)

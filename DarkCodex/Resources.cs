@@ -719,6 +719,8 @@ namespace DarkCodex
             public const string Burst10_Magma = "0e2c7eccf4456fb4285ceff4c2dae0fa";
             public const string Burst15_Holy = "94708cc80dd5eb14a9a5ec04365a1fdc";
             public const string Burst30_Holy = "d58c16961298c6f4490ed4c158c142e6";
+
+            public const string Weapon_Fire = "91e5a56dd421a2941984a36a2af164b6";
         }
     }
 }

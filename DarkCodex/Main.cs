@@ -426,6 +426,8 @@ namespace Shared
             PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
+            LoadSafe(MartialArt.CreatePaladinVirtuousBravo);
+            LoadSafe(Kineticist.FixBladeWhirlwind);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -471,6 +473,7 @@ namespace Shared
             // Spells - early
             LoadSafe(Spells.CreateBladedDash);
             LoadSafe(Spells.CreateHealingFlames);
+            LoadSafe(Spells.CreateFlameBlade);
             LoadSafe(Spells.PatchVarious);
 
             // General

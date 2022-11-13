@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.8]
+- added Flame Blade, spell: Flame Blade, feat: Flame Blade Dervish Combat
+
 ## [1.5.7]
 - fixed damage calculation of Energy Channel
 - fixed Healing Flames alignment checks

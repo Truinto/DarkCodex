@@ -1,6 +1,7 @@
 ﻿using CodexLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
@@ -156,6 +157,91 @@ namespace DarkCodex
                 );
         }
 
+        [PatchInfo(Severity.Create, "Flame Blade", "spell: Flame Blade, feat: Flame Blade Dervish Combat", false)]
+        public static void CreateFlameBlade()
+        {
+            /*
+            Flame Blade Dervish Combat
+            You move effortlessly when wielding a flame blade.
+            Prerequisite(s): Ability to cast flame blade as a spell or spell-like ability.
+            Benefit(s): When you cast flame blade, you gain a +10 enhancement bonus to your base speed as long as the spell persists, along with a +4 competence bonus on all Acrobatics checks. You add your Charisma modifier to damage rolls with your flame blade, and ignore the first 10 points of fire resistance possessed by a creature you hit with the flame blade for the purposes of determining the damage dealt by the flame blade. Against undead foes, you ignore the first 30 points of fire resistance. Immunity to fire still completely protects against damage from your flame blade.
+            */
+
+            AnyRef feat = Helper.CreateBlueprintFeature(
+                "FlameBladeDervishCombat",
+                "Flame Blade Dervish Combat",
+                "Benefit(s): When you cast flame blade, you gain a +10 enhancement bonus to your base speed as long as the spell persists, along with a +4 competence bonus on all Acrobatics checks. You add your Charisma modifier to damage rolls with your flame blade, and ignore the first 10 points of fire resistance possessed by a creature you hit with the flame blade for the purposes of determining the damage dealt by the flame blade. Against undead foes, you ignore the first 30 points of fire resistance. Immunity to fire still completely protects against damage from your flame blade."
+                ).SetComponents(
+                Helper.CreatePrerequisiteClassLevel("610d836f3a3a9ed42a4349b62f002e96", 3, true), //DruidClass
+                Helper.CreatePrerequisiteClassLevel("145f1d3d360a7ad48bd95d392c81b38e", 3, true)  //ShamanClass // TODO: make spell prerequisite
+                );
+
+            Helper.AddFeats(feat);
+
+            /*
+            Flame Blade
+            School evocation [fire]; Level druid 2, shaman 2
+            Casting Time 1 standard action
+            Range personal
+            Duration 1 min./level (D)
+            Saving Throw none; Spell Resistance yes
+
+            A 3-foot-long, blazing beam of red-hot fire springs forth from your hand. You wield this blade-like beam as if it were a scimitar. Attacks with the flame blade are melee touch attacks. The blade deals 1d8 points of fire damage + 1 point per two caster levels (maximum +10). Since the blade is immaterial, your Strength modifier does not apply to the damage. A flame blade can ignite combustible materials such as parchment, straw, dry sticks, and cloth.
+            */
+
+            var enchantment = Helper.CreateBlueprintWeaponEnchantment(
+                "Flame Blade"
+                ).SetComponents(
+                new FlameBladeLogic(feat, DamageTypeMix.Fire, 10)
+                );
+            enchantment.WeaponFxPrefab = Helper.GetPrefabLink(Resource.Sfx.Weapon_Fire);
+            enchantment.m_HiddenInUI = true;
+
+            var weapon = Helper.CreateBlueprintItemWeapon(
+                "FlameBladeWeapon",
+                "Flame Blade",
+                weaponType: Helper.ToRef<BlueprintWeaponTypeReference>("be24e972e8656514898dd335e983ea2c"), //MeleeTouchType
+                cloneVisuals: "d9fbec4637d71bd4ebc977628de3daf3", //Scimitar
+                damageOverride: new DiceFormula(1, DiceType.D8),
+                form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
+                enchantments: new BlueprintWeaponEnchantmentReference[] { enchantment.ToRef() }
+                );
+
+            var buff = Helper.CreateBlueprintBuff(
+                "FlameBladeBuff"
+                ).Flags(
+                hidden: true
+                ).SetComponents(
+                new AddTemporaryWeapon(weapon),
+                Helper.CreateAddStatBonusIfHasFact(StatType.Speed, ModifierDescriptor.Enhancement, 10, facts: feat),
+                Helper.CreateAddStatBonusIfHasFact(StatType.SkillMobility, ModifierDescriptor.Competence, 4, facts: feat)
+                );
+
+            var ab = Helper.CreateBlueprintAbility(
+                "FlameBladeAbility",
+                "Flame Blade",
+                "A 3-foot-long, blazing beam of red-hot fire springs forth from your hand. You wield this blade-like beam as if it were a scimitar. Attacks with the flame blade are melee touch attacks. The blade deals 1d8 points of fire damage + 1 point per two caster levels (maximum +10). Since the blade is immaterial, your Strength modifier does not apply to the damage. A flame blade can ignite combustible materials such as parchment, straw, dry sticks, and cloth.",
+                icon: Helper.StealIcon("05b7cbe45b1444a4f8bf4570fb2c0208"),
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Free,
+                range: AbilityRange.Personal,
+                duration: Resource.Strings.MinutesPerLevel
+                ).TargetSelf(
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true)),
+                Helper.CreateSpellComponent(SpellSchool.Evocation),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Fire),
+                Helper.CreateCraftInfoComponent()
+                );
+
+            ab.Add(2,
+                "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "c0c40e42f07ff104fa85492da464ac69"  //ShamanSpelllist
+                );
+        }
+
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]
         public static void PatchVarious()
         {
@@ -166,4 +252,38 @@ namespace DarkCodex
                 bubble.AddComponents(new AbilityTargetsAround { m_Radius = 20.Feet(), m_TargetType = TargetType.Ally, m_Condition = new() });
         }
     }
+
+    /*
+    Chill Touch
+    School necromancy; Level bloodrager 1, magus 1, shaman 1, sorcerer/wizard 1, witch 1; Mystery reaper 1
+    Casting Time 1 standard action
+    Range touch
+    Targets creature or creatures touched (up to one/level)
+    Saving Throw Fortitude partial or Will negates; see text; Spell Resistance yes
+
+    A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.
+    An undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.
+
+
+    Produce Flame
+    School evocation [fire]; Level druid 1, shaman 1; Domain fire 2
+    Casting Time 1 standard action
+    Range personal
+    Duration 1 min./level (D)
+    Saving Throw none; Spell Resistance yes
+
+    Flames as bright as a torch appear in your open hand. The flames harm neither you nor your equipment.
+    In addition to providing illumination, the flames can be hurled or used to touch enemies. You can strike an opponent with a melee touch attack, dealing fire damage equal to 1d6 + 1 point per caster level (maximum +5). Alternatively, you can hurl the flames up to 120 feet as a thrown weapon. When doing so, you attack with a ranged touch attack (with no range penalty) and deal the same damage as with the melee attack. No sooner do you hurl the flames than a new set appears in your hand. Each attack you make reduces the remaining duration by 1 minute. If an attack reduces the remaining duration to 0 minutes or less, the spell ends after the attack resolves.
+    
+
+    Gozreh's Trident
+    School evocation [electricity]; Level bloodrager 2, cleric 2, druid 2, hunter 2, oracle 2, warpriest 2, witch 2 (Gozreh)
+    Casting Time 1 standard action
+    Range personal
+    Duration 1 minute/level (D)
+    Saving Throw none; Spell Resistance yes
+
+    A 4-foot-long, blazing, forked bolt of electricity springs forth from your hand. You wield this spear-like bolt as if it were a trident (you are considered proficient with the bolt). Attacks with Gozreh’s trident are melee touch attacks. The bolt deals 1d8 points of electricity damage + 1 point per 2 caster levels (maximum +10). Since the bolt is immaterial, your Strength modifier does not apply to the damage. The bolt can ignite combustible materials such as parchment, straw, dry sticks, and cloth.
+
+    */
 }

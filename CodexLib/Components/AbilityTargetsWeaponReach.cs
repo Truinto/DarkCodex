@@ -8,12 +8,21 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class AbilityTargetsWeaponReach : AbilitySelectTarget, IAbilityAoERadiusProvider // TODO: use for BladeWhirlwind
+    public class AbilityTargetsWeaponReach : AbilitySelectTarget, IAbilityAoERadiusProvider
     {
         public Feet BaseRange;
         public Feet SpreadSpeed;
         private bool IncludeDead;
         private ConditionsChecker Condition;
+
+        public AbilityTargetsWeaponReach(Feet baseRange, TargetType targets = TargetType.Enemy, Feet spreadSpeed = default, bool includeDead = false, ConditionsChecker condition = null)
+        {
+            this.BaseRange = baseRange;
+            this.Targets = targets;
+            this.SpreadSpeed = spreadSpeed;
+            this.IncludeDead = includeDead;
+            this.Condition = condition ?? new();
+        }
 
         public TargetType Targets { get; set; }
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class ModifyWeaponSize : WeaponEnchantmentLogic, ISubscriber, IInitiatorRulebookSubscriber, IInitiatorRulebookHandler<RuleCalculateWeaponStats>, IRulebookHandler<RuleCalculateWeaponStats>
+    public class ModifyWeaponSize : WeaponEnchantmentLogic, IInitiatorRulebookHandler<RuleCalculateWeaponStats>
     {
         public void OnEventAboutToTrigger(RuleCalculateWeaponStats evt)
         {

@@ -747,6 +747,7 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("80fdf049d396c33408a805d9e21a42e1"),
                 Buff = null,
                 RequiresMeleeAttackRoll = true,
+                Activator = Helper.ToRef<BlueprintAbilityReference>("80f10dc9181a0f64f97a9f7ac9f47d65"),
             };
             KineticBlade = new()
             {
@@ -1921,8 +1922,11 @@ namespace CodexLib
             /// <summary>can be null (only exists on substance infusions)</summary>
             [CanBeNull] public BlueprintBuffReference Buff;
 
-            /// <summary>WIP; can be null (only exists on form infusions)</summary>
+            /// <summary>can be null (only exists on form infusions)</summary>
             [CanBeNull] public List<BlueprintAbilityReference> Variants;
+
+            /// <summary>WIP; can be null; either BlueprintActivatable or BlueprintAbility</summary>
+            [CanBeNull] public BlueprintReferenceBase Activator;
         }
 
         #region Helper
@@ -1982,6 +1986,34 @@ namespace CodexLib
 
                 #endregion
 
+                #region check activators
+
+                Helper.PrintDebug("KineticistTree.Validate check activators");
+                foreach (var talent in GetTalents(form: true, substance: true, utility: true))
+                {
+                    var feature = talent.Feature.Get();
+                    if (feature == null)
+                    {
+                        Helper.Print($"KineticistTree.Validate {resolve(talent)}.Feature is null : {talent.Feature?.Guid}");
+                        continue;
+                    }
+
+                    var addfacts = feature.GetComponent<AddFacts>();
+                    if (addfacts == null)
+                        continue;
+
+                    if (addfacts.m_Facts.Length != 1)
+                    {
+                        compare<BlueprintReferenceBase>(talent, talent.Variants, addfacts.m_Facts);
+                    }
+                    else if (talent.Activator == null || !talent.Activator.Equals(addfacts.m_Facts[0]))
+                    {
+                        Helper.Print($"KineticistTree.Validate wrong activator: {feature.name} -> {talent.Activator?.GetBlueprint()?.AssetGuid} : {addfacts.m_Facts[0]}");
+                    }
+                }
+
+                #endregion
+
                 #region check form infusions
 
                 // REGEX    log file to variant references
@@ -1994,7 +2026,7 @@ namespace CodexLib
                     var feature = talent.Feature.Get();
                     if (feature == null)
                     {
-                        Helper.Print("KineticistTree.Validate form talent is null");
+                        Helper.Print("KineticistTree.Validate talent is null");
                         continue;
                     }
 
@@ -2025,6 +2057,34 @@ namespace CodexLib
                 }
 
                 #endregion
+
+                return;
+
+                void compare<T>(object field, IEnumerable<T> collection1, IEnumerable<T> collection2)
+                {
+                    if (collection1 == null && collection2 == null)
+                        return;
+
+                    if (collection1 == null)
+                        Helper.PrintDebug($"{resolve(field)} left empty; right: {collection2.Join()}");
+                    else if (collection2 == null)
+                        Helper.PrintDebug($"{resolve(field)} right empty; left: {collection1.Join()}");
+                    else
+                    {
+                        foreach (var item in collection1.Where(w => !collection2.Contains(w)))
+                            Helper.PrintDebug($"{resolve(field)} only left: {item}");
+                        foreach (var item in collection2.Where(w => !collection1.Contains(w)))
+                            Helper.PrintDebug($"{resolve(field)} only right: {item}");
+                    }
+                }
+
+                string resolve(object field)
+                {
+                    var fi = fields.FirstOrDefault(f => ReferenceEquals(f.GetValue(this), field));
+                    if (fi != null)
+                        return fi.Name;
+                    return "";
+                }
             }
             catch (Exception e) { Helper.PrintException(e); }
         }

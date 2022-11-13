@@ -14,7 +14,8 @@ namespace DarkCodex
 {
     public class MartialArt
     {
-        public static void CreatePaladinVirtuousBravo() // TODO: 
+        [PatchInfo(Severity.Create | Severity.WIP | Severity.Hidden, "Paladin Virtuous Bravo", "archetype", false)]
+        public static void CreatePaladinVirtuousBravo()
         {
             var paladin = Helper.ToRef<BlueprintCharacterClassReference>("bfa11238e7ae3544bbeb4d0b92e897ec"); //PaladinClass
 
@@ -115,7 +116,7 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreateAddFacts(swordplay_ab)
                 ).SetUIData(swordplay_ab);
-            
+
             var f4_panache = Helper.CreateBlueprintFeature(
                 "VirtuousBravoPanacheDeeds",
                 "Panache and Deeds",
@@ -145,6 +146,7 @@ namespace DarkCodex
                 range: AbilityRange.Personal
                 ).TargetSelf(
                 ).SetComponents(
+                new AbilityRestrictionDuelist(),
                 Helper.MakeRunActionApplyBuff(bleedbuff1),
                 Helper.CreateAbilityResourceLogic(resourcePanache, 1)
                 ).SetUIData(bleedbuff1);
@@ -165,6 +167,7 @@ namespace DarkCodex
                 range: AbilityRange.Personal
                 ).TargetSelf(
                 ).SetComponents(
+                new AbilityRestrictionDuelist(),
                 Helper.MakeRunActionApplyBuff(bleedbuff2),
                 Helper.CreateAbilityResourceLogic(resourcePanache, 2)
                 ).SetUIData(bleedbuff2);
@@ -201,6 +204,7 @@ namespace DarkCodex
                 range: AbilityRange.Weapon
                 ).TargetEnemy(
                 ).SetComponents(
+                new AbilityRestrictionDuelist(),
                 Helper.MakeRunActionApplyBuff(feint_buff, Helper.CreateContextDurationValue(bonus: 1))
                 );
             var panache8 = Helper.CreateBlueprintFeature(
@@ -223,9 +227,10 @@ namespace DarkCodex
                 "Arms: The target takes no damage from the attack, but you disarm it. If successful, the target cannot use his weapons for 1 {g|Encyclopedia:Combat_Round}round{/g}. For every 5 by which your {g|Encyclopedia:Attack}attack{/g} exceeds your opponent's {g|Encyclopedia:AC}AC{/g}, the disarmed condition lasts 1 additional round.",
                 icon: null,
                 type: AbilityType.Extraordinary,
-                range: AbilityRange.Touch
+                range: AbilityRange.Weapon
                 ).TargetEnemy(
                 ).SetComponents(
+                new AbilityRestrictionDuelist(),
                 Helper.CreateAbilityResourceLogic(resourcePanache, 1),
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
@@ -238,27 +243,55 @@ namespace DarkCodex
                 "Head: The target is confused for 1 round. This is a mind-affecting effect.",
                 icon: null,
                 type: AbilityType.Extraordinary,
-                range: AbilityRange.Touch
+                range: AbilityRange.Weapon
                 ).TargetEnemy(
                 ).SetComponents(
+                new AbilityRestrictionDuelist(),
                 Helper.CreateAbilityResourceLogic(resourcePanache, 1),
-                Helper.CreateAbilityEffectRunAction( // TODO: restrict duelist weapon
+                Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
-                    Helper.CreateConditional(
-                        condition: new Condition[] {
-                            new ContextConditionAttackRoll(canBeRanged: false), },
-                            //new ContextConditionDuelistWeapon() },
-                        ifTrue: new GameAction[] {
-                            new ContextActionDealWeaponDamage { CanBeRanged = false },
-                            Helper.CreateContextActionApplyBuff("886c7407dc629dc499b9f1465ff382df", Helper.CreateContextDurationValue(1), dispellable: false) }) //Confusion
+                    new ContextActionAttack(
+                        Helper.CreateContextActionApplyBuff("886c7407dc629dc499b9f1465ff382df", Helper.DurationOneRound, dispellable: false)) //Confusion
+                    )
+                );
+            var trip_ab = Helper.CreateBlueprintAbility(
+                "TargetedStrikeTrip",
+                "Targeted Strike: Trip",
+                "Legs: The target is knocked prone. Creatures with four or more legs or that are immune to trip attacks are immune to this effect.",
+                icon: null,
+                type: AbilityType.Extraordinary,
+                range: AbilityRange.Weapon
+                ).SetComponents(
+                new AbilityRestrictionDuelist(),
+                Helper.CreateAbilityResourceLogic(resourcePanache, 1),
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    new ContextActionAttack(
+                        Helper.CreateContextActionApplyBuff("24cf3deb078d3df4d92ba24b176bda97", Helper.DurationOneRound, dispellable: false)) //Prone
+                    )
+                );
+            var stagger_ab = Helper.CreateBlueprintAbility(
+                "TargetedStrikeStagger",
+                "Targeted Strike: Stagger",
+                "Torso or Wings: The target is staggered for 1 round.",
+                icon: null,
+                type: AbilityType.Extraordinary,
+                range: AbilityRange.Weapon
+                ).SetComponents(
+                new AbilityRestrictionDuelist(),
+                Helper.CreateAbilityResourceLogic(resourcePanache, 1),
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    new ContextActionAttack(
+                        Helper.CreateContextActionApplyBuff("df3950af5a783bd4d91ab73eb8fa0fd3", Helper.DurationOneRound, dispellable: false)) //Staggered
                     )
                 );
             var panache10 = Helper.CreateBlueprintFeature(
                 "Panache_TargetedStrike",
                 "Targeted Strike",
-                "WIP"
+                "At 7th level, as a full-round action the swashbuckler can spend 1 panache point to make an attack with a single light or one-handed piercing melee weapon that cripples part of a foe’s body. The swashbuckler chooses a part of the body to target. If the attack succeeds, in addition to the attack’s normal damage, the target suffers one of the following effects based on the part of the body targeted. If a creature doesn’t have one of the listed body locations, that body part cannot be targeted. Creatures that are immune to sneak attacks are also immune to targeted strikes. Items or abilities that protect a creature from critical hits also protect a creature from targeted strikes."
                 ).SetComponents(
-                Helper.CreateAddFacts(disarm_ab)
+                Helper.CreateAddFacts(disarm_ab, confuse_ab, trip_ab, stagger_ab)
                 );
 
             var f11_panache = Helper.CreateBlueprintFeature(
@@ -272,12 +305,36 @@ namespace DarkCodex
                 "485a18c05792521459c7d06c63128c79") //ImprovedUncannyDodge
                 );
 
+            var holy_strike_buff = Helper.CreateBlueprintBuff(
+                "VirtuousBravoHolyStrikeBuff"
+                ).Flags(hidden: true);
+            var f20_holy_strike = Helper.CreateBlueprintFeature(
+                "VirtuousBravoHolyStrike",
+                "Bravo’s Holy Strike",
+                "At 20th level, a virtuous bravo becomes a master at dispensing holy justice with her blade.\nWhen the virtuous bravo confirms a critical hit with a light or one-handed piercing melee weapon, the target is slain. The target can attempt a Fortitude save. On a success, the target is instead stunned for 1 round (it still takes damage). The DC of this save is equal to 10 + 1/2 the virtuous bravo’s paladin level + her Charisma modifier. Once a creature has been the target of a bravo’s holy strike, regardless of whether or not it succeeds at the save, that creature is immune to that bravo’s holy strike for 24 hours. Creatures that are immune to critical hits are also immune to this ability."
+                ).SetComponents(
+                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
+                    Helper.CreateActionList(Helper.CreateConditional(
+                        condition: new Condition[] {
+                            Helper.CreateContextConditionHasBuff(holy_strike_buff) },
+                        ifFalse: new GameAction[] {
+                            Helper.CreateContextActionApplyBuff(holy_strike_buff, Helper.DurationOneDay, dispellable: false),
+                            Helper.MakeContextActionSavingThrow(
+                                SavingThrowType.Fortitude,
+                                succeed: Helper.CreateContextActionApplyBuff("09d39b38bb7c6014394b6daced9bacd3", Helper.DurationOneRound, dispellable: false), //Stunned
+                                failed: new ContextActionKill()) }
+                        )),
+                    CriticalHit: true,
+                    DuelistWeapon: true)
+                );
+
             archetype.SetAddFeatures(
                 Helper.CreateLevelEntry(1, f1_prof),
                 Helper.CreateLevelEntry(1, f1_finesse),
                 Helper.CreateLevelEntry(3, f3_nimble),
                 Helper.CreateLevelEntry(4, f4_panache),
-                Helper.CreateLevelEntry(11, f11_panache)
+                Helper.CreateLevelEntry(11, f11_panache),
+                Helper.CreateLevelEntry(20, f20_holy_strike)
                 );
 
             archetype.SetRemoveFeatures(
@@ -309,24 +366,6 @@ namespace DarkCodex
 
             Main.Patch(typeof(Patch_BladedBrush));
         }
-
-        /*
-        
-        Virtuous Bravo
-
-        *Targeted Strike (Ex): At 7th level, as a full-round action the swashbuckler can spend 1 panache point to make an attack with a single light or one-handed piercing melee weapon that cripples part of a foe’s body. The swashbuckler chooses a part of the body to target. If the attack succeeds, in addition to the attack’s normal damage, the target suffers one of the following effects based on the part of the body targeted. If a creature doesn’t have one of the listed body locations, that body part cannot be targeted. Creatures that are immune to sneak attacks are also immune to targeted strikes. Items or abilities that protect a creature from critical hits also protect a creature from targeted strikes.
-            *Head: The target is confused for 1 round. This is a mind-affecting effect.
-            *Legs: The target is knocked prone. Creatures with four or more legs or that are immune to trip attacks are immune to this effect.
-            *Torso or Wings: The target is staggered for 1 round.
-
-
-        Bravo’s Holy Strike (Su)
-        At 20th level, a virtuous bravo becomes a master at dispensing holy justice with her blade.
-        When the virtuous bravo confirms a critical hit with a light or one-handed piercing melee weapon, she can choose one of the following three effects in addition to dealing damage: the target is rendered unconscious for 1d4 hours, the target is paralyzed for 2d6 rounds, or the target is slain. Regardless of the effect chosen, the target can attempt a Fortitude save.
-        On a success, the target is instead stunned for 1 round (it still takes damage). The DC of this save is equal to 10 + 1/2 the virtuous bravo’s paladin level + her Charisma modifier. Once a creature has been the target of a bravo’s holy strike, regardless of whether or not it succeeds at the save, that creature is immune to that bravo’s holy strike for 24 hours. Creatures that are immune to critical hits are also immune to this ability.
-        This ability replaces holy champion.
-
-        */
 
         [PatchInfo(Severity.Create, "Prodigious Two-Weapon Fighting", "combat feat: use STR for TWF and always treat offhand as light", false)]
         public static void CreateProdigiousTwoWeaponFighting()

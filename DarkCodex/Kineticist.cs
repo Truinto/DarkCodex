@@ -1299,6 +1299,13 @@ namespace DarkCodex
             });
         }
 
+        [PatchInfo(Severity.Fix | Severity.WIP | Severity.Hidden, "Blade Whirlwind", "fix Blade Whirlwind reach", false)]
+        public static void FixBladeWhirlwind()
+        {
+            var whirlwind = Tree.BladeWhirlwind.Activator.GetBlueprint() as BlueprintAbility;
+            whirlwind.ReplaceComponent(default(AbilityTargetsAround), new AbilityTargetsWeaponReach(10.Feet()));
+        }
+
         #region Helper
 
         /// <summary>
@@ -1473,17 +1480,4 @@ namespace DarkCodex
 
         #endregion
     }
-
-    //[HarmonyPatch(typeof(KineticistController), nameof(KineticistController.TryRunKineticBladeActivationAction))]
-    //public class Patch_KineticistWhipReach
-    //{
-    //    public static void Postfix(UnitPartKineticist kineticist, UnitCommand cmd, bool __result)
-    //    {
-    //        if (!__result)
-    //            return;
-    //        if (kineticist.Owner.Buffs.GetBuff(Patch_KineticistAllowOpportunityAttack2.whip_buff) == null) 
-    //            return;
-    //        cmd.ApproachRadius += 5f * 0.3048f;
-    //    }
-    //}
 }
