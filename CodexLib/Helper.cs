@@ -81,6 +81,7 @@ using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.Controllers.Dialog;
 using Kingmaker.Designers.EventConditionActionSystem.Conditions;
 using Kingmaker.Designers.Mechanics.Buffs;
+using Kingmaker.Designers.Mechanics.Recommendations;
 
 namespace CodexLib
 {
@@ -1407,12 +1408,8 @@ namespace CodexLib
             }
         }
 
-        public static T GetComponent<T>(this AnyRef any) where T : BlueprintComponent
-        {
-            if (any?.GetBlueprint() is BlueprintScriptableObject bso)
-                return bso.GetComponent<T>();
-            return null;
-        }
+        public static T GetComponent<T>(this AnyRef any) where T : BlueprintComponent 
+            => any.Get<BlueprintScriptableObject>()?.GetComponent<T>();
 
         public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
@@ -1449,6 +1446,9 @@ namespace CodexLib
             return obj.AddComponents(Flush<BlueprintComponent>());
         }
 
+        public static void AddComponents(this AnyRef any, params BlueprintComponent[] components) 
+            => any.Get<BlueprintScriptableObject>()?.AddComponents(components);
+
         public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
         {
             for (int i = 0; i < components.Length; i++)
@@ -1482,6 +1482,9 @@ namespace CodexLib
             return obj.SetComponents(Flush<BlueprintComponent>());
         }
 
+        public static void SetComponents(this AnyRef any, params BlueprintComponent[] components)
+            => any.Get<BlueprintScriptableObject>()?.SetComponents(components);
+
         public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig original, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
         {
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
@@ -1502,6 +1505,9 @@ namespace CodexLib
 
             return obj;
         }
+        
+        public static void ReplaceComponent<TOrig, TRep>(this AnyRef any, TOrig original, TRep replacement)
+            => (any.GetBlueprint() as BlueprintScriptableObject)?.SetComponents(original, replacement);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static T RemoveComponents<T, TRemove>(T obj) where T : BlueprintScriptableObject where TRemove : BlueprintComponent
@@ -2294,6 +2300,24 @@ namespace CodexLib
             }
 
             return buff;
+        }
+
+        public static BlueprintAbility SetMetamagic(this BlueprintAbility ability, Metamagic metamagic)
+        {
+            //Metamagic.Empower | Metamagic.Maximize | Metamagic.Quicken | Metamagic.Extend | Metamagic.Heighten | Metamagic.Reach | Metamagic.CompletelyNormal | Metamagic.Persistent | Metamagic.Selective | Metamagic.Bolstered
+
+            ability.AvailableMetamagic = metamagic;
+
+            return ability;
+        }
+
+        public static BlueprintAbility NoMetamagic(this BlueprintAbility ability, Metamagic metamagic)
+        {
+            //Metamagic.Empower | Metamagic.Maximize | Metamagic.Quicken | Metamagic.Extend | Metamagic.Heighten | Metamagic.Reach | Metamagic.CompletelyNormal | Metamagic.Persistent | Metamagic.Selective | Metamagic.Bolstered
+
+            ability.AvailableMetamagic &= ~metamagic;
+
+            return ability;
         }
 
         public static void AddArcaneVendorItem(BlueprintItemReference item, int amount = 1)
@@ -3933,6 +3957,14 @@ namespace CodexLib
             return result;
         }
 
+        public static PureRecommendation CreatePureRecommendation(RecommendationPriority priority = RecommendationPriority.Good)
+        {
+            return new PureRecommendation()
+            {
+                Priority = priority
+            };
+        }
+
         public static AddFacts CreateAddFacts(params BlueprintUnitFactReference[] facts)
         {
             var result = new AddFacts();
@@ -4271,12 +4303,15 @@ namespace CodexLib
             return result;
         }
 
-        [Obsolete]
-        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string i, string a = null, string b = null, BlueprintWeaponTypeReference c = null, DiceFormula? d = null, DamageTypeDescription e = null, BlueprintItemWeaponReference f = null, bool g = false, int h = 1000)
-         => CreateBlueprintItemWeapon(i, a, b, c, d, e, f, g, h, null, null);
+        [Obsolete("see overload; use named parameters")]
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string a, string b, string c, BlueprintWeaponTypeReference d, DiceFormula? e, DamageTypeDescription f, BlueprintItemWeaponReference g, bool h, int i)
+         => CreateBlueprintItemWeapon(a, b, c, null, d, e, f, g, h, i, null, null);
 
+        /// <param name="weaponType">type: <b>BlueprintWeaponType</b></param>
+        /// <param name="secondWeapon">type: <b>BlueprintItemWeapon</b></param>
         /// <param name="cloneVisuals">type: <b>BlueprintWeaponType</b></param>
-        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, BlueprintWeaponTypeReference weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, BlueprintItemWeaponReference secondWeapon = null, bool primaryNatural = false, int price = 1000, AnyRef cloneVisuals = null, BlueprintWeaponEnchantmentReference[] enchantments = null)
+        /// <param name="enchantments">type: <b>BlueprintWeaponEnchantment[]</b></param>
+        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, Sprite icon = null, AnyRef weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, AnyRef secondWeapon = null, bool primaryNatural = false, int price = 1000, AnyRef cloneVisuals = null, params AnyRef[] enchantments)
         {
             string guid = GetGuid(name);
 
@@ -4285,6 +4320,7 @@ namespace CodexLib
 
             result.m_DisplayNameText = displayName.CreateString();
             result.m_DescriptionText = description.CreateString();
+            result.m_Icon = icon;
             result.m_Type = weaponType;
             result.m_Size = Size.Medium;
             result.m_OverrideDamageDice = damageOverride != null;
@@ -4311,9 +4347,8 @@ namespace CodexLib
             result.m_FlavorText = "".CreateString();
             result.m_NonIdentifiedNameText = "".CreateString();
             result.m_NonIdentifiedDescriptionText = "".CreateString();
-            result.m_Icon = null; //can be null
 
-            result.m_Enchantments = enchantments ?? Array.Empty<BlueprintWeaponEnchantmentReference>();
+            result.m_Enchantments = enchantments.ToRef<BlueprintWeaponEnchantmentReference>();
 
             // not sure
             if (cloneVisuals != null)
@@ -4617,6 +4652,18 @@ namespace CodexLib
 
         #region ToReference
 
+        public static bool Contains(this IEnumerable<BlueprintReferenceBase> source, SimpleBlueprint bp)
+        {
+            if (bp == null || source == null)
+                return false;
+
+            foreach (var item in source)
+                if (item.deserializedGuid == bp.AssetGuid)
+                    return true;
+
+            return false;
+        }
+
         public static bool NotEmpty(this BlueprintReferenceBase reference)
         {
             return reference != null && reference.deserializedGuid != BlueprintGuid.Empty && reference.GetBlueprint() != null;
@@ -4666,12 +4713,14 @@ namespace CodexLib
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [NotNull]
         public static T[] ToRef<T>(params object[] source) where T : BlueprintReferenceBase, new() => ToRef<T>((IEnumerable<object>)source);
 
         /// <summary>
         /// Converts a collection of strings, references, and blueprints into a specified reference type.<br/>
         /// Can handle multiple different types and will recursively resolve collections.
         /// </summary>
+        [NotNull]
         public static T[] ToRef<T>(this IEnumerable<object> source) where T : BlueprintReferenceBase, new()
         {
             if (source is null)

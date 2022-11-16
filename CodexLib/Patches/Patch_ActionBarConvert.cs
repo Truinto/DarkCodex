@@ -63,7 +63,7 @@ namespace CodexLib.Patches
 
         [HarmonyPatch(typeof(ActionBarSlotPCView), "UnityEngine.EventSystems.IEndDragHandler.OnEndDrag")]
         [HarmonyPrefix]
-        public static bool DisableDrag(ActionBarSlotPCView __instance)
+        public static bool DisableDrag(ActionBarSlotPCView __instance) // TODO: ensure controller input can't circumvent this
         {
             if (__instance.ViewModel?.MechanicActionBarSlot is IActionBarDisableDrag)
             {

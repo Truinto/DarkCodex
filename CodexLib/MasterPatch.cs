@@ -28,7 +28,6 @@ namespace CodexLib
             typeof(Patch_ContextRankBonus),
             typeof(Patch_ContextStatValue),
             typeof(Patch_DebugReport),
-            typeof(Patch_DuelistParry),
             typeof(Patch_FixAbilityTargets),
             typeof(Patch_GetTargetProjectileFix),
             typeof(Patch_LevelUp),

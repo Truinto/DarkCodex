@@ -20,6 +20,7 @@ global using Kingmaker.Localization;
 global using Kingmaker.PubSubSystem;
 global using Kingmaker.RuleSystem;
 global using Kingmaker.RuleSystem.Rules;
+global using Kingmaker.RuleSystem.Rules.Abilities;
 global using Kingmaker.RuleSystem.Rules.Damage;
 global using Kingmaker.UnitLogic;
 global using Kingmaker.UnitLogic.Abilities;

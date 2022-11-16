@@ -759,6 +759,7 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("75cbe35e4ada12441a0270d541c12c64"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("492a8156ecede6345a8e82475eed85ac"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("6d35b4f39de9eb446b2d0a65b931246b"),
             };
             Cloud = new()
             {
@@ -998,71 +999,79 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("b3bd080eed83a9940abd97e4aa2a7341"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("918b2524af5c3f647b5daa4f4e985411"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("88c37d8a7d808a844ba0116dd37e4059"),
             };
             Chilling = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("6ac87a3af9ccf014787c49745df75e6a"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("49fc69c05ff7c5d46b61745d361a72fb"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("fb426ea002abbbc4198b1cd6b99f1be8"),
             };
             Dazzling = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("037460f7ae3e21943b237007f2b1a5d5"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("ee8d9f5631c53684d8d627d715eb635c"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("abf5c26910fda5949abbc285c60416f9"),
             };
             Entangling = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("607539d018d03454aaac0a2c1522f7ac"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("738120aad01eedb4f891eca5b784646a"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("091b297f43ac5be43af31979c00ade57"),
             };
             Flash = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("37f3cfca29073e142a80c3b8e7c54b05"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("50cf40b1cb3115546a3e9b44d7687384"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("323be9d573657374da4e3f1456a2366c"),
             };
             Foxfire = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("ae21c5369252ec74aa1fee89f1bc1b21"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("e671f173fcb75bf4aa78a4078d075792"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("d0007fed20710ae4a96cebd2ba99f08b"),
             };
             Grappling = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("e2d70b95e80549b439d30df29a79cb58"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("f69a66c0feaa4374b8ca2732ee91a373"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("2816fad233e15a54c86729cee6e8969d"),
             };
             Magnetic = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("d6b95ac99e3004b499d750835864e053"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("696a0eafc6a21334580174a461079841"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("b2d91bac690b74140b4fa3eec443edee"),
             };
             PureFlame = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("1dfd9b8e1439e4a4ab4b6b11f5ea676a"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("1b9f7db78467ff34ab2e1c0f86cdaa77"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("06e3ac0ec6341744eb87f1f70a11576b"),
             };
             Pushing = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("fbb97f35a41b71c4cbc36c5f3995b892"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("f795bede8baefaf4d9d7f404ede960ba"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("bc5665a318bc4eb46a0537455509851a"),
             };
             RareMetal = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("6700ce7f56ddc30488e45b049f4ee475"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("417086d2c99b60f4c911de6712bc76a7"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("097c209e378144045ab97f4d54876959"),
             };
             Synaptic = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("53c80f136f2bf65409d358f28b0c5bb4"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("67fc7492f198c8d4aace14d28e0ad438"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("db3ccc72faeac0343891ba71bb692a42"),
             };
             Unraveling = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("79339d57d491d824ba0aa4ed0c114b2f"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("cebd08ab72f1baa4eaacdd836207873a"),
-            };
-            Vampiric = new()
-            {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("66c71846bbb626a4ab73cef60f1c8bbf"),
-                Buff = Helper.ToRef<BlueprintBuffReference>("e50e653cff511cd49a55b979346699f1"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("59303d0eb693cd2438fc89f91e29ab19"),
             };
 
             #endregion
@@ -1075,12 +1084,14 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("350b164b8fd942f4a37af9fe31d6b97a"),
                 Buff = null,
                 RequiresMeleeAttackRoll = true,
+                Activator = Helper.ToRef<BlueprintAbilityReference>("e6b5691631c7417696af64bdef75f706"),
             };
             Whip = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("00df2fabfc3f40a4aaf4a066dcd78b80"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("26983c7ac7f1465fab8ec646f366b9f7"),
                 RequiresMeleeAttackRoll = true,
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("a95f76e9cb344bef8d8bc3839d1a75dd"),
             };
             Chain = new()
             {
@@ -1109,31 +1120,36 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("637329bf936244668c55d81985c4eaf8"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("41b2d6e118034bd0bf3edc214a895d70"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("0d66e6c2ab8d4aa38b8e4aa5e0795120"),
             };
             VenomGreater = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("e9021412e87847b3b104d4d31bfe5403"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("ec75b0fc5e484c1eabb1fd15eb204b99"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("7c825af055e04ccf87916838800cf18b"),
             };
             KineticFist = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("5e3db32b4e244abfa642ee03276d88ed"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("07e18f24bda7444a9b34405227b31b60"),
                 RequiresMeleeAttackRoll = true,
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("a909d31742af4c7788c0e401de191617"),
             };
             EnergizeWeapon = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("fb9fe27f13934807bcd62dfeec477758"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("f5fbde9e5fbe4973bc421315c723d9fe"),
                 RequiresMeleeAttackRoll = true,
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("5572beb8ca8c4efaa43c514190fe2f13"),
             };
             HurricaneQueen = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("f90ab62ccb6349a3be43adbdacb34dff")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("f90ab62ccb6349a3be43adbdacb34dff"),
+                Activator = Helper.ToRef<BlueprintFeatureReference>("bbba1600582cf8446bb515a33bd89af8"),
             };
             MindShield = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("c15c4e5e91804f2abd19ff7628fc62e2")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c15c4e5e91804f2abd19ff7628fc62e2"),
             };
 
             // Modded: Kineticist Elements Expanded
@@ -1190,7 +1206,7 @@ namespace CodexLib
             };
             VoidVampire = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("c1cdb07b56614ff6acb4416eb90629d1"),
+                Feature = Helper.ToRef<BlueprintFeatureReference>("922fd10e3e994d7793821da1583cdfea"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("2b306434ee2948a782263f57b7c2ddb5"),
             };
             Weighing = new()
@@ -1221,8 +1237,14 @@ namespace CodexLib
             };
             ToxicGreater = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("848ab4144cb14b4499167bcbfd372796"),
+                Feature = Helper.ToRef<BlueprintFeatureReference>("56567887f604473797dc8223c68999da"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("56567887f604473797dc8223c68999da"),
+            };
+            Vampiric = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("66c71846bbb626a4ab73cef60f1c8bbf"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("e50e653cff511cd49a55b979346699f1"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("d9e3b600a10e4edc97fb3a1702831b4a"),
             };
 
             #endregion
@@ -1231,159 +1253,174 @@ namespace CodexLib
 
             AerialAdaptation = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("c8719b3c5c0d4694cb13abcc3b7e893b")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c8719b3c5c0d4694cb13abcc3b7e893b"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("de4f4b6aa7f62204c95f5d03ac0bc459"),
             };
             AerialEvasion = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("871e6b0bb9d050743b98b78990ae1cff")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("871e6b0bb9d050743b98b78990ae1cff"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("41281aa38b6b27f4fa3a05c97cc01783"),
             };
             Celerity = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("b182f559f572da342b54bece4404e4e7")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("b182f559f572da342b54bece4404e4e7"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("4e85d35a76525e1439aeb8086af53809"),
             };
             ColdAdaptation = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("1ff5d6e76b7c2fa48be555b77d1ad8b2")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("1ff5d6e76b7c2fa48be555b77d1ad8b2"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("04a414c3d1585a74e9d3f23addc465cc"),
             };
             ElementalWhispersSelection = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("f02525006521bee4eb90ab26b7b9db24")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("f02525006521bee4eb90ab26b7b9db24"),
             };
             EnduringEarth = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("14359e9c35a42ee48b8c31b4424a8d3f")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("14359e9c35a42ee48b8c31b4424a8d3f"),
             };
             ExpandedDefense = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("d741f298dfae8fc40b4615aaf83b6548")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("d741f298dfae8fc40b4615aaf83b6548"),
             };
             FiresFury = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("641d15b6c3d3017409e352c558fb0090")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("641d15b6c3d3017409e352c558fb0090"),
             };
             FlameShield = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("733bbf836ec575b44b3c88b61a26282e")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("733bbf836ec575b44b3c88b61a26282e"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("c3a13237b17de5742a2dbf2da46f23d5"),
             };
             FoxfireUtility = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("14c699ccd0564e04a9587b1845d16014")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("14c699ccd0564e04a9587b1845d16014"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("27f0127528bd96f44897987f339ae282"),
             };
             HealingBurst = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("c73b37aaa2b82b44686c56db8ce14e7f")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c73b37aaa2b82b44686c56db8ce14e7f"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("db611ffeefb8f1e4f88e7d5393fc651d"),
             };
             HeatAdaptation = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("2825e3a53c76ad944a47c5c44fb6109f")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("2825e3a53c76ad944a47c5c44fb6109f"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("1a74716a5b0217a4eb922856c01e80cc"),
             };
             JaggedFlesh = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("94064ed53b1020247941ac70313b439d")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("94064ed53b1020247941ac70313b439d"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("b448a9c0ff27b6846b9c676f6839e907"),
             };
             KineticHealer = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("3ef666973adfa8f40af6c0679bd98ba5")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("3ef666973adfa8f40af6c0679bd98ba5"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("eff667a3a43a77d45a193bb7c94b3a6c"),
             };
             KineticRestoration = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("ed01d50910ae67b4dadc050f16d93bdf")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("ed01d50910ae67b4dadc050f16d93bdf"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("1dc60bdbf5843f342aaa5e838b66e43a"),
             };
             KineticRevification = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("0377fcf4c10871f4187809d273af7f5d")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("0377fcf4c10871f4187809d273af7f5d"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("0e370822d9e0ff54f897e7fdf24cffb8"),
             };
             SkilledKineticist = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("fd13e9efee08db448974fe0263eb96c8")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("fd13e9efee08db448974fe0263eb96c8"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("56b70109d78b0444cb3ad04be3b1ee9e"),
             };
             Slick = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("1d42456e6113739499e1bda025e0ba03")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("1d42456e6113739499e1bda025e0ba03"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("5f3cfbd441529df4f85a97075f299b41"),
             };
             TidalWave = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("7c4bbfe3b089a8a4ebcd2401995230a4")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("7c4bbfe3b089a8a4ebcd2401995230a4"),
+                Activator = Helper.ToRef<BlueprintAbilityReference>("d8d451ed3c919a4438cde74cd145b981"),
             };
             Tremorsense = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("6e668702fdc53c343a0363813683346e")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("6e668702fdc53c343a0363813683346e"),
             };
             WildTalentBonusFeatAir = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("4ff45d291d0ee9c4b8c83a298b0b4969")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("4ff45d291d0ee9c4b8c83a298b0b4969"),
             };
             WildTalentBonusFeatAir1 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("95ab2bdf0d45b2742a357f5780aac4a3")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("95ab2bdf0d45b2742a357f5780aac4a3"),
             };
             WildTalentBonusFeatAir2 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("a8a481c7fbcc9c446a0eecb6e5604405")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("a8a481c7fbcc9c446a0eecb6e5604405"),
             };
             WildTalentBonusFeatAir3 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("a82e3b11fc5935d4289c807b241a2bb5")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("a82e3b11fc5935d4289c807b241a2bb5"),
             };
             WildTalentBonusFeatEarth = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("28bd446d8aeab1341acc8d2fba91e455")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("28bd446d8aeab1341acc8d2fba91e455"),
             };
             WildTalentBonusFeatEarth1 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("fc75b0bcfcb5236419d1a47e1bc555a9")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("fc75b0bcfcb5236419d1a47e1bc555a9"),
             };
             WildTalentBonusFeatEarth2 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("2205fc9ed34368548b1358a781326bab")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("2205fc9ed34368548b1358a781326bab"),
             };
             WildTalentBonusFeatEarth3 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("f593346da04badb4185a47af8e4c4f7f")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("f593346da04badb4185a47af8e4c4f7f"),
             };
             WildTalentBonusFeatFire = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("4d14baf0ee4da2a4cb05fb4312921ee4")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("4d14baf0ee4da2a4cb05fb4312921ee4"),
             };
             WildTalentBonusFeatFire1 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("0e0207491a09a9e428409c4a1b2871a3")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("0e0207491a09a9e428409c4a1b2871a3"),
             };
             WildTalentBonusFeatFire2 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("cd107bf355f84b64f9f472ca288c208b")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("cd107bf355f84b64f9f472ca288c208b"),
             };
             WildTalentBonusFeatFire3 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("0213c0c9062203540bd0365cbde44b99")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("0213c0c9062203540bd0365cbde44b99"),
             };
             WildTalentBonusFeatWater = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("31c18eae013b09c4f9ee51da71a2d61c")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("31c18eae013b09c4f9ee51da71a2d61c"),
             };
             WildTalentBonusFeatWater1 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("b6f42b59d000228498445526042dfd1b")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("b6f42b59d000228498445526042dfd1b"),
             };
             WildTalentBonusFeatWater2 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("b881e2d840eaf6044b0d243b239cccd7")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("b881e2d840eaf6044b0d243b239cccd7"),
             };
             WildTalentBonusFeatWater3 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("1d341cc7535e64b4b8e2c53fb6726394")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("1d341cc7535e64b4b8e2c53fb6726394"),
             };
             WildTalentBonusFeatWater4 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("ebf90f9f8a5e43f40bee85fd6506b922")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("ebf90f9f8a5e43f40bee85fd6506b922"),
             };
             WildTalentBonusFeatWater5 = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("40a4fb42aafa7ee4991d3e3140e98856")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("40a4fb42aafa7ee4991d3e3140e98856"),
             };
             SkillFocusSelection = new()
             {
-                Feature = Helper.ToRef<BlueprintFeatureReference>("c9629ef9eebb88b479b2fbc5e836656a")
+                Feature = Helper.ToRef<BlueprintFeatureReference>("c9629ef9eebb88b479b2fbc5e836656a"),
             };
 
             #endregion
@@ -1561,7 +1598,6 @@ namespace CodexLib
                 yield return RareMetal;
                 yield return Synaptic;
                 yield return Unraveling;
-                yield return Vampiric;
             }
             if (utility)
             {
@@ -1652,6 +1688,7 @@ namespace CodexLib
                     yield return Spore;
                     yield return Toxic;
                     yield return ToxicGreater;
+                    yield return Vampiric;
                 }
                 if (utility)
                 {
@@ -1925,7 +1962,7 @@ namespace CodexLib
             /// <summary>can be null (only exists on form infusions)</summary>
             [CanBeNull] public List<BlueprintAbilityReference> Variants;
 
-            /// <summary>WIP; can be null; either BlueprintActivatable or BlueprintAbility</summary>
+            /// <summary>can be null (BlueprintActivatable, BlueprintAbility, BlueprintBuff, BlueprintFeature)</summary>
             [CanBeNull] public BlueprintReferenceBase Activator;
         }
 
@@ -1965,126 +2002,183 @@ namespace CodexLib
         {
             try
             {
-                #region fields
+                Helper.Print("KineticistTree.Validate start");
 
+                Helper.Print("check all top level blueprint references");
+                check(typeof(KineticistTree).GetField(nameof(instance), Helper.BindingAll), this);
+
+                Helper.Print("check all top level fields (Element, Focus, Infusion)");
+                var fi_blade = typeof(Element).GetField(nameof(Element.Blade));
                 var fields = typeof(KineticistTree).GetFields(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (var field in fields)
+                foreach (var fi in fields)
                 {
-                    object value = field.GetValue(this);
-                    if (value is null)
-                        Helper.PrintDebug($"KineticistTree.Validate field is null '{field.Name}'");
-                    else if (object.ReferenceEquals(value, DefaultAbility))
+                    object value = fi.GetValue(this);
+
+                    if (typeof(BlueprintReferenceBase).IsAssignableFrom(fi.FieldType)) // these are already covered
                     { }
-                    else if (value is Element element && !GetAll(true, true, archetype: true).Contains(element))
-                        Helper.PrintDebug($"KineticistTree.Validate field missing in GetAll '{field.Name}'");
-                    else if (value is Focus focus && !GetFocus().Contains(focus))
-                        Helper.PrintDebug($"KineticistTree.Validate field missing in GetFocus '{field.Name}'");
-                    else if (value is Infusion infusion && !GetTalents(true, true, true).Contains(infusion))
-                        Helper.PrintDebug($"KineticistTree.Validate field missing in GetTalents '{field.Name}'");
-                }
 
-                #endregion
+                    else if (value is null)
+                        Helper.Print($"field is null '{fi.Name}'");
 
-                #region check activators
+                    else if (object.ReferenceEquals(value, DefaultAbility)) // this has special logic
+                    { }
 
-                Helper.PrintDebug("KineticistTree.Validate check activators");
-                foreach (var talent in GetTalents(form: true, substance: true, utility: true))
-                {
-                    var feature = talent.Feature.Get();
-                    if (feature == null)
+                    #region Element
+                    else if (value is Element element)
                     {
-                        Helper.Print($"KineticistTree.Validate {resolve(talent)}.Feature is null : {talent.Feature?.Guid}");
-                        continue;
+                        if (!GetAll(true, true, archetype: true).Contains(element))
+                            Helper.Print($"field missing in GetAll '{fi.Name}'");
+
+                        check(fi, value);
+                        check(fi_blade, element.Blade);
                     }
+                    #endregion
 
-                    var addfacts = feature.GetComponent<AddFacts>();
-                    if (addfacts == null)
-                        continue;
-
-                    if (addfacts.m_Facts.Length != 1)
+                    #region Focus
+                    else if (value is Focus focus)
                     {
-                        compare<BlueprintReferenceBase>(talent, talent.Variants, addfacts.m_Facts);
+                        if (!GetFocus().Contains(focus))
+                            Helper.Print($"field missing in GetFocus '{fi.Name}'");
+
+                        check(fi, value);
                     }
-                    else if (talent.Activator == null || !talent.Activator.Equals(addfacts.m_Facts[0]))
+                    #endregion
+
+                    #region Infusion
+                    else if (value is Infusion infusion)
                     {
-                        Helper.Print($"KineticistTree.Validate wrong activator: {feature.name} -> {talent.Activator?.GetBlueprint()?.AssetGuid} : {addfacts.m_Facts[0]}");
-                    }
-                }
+                        if (!GetTalents(form: true, substance: true, utility: true).Contains(infusion))
+                            Helper.Print($"field missing in GetTalents '{fi.Name}'");
 
-                #endregion
+                        check(fi, value);
 
-                #region check form infusions
-
-                // REGEX    log file to variant references
-                // search   .*([\w\d]{32})$
-                // replace  Helper.ToRef<BlueprintAbilityReference>\("$1"\),
-
-                Helper.PrintDebug("KineticistTree.Validate check form infusions");
-                foreach (var talent in GetTalents(form: true))
-                {
-                    var feature = talent.Feature.Get();
-                    if (feature == null)
-                    {
-                        Helper.Print("KineticistTree.Validate talent is null");
-                        continue;
-                    }
-
-                    // check variants
-                    if (talent.Variants != null)
-                    {
-                        foreach (var variant in talent.Variants)
+                        // check form infusion
+                        if (GetTalents(form: true).Contains(infusion))
                         {
-                            if (variant.Get()?.GetComponent<AbilityShowIfCasterHasFact>()?.m_UnitFact?.Is(feature) != true)
-                                Helper.Print($"KineticistTree.Validate wrong variant: {feature.name} -> {variant.Get()?.name} : {variant.Get()?.AssetGuid}");
+                            // REGEX    log file to variant references
+                            // search   .*([\w\d]{32})$
+                            // replace  Helper.ToRef<BlueprintAbilityReference>\("$1"\),
+
+                            // check variants
+                            if (infusion.Variants != null)
+                            {
+                                foreach (var variant in infusion.Variants)
+                                {
+                                    if (variant.Get()?.GetComponent<AbilityShowIfCasterHasFact>()?.m_UnitFact?.Equals(infusion.Feature) != true)
+                                        Helper.Print($"wrong variant: {fi.Name} -> {variant.Get()?.name} : {variant.Get()?.AssetGuid}");
+                                }
+                            }
+
+                            // check missing variants
+                            foreach (var blast in GetBlasts(variants: true).Where(a => a.GetComponent<AbilityShowIfCasterHasFact>()?.m_UnitFact?.Equals(infusion.Feature) == true))
+                            {
+                                if (infusion.Variants == null || !infusion.Variants.Any(a => a.Is(blast)))
+                                    Helper.Print($"missing variant: {fi.Name} -> {blast.name} : {blast.AssetGuid}");
+                            }
+                        }
+
+                        // check activators
+                        if (GetTalents(substance: true, utility: true).Contains(infusion))
+                        {
+                            var addfacts = infusion.Feature?.Get()?.GetComponent<AddFacts>()?.m_Facts?.Distinct();
+                            if (addfacts == null)
+                                continue;
+
+                            if (addfacts.Count() != 1)
+                            {
+                                compare<BlueprintReferenceBase>(fi.Name, infusion.Variants, addfacts);
+                            }
+                            else if (infusion.Activator == null || !infusion.Activator.Equals(addfacts.First()))
+                            {
+                                Helper.Print($"wrong activator: {fi.Name} -> {infusion.Activator?.GetBlueprint()?.AssetGuid} : {addfacts.First()} : {addfacts.First().GetBlueprint()?.GetType()}");
+                            }
                         }
                     }
-
-                    // check missing variants
-                    foreach (var blast in GetBlasts(variants: true).Where(a => a.GetComponent<AbilityShowIfCasterHasFact>()?.m_UnitFact?.Is(feature) == true))
-                    {
-                        if (talent.Variants == null || !talent.Variants.Any(a => a.Is(blast)))
-                            Helper.Print($"KineticistTree.Validate missing variant: {feature.name} -> {blast.name} : {blast.AssetGuid}");
-                    }
+                    #endregion
                 }
 
-                Helper.PrintDebug("KineticistTree.Validate check DefaultAbility");
+                #region check DefaultAbility
+
+                Helper.Print("check DefaultAbility");
                 // check missing variants
                 foreach (var blast in GetBlasts(variants: true).Where(a => a.GetComponent<AbilityShowIfCasterHasFact>() == null))
                 {
                     if (!DefaultAbility.Variants.Any(a => a.Is(blast)))
-                        Helper.Print($"KineticistTree.Validate missing variant: {nameof(DefaultAbility)} -> {blast.name} : {blast.AssetGuid}");
+                        Helper.Print($"missing variant: {nameof(DefaultAbility)} -> {blast.name} : {blast.AssetGuid}");
                 }
 
                 #endregion
 
+                Helper.Print("KineticistTree.Validate end");
                 return;
 
-                void compare<T>(object field, IEnumerable<T> collection1, IEnumerable<T> collection2)
+                // check all blueprint references on an object for missing CanBeNullAttribute, missing blueprint, and wrong reference typing
+                void check(FieldInfo fi, object field)
+                {
+                    if (fi == null || field == null)
+                        return;
+
+                    var type = fi.FieldType;
+                    if (!type.IsClass)
+                        return;
+
+                    foreach (var fi2 in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        if (!typeof(BlueprintReferenceBase).IsAssignableFrom(fi2.FieldType))
+                            continue;
+
+                        bool canBeNull = fi2.HasAttribute<CanBeNullAttribute>();
+
+                        if (fi2.GetValue(field) is not BlueprintReferenceBase reference)
+                        {
+                            if (!canBeNull)
+                                Helper.Print($"reference check '{fi.Name}.{fi2.Name}' is null");
+                            continue;
+                        }
+
+                        var bp = reference.GetBlueprint();
+                        if (bp == null)
+                        {
+                            Helper.Print($"reference check '{fi.Name}.{fi2.Name}':{reference.Guid} is null");
+                            continue;
+                        }
+
+                        var refType = reference.GetType().BaseType?.GenericTypeArguments.FirstOrDefault();
+                        if (refType != null && refType != bp.GetType())
+                        {
+                            Helper.Print($"reference check '{fi.Name}.{fi2.Name}':{reference.Guid} type mismatch ref={refType} bp={bp.GetType()}");
+                        }
+                    }
+                }
+
+                // prints diff in two collections
+                void compare<T>(string name, IEnumerable<T> collection1, IEnumerable<T> collection2)
                 {
                     if (collection1 == null && collection2 == null)
                         return;
 
                     if (collection1 == null)
-                        Helper.PrintDebug($"{resolve(field)} left empty; right: {collection2.Join()}");
+                        Helper.Print($"{name} left empty; right: {collection2.Join()}");
                     else if (collection2 == null)
-                        Helper.PrintDebug($"{resolve(field)} right empty; left: {collection1.Join()}");
+                        Helper.Print($"{name} right empty; left: {collection1.Join()}");
                     else
                     {
                         foreach (var item in collection1.Where(w => !collection2.Contains(w)))
-                            Helper.PrintDebug($"{resolve(field)} only left: {item}");
+                            Helper.Print($"{name} only left: {item}");
                         foreach (var item in collection2.Where(w => !collection1.Contains(w)))
-                            Helper.PrintDebug($"{resolve(field)} only right: {item}");
+                            Helper.Print($"{name} only right: {item}");
                     }
                 }
 
-                string resolve(object field)
-                {
-                    var fi = fields.FirstOrDefault(f => ReferenceEquals(f.GetValue(this), field));
-                    if (fi != null)
-                        return fi.Name;
-                    return "";
-                }
+                // finds field name of top level object
+                //string resolve(object field)
+                //{
+                //    var fi = fields.FirstOrDefault(f => ReferenceEquals(f.GetValue(this), field));
+                //    if (fi != null)
+                //        return fi.Name;
+                //    return "";
+                //}
+
             }
             catch (Exception e) { Helper.PrintException(e); }
         }

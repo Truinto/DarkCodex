@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// If attached to a component, will cause convertables to not drag.
+    /// </summary>
     public interface IActionBarDisableDrag
     {
     }

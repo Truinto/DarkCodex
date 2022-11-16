@@ -89,6 +89,8 @@ namespace CodexLib
             }
         }
 
+        public BlueprintScriptableObject Get() => Get<BlueprintScriptableObject>();
+
         public T Get<T>() where T : SimpleBlueprint
         {
             var bp = this.Cached;

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Cache for slow operations. Will return known solution to specified arguments. Otherwise calls getter and remembers solution in cache.
+    /// </summary>
     public class CacheData<T> where T: class
     {
         const int Size = 5;

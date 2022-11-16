@@ -160,6 +160,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Flame Blade", "spell: Flame Blade, feat: Flame Blade Dervish Combat", false)]
         public static void CreateFlameBlade()
         {
+            Sprite icon = Helper.StealIcon("05b7cbe45b1444a4f8bf4570fb2c0208");
+
             /*
             Flame Blade Dervish Combat
             You move effortlessly when wielding a flame blade.
@@ -170,15 +172,19 @@ namespace DarkCodex
             AnyRef feat = Helper.CreateBlueprintFeature(
                 "FlameBladeDervishCombat",
                 "Flame Blade Dervish Combat",
-                "Benefit(s): When you cast flame blade, you gain a +10 enhancement bonus to your base speed as long as the spell persists, along with a +4 competence bonus on all Acrobatics checks. You add your Charisma modifier to damage rolls with your flame blade, and ignore the first 10 points of fire resistance possessed by a creature you hit with the flame blade for the purposes of determining the damage dealt by the flame blade. Against undead foes, you ignore the first 30 points of fire resistance. Immunity to fire still completely protects against damage from your flame blade."
+                "Benefit(s): When you cast flame blade, you gain a +10 enhancement bonus to your base speed as long as the spell persists, along with a +4 competence bonus on all Acrobatics checks. You add your Charisma modifier to damage rolls with your flame blade, and ignore the first 10 points of fire resistance possessed by a creature you hit with the flame blade for the purposes of determining the damage dealt by the flame blade. Against undead foes, you ignore the first 30 points of fire resistance. Immunity to fire still completely protects against damage from your flame blade.\nYou may use this with Gozreh's Trident instead.",
+                icon: icon
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel("610d836f3a3a9ed42a4349b62f002e96", 3, true), //DruidClass
-                Helper.CreatePrerequisiteClassLevel("145f1d3d360a7ad48bd95d392c81b38e", 3, true)  //ShamanClass // TODO: make spell prerequisite
+                Helper.CreatePrerequisiteClassLevel("145f1d3d360a7ad48bd95d392c81b38e", 3, true)  //ShamanClass
                 );
 
             Helper.AddFeats(feat);
 
             /*
+            https://www.d20pfsrd.com/gamemastering/Combat/#TOC-Cast-a-Spell1
+            I think you get a free touch attack with casting this spell. So I made this a move action, like unsheating a weapon.
+
             Flame Blade
             School evocation [fire]; Level druid 2, shaman 2
             Casting Time 1 standard action
@@ -190,6 +196,7 @@ namespace DarkCodex
             */
 
             var enchantment = Helper.CreateBlueprintWeaponEnchantment(
+                "Flame Blade", // TODO!! rename to FlameBladeEnchantment
                 "Flame Blade"
                 ).SetComponents(
                 new FlameBladeLogic(feat, DamageTypeMix.Fire, 10)
@@ -200,11 +207,11 @@ namespace DarkCodex
             var weapon = Helper.CreateBlueprintItemWeapon(
                 "FlameBladeWeapon",
                 "Flame Blade",
-                weaponType: Helper.ToRef<BlueprintWeaponTypeReference>("be24e972e8656514898dd335e983ea2c"), //MeleeTouchType
+                weaponType: "be24e972e8656514898dd335e983ea2c", //MeleeTouchType
                 cloneVisuals: "d9fbec4637d71bd4ebc977628de3daf3", //Scimitar
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
-                enchantments: new BlueprintWeaponEnchantmentReference[] { enchantment.ToRef() }
+                enchantments: new AnyRef[] { enchantment }
                 );
 
             var buff = Helper.CreateBlueprintBuff(
@@ -221,12 +228,11 @@ namespace DarkCodex
                 "FlameBladeAbility",
                 "Flame Blade",
                 "A 3-foot-long, blazing beam of red-hot fire springs forth from your hand. You wield this blade-like beam as if it were a scimitar. Attacks with the flame blade are melee touch attacks. The blade deals 1d8 points of fire damage + 1 point per two caster levels (maximum +10). Since the blade is immaterial, your Strength modifier does not apply to the damage. A flame blade can ignite combustible materials such as parchment, straw, dry sticks, and cloth.",
-                icon: Helper.StealIcon("05b7cbe45b1444a4f8bf4570fb2c0208"),
+                icon: icon,
                 type: AbilityType.Spell,
-                actionType: UnitCommand.CommandType.Free,
+                actionType: UnitCommand.CommandType.Move,
                 range: AbilityRange.Personal,
                 duration: Resource.Strings.MinutesPerLevel
-                ).TargetSelf(
                 ).SetComponents(
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
@@ -234,12 +240,110 @@ namespace DarkCodex
                 Helper.CreateSpellComponent(SpellSchool.Evocation),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Fire),
                 Helper.CreateCraftInfoComponent()
+                ).TargetSelf(
+                ).SetMetamagic(
+                Metamagic.Empower | Metamagic.Maximize | Metamagic.Extend
                 );
 
             ab.Add(2,
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
                 "c0c40e42f07ff104fa85492da464ac69"  //ShamanSpelllist
                 );
+        }
+
+        [PatchInfo(Severity.Create, "Gozreh's Trident", "spell: Gozreh's Trident", false)]
+        public static void CreateDivineTrident()
+        {
+            Sprite icon = Helper.StealIcon("05b7cbe45b1444a4f8bf4570fb2c0208");
+            AnyRef feat = "4df40f35e124455c9e20dd44e7cacf12";
+
+            feat.Get()?.AddComponents(
+                Helper.CreatePrerequisiteClassLevel("67819271767a9dd4fbfd4ae700befea0", 3, true), //ClericClass
+                Helper.CreatePrerequisiteClassLevel("d77e67a814d686842802c9cfd8ef8499", 7, true), //BloodragerClass
+                Helper.CreatePrerequisiteClassLevel("34ecd1b5e1b90b9498795791b0855239", 4, true), //HunterClass
+                Helper.CreatePrerequisiteClassLevel("30b5e47d47a0e37438cc5a80c96cfb99", 4, true), //WarpriestClass
+                Helper.CreatePrerequisiteClassLevel("1b9873f1e7bfe5449bc84d03e9c8e3cc", 3, true)  //WitchClass
+                );
+
+            /*
+            Gozreh's Trident
+            School evocation [electricity]; Level bloodrager 2, cleric 2, druid 2, hunter 2, oracle 2, warpriest 2, witch 2 (Gozreh)
+            Casting Time 1 standard action
+            Range personal
+            Duration 1 minute/level (D)
+            Saving Throw none; Spell Resistance yes
+
+            A 4-foot-long, blazing, forked bolt of electricity springs forth from your hand. You wield this spear-like bolt as if it were a trident (you are considered proficient with the bolt). Attacks with Gozreh’s trident are melee touch attacks. The bolt deals 1d8 points of electricity damage + 1 point per 2 caster levels (maximum +10). Since the bolt is immaterial, your Strength modifier does not apply to the damage. The bolt can ignite combustible materials such as parchment, straw, dry sticks, and cloth.
+            */
+
+            var enchantment = Helper.CreateBlueprintWeaponEnchantment(
+                "DivineTridentEnchantment",
+                "Gozreh's Trident"
+                ).SetComponents(
+                new FlameBladeLogic(feat, DamageTypeMix.Electricity, 10)
+                );
+            enchantment.WeaponFxPrefab = Helper.GetPrefabLink(Resource.Sfx.Weapon_Shock);
+            enchantment.m_HiddenInUI = true;
+
+            var weapon = Helper.CreateBlueprintItemWeapon(
+                "DivineTridentWeapon",
+                "Gozreh's Trident",
+                weaponType: "be24e972e8656514898dd335e983ea2c", //MeleeTouchType
+                cloneVisuals: "6ff66364e0a2c89469c2e52ebb46365e", //Trident
+                damageOverride: new DiceFormula(1, DiceType.D8),
+                form: Helper.CreateDamageTypeDescription(DamageEnergyType.Electricity),
+                enchantments: new AnyRef[] { enchantment }
+                );
+
+            var buff = Helper.CreateBlueprintBuff(
+                "DivineTridentBuff"
+                ).Flags(
+                hidden: true
+                ).SetComponents(
+                new AddTemporaryWeapon(weapon),
+                Helper.CreateAddStatBonusIfHasFact(StatType.Speed, ModifierDescriptor.Enhancement, 10, facts: feat),
+                Helper.CreateAddStatBonusIfHasFact(StatType.SkillMobility, ModifierDescriptor.Competence, 4, facts: feat)
+                );
+
+            var ab = Helper.CreateBlueprintAbility(
+                "DivineTridentAbility",
+                "Gozreh's Trident",
+                "A 4-foot-long, blazing, forked bolt of electricity springs forth from your hand. You wield this spear-like bolt as if it were a trident (you are considered proficient with the bolt). Attacks with Gozreh’s trident are melee touch attacks. The bolt deals 1d8 points of electricity damage + 1 point per 2 caster levels (maximum +10). Since the bolt is immaterial, your Strength modifier does not apply to the damage. The bolt can ignite combustible materials such as parchment, straw, dry sticks, and cloth.",
+                icon: icon,
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Move,
+                range: AbilityRange.Personal,
+                duration: Resource.Strings.MinutesPerLevel
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true)),
+                Helper.CreateSpellComponent(SpellSchool.Evocation),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Electricity),
+                Helper.CreateCraftInfoComponent()
+                ).TargetSelf(
+                ).SetMetamagic(
+                Metamagic.Empower | Metamagic.Maximize | Metamagic.Extend
+                );
+
+            ab.Add(2,
+                "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "8443ce803d2d31347897a3d85cc32f53", //ClericSpellList
+                "98c05aeff6e3d384f8aec6d584973642", //BloodragerSpellList
+                "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
+                "c5a1b8df32914d74c9b44052ba3e686a", //WarpriestSpelllist
+                "e17df9977b879b64e8a8cbb4b3569f19"  //WitchSpellList
+                );
+        }
+
+        public static void CreateProduceFlame()
+        {
+            // as with flame blade, but with ranged weapon
+        }
+
+        public static void CreateChillTouch()
+        {
+            
         }
 
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]
@@ -275,15 +379,5 @@ namespace DarkCodex
     Flames as bright as a torch appear in your open hand. The flames harm neither you nor your equipment.
     In addition to providing illumination, the flames can be hurled or used to touch enemies. You can strike an opponent with a melee touch attack, dealing fire damage equal to 1d6 + 1 point per caster level (maximum +5). Alternatively, you can hurl the flames up to 120 feet as a thrown weapon. When doing so, you attack with a ranged touch attack (with no range penalty) and deal the same damage as with the melee attack. No sooner do you hurl the flames than a new set appears in your hand. Each attack you make reduces the remaining duration by 1 minute. If an attack reduces the remaining duration to 0 minutes or less, the spell ends after the attack resolves.
     
-
-    Gozreh's Trident
-    School evocation [electricity]; Level bloodrager 2, cleric 2, druid 2, hunter 2, oracle 2, warpriest 2, witch 2 (Gozreh)
-    Casting Time 1 standard action
-    Range personal
-    Duration 1 minute/level (D)
-    Saving Throw none; Spell Resistance yes
-
-    A 4-foot-long, blazing, forked bolt of electricity springs forth from your hand. You wield this spear-like bolt as if it were a trident (you are considered proficient with the bolt). Attacks with Gozreh’s trident are melee touch attacks. The bolt deals 1d8 points of electricity damage + 1 point per 2 caster levels (maximum +10). Since the bolt is immaterial, your Strength modifier does not apply to the damage. The bolt can ignite combustible materials such as parchment, straw, dry sticks, and cloth.
-
     */
 }

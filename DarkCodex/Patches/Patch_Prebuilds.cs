@@ -118,7 +118,7 @@ namespace DarkCodex
             Helper.Serialize(list, path: Path.Combine(Main.ModPath, "builds", "testdata.json"));
         }
 
-        [HarmonyPatch(typeof(LevelUpController), MethodType.Constructor, typeof(UnitEntityData), typeof(bool), typeof(LevelUpState.CharBuildMode))]
+        [HarmonyPatch(typeof(LevelUpController), MethodType.Constructor, typeof(UnitEntityData), typeof(bool), typeof(LevelUpState.CharBuildMode), typeof(bool))]
         [HarmonyPrefix]
         public static void Debug1(UnitEntityData unit, bool autoCommit, LevelUpState.CharBuildMode mode, LevelUpController __instance)
         {

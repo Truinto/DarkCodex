@@ -207,28 +207,28 @@ namespace DarkCodex
                      "ButcheringAxePlus1Impact",
                      "",
                      "",
-                     butcherType,
+                     weaponType: butcherType,
                      price: Resource.WeaponPrice[3]).SetEnchantment("d42fc23b92c640846ac137dc26e000d4", impact); //Enhancement1
 
                 var w2 = Helper.CreateBlueprintItemWeapon(
                      "ButcheringAxePlus3Impact",
                      "",
                      "",
-                     butcherType,
+                     weaponType: butcherType,
                      price: Resource.WeaponPrice[5]).SetEnchantment("80bb8a737579e35498177e1e3c75899b", impact); //Enhancement3
 
                 var w3 = Helper.CreateBlueprintItemWeapon(
                      "ButcheringAxePlus5Impact",
                      "",
                      "",
-                     butcherType,
+                     weaponType: butcherType,
                      price: Resource.WeaponPrice[7]).SetEnchantment("bdba267e951851449af552aa9f9e3992", impact); //Enhancement5
 
                 var w4 = Helper.CreateBlueprintItemWeapon(
                      "ButcheringAxePlus5ImpactBaneEvil",
                      "",
                      "",
-                     butcherType,
+                     weaponType: butcherType,
                      price: Resource.WeaponPrice[8]).SetEnchantment("bdba267e951851449af552aa9f9e3992", impact, "20ba9055c6ae1e44ca270c03feacc53b"); //Enhancement5, BaneOutsiderEvil
 
                 Helper.AddExoticVendorItem(w1.ToReference<BlueprintItemReference>(), 3);

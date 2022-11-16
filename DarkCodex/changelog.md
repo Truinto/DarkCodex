@@ -1,6 +1,12 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.9]
+- added metamagic to Flame Blade
+- changed Flame Blade to move action (like unsheating a weapon), that way you get the free touch attack from casting a spell, but cannot do a full attack
+- added Gozreh's Trident (Divine Trident); allowing Flame Blade Dervish Combat with it (since the spell is virtually identical)
+- fixed for 2.0.4j
+
 ## [1.5.8]
 - added Flame Blade, spell: Flame Blade, feat: Flame Blade Dervish Combat
 

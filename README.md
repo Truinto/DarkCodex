@@ -76,7 +76,6 @@ Content
 |Kineticist.PatchDemonCharge|Demon Charge also gathers power|:house:|:heavy_check_mark:|
 |Kineticist.PatchGatherPower|Kineticist Gather Power can be used manually|:book:|:heavy_check_mark:|
 |Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting, fixed Negative Energy Mastery|:house:|:heavy_check_mark:|
-|Kineticist.FixBladeWhirlwind|fix Blade Whirlwind reach|:book:|:heavy_check_mark:|
 |Kineticist.FixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
 |Kineticist.FixBloodKineticist|seeks to fix bugs in Blood Kineticist|:book:|:construction:|
 |Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:heavy_check_mark:|
@@ -130,6 +129,7 @@ Content
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
+|Spells.CreateDivineTrident|spell: Gozreh's Trident|:book:|:heavy_check_mark:|
 |Spells.CreateFlameBlade|spell: Flame Blade, feat: Flame Blade Dervish Combat|:book:|:heavy_check_mark:|
 |Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
 |Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|

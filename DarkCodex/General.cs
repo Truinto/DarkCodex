@@ -694,6 +694,8 @@ namespace DarkCodex
                 );
 
             Helper.AddCombatFeat(feat);
+
+            Main.Patch(typeof(Patch_DuelistParry));
         }
 
         [PatchInfo(Severity.Create, "Kitsune Foxfire", "magical tail also grants Foxfire Bolt", true)]

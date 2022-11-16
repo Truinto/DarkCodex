@@ -48,6 +48,8 @@ namespace CodexLib
 
         public const PetType PetUndead = (PetType)5580;
 
+        public const string ObsoleteNotice = "see overload; use named parameters";
+
         public static CustomDataKey KeyChangeElement = new("ChangeElement");
     }
 }

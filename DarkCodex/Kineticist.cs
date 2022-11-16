@@ -1224,7 +1224,7 @@ namespace DarkCodex
                 new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = Tree.DefaultAbility.Variants.ToArray() }
                 );
 
-            var wisdom_feat = burnFeature.Clone(
+            var wisdom_feat = burnFeature.Clone( // TODO: fix AsceticElemental main stat
                 "AsceticElementalWisdom"
                 ).SetUIData(
                 "Elemental Wisdom",
@@ -1251,13 +1251,13 @@ namespace DarkCodex
                 );
 
             ascetic.SetAddFeatures(
-                Helper.CreateLevelEntry(1, wisdom_feat, flurry_feat, Tree.KineticFist.Feature, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
+                Helper.CreateLevelEntry(1, /*wisdom_feat,*/ flurry_feat, Tree.KineticFist.Feature, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
                 Helper.CreateLevelEntry(2, "2615c5f87b3d72b42ac0e73b56d895e0"), //MonkACBonusUnlock
                 Helper.CreateLevelEntry(5, power_feat)
                 );
 
             ascetic.SetRemoveFeatures(
-                Helper.CreateLevelEntry(1, burnFeature, "86beb0391653faf43aec60d5ec05b538"), //ElementalOverflowProgression
+                Helper.CreateLevelEntry(1, /*burnFeature,*/ "86beb0391653faf43aec60d5ec05b538"), //ElementalOverflowProgression
                 Helper.CreateLevelEntry(2, "bb0de2047c448bd46aff120be3b39b7a", "8ad77685e64842c45a6f5b19f9086c6c", "a275b35f282601944a97e694f6bc79f8", "29ec36fa2a5b8b94ebce170bd369083a"), //all the defense talents // TODO: fix this
                 Helper.CreateLevelEntry(3, "2496916d8465dbb4b9ddeafdf28c67d8"), //ElementalOverflowBonusFeature
                 Helper.CreateLevelEntry(5, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection

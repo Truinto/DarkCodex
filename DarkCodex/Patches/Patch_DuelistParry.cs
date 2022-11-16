@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodexLib.Patches
+namespace DarkCodex
 {
     [HarmonyPatch]
     public class Patch_DuelistParry

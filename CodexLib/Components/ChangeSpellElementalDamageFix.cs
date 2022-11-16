@@ -26,7 +26,7 @@ namespace CodexLib
 
         public ChangeSpellElementalDamageFix(DamageEnergyType element)
         {
-            Descriptor = ChangeSpellElementalDamage.ElementToSpellDescriptor(element);
+            Descriptor = ChangeSpellElementalDamage.GetDamageEnergyDescriptor(element);
         }
 
         public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)

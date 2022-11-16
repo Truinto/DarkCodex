@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Experiment for storing flags. Abandoned.
+    /// </summary>
     public class FlagArray
     {
         [JsonProperty]

@@ -21,6 +21,7 @@ global using Kingmaker.Localization;
 global using Kingmaker.PubSubSystem;
 global using Kingmaker.RuleSystem;
 global using Kingmaker.RuleSystem.Rules;
+global using Kingmaker.RuleSystem.Rules.Abilities;
 global using Kingmaker.RuleSystem.Rules.Damage;
 global using Kingmaker.UnitLogic;
 global using Kingmaker.UnitLogic.Abilities;
@@ -46,7 +47,6 @@ global using System.Reflection;
 global using System.Reflection.Emit;
 global using UnityEngine;
 using DarkCodex;
-using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.UI;
 using Kingmaker.UI.Common;
 using System.IO;
@@ -474,6 +474,7 @@ namespace Shared
             LoadSafe(Spells.CreateBladedDash);
             LoadSafe(Spells.CreateHealingFlames);
             LoadSafe(Spells.CreateFlameBlade);
+            LoadSafe(Spells.CreateDivineTrident);
             LoadSafe(Spells.PatchVarious);
 
             // General

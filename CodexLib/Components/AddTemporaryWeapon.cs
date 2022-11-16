@@ -27,6 +27,8 @@ namespace CodexLib
             var itemPart = this.Data.Applied.Ensure<CraftedItemPart>();
             itemPart.CasterLevel = this.Context.Params.CasterLevel;
             itemPart.SpellLevel = this.Context.Params.SpellLevel;
+            itemPart.MetamagicData ??= new();
+            itemPart.MetamagicData.Add(this.Context.Params.Metamagic);
             this.Data.Applied.MakeNotLootable();
             if (!this.Owner.Body.PrimaryHand.CanInsertItem(this.Data.Applied))
             {

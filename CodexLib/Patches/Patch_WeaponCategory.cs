@@ -27,7 +27,7 @@ namespace CodexLib.Patches
             if (Extention == null || Extention.Count == 0)
                 return;
 
-            var result = __result.ToList();
+            var result = __result as List<FeatureUIData> ?? __result.ToList();
 
             foreach ((WeaponCategory num, LocalizedString name, Sprite icon) in Extention)
             {

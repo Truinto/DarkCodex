@@ -1,5 +1,9 @@
 ﻿# Changelog
 
+## [1.3.2]
+- compiled for 2.0.4j
+- removed Patch_DuelistParry
+
 ## [1.3.1]
 - !signature change Helper.Calls(CodeInstruction, FieldInfo) to Helper.Calls(CodeInstruction, MemberInfo)
 - changed logic in CreateAbilityEffectRunAction

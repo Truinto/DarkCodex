@@ -374,6 +374,53 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Bloodline Claws", "mythic ability: use claws from bloodlines at will", true)]
+        public static void CreateLimitlessBloodlineClaws()
+        {
+            // claws at will
+            // breath weapon with cooldown
+            // dragon disciple dragon form at will
+
+            var claws_resource = BlueprintGuid.Parse("5be91334e3de5aa458ade509cc16daff"); //BloodlineDraconicClawsResource
+
+            var limitless = Helper.CreateBlueprintFeature(
+                "LimitlessBloodlineClaws",
+                "True Dragon",
+                "You unleash your draconic blood.\nBenefits: You can use your draconic claws at will."
+                ).SetComponents(
+                Helper.CreatePureRecommendation(),
+                Helper.CreatePrerequisiteFeaturesFromList(new AnyRef[] { 
+                    "d89fb8ce9152ffa4dacd69390f3d7721", //DraconicBlackBloodlineRequisiteFeature
+                    "64e1f27147b642448842ab8dcbaca03f", //DraconicBlueBloodlineRequisiteFeature
+                    "12bb1056a5f3f9f4b9facdb78b8d8914", //DraconicBrassBloodlineRequisiteFeature
+                    "1d34d95ad4961e343b02db14690eb6d8", //DraconicBronzeBloodlineRequisiteFeature
+                    "eef664d1e4318f64cb2304d1628d29ae", //DraconicCopperBloodlineRequisiteFeature
+                    "bef8d08ee3c20b246b404ce3ef948291", //DraconicGoldBloodlineRequisiteFeature
+                    "49115e2147cd32841baa34c305171daa", //DraconicGreenBloodlineRequisiteFeature
+                    "01e7aab638d6a0b43bc4e9d5b49e68d9", //DraconicSilverBloodlineRequisiteFeature
+                    "9c5ed34089fedf54ba8d0f43565bcc91", //DraconicRedBloodlineRequisiteFeature
+                    "3867419bf47841b428333808dfdf4ae0", //DraconicWhiteBloodlineRequisiteFeature
+                    }),
+                new OverrideResourceLogic(
+                    new AbilityResourceLogicCooldown("bebe2a97cc091934189fd8255e903b1f", 4), //BloodlineDraconicBreathWeaponResource
+                    "1e65b0b2db777e24db96d8bc52cc9207", //BloodlineDraconicBlackBreathWeaponAbility
+                    "60a3047f434f38544a2878c26955d3ad", //BloodlineDraconicBlueBreathWeaponAbility
+                    "531a57e0c19f80945b68bdb3e289279a", //BloodlineDraconicBrassBreathWeaponAbility
+                    "732291d7ac20b0949aae002622e00b34", //BloodlineDraconicBronzeBreathWeaponAbility
+                    "826ef8251d9243941b432f97d901e938", //BloodlineDraconicCopperBreathWeaponAbility
+                    "598e33639b662784fb07c0e4c8978aa4", //BloodlineDraconicGoldBreathWeaponAbility
+                    "633b622267c097d4abe3ec6445c05152", //BloodlineDraconicGreenBreathWeaponAbility
+                    "11d03ebc508d6834cad5992056ad01a4", //BloodlineDraconicSilverBreathWeaponAbility
+                    "3f31704e595e78942b3640cdc9b95d8b", //BloodlineDraconicRedBreathWeaponAbility
+                    "84be529914c90664aa948d8266bb3fa6"  //BloodlineDraconicWhiteBreathWeaponAbility
+                    )
+                );
+
+            SetResourceDecreasing(claws_resource, limitless);
+
+            Helper.AddMythicTalent(limitless);
+        }
+
         [PatchInfo(Severity.Create, "Kinetic Mastery", "mythic feat: physical Kinetic Blasts gain attack bonus equal to mythic level, or half with energy Blasts", true)]
         public static void CreateKineticMastery()
         {
