@@ -246,12 +246,12 @@ namespace DarkCodex
                 "WitchHexIceTombAbility",
                 "Ice Tomb",
                 "A storm of ice and freezing wind envelops the creature, which takes 3d8 points of cold damage (Fortitude half). If the target fails its save, it is paralyzed and unconscious for 1 minute/level. A successful save destroys the ice freeing the creature, which is staggered for 1d4 rounds. Whether or not the target’s saving throw is successful, it cannot be the target of this hex again for 1 day.",
-                IcyPrison.Icon,
-                AbilityType.Supernatural,
-                CommandType.Standard,
-                AbilityRange.Medium,
-                Resource.Strings.MinutesPerLevel,
-                Resource.Strings.FortitudePartial
+                icon: IcyPrison.Icon,
+                type: AbilityType.Supernatural,
+                actionType: CommandType.Standard,
+                range: AbilityRange.Medium,
+                duration: Resource.Strings.MinutesPerLevel,
+                savingThrow: Resource.Strings.FortitudePartial
                 ).SetComponents(
                 runaction,
                 Helper.CreateAbilityTargetHasFact(true, icetomb_cooldown.ToRef2()),

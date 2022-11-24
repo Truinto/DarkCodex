@@ -38,13 +38,9 @@ namespace CodexLib
 
         #region Constructors
 
-        public TranspilerData(IEnumerable<CodeInstruction> code, ILGenerator generator, MethodBase original) : this(code as List<CodeInstruction> ?? code.ToList(), generator, original)
+        public TranspilerData(IEnumerable<CodeInstruction> code, ILGenerator generator, MethodBase original)
         {
-        }
-
-        public TranspilerData(List<CodeInstruction> code, ILGenerator generator, MethodBase original)
-        {
-            this.Code = code;
+            this.Code = code as List<CodeInstruction> ?? code.ToList();
             this.Index = 0;
             this.Generator = generator;
             this.Original = original;
@@ -360,6 +356,29 @@ namespace CodexLib
             InsertBefore(OpCodes.Call, mi);
         }
 
+        /// <summary>
+        /// Replaces the current IL line with call. Does not validate arguments.
+        /// </summary>
+        public void ReplaceCall(Delegate newFunc)
+        {
+            Code[Index].opcode = OpCodes.Call;
+            Code[Index].operand = newFunc.Method;
+        }
+
+        public void ReplaceAllCalls(Type type, string name, Delegate newFunc)
+        {
+            var original = AccessTools.Method(type, name, null, null);
+
+            for (int i = 0; i < Code.Count; i++)
+            {
+                if (Code[i].Calls(original))
+                {
+                    Code[i].opcode = OpCodes.Call;
+                    Code[i].operand = newFunc.Method;
+                }
+            }
+        }
+
         public void NextJumpAlways()
         {
             for (; Index < Code.Count; Index++)
@@ -372,7 +391,7 @@ namespace CodexLib
                     return;
                 }
 
-                if (line.opcode.FlowControl != FlowControl.Cond_Branch)
+                if (line.opcode.FlowControl != FlowControl.Cond_Branch || line.opcode == OpCodes.Switch)
                     continue;
 
                 Helper.PrintDebug($"Transpiler NextJumpAlways @{Index} {line.opcode}");
@@ -402,7 +421,7 @@ namespace CodexLib
                     return;
                 }
 
-                if (line.opcode.FlowControl != FlowControl.Cond_Branch)
+                if (line.opcode.FlowControl != FlowControl.Cond_Branch || line.opcode == OpCodes.Switch)
                     continue;
 
                 Helper.PrintDebug($"Transpiler NextJumpNever @{Index} {line.opcode}");

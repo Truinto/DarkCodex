@@ -92,6 +92,7 @@ Content
 |Mythic.CreateLimitlessArcanePool|mythic ability: infinite arcane pool, expect spell recall|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessArcaneReservoir|mythic ability: infinite arcane reservoir|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessBardicPerformance|mythic ability: Bardic Performances cost no resources mythic ability: Skald's Raging Song cost no resources|:house:|:heavy_check_mark:|
+|Mythic.CreateLimitlessBloodlineClaws|mythic ability: use claws from bloodlines at will, use breath weapon more often, use dragon disciple form II at will|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessBombs|mythic ability: infinite alchemist bombs and incenses|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessDomain|mythic ability: use domain powers at will|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessKi|mythic ability: reduce ki costs by 1|:house:|:heavy_check_mark:|
@@ -124,6 +125,7 @@ Content
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
 |Spellcasters.CreateBestowHope|basic feat: channel energy reduces fear|:book:|:heavy_check_mark:|
+|Spellcasters.CreateChannelForm|basic feat: collection of abilities to shape channel energy into new forms|:house:|:heavy_check_mark:|
 |Spellcasters.CreateEnergyChannel|basic feat: channel energy through weapon attacks|:book:|:heavy_check_mark:|
 |Spellcasters.CreatePurifyingChannel|basic feat: channel positive energy deals fire damage|:book:|:heavy_check_mark:|
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
@@ -132,6 +134,7 @@ Content
 |Spells.CreateDivineTrident|spell: Gozreh's Trident|:book:|:heavy_check_mark:|
 |Spells.CreateFlameBlade|spell: Flame Blade, feat: Flame Blade Dervish Combat|:book:|:heavy_check_mark:|
 |Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
+|Spells.CreateProduceFlame|spell: Produce Flame|:book:|:heavy_check_mark:|
 |Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
 |Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:heavy_check_mark:|
@@ -154,7 +157,6 @@ Content
 |Patch.Patch_DismissAnything|dismiss any spell regardless of who the caster is|:house:|:heavy_check_mark:|
 |Patch.Patch_EnduringSpells|allows Enduring Spell to apply to spells from any source; fix for Magic Weapon|:book:|:heavy_check_mark:|
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
-|Patch.Patch_FactSelectionParameterized|what does this do? hide abilities unit doesn't have?|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaDoubleDamage|fixes area effects triggering twice when cast|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaEndOfTurn|in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round|:book:|:heavy_check_mark:|
 |Patch.Patch_FixPolymorphGather|makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade|:book:|:heavy_check_mark:|
@@ -166,6 +168,7 @@ Content
 |Patch.Patch_Polymorph|allows debug flags to keep inventory or model during polymorph|:book:|:heavy_check_mark:|
 |Patch.Patch_PreferredSpellMetamagic|necessary patches for Preferred Spell|:book:|:heavy_check_mark:|
 |Patch.Patch_ResourcefulCaster|patches for Resourceful Caster|:house:|:heavy_check_mark:|
+|Patch.Patch_RespecPartially|allows respec to be finished at any point|:book:|:heavy_check_mark:|
 |Patch.Patch_TrueGatherPowerLevel|Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost. Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.|:book:|:heavy_check_mark:|
 |Patch.Patch_ZippySpellLike|allows zippy to work on spell-like abilities|:house:|:heavy_check_mark:|
 

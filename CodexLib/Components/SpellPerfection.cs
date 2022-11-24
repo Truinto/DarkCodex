@@ -70,13 +70,13 @@ namespace CodexLib
                 return;
 
             int sum = 0;
-            foreach (var mod in evt.m_BonusCasterLevel.Modifiers)
+            foreach (var mod in (evt.m_BonusCasterLevel ??= new()).Modifiers)
                 if (mod.Descriptor == ModifierDescriptor.Feat || mod.Descriptor >= Const.TTT_UntypedStrength)
                     sum += mod.Value;
             evt.AddBonusCasterLevel(sum);
 
             sum = 0;
-            foreach (var mod in evt.m_BonusDC.Modifiers)
+            foreach (var mod in (evt.m_BonusDC ??= new()).Modifiers)
                 if (mod.Descriptor == ModifierDescriptor.Feat || mod.Descriptor >= Const.TTT_UntypedStrength)
                     sum += mod.Value;
             evt.AddBonusDC(sum);
@@ -134,7 +134,7 @@ namespace CodexLib
                 return;
 
             int sum = 0;
-            foreach (var mod in evt.m_AdditionalSpellPenetration.Modifiers)
+            foreach (var mod in (evt.m_AdditionalSpellPenetration ??= new()).Modifiers)
                 if (mod.Descriptor == ModifierDescriptor.Feat || mod.Descriptor >= Const.TTT_UntypedStrength)
                     sum += mod.Value;
             evt.AddSpellPenetration(sum);
@@ -158,7 +158,7 @@ namespace CodexLib
                 return;
 
             int sum = 0;
-            foreach (var mod in evt.m_ModifiableBonus.Modifiers)
+            foreach (var mod in (evt.m_ModifiableBonus ??= new()).Modifiers)
                 if (mod.Descriptor == ModifierDescriptor.Feat || mod.Descriptor >= Const.TTT_UntypedStrength)
                     sum += mod.Value;
             evt.AddModifier(sum, this.Fact);

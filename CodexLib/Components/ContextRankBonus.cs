@@ -2,10 +2,12 @@
 
 namespace CodexLib
 {
-    public class ContextRankBonus : BlueprintComponent, IContextBonus
+    public class ContextRankBonus : BlueprintComponent, IMechanicRecalculate
     {
         public int Bonus;
         public AbilityRankType RankType;
+
+        public int Priority => 400;
 
         public ContextRankBonus(int bonus, AbilityRankType rankType = AbilityRankType.Default)
         {
@@ -13,7 +15,11 @@ namespace CodexLib
             this.RankType = rankType;
         }
 
-        public void Apply(MechanicsContext context)
+        public void PreCalculate(MechanicsContext context)
+        {
+        }
+
+        public void PostCalculate(MechanicsContext context)
         {
             context[RankType] += Bonus;
         }

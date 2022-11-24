@@ -8,16 +8,20 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class FlameBladeLogic : WeaponEnchantmentLogic, IInitiatorRulebookHandler<RuleCalculateWeaponStats>, IInitiatorRulebookHandler<RuleCalculateDamage>
+    public class FlameBladeLogic : WeaponEnchantmentLogic, IInitiatorRulebookHandler<RuleCalculateWeaponStats>, IInitiatorRulebookHandler<RuleCalculateDamage>, IInitiatorRulebookHandler<RuleAttackRoll>
     {
         public BlueprintUnitFactReference FlameBladeDervish;
-        public DamageTypeMix Type;
+        public ContextValue DRReduction;
+        public int Step;
+        public int Max;
 
         /// <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
-        public FlameBladeLogic(AnyRef flameBladeDervish, DamageTypeMix type, ContextValue amount = null)
+        public FlameBladeLogic(AnyRef flameBladeDervish, ContextValue drReduction = null, int step = 2, int max = 20)
         {
             this.FlameBladeDervish = flameBladeDervish;
-            this.Type = type;
+            this.DRReduction = drReduction;
+            this.Step = step;
+            this.Max = max;
         }
 
         public void OnEventAboutToTrigger(RuleCalculateWeaponStats evt)
@@ -25,16 +29,30 @@ namespace CodexLib
             if (evt.Weapon != this.Owner)
                 return;
 
+            int max = this.Max;
+
+            var metamagic = this.Owner.Get<CraftedItemPart>()?.MetamagicData;
+            if (metamagic != null)
+            {
+                if (metamagic.Has(Const.Intensified))
+                    max += 5;
+            }
+
+            int bonus = Math.Min(max, this.Owner.GetCasterLevel() / this.Step);
+            evt.AddDamageModifier(bonus, this.Fact);
+
             if (this.FlameBladeDervish.NotEmpty() && evt.Initiator.HasFact(this.FlameBladeDervish))
             {
                 evt.OverrideDamageBonusStat(evt.Initiator.GetStat(StatType.Intelligence, StatType.Wisdom, StatType.Charisma).Type);
                 evt.OverrideDamageBonusStatMultiplier(1f);
             }
 
-            int bonus = this.Owner.GetCasterLevel() / 2;
-            evt.AddDamageModifier(bonus, this.Fact);
-
             //evt.DoNotScaleDamage = true;
+            
+            // TODO: debug
+            Helper.PrintDebug($"RuleCalculateWeaponStats context={this.Context.Params.Metamagic} reason={evt.Reason.Context.Params.Metamagic} craft={this.Owner.Get<CraftedItemPart>()?.MetamagicData?.MetamagicMask}");
+            this.Context.Params.Metamagic |= Metamagic.Heighten;
+            evt.Reason.Context.Params.Metamagic |= Metamagic.Persistent;
         }
 
         public void OnEventDidTrigger(RuleCalculateWeaponStats evt)
@@ -60,12 +78,15 @@ namespace CodexLib
             var metamagic = this.Owner.Get<CraftedItemPart>()?.MetamagicData;
             if (metamagic == null)
                 return;
-            
+
             if (metamagic.Has(Metamagic.Maximize))
                 evt.DamageBundle.First().CalculationType.Set(DamageCalculationType.Maximized, Metamagic.Maximize);
 
             if (metamagic.Has(Metamagic.Empower))
                 evt.DamageBundle.First().EmpowerBonus.Set(1.5f, Metamagic.Empower);
+
+            // TODO: debug
+            Helper.PrintDebug($"RuleCalculateWeaponStats context={this.Context.Params.Metamagic} reason={evt.Reason.Context.Params.Metamagic}");
         }
 
         public void OnEventDidTrigger(RuleCalculateDamage evt)
@@ -74,21 +95,37 @@ namespace CodexLib
                 return;
 
             // reduce elemental DR
-            foreach (var damage in evt.CalculatedDamage)
+            if (this.FlameBladeDervish.NotEmpty() && evt.Initiator.HasFact(this.FlameBladeDervish) && this.DRReduction != null)
             {
+                var damage = evt.CalculatedDamage.First();
                 var source = damage.Source;
-                if (source.Type >= DamageType.Direct)
-                    continue;
 
-                if ((source.ToDamageTypeMix() & this.Type) == 0)
-                    continue;
-
-                int reduction = Math.Min(source.ReductionBecauseResistance.TotalValue, evt.Target.Descriptor.IsUndead ? 30 : 10);
-                if (reduction <= 0)
-                    continue;
-
-                source.ReductionBecauseResistance.Add(new Modifier(-reduction, this.Fact, ModifierDescriptor.UntypedStackable));
+                int reduction;
+                if (evt.Target.Descriptor.IsUndead)
+                    reduction = this.DRReduction.Calculate(this.Context) * 3;
+                else
+                    reduction = this.DRReduction.Calculate(this.Context);
+                reduction = Math.Min(source.ReductionBecauseResistance.TotalValue, reduction);
+                if (reduction > 0)
+                    source.ReductionBecauseResistance.Add(new Modifier(-reduction, this.Fact, ModifierDescriptor.UntypedStackable));
             }
+        }
+
+        public void OnEventAboutToTrigger(RuleAttackRoll evt)
+        {
+            if (evt.Weapon != this.Owner)
+                return;
+
+            bool spellResisted = Rulebook.Trigger(new RuleSpellResistanceCheck(this.Context, evt.Target)).IsSpellResisted;
+            if (spellResisted)
+                evt.AutoMiss = true;
+
+            // TODO: debug
+            Helper.PrintDebug($"RuleAttackRoll context={this.Context.Params.CasterLevel} reason={evt.Reason.Context.Params.CasterLevel}");
+        }
+
+        public void OnEventDidTrigger(RuleAttackRoll evt)
+        {
         }
     }
 }

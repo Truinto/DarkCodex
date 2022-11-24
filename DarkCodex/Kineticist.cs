@@ -155,10 +155,10 @@ namespace DarkCodex
                 "KineticBladeRushAbility",
                 name,
                 description,
-                icon,
-                AbilityType.SpellLike,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close
+                icon: icon,
+                type: AbilityType.SpellLike,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close
                 ).SetComponents(
                 Helper.CreateAbilityExecuteActionOnCast(
                     Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true)
@@ -253,12 +253,12 @@ namespace DarkCodex
                 "MobileGatheringShort",
                 "Mobile Gathering (Move Action)",
                 "You may move up to half your normal speed while gathering power.",
-                Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileLow.png")),
-                AbilityType.Special,
-                UnitCommand.CommandType.Move,
-                AbilityRange.Personal,
-                null,
-                null
+                icon: Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileLow.png")),
+                type: AbilityType.Special,
+                actionType: UnitCommand.CommandType.Move,
+                range: AbilityRange.Personal,
+                duration: null,
+                savingThrow: null
                 ).SetComponents(
                 can_gather,
                 Helper.CreateAbilityEffectRunAction(0, regain_halfmove, apply_debuff, three2three, two2three, one2two, zero2one),
@@ -276,12 +276,12 @@ namespace DarkCodex
                 "MobileGatheringLong",
                 "Mobile Gathering (Full Round)",
                 "You may move up to half your normal speed while gathering power.",
-                Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileMedium.png")),
-                AbilityType.Special,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Personal,
-                null,
-                null
+                icon: Helper.CreateSprite(Path.Combine(Main.ModPath, "icons", "GatherMobileMedium.png")),
+                type: AbilityType.Special,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Personal,
+                duration: null,
+                savingThrow: null
                 ).SetComponents(
                 can_gather,
                 hasMoveAction,
@@ -290,6 +290,7 @@ namespace DarkCodex
             mobile_gathering_long_ab.CanTargetSelf = true;
             mobile_gathering_long_ab.Animation = CastAnimationStyle.Self;
             mobile_gathering_long_ab.HasFastAnimation = true;
+            mobile_gathering_long_ab.m_IsFullRoundAction = true;
 
             var mobile_gathering_feat = Helper.CreateBlueprintFeature(
                 "MobileGatheringFeat",
@@ -453,10 +454,10 @@ namespace DarkCodex
                 "ImpaleEarthBlastAbility",
                 impale_feat.m_DisplayName,
                 impale_feat.m_Description,
-                icon,
-                AbilityType.SpellLike,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close,
+                icon: icon,
+                type: AbilityType.SpellLike,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close,
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
@@ -477,10 +478,10 @@ namespace DarkCodex
                 "ImpaleMetalBlastAbility",
                 impale_feat.m_DisplayName,
                 impale_feat.m_Description,
-                icon,
-                AbilityType.SpellLike,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close,
+                icon: icon,
+                type: AbilityType.SpellLike,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close,
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
@@ -501,10 +502,10 @@ namespace DarkCodex
                 "ImpaleIceBlastAbility",
                 impale_feat.m_DisplayName,
                 impale_feat.m_Description,
-                icon,
-                AbilityType.SpellLike,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close,
+                icon: icon,
+                type: AbilityType.SpellLike,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close,
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
@@ -558,10 +559,10 @@ namespace DarkCodex
                 "ChainElectricBlastAbility",
                 chain_feat.m_DisplayName,
                 chain_feat.m_Description,
-                icon,
-                AbilityType.SpellLike,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close,
+                icon: icon,
+                type: AbilityType.SpellLike,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close,
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
@@ -585,10 +586,10 @@ namespace DarkCodex
                 "ChainThunderstormBlastAbility",
                 chain_feat.m_DisplayName,
                 chain_feat.m_Description,
-                icon,
-                AbilityType.SpellLike,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close,
+                icon: icon,
+                type: AbilityType.SpellLike,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close,
                 duration: null,
                 savingThrow: null
                 ).SetComponents(
@@ -1224,13 +1225,22 @@ namespace DarkCodex
                 new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = Tree.DefaultAbility.Variants.ToArray() }
                 );
 
-            var wisdom_feat = burnFeature.Clone( // TODO: fix AsceticElemental main stat
+            var wisdom_feat = burnFeature.Clone(
                 "AsceticElementalWisdom"
                 ).SetUIData(
                 "Elemental Wisdom",
                 "An elemental ascetic can use his Wisdom modifier instead of his Constitution modifier to determine the DCs of Constitution-based wild talents, the duration of wild talents with a Constitution-based duration, and his bonus on concentration checks for wild talents.\n"
                 );
             wisdom_feat.GetComponent<AddKineticistPart>().MainStat = StatType.Wisdom;
+
+            var monk_ac = Helper.CreateBlueprintFeature(
+                "AsceticMonkACBonus",
+                "AC Bonus",
+                "At 2nd level, when unarmored, not using a shield, and unencumbered, an elemental ascetic adds his Wisdom bonus (if any) to his AC and his CMD.\nThese bonuses to AC apply even against touch attacks or when the elemental ascetic is flat-footed. He loses these bonuses when he is immobilized or helpless. This bonus increases by 1 for every 4 kineticist levels the elemental ascetic possesses beyond 2nd. The elemental ascetic’s kineticist levels stack with monk levels for the purpose of determining when the bonus increases. An elemental ascetic can never take the expanded defense utility wild talent.\nThis ability replaces elemental defense."
+                ).SetComponents(
+                Helper.CreateAddFeatureIfHasFact("2615c5f87b3d72b42ac0e73b56d895e0"), //MonkACBonusUnlock
+                Tree.GetFocus().Select(s => Helper.CreateRemoveFeatureOnApply(s.Defense)) // remove any defense talent the progression usually grants
+                );
 
             var pfist = Helper.CreateBlueprintActivatableAbility(
                 "AsceticPowerfulFistActivatable",
@@ -1241,7 +1251,6 @@ namespace DarkCodex
                 ).SetComponents(
                 new KineticistPowerfulFist()
                 );
-
             var power_feat = Helper.CreateBlueprintFeature(
                 "AsceticPowerfulFist"
                 ).SetUIData(
@@ -1251,14 +1260,13 @@ namespace DarkCodex
                 );
 
             ascetic.SetAddFeatures(
-                Helper.CreateLevelEntry(1, /*wisdom_feat,*/ flurry_feat, Tree.KineticFist.Feature, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
-                Helper.CreateLevelEntry(2, "2615c5f87b3d72b42ac0e73b56d895e0"), //MonkACBonusUnlock
+                Helper.CreateLevelEntry(1, wisdom_feat, flurry_feat, Tree.KineticFist.Feature, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
+                Helper.CreateLevelEntry(2, monk_ac),
                 Helper.CreateLevelEntry(5, power_feat)
                 );
 
             ascetic.SetRemoveFeatures(
-                Helper.CreateLevelEntry(1, /*burnFeature,*/ "86beb0391653faf43aec60d5ec05b538"), //ElementalOverflowProgression
-                Helper.CreateLevelEntry(2, "bb0de2047c448bd46aff120be3b39b7a", "8ad77685e64842c45a6f5b19f9086c6c", "a275b35f282601944a97e694f6bc79f8", "29ec36fa2a5b8b94ebce170bd369083a"), //all the defense talents // TODO: fix this
+                Helper.CreateLevelEntry(1, burnFeature, "86beb0391653faf43aec60d5ec05b538"), //ElementalOverflowProgression
                 Helper.CreateLevelEntry(3, "2496916d8465dbb4b9ddeafdf28c67d8"), //ElementalOverflowBonusFeature
                 Helper.CreateLevelEntry(5, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
                 Helper.CreateLevelEntry(9, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
@@ -1267,6 +1275,10 @@ namespace DarkCodex
 
             Tree.ElementalAscetic.SetReference(ascetic);
             Helper.AppendAndReplace(ref Tree.Class.Get().m_Archetypes, Tree.ElementalAscetic); // add to character class selection
+
+            Tree.ExpandedDefense.Feature.Get().AddComponents(
+                Helper.CreatePrerequisiteNoArchetype(Tree.ElementalAscetic, Tree.Class)
+                );
 
             // add to monk ac progression
             var ac = Helper.Get<BlueprintBuff>("f132c4c4279e4646a05de26635941bfe").GetComponents<ContextRankConfig>().First(f => f.m_BaseValueType == ContextRankBaseValueType.SummClassLevelWithArchetype);
@@ -1418,9 +1430,9 @@ namespace DarkCodex
             //KineticBlastEnergyBlade a15b2fb1d5dc4f247882a7148d50afb0
 
             var projectile = Helper.CreateAbilityDeliverProjectile(
-                projectile_guid.ToRef<BlueprintProjectileReference>(),
+                projectile_guid,
                 type,
-                weapon.ToRef<BlueprintItemWeaponReference>(),
+                weapon,
                 length.Feet(),
                 width.Feet());
             return projectile;

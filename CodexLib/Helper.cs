@@ -215,7 +215,7 @@ namespace CodexLib
         {
             var patches = GetConflictPatches(processor);
             if (patches != null && patches.Count > 0)
-                PrintDebug("warning: potential conflict\n\t" + patches.Join(s => $"{s.owner}, {s.PatchMethod?.Name}", "\n\t"));
+                PrintDebug("warning: potential conflict\n\t" + patches.Join(s => $"{s.owner}, {s.PatchMethod?.FullDescription()}", "\n\t"));
         }
 
         //private static void PatchManual(this Harmony harmony, Type patch)
@@ -519,7 +519,7 @@ namespace CodexLib
             {
                 var line = code[index];
 
-                if (line.opcode.FlowControl != FlowControl.Cond_Branch)
+                if (line.opcode.FlowControl != FlowControl.Cond_Branch || line.opcode == OpCodes.Switch)
                     continue;
 
                 PrintDebug($"Transpiler NextJumpAlways @{index} {line.opcode}");
@@ -543,7 +543,7 @@ namespace CodexLib
             {
                 var line = code[index];
 
-                if (line.opcode.FlowControl != FlowControl.Cond_Branch)
+                if (line.opcode.FlowControl != FlowControl.Cond_Branch || line.opcode == OpCodes.Switch)
                     continue;
 
                 PrintDebug($"Transpiler NextJumpNever @{index} {line.opcode}");
@@ -793,6 +793,20 @@ namespace CodexLib
                 return false;
             dic[key] = value = (TValue)Activator.CreateInstance(type);
             return true;
+        }
+
+        public static List<T> AddUnique<T>(this List<T> list, T item)
+        {
+            if (!list.Contains(item))
+                list.Add(item);
+            return list;
+        }
+
+        public static List<T> AddUnique<T>(this List<T> list, Func<T, bool> pred, Func<T> getter)
+        {
+            if (!list.Any(pred))
+                list.Add(getter());
+            return list;
         }
 
         public static IEnumerable<TResult> SelectNotNull<T, TResult>(this IEnumerable<T> array, Func<T, TResult> func) where TResult : class
@@ -1232,14 +1246,17 @@ namespace CodexLib
             return new LocalizedString { Key = key };
         }
 
-        public static bool IsEmptyKey(this LocalizedString key)
+        public static bool IsEmptyKey(this LocalizedString locString)
         {
-            if (key == null)
-                return true;
-            if (key == "")
+            if (locString == null)
                 return true;
 
-            if (LocalizationManager.CurrentPack.GetText(key.Key, false) == "")
+            string key = locString.GetActualKey();
+            if (key == null || key == "")
+                return true;
+
+            string text = LocalizationManager.CurrentPack.GetText(key, false);
+            if (text == null || text == "")
                 return true;
 
             return false;
@@ -2393,6 +2410,24 @@ namespace CodexLib
             return b;
         }
 
+        public static BlueprintAbility MakeStickySpell(this BlueprintAbility effect, out BlueprintAbility cast)
+        {
+            const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
+
+            string name = effect.name.EndsWith("_Effect") ? effect.name.Replace("_Effect", "_Cast") : effect.name + "_Cast";
+
+            cast = effect.Clone(name, guid2: guid_cast)
+                    .RemoveComponents<AbilityDeliverProjectile>()
+                    .RemoveComponents<AbilityEffectRunAction>()
+                    .RemoveComponents<AbilityExecuteActionOnCast>();
+
+            cast.AddComponents(CreateAbilityEffectStickyTouch(effect.ToRef()));
+            cast.Range = AbilityRange.Touch;
+            cast.Animation = CastAnimationStyle.Self;
+
+            return effect;
+        }
+
         public static void MakeStickySpell(BlueprintAbility spell, out BlueprintAbility cast, out BlueprintAbility effect)
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
@@ -2456,13 +2491,13 @@ namespace CodexLib
             ability.Animation = animation;
             return ability;
         }
-        public static BlueprintAbility TargetAny(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true, bool point = false, bool harmful = true)
+        public static BlueprintAbility TargetAny(this BlueprintAbility ability, CastAnimationStyle animation = CastAnimationStyle.Directional, bool self = true, bool point = false, bool harmful = true, bool ally = true, bool enemy = true)
         {
             ability.EffectOnEnemy = harmful ? AbilityEffectOnUnit.Harmful : AbilityEffectOnUnit.Helpful;
             ability.EffectOnAlly = harmful ? AbilityEffectOnUnit.Harmful : AbilityEffectOnUnit.Helpful;
-            ability.CanTargetEnemies = true;
+            ability.CanTargetEnemies = enemy;
             ability.CanTargetPoint = point;
-            ability.CanTargetFriends = true;
+            ability.CanTargetFriends = ally;
             ability.CanTargetSelf = self;
             ability.Animation = animation;
             return ability;
@@ -2780,6 +2815,7 @@ namespace CodexLib
                 _spells1[i].BlueprintParameterVariants = newAllSpells;
         }
 
+        /// <param name="blueprintSpellList">type: <b>BlueprintSpellList[]</b></param>
         public static void Add(this BlueprintAbility spell, int level, params AnyRef[] blueprintSpellList)
         {
             foreach (var spellList in blueprintSpellList.Get<BlueprintSpellList>())
@@ -3399,6 +3435,25 @@ namespace CodexLib
             return c;
         }
 
+        public static ContextActionDealDamage CreateContextActionDealDamage(StatType stat, ContextDiceValue damage, bool isAoE = false, bool halfIfSaved = false, bool IgnoreCritical = false, bool half = false, bool alreadyHalved = false, AbilitySharedValue sharedValue = 0, bool readShare = false, bool writeShare = false)
+        {
+            var c = new ContextActionDealDamage();
+            c.m_Type = ContextActionDealDamage.Type.AbilityDamage;
+            c.AbilityType = stat;
+            c.Duration = CreateContextDurationValue();
+            c.Value = damage;
+            c.IsAoE = isAoE;
+            c.HalfIfSaved = halfIfSaved;
+            c.IgnoreCritical = IgnoreCritical;
+            c.Half = half;
+            c.AlreadyHalved = alreadyHalved;
+            c.ReadPreRolledFromSharedValue = readShare;
+            c.PreRolledSharedValue = readShare ? sharedValue : 0;
+            c.WriteResultToSharedValue = writeShare;
+            c.ResultSharedValue = writeShare ? sharedValue : 0;
+            return c;
+        }
+
         public static ContextActionHealTarget CreateContextActionHealTarget(DiceType diceType = DiceType.Zero, ContextValue diceCount = null, ContextValue bonus = null)
         {
             var result = new ContextActionHealTarget();
@@ -3511,6 +3566,22 @@ namespace CodexLib
             return result;
         }
 
+        /// <param name="projectile">type: <b>BlueprintProjectile</b></param>
+        /// <param name="weapon">type: <b></b></param>
+        public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(AnyRef projectile, AbilityProjectileType type = AbilityProjectileType.Simple, AnyRef weapon = null, Feet length = default, Feet width = default)
+        {
+            var result = new AbilityDeliverProjectile();
+            result.m_Projectiles = projectile.ToRef<BlueprintProjectileReference>().ObjToArray();
+            result.Type = type;
+            result.m_Length = length;
+            result.m_LineWidth = width;
+            result.m_Weapon = weapon;
+            result.Type = AbilityProjectileType.Line;
+            result.NeedAttackRoll = weapon != null;
+            return result;
+        }
+
+        [Obsolete]
         public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(BlueprintProjectileReference projectile, AbilityProjectileType type = AbilityProjectileType.Simple, BlueprintItemWeaponReference weapon = null, Feet length = default, Feet width = default)
         {
             var result = new AbilityDeliverProjectile();
@@ -4090,6 +4161,8 @@ namespace CodexLib
             result.LocalizedSavingThrow = savingThrow ?? _empty;
             result.AvailableMetamagic = Metamagic.Empower | Metamagic.Maximize | Metamagic.Quicken | Metamagic.Extend | Metamagic.Heighten | Metamagic.Reach
                                       | Metamagic.CompletelyNormal | Metamagic.Persistent | Metamagic.Selective | Metamagic.Bolstered;
+            result.SpellResistance = type == AbilityType.Spell;
+            result.IgnoreSpellResistanceForAlly = result.SpellResistance;
             AddAsset(result, guid);
             return result;
         }
@@ -4111,9 +4184,20 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool requireKnown = false, bool requireUnknown = false, AnyBlueprintReference[] blueprints = null)
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool requireKnown = false, bool requireUnknown = false, AnyRef spellList = null, int minLevel = 0, int maxlevel = 10, bool onlyKnownSpells = false, bool onlyNonSpells = false, AnyRef[] blueprints = null)
         {
+            // TODO: AbilityFocus allow BlueprintFeature
             string guid = GetGuid(name);
+
+            var groups = new List<FeatureGroup>();
+            if (parameterType == FeatureParameterType.Custom)
+                groups.Add(Const.ParameterizedAbilitySelection);
+            if (onlyKnownSpells)
+                groups.Add(Const.KnownSpell);
+            if (onlyNonSpells)
+                groups.Add(Const.KnownAbility);
+            if (group != 0)
+                groups.Add(group);
 
             var result = new BlueprintParametrizedFeature();
             result.IsClassFeature = true;
@@ -4121,12 +4205,16 @@ namespace CodexLib
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
             result.m_Icon = icon;
-            result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
+            result.Groups = groups.ToArray();
             result.ParameterType = parameterType; //FeatureParameterType.FeatureSelection
-            result.BlueprintParameterVariants = blueprints ?? Array.Empty<AnyBlueprintReference>();
+            result.CustomParameterVariants = blueprints.ToRef<AnyBlueprintReference>();
+            result.m_SpellList = spellList;
+            result.SpellLevelPenalty = minLevel;
+            result.SpellLevel = maxlevel;
 
             result.RequireProficiency = requireKnown; // use this to require the spell to be known?
-            result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unkonwn?
+            result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unknown?
+            // if both true, check unknown and prerequisites are met
 
             AddAsset(result, guid);
             return result;
@@ -4918,10 +5006,8 @@ namespace CodexLib
                 var bp = ResourcesLibrary.TryGetBlueprint(BlueprintGuid.Parse(guid));
                 if (bp is BlueprintUnitFact fact)
                     return fact.m_Icon;
-                if (bp is BlueprintWeaponType weapontype)
-                    return weapontype.m_Icon;
-                if (bp is BlueprintBuff buff)
-                    return buff.Icon;
+                if (bp is IUIDataProvider ui)
+                    return ui.Icon;
             }
             catch (Exception)
             {

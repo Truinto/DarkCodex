@@ -10,6 +10,7 @@ using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.Utility;
+using Kingmaker.View.Animation;
 using Shared;
 using System;
 using System.Collections.Generic;
@@ -39,9 +40,9 @@ namespace DarkCodex
                 "Bladed Dash, Greater",
                 "This spell functions like bladed dash, save that you can make a single melee attack against every creature you pass during the 30 feet of your dash. You cannot attack an individual creature more than once with this spell.",
                 icon: icon,
-                AbilityType.Spell,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close
                 ).SetComponents(
                 new AbilityDeliverTeleportTrample()
                 {
@@ -70,9 +71,9 @@ namespace DarkCodex
                 "Bladed Dash",
                 "When you cast this spell, you immediately move up to 30 feet in a straight line any direction, momentarily leaving a multi-hued cascade of images behind you. This movement does not provoke attacks of opportunity. You may make a single melee attack at your highest base attack bonus against any one creature you are adjacent to at any point along this 30 feet. You gain a circumstance bonus on your attack roll equal to your Intelligence or Charisma modifier, whichever is higher. You must end the bonus movement granted by this spell in an unoccupied space. Despite the name, the spell works with any melee weapon.",
                 icon: icon,
-                AbilityType.Spell,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close
                 ).SetComponents(
                 new AbilityDeliverTeleportTrample()
                 {
@@ -132,8 +133,8 @@ namespace DarkCodex
                         ifTrue: Helper.CreateContextActionHealTarget(bonus: Helper.SharedHeal),
                         ifFalse: Helper.CreateConditional(
                             Helper.CreateContextConditionAlignment(AlignmentComponent.Evil),
-                            ifTrue: Helper.CreateContextActionSavingThrow(SavingThrowType.Reflex, 
-                                Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.SharedDiceHeal, halfIfSaved: true, half: true), 
+                            ifTrue: Helper.CreateContextActionSavingThrow(SavingThrowType.Reflex,
+                                Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.SharedDiceHeal, halfIfSaved: true, half: true),
                                 Helper.CreateContextActionDealDamage(DamageEnergyType.Holy, Helper.SharedDiceHeal, halfIfSaved: true, half: true)),
                             ifFalse: Helper.CreateConditional(
                                 Helper.CreateContextConditionIsAlly(),
@@ -199,7 +200,7 @@ namespace DarkCodex
                 "Flame Blade", // TODO!! rename to FlameBladeEnchantment
                 "Flame Blade"
                 ).SetComponents(
-                new FlameBladeLogic(feat, DamageTypeMix.Fire, 10)
+                new FlameBladeLogic(feat, 10)
                 );
             enchantment.WeaponFxPrefab = Helper.GetPrefabLink(Resource.Sfx.Weapon_Fire);
             enchantment.m_HiddenInUI = true;
@@ -207,7 +208,8 @@ namespace DarkCodex
             var weapon = Helper.CreateBlueprintItemWeapon(
                 "FlameBladeWeapon",
                 "Flame Blade",
-                weaponType: "be24e972e8656514898dd335e983ea2c", //MeleeTouchType
+                icon: icon,
+                weaponType: "ba9cd5a303b089f458aa9f07aa10ea10", //TouchType
                 cloneVisuals: "d9fbec4637d71bd4ebc977628de3daf3", //Scimitar
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
@@ -230,20 +232,27 @@ namespace DarkCodex
                 "A 3-foot-long, blazing beam of red-hot fire springs forth from your hand. You wield this blade-like beam as if it were a scimitar. Attacks with the flame blade are melee touch attacks. The blade deals 1d8 points of fire damage + 1 point per two caster levels (maximum +10). Since the blade is immaterial, your Strength modifier does not apply to the damage. A flame blade can ignite combustible materials such as parchment, straw, dry sticks, and cloth.",
                 icon: icon,
                 type: AbilityType.Spell,
-                actionType: UnitCommand.CommandType.Move,
-                range: AbilityRange.Personal,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Touch,
                 duration: Resource.Strings.MinutesPerLevel
                 ).SetComponents(
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
-                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true)),
+                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true, toCaster: true),
+                    Helper.CreateConditional(
+                        condition: Helper.CreateContextConditionIsEnemy(),
+                        ifTrue: new ContextActionAttack())
+                    ),
                 Helper.CreateSpellComponent(SpellSchool.Evocation),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Fire),
                 Helper.CreateCraftInfoComponent()
-                ).TargetSelf(
+                ).TargetAny(
+                point: false,
+                ally: false
                 ).SetMetamagic(
                 Metamagic.Empower | Metamagic.Maximize | Metamagic.Extend
                 );
+            ab.SpellResistance = false;
 
             ab.Add(2,
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
@@ -254,7 +263,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Gozreh's Trident", "spell: Gozreh's Trident", false)]
         public static void CreateDivineTrident()
         {
-            Sprite icon = Helper.StealIcon("05b7cbe45b1444a4f8bf4570fb2c0208");
+            Sprite icon = Helper.StealIcon("877bf08948dd654478dc3c113af6eaf8");
             AnyRef feat = "4df40f35e124455c9e20dd44e7cacf12";
 
             feat.Get()?.AddComponents(
@@ -280,7 +289,7 @@ namespace DarkCodex
                 "DivineTridentEnchantment",
                 "Gozreh's Trident"
                 ).SetComponents(
-                new FlameBladeLogic(feat, DamageTypeMix.Electricity, 10)
+                new FlameBladeLogic(feat, 10)
                 );
             enchantment.WeaponFxPrefab = Helper.GetPrefabLink(Resource.Sfx.Weapon_Shock);
             enchantment.m_HiddenInUI = true;
@@ -288,7 +297,8 @@ namespace DarkCodex
             var weapon = Helper.CreateBlueprintItemWeapon(
                 "DivineTridentWeapon",
                 "Gozreh's Trident",
-                weaponType: "be24e972e8656514898dd335e983ea2c", //MeleeTouchType
+                icon: icon,
+                weaponType: "ba9cd5a303b089f458aa9f07aa10ea10", //TouchType
                 cloneVisuals: "6ff66364e0a2c89469c2e52ebb46365e", //Trident
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Electricity),
@@ -311,20 +321,27 @@ namespace DarkCodex
                 "A 4-foot-long, blazing, forked bolt of electricity springs forth from your hand. You wield this spear-like bolt as if it were a trident (you are considered proficient with the bolt). Attacks with Gozreh’s trident are melee touch attacks. The bolt deals 1d8 points of electricity damage + 1 point per 2 caster levels (maximum +10). Since the bolt is immaterial, your Strength modifier does not apply to the damage. The bolt can ignite combustible materials such as parchment, straw, dry sticks, and cloth.",
                 icon: icon,
                 type: AbilityType.Spell,
-                actionType: UnitCommand.CommandType.Move,
-                range: AbilityRange.Personal,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Touch,
                 duration: Resource.Strings.MinutesPerLevel
                 ).SetComponents(
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
-                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true)),
+                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true, toCaster: true),
+                    Helper.CreateConditional(
+                        condition: Helper.CreateContextConditionIsEnemy(),
+                        ifTrue: new ContextActionAttack())
+                    ),
                 Helper.CreateSpellComponent(SpellSchool.Evocation),
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Electricity),
                 Helper.CreateCraftInfoComponent()
-                ).TargetSelf(
+                ).TargetAny(
+                point: false,
+                ally: false
                 ).SetMetamagic(
                 Metamagic.Empower | Metamagic.Maximize | Metamagic.Extend
                 );
+            ab.SpellResistance = false;
 
             ab.Add(2,
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
@@ -336,14 +353,136 @@ namespace DarkCodex
                 );
         }
 
+        [PatchInfo(Severity.Create, "Produce Flame", "spell: Produce Flame", false)]
         public static void CreateProduceFlame()
         {
-            // as with flame blade, but with ranged weapon
+            Sprite icon = Helper.StealIcon("cdb106d53c65bbc4086183d54c3b97c7");
+
+            /*
+            Produce Flame
+            School evocation [fire]; Level druid 1, shaman 1; Domain fire 2
+            Casting Time 1 standard action
+            Range personal
+            Duration 1 min./level (D)
+            Saving Throw none; Spell Resistance yes
+
+            Flames as bright as a torch appear in your open hand. The flames harm neither you nor your equipment.
+            In addition to providing illumination, the flames can be hurled or used to touch enemies. You can strike an opponent with a melee touch attack, dealing fire damage equal to 1d6 + 1 point per caster level (maximum +5). Alternatively, you can hurl the flames up to 120 feet as a thrown weapon. When doing so, you attack with a ranged touch attack (with no range penalty) and deal the same damage as with the melee attack. No sooner do you hurl the flames than a new set appears in your hand. Each attack you make reduces the remaining duration by 1 minute. If an attack reduces the remaining duration to 0 minutes or less, the spell ends after the attack resolves.
+            */
+
+            var buff = Helper.CreateBlueprintBuff("ProduceFlameBuff");
+
+            var enchantment = Helper.CreateBlueprintWeaponEnchantment(
+                "ProduceFlameEnchantment",
+                "Produce Flame"
+                ).SetComponents(
+                new FlameBladeLogic(null, step: 1, max: 5),
+                Helper.CreateAddInitiatorAttackWithWeaponTrigger(
+                    Helper.CreateActionList(
+                        Helper.CreateContextActionReduceBuffDuration(buff, 10)),
+                    OnlyHit: false
+                    )
+                );
+            enchantment.m_HiddenInUI = true;
+
+            var weapon = Helper.CreateBlueprintItemWeapon(
+                "ProduceFlameWeapon",
+                "Produce Flame",
+                weaponType: "1d39a22f206840e40b2255fc0175b8d0", //RayType
+                damageOverride: new DiceFormula(1, DiceType.D6),
+                form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
+                enchantments: new AnyRef[] { enchantment }
+                );
+            weapon.m_VisualParameters = new()
+            {
+                m_Projectiles = new BlueprintProjectileReference[] { (AnyRef)Resource.Projectile.ScorchingRay00 },
+                m_WeaponAnimationStyle = WeaponAnimationStyle.ThrownStraight
+            };
+
+            buff.Flags(
+              hidden: true
+              ).SetComponents(
+                new AddTemporaryWeapon(weapon)
+                );
+
+            var ab = Helper.CreateBlueprintAbility(
+                "ProduceFlameAbility",
+                "Produce Flame",
+                "Flames as bright as a torch appear in your open hand. The flames harm neither you nor your equipment.\nIn addition to providing illumination, the flames can be hurled or used to touch enemies. You can strike an opponent with a ranged touch attack, dealing fire damage equal to 1d6 + 1 point per caster level (maximum +5). Alternatively, you can hurl the flames up to 120 feet as a thrown weapon. No sooner do you hurl the flames than a new set appears in your hand. Each attack you make reduces the remaining duration by 1 minute. If an attack reduces the remaining duration to 0 minutes or less, the spell ends after the attack resolves.",
+                icon: icon,
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Medium,
+                duration: Resource.Strings.MinutesPerLevel
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateContextActionApplyBuff(buff, Helper.DurationMinutesPerLevel, fromSpell: true, toCaster: true),
+                    Helper.CreateConditional(
+                        condition: Helper.CreateContextConditionIsEnemy(),
+                        ifTrue: new ContextActionAttack(canBeRanged: true))
+                    ),
+                Helper.CreateSpellComponent(SpellSchool.Evocation),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Fire),
+                Helper.CreateCraftInfoComponent()
+                ).TargetAny(
+                point: false,
+                ally: false
+                ).SetMetamagic(
+                Metamagic.Empower | Metamagic.Maximize | Metamagic.Extend | Const.Intensified
+                );
+            ab.SpellResistance = false;
+
+            ab.Add(1,
+                "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "c0c40e42f07ff104fa85492da464ac69" //ShamanSpelllist
+                );
+            ab.Add(2, "d8f30625d1b1f9d41a24446cbf7ac52e"); //FireDomainSpellList
         }
 
         public static void CreateChillTouch()
         {
-            
+            /*
+            Chill Touch
+            School necromancy; Level bloodrager 1, magus 1, shaman 1, sorcerer/wizard 1, witch 1; Mystery reaper 1
+            Casting Time 1 standard action
+            Range touch
+            Targets creature or creatures touched (up to one/level)
+            Saving Throw Fortitude partial or Will negates; see text; Spell Resistance yes
+
+            A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.
+            An undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.
+            */
+
+            var effect = Helper.CreateBlueprintAbility(
+                "ChillTouch_Effect",
+                "Chill Touch",
+                "A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.\nAn undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.",
+                icon: null,
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Touch,
+                savingThrow: Resource.Strings.FortitudePartial
+                ).TargetEnemy(
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateConditional(
+                        condition: Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.UndeadType),
+                        ifTrue: Helper.MakeContextActionSavingThrow(
+                            SavingThrowType.Will,
+                            failed: Helper.CreateContextActionApplyBuff("1265c0b27ef559c4e980a900dfc68d1e", Helper.CreateContextDurationValue(1, DiceType.D4, 1), fromSpell: true, dispellable: false)), //FrightenedUndead
+                        ifFalse: Helper.CreateContextActionSavingThrow(
+                            SavingThrowType.Fortitude,
+                            Helper.CreateContextActionDealDamage(DamageEnergyType.NegativeEnergy, Helper.CreateContextDiceValue(DiceType.D6, 1, 0)),
+                            Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionDealDamage(StatType.Strength, Helper.CreateContextDiceValue(DiceType.Zero, 0, 1))))
+                        )
+                    )
+                ).MakeStickySpell(out var cast);
+
+            // AbilityCastRateUtils.GetChargesCount
+            // TouchSpellsController.OnAbilityEffectApplied
+
         }
 
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]
@@ -356,28 +495,4 @@ namespace DarkCodex
                 bubble.AddComponents(new AbilityTargetsAround { m_Radius = 20.Feet(), m_TargetType = TargetType.Ally, m_Condition = new() });
         }
     }
-
-    /*
-    Chill Touch
-    School necromancy; Level bloodrager 1, magus 1, shaman 1, sorcerer/wizard 1, witch 1; Mystery reaper 1
-    Casting Time 1 standard action
-    Range touch
-    Targets creature or creatures touched (up to one/level)
-    Saving Throw Fortitude partial or Will negates; see text; Spell Resistance yes
-
-    A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.
-    An undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.
-
-
-    Produce Flame
-    School evocation [fire]; Level druid 1, shaman 1; Domain fire 2
-    Casting Time 1 standard action
-    Range personal
-    Duration 1 min./level (D)
-    Saving Throw none; Spell Resistance yes
-
-    Flames as bright as a torch appear in your open hand. The flames harm neither you nor your equipment.
-    In addition to providing illumination, the flames can be hurled or used to touch enemies. You can strike an opponent with a melee touch attack, dealing fire damage equal to 1d6 + 1 point per caster level (maximum +5). Alternatively, you can hurl the flames up to 120 feet as a thrown weapon. When doing so, you attack with a ranged touch attack (with no range penalty) and deal the same damage as with the melee attack. No sooner do you hurl the flames than a new set appears in your hand. Each attack you make reduces the remaining duration by 1 minute. If an attack reduces the remaining duration to 0 minutes or less, the spell ends after the attack resolves.
-    
-    */
 }

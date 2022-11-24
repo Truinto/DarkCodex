@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib.Examples
 {
-    internal class TranspilerExample
+    public class TranspilerExample
     {
         // Excellent Transpiler Example
         [HarmonyPatch(typeof(object), nameof(object.ToString))]

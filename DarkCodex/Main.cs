@@ -423,11 +423,11 @@ namespace Shared
             PatchSafe(typeof(DEBUG.SpellReach));
             PatchSafe(typeof(Patch_Prebuilds));
             //PatchSafe(typeof(Patch_SaveExtension));
-            PatchSafe(typeof(Patch_FactSelectionParameterized));
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(MartialArt.CreatePaladinVirtuousBravo);
             LoadSafe(Kineticist.FixBladeWhirlwind);
+            LoadSafe(Spellcasters.CreateChannelForm);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -468,6 +468,7 @@ namespace Shared
             PatchSafe(typeof(Patch_FixMisc));
             PatchSafe(typeof(Patch_ParryAlways));
             PatchSafe(typeof(Patch_AzataFavorableMagic));
+            PatchSafe(typeof(Patch_RespecPartially));
             //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early
@@ -475,6 +476,7 @@ namespace Shared
             LoadSafe(Spells.CreateHealingFlames);
             LoadSafe(Spells.CreateFlameBlade);
             LoadSafe(Spells.CreateDivineTrident);
+            LoadSafe(Spells.CreateProduceFlame);
             LoadSafe(Spells.PatchVarious);
 
             // General
@@ -520,6 +522,7 @@ namespace Shared
             LoadSafe(Mythic.CreateLimitlessShaman);
             LoadSafe(Mythic.CreateLimitlessWarpriest);
             LoadSafe(Mythic.CreateLimitlessWarpriestBlessing);
+            LoadSafe(Mythic.CreateLimitlessBloodlineClaws);
             LoadSafe(Mythic.CreateKineticMastery);
             LoadSafe(Mythic.CreateMagicItemAdept);
             LoadSafe(Mythic.CreateResourcefulCaster);

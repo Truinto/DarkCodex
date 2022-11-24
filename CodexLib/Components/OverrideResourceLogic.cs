@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Replace ResourceLogic of specific abilities.
+    /// </summary>
     public class OverrideResourceLogic : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleCalculateAbilityParams>
     {
         public IAbilityResourceLogic ResourceLogic;
@@ -24,7 +27,7 @@ namespace CodexLib
             if (ability == null)
                 return;
 
-            if (this.Spells.Contains(ability.Blueprint) && ability.OverridenResourceLogic == null)
+            if (this.Spells.Contains(ability.Blueprint))
             {
                 ability.OverridenResourceLogic = this.ResourceLogic;
             }
@@ -35,6 +38,9 @@ namespace CodexLib
         }
     }
 
+    /// <summary>
+    /// Resource-free use of ability, if not on cooldown.
+    /// </summary>
     public class AbilityResourceLogicCooldown : AbilityResourceLogic, IAbilityRestriction, IAbilityResourceLogic
     {
         public int Cooldown;
@@ -54,7 +60,9 @@ namespace CodexLib
 
         public override bool IsAbilityRestrictionPassed(AbilityData ability)
         {
-            return base.IsAbilityRestrictionPassed(ability);
+            if (!this.IsSpendResource)
+                return true;
+            return ability.Caster.Resources.HasEnoughResource(RequiredResource, CalculateCost(ability));
         }
 
         public override int CalculateCost(AbilityData ability)
@@ -67,20 +75,17 @@ namespace CodexLib
 
         public override void Spend(AbilityData ability)
         {
-            ability.Caster.Unit.Ensure<PartCooldown>().Apply(ability.Blueprint, this.Cooldown);
-
             if (!this.IsSpendResource)
                 return;
-
             var unit = ability.Caster.Unit;
             if (unit == null || unit.Blueprint.IsCheater)
                 return;
 
             int cost = CalculateCost(ability);
-            if (!ability.Caster.Resources.HasEnoughResource(this.RequiredResource, cost))
-                return;
+            unit.Ensure<PartCooldown>().Apply(ability.Blueprint, this.Cooldown);
 
-            unit.Descriptor.Resources.Spend(this.RequiredResource, cost);
+            if (cost > 0 && ability.Caster.Resources.HasEnoughResource(this.RequiredResource, cost))
+                unit.Descriptor.Resources.Spend(this.RequiredResource, cost);
         }
     }
 }

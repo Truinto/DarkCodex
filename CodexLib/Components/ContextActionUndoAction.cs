@@ -12,9 +12,21 @@ namespace CodexLib
 {
     public class ContextActionUndoAction : ContextAction
     {
-        public ContextActionUndoAction(UnitCommand.CommandType command = UnitCommand.CommandType.Move, float amount = 1.5f)
+        public UnitCommand.CommandType Command;
+        public float GainTime = 1.5f; // gain half a move action
+        public bool ForceMove = true; // counts as movement
+
+        /// <summary>
+        /// Restore action time. Cooldown is usually 6 seconds, except for CommandType.Move where 3 seconds is one move action and 6 seconds are 2 move actions.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="amount">Time to refund. Negative values will steal time instead.</param>
+        /// <param name="forceMove"></param>
+        public ContextActionUndoAction(UnitCommand.CommandType command = UnitCommand.CommandType.Move, float amount = 1.5f, bool forceMove = true)
         {
             this.Command = command;
+            this.GainTime = amount;
+            this.ForceMove = forceMove;
         }
 
         public override string GetCaption()
@@ -34,18 +46,21 @@ namespace CodexLib
                 && this.Context.MaybeCaster.IsCurrentUnit())
                 currentTurn = Game.Instance.TurnBasedCombatController.CurrentTurn;
 
-            Helper.PrintDebug($"pre  UndoAction GainTime={GainTime} TimeMoved={currentTurn?.m_RiderMovementStats.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime(unit)}");
+            Helper.PrintDebug($"pre  UndoAction GainTime={this.GainTime} TimeMoved={currentTurn?.m_RiderMovementStats.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime(unit)}");
+
+            if (this.ForceMove)
+                this.Context.MaybeCaster.CombatState.m_LastUsageOfMoveActionTime = Game.Instance.TimeController.GameTime;
 
             var cooldown = this.Context.MaybeCaster.CombatState.Cooldown;
-            if (GainTime >= 0f) // gain time
-                switch (Command)
+            if (this.GainTime >= 0f) // gain time
+                switch (this.Command)
                 {
                     case UnitCommand.CommandType.Standard:
                         cooldown.StandardAction = 0f;
                         break;
                     case UnitCommand.CommandType.Move:
-                        cooldown.MoveAction = Math.Max(0, cooldown.MoveAction - GainTime);
-                        if (ForceMove && currentTurn != null)
+                        cooldown.MoveAction = Math.Max(0, cooldown.MoveAction - this.GainTime);
+                        if (currentTurn != null)
                         {
                             currentTurn.m_RiderMovementStats.TimeMoved = cooldown.MoveAction;
                             //currentTurn.TrySelectMovementLimit();
@@ -56,30 +71,26 @@ namespace CodexLib
                         break;
                 }
             else            // lose time
-                switch (Command)
+                switch (this.Command)
                 {
                     case UnitCommand.CommandType.Standard:
                         cooldown.StandardAction = 6f;
                         break;
                     case UnitCommand.CommandType.Move:
-                        if (ForceMove && currentTurn != null)
+                        if (currentTurn != null)
                         {
                             //currentTurn.TickMovement()
-                            currentTurn.m_RiderMovementStats.TimeMoved -= GainTime;
+                            currentTurn.m_RiderMovementStats.TimeMoved -= this.GainTime;
                             //currentTurn.TrySelectMovementLimit();
                         }
-                        cooldown.MoveAction = Math.Min(6f, cooldown.MoveAction - GainTime);
+                        cooldown.MoveAction = Math.Min(6f, cooldown.MoveAction - this.GainTime);
                         break;
                     case UnitCommand.CommandType.Swift:
                         cooldown.SwiftAction = 6f;
                         break;
                 }
 
-            Helper.PrintDebug($"post UndoAction GainTime={GainTime} TimeMoved={currentTurn?.m_RiderMovementStats?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime(unit)}");
+            Helper.PrintDebug($"post UndoAction GainTime={this.GainTime} TimeMoved={currentTurn?.m_RiderMovementStats?.TimeMoved} GetRemainingTime={currentTurn?.GetRemainingTime(unit)}");
         }
-
-        public bool ForceMove = true; // counts as movement
-        public float GainTime = 1.5f; // gain half a move action
-        public UnitCommand.CommandType Command;
     }
 }

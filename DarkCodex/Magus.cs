@@ -44,10 +44,10 @@ namespace DarkCodex
                 "AccursedStrikeAbility",
                 "Accursed Strike",
                 "Any prepared spell or hex with the curse descriptor can be delivered using the spellstrike ability, even if the spells are not touch attack spells.",
-                accursed_strike_variants[0].m_Icon,
-                AbilityType.Supernatural,
-                CommandType.Standard,
-                AbilityRange.Touch
+                icon: accursed_strike_variants[0].m_Icon,
+                type: AbilityType.Supernatural,
+                actionType: CommandType.Standard,
+                range: AbilityRange.Touch
                 ).TargetEnemy(
                 ).AddToAbilityVariants(accursed_strike_variants.ToArray());
 

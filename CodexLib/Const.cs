@@ -39,7 +39,25 @@ namespace CodexLib
         public const ModifierDescriptor Intelligence = (ModifierDescriptor)5380;
         public const ModifierDescriptor Charisma = (ModifierDescriptor)5381;
 
+        public const Metamagic Intensified = (Metamagic)(1 << 12);
+        public const Metamagic Dazing = (Metamagic)(1 << 13);
+        public const Metamagic Rime = (Metamagic)(1 << 16);
+        public const Metamagic Burning = (Metamagic)(1 << 17);
+        public const Metamagic Flaring = (Metamagic)(1 << 18);
+        public const Metamagic Piercing = (Metamagic)(1 << 19);
+        public const Metamagic SolidShadows = (Metamagic)(1 << 20);
+        public const Metamagic Encouraging = (Metamagic)(1 << 21);
+        public const Metamagic ElementalAcid = (Metamagic)(1 << 22);
+        public const Metamagic ElementalCold = (Metamagic)(1 << 23);
+        public const Metamagic ElementalElectricity = (Metamagic)(1 << 24);
+        public const Metamagic ElementalFire = (Metamagic)(1 << 25);
+
         public const WeaponCategory ButcheringAxe = (WeaponCategory)5480;
+
+        // use in BlueprintParametrizedFeature
+        public const FeatureGroup ParameterizedAbilitySelection = (FeatureGroup)5580;
+        public const FeatureGroup KnownSpell = (FeatureGroup)5581;
+        public const FeatureGroup KnownAbility = (FeatureGroup)5582;
 
         // use in BlueprintActivatableAblity.WeightInGroup to restrict use of Activatable
         public const int NoManualOn = 788704819;

@@ -627,6 +627,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("659c39542b728c04b83e969c834782a9"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("651570c873e22b84f893f146ce2de502"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("93bd14dd916cfd1429c11ad66adf5e2b"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("bb0de2047c448bd46aff120be3b39b7a"),
                 Element1 = Air,
                 Element2 = Electric,
                 Composite = Composite_Thunder
@@ -638,6 +639,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("956b65effbf37e5419c13100ab4385a3"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("c43d9c2d23e56fb428a4eb60da9ba1cb"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("d2a93ab18fcff8c419b03a2c3d573606"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("a275b35f282601944a97e694f6bc79f8"),
                 Element1 = Earth,
                 Element2 = null,
                 Composite = Composite_Metal
@@ -649,6 +651,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("caa7edca64af1914d9e14785beb6a143"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("56e2fc3abed8f2247a621ac37e75f303"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("d4a2a75d01d1e77489ff692636a538bf"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("8ad77685e64842c45a6f5b19f9086c6c"),
                 Element1 = Fire,
                 Element2 = null,
                 Composite = Composite_BlueFlame
@@ -660,6 +663,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("faa5f1233600d864fa998bc0afe351ab"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("86eff374d040404438ad97fedd7218bc"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("5e839c743c6da6649a43cdeb70b6018f"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("29ec36fa2a5b8b94ebce170bd369083a"),
                 Element1 = Water,
                 Element2 = Cold,
                 Composite = Composite_Ice
@@ -672,6 +676,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("ff967af2a4634048be9d4beab75d86be"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("ff2e26f01237404f8a820f61212b3917"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("0af9c49df79a469cbfc29fa469d97a64"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("772d6eb030d547d6b9f85e599ec9fef1"),
                 Element1 = Telekinetic,
                 Element2 = null,
                 Composite = Composite_Force
@@ -683,6 +688,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("ace3846cf5324cd080f0e4cfd68b26e7"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("9f02317d4e5e476ba1678d0ccad13ef9"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("65e6ed019bc742b78e7a203f8ab45aac"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("92de8ee602184f1eb81434edc204a7b5"),
                 Element1 = Gravity,
                 Element2 = Negative,
                 Composite = Composite_Void
@@ -694,6 +700,7 @@ namespace CodexLib
                 Second = Helper.ToRef<BlueprintProgressionReference>("c8355b680ec040efb4e1e1741df662c3"),
                 Third = Helper.ToRef<BlueprintProgressionReference>("1a48f56f45584e619490210319330d4d"),
                 Knight = Helper.ToRef<BlueprintProgressionReference>("ade87cba8c0e4883be35d1b5563f28e1"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("12617b1537b749a0b7a4e30d2627ba7a"),
                 Element1 = Wood,
                 Element2 = Positive,
                 Composite = Composite_Verdant
@@ -1933,6 +1940,8 @@ namespace CodexLib
             public BlueprintProgressionReference Second;
             public BlueprintProgressionReference Third;
             public BlueprintProgressionReference Knight;
+
+            public BlueprintFeatureReference Defense;
 
             public Element Element1;
             /// <summary>can be null (earth, fire)</summary>

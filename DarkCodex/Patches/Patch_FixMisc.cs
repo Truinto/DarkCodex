@@ -1,5 +1,6 @@
 ﻿using Kingmaker.QA;
 using Owlcat.Runtime.Core.Logging;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
+    [PatchInfo(Severity.Harmony | Severity.Hidden, "Fix Misc", "suppress errors", false)]
     [HarmonyPatch]
     public class Patch_FixMisc
     {

@@ -62,9 +62,10 @@ namespace DarkCodex
                 "KineticCatalystDamage",
                 "",
                 "",
-                null, AbilityType.Special,
-                UnitCommand.CommandType.Standard,
-                AbilityRange.Close
+                icon: null,
+                type: AbilityType.Special,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Close
                 ).TargetEnemy()
                 .SetComponents(air_damage.Components)
                 .RemoveComponents<AbilityShowIfCasterHasFact>();
@@ -74,9 +75,10 @@ namespace DarkCodex
                 "KineticCatalystBurn",
                 "",
                 "",
-                null, AbilityType.Special,
-                UnitCommand.CommandType.Free,
-                AbilityRange.Close
+                icon: null, 
+                type: AbilityType.Special,
+                actionType: UnitCommand.CommandType.Free,
+                range: AbilityRange.Close
                 ).TargetSelf()
                 .SetComponents(air_burn.Components);
             fake_blade_burn.Hidden = true;

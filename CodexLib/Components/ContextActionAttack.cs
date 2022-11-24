@@ -9,11 +9,13 @@ namespace CodexLib
 {
     public class ContextActionAttack : ContextAction
     {
+        public bool CanBeRanged;
         public ActionList OnSuccess;
         public ActionList OnFailure;
 
-        public ContextActionAttack(ActionList onSuccess = null, ActionList onFailure = null)
+        public ContextActionAttack(bool canBeRanged, ActionList onSuccess = null, ActionList onFailure = null)
         {
+            this.CanBeRanged = canBeRanged;
             this.OnSuccess = onSuccess;
             this.OnFailure = onFailure;
         }
@@ -33,7 +35,7 @@ namespace CodexLib
             var target = this.Target.Unit;
             if (target == null)
                 return;
-            var weapon = caster.GetThreatHandMelee()?.Weapon;
+            var weapon = this.CanBeRanged ? caster.GetFirstWeapon() : caster.GetThreatHandMelee()?.Weapon;
             if (weapon == null)
                 return;
 

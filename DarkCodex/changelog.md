@@ -1,6 +1,14 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.10]
+- added Limitless Bloodline Claws, mythic ability: use claws from bloodlines at will, use breath weapon more often, use dragon disciple form II at will
+- fixed spell resistance check on Flame Blade
+- change Flame Blade to standard action, but you can target enemies for the first attack
+- added Evangelist (Homebrew Archetypes) to Limitless Bardic Performance
+- fixed metamagic reduction with convertable spells
+- fixed spell selection for metamagic traits, spell perfection, preferred spell
+
 ## [1.5.9]
 - added metamagic to Flame Blade
 - changed Flame Blade to move action (like unsheating a weapon), that way you get the free touch attack from casting a spell, but cannot do a full attack

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class ContextSharedBonus : BlueprintComponent, IContextBonus
+    public class ContextSharedBonus : BlueprintComponent, IMechanicRecalculate
     {
         public int Bonus;
         public AbilitySharedValue SharedType;
+
+        public int Priority => 300;
 
         public ContextSharedBonus(int bonus, AbilitySharedValue sharedType = AbilitySharedValue.Damage)
         {
@@ -17,7 +19,11 @@ namespace CodexLib
             this.SharedType = sharedType;
         }
 
-        public void Apply(MechanicsContext context)
+        public void PreCalculate(MechanicsContext context)
+        {
+        }
+
+        public void PostCalculate(MechanicsContext context)
         {
             context[SharedType] += Bonus;
         }

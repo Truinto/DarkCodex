@@ -23,7 +23,7 @@ namespace CodexLib
         public void OnEventAboutToTrigger(RuleApplyMetamagic evt)
         {
             var bp = this.Param.Blueprint as BlueprintAbility;
-            if (bp != null && bp != evt.Spell)
+            if (bp != null && bp != evt.Spell && bp != evt.Spell.Parent)
                 return;
 
             if (ReduceByMostExpensive)

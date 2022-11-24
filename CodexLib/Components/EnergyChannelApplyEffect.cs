@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
-    public class EnergyChannelApplyEffect : AbilityApplyEffect
+    public class EnergyChannelApplyEffect : AbilityApplyEffect, IAbilityRestriction
     {
         public BlueprintBuffReference Buff;
         public DamageEnergyType Element;
@@ -18,6 +18,21 @@ namespace CodexLib
             this.Element = element;
         }
 
+        public string GetAbilityRestrictionUIText()
+        {
+            return LocalizedTexts.Instance.Reasons.NoResources;
+        }
+
+        public bool IsAbilityRestrictionPassed(AbilityData ability)
+        {
+            if (ability.Caster.GetFact(ability.Blueprint)?.GetDataExt<IActionBarConvert, VariantSelectionData>()?.Selected is not BlueprintScriptableObject bp)
+                return false;
+            var resource = bp.GetComponent<AbilityResourceLogic>();
+            if (resource == null)
+                return true;
+            return resource.IsAbilityRestrictionPassed(ability);
+        }
+
         public override void Apply(AbilityExecutionContext context, TargetWrapper target)
         {
             if (context.SourceAbility == null
@@ -25,12 +40,12 @@ namespace CodexLib
                 || target.Unit == null)
                 return;
 
-            var data = context.MaybeCaster.GetFact(context.SourceAbility).GetDataExt<IActionBarConvert, VariantSelectionData>();
+            var data = context.MaybeCaster.GetFact(context.SourceAbility)?.GetDataExt<IActionBarConvert, VariantSelectionData>();
             if (data?.Selected is not BlueprintAbility sourceAbility)
                 return;
 
             // reduce resource
-            var resource = sourceAbility?.GetComponent<AbilityResourceLogic>()?.RequiredResource;
+            var resource = sourceAbility.GetComponent<AbilityResourceLogic>()?.RequiredResource;
             if (resource == null || !context.MaybeCaster.Resources.HasEnoughResource(resource, 1))
                 return;
             context.MaybeCaster.Resources.Spend(resource, 1);

@@ -9,7 +9,7 @@ namespace CodexLib.Examples
     /// <summary>
     /// Example: Useful for custom ability logic
     /// </summary>
-    internal class OnCastDoX : IAbilityOnCastLogic
+    public class OnCastDoX : IAbilityOnCastLogic
     {
         public void OnCast(AbilityExecutionContext context)
         {

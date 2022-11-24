@@ -7,6 +7,9 @@ using TurnBased.Controllers;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Storage for ability specific cooldowns. Is not saved in save files. This is only used in combat, where you cannot save.
+    /// </summary>
     public class PartCooldown : EntityPart
     {
         public Dictionary<BlueprintAbility, TimeSpan> Cooldowns = new();

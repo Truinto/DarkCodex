@@ -253,5 +253,73 @@ namespace DarkCodex
 
             Helper.AddFeats(feat);
         }
+
+        [PatchInfo(Severity.Create, "Channel Form", "basic feat: collection of abilities to shape channel energy into new forms", true)]
+        public static void CreateChannelForm()
+        {
+            /*
+            Malleable Symbol
+            Aura moderate conjuration; CL 9th; Weight 1 lb.; Slot none; Price 10,000 gp
+            This undistinguished metal lump has no powers in its default state. By concentrating on it for 1 minute, a creature who worships a deity may transform it into a masterwork holy symbol of that deity. Whenever this holy symbol is used as a focus for channeled energy, as a free action the bearer can alter the channel area to one of the following options:
+            - 10-foot burst centered anywhere within 30 feet
+            - 60-foot line
+            - 30-foot cone
+            */
+
+            AnyRef[] channels = Resource.Cache.Ability.Where(w => w.SpellDescriptor.HasAnyFlag(
+                SpellDescriptor.ChannelNegativeHarm
+                | SpellDescriptor.ChannelNegativeHeal
+                | SpellDescriptor.ChannelPositiveHarm
+                | SpellDescriptor.ChannelPositiveHeal)).ToAny();
+
+            var ray = Helper.CreateBlueprintAbility(
+                "ChannelFormRay",
+                "Channel Ray",
+                "Alter your channel energy area into a ray attack.",
+                icon: Helper.StealIcon("8eead52509987034ea9025d60cc05985"), //RayOfExhaustion
+                range: AbilityRange.Long
+                ).TargetEnemy(
+                ).SetComponents(
+                Helper.CreateAbilityDeliverProjectile(
+                    projectile: Resource.Projectile.RayOfExhaustion00,
+                    weapon: "f6ef95b1f7bb52b408a5b345a330ffe8"), //RayItem
+                new ActivatableVariants(channels),
+                new VariantSelectionApplyEffect()
+                ); // TODO: this shows up as a 50ft line?
+
+            var burst = Helper.CreateBlueprintAbility(
+                "ChannelFormBurst",
+                "Channel Burst",
+                "Alter your channel energy area into a 20 feet radius burst."
+                );
+
+            var line = Helper.CreateBlueprintAbility(
+                "ChannelFormLine",
+                "Channel Line",
+                "Alter your channel energy area into a 60 feet line."
+                );
+
+            var cone = Helper.CreateBlueprintAbility(
+                "ChannelFormCone",
+                "Channel Cone",
+                "Alter your channel energy area into a 30 feet cone."
+                );
+
+            _ = Resource.Projectile.FireLine00;
+            _ = Resource.Projectile.FireCone30Feet00;
+            _ = Resource.Projectile.Fireball00;
+
+            var feat = Helper.CreateBlueprintFeature(
+                "ChannelFormFeat",
+                "Channel Form",
+                "As a free action you may alter your channel energy area into new forms."
+                ).SetComponents(
+                Helper.CreatePureRecommendation(),
+                Helper.CreateAddFacts(ray),
+                Helper.Get<BlueprintFeature>("fd30c69417b434d47b6b03b9c1f568ff").GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any) //SelectiveChannel
+                );
+
+            Helper.AddFeats(feat);
+        }
     }
 }
