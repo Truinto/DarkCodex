@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.11]
+- fixed Kinetic Knight maneuver bonus while whip is active #185
+- added Unlock Spells: unlocks some spells: Transformation
+- fixed parametrized selection not showing spells from base game #188
+
 ## [1.5.10]
 - added Limitless Bloodline Claws, mythic ability: use claws from bloodlines at will, use breath weapon more often, use dragon disciple form II at will
 - fixed spell resistance check on Flame Blade

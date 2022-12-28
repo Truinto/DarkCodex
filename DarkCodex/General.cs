@@ -56,10 +56,9 @@ namespace DarkCodex
                 );
             feat.RequireProficiency = true;
 
-            Resource.Cache.Ensure();
             var list = new List<AnyBlueprintReference>();
 
-            foreach (var ab in Resource.Cache.Ability)
+            foreach (var ab in BpCache.Get<BlueprintAbility>())
             {
                 if (ab.Type == AbilityType.Spell
                     || ab.m_DisplayName.IsEmptyKey()
@@ -72,7 +71,7 @@ namespace DarkCodex
                 list.Add(ab.ToReference<AnyBlueprintReference>());
             }
 
-            foreach (var ft in Resource.Cache.Feature)
+            foreach (var ft in BpCache.Get<BlueprintFeature>())
             {
                 if (ft.m_DisplayName.IsEmptyKey()
                     || ft.GetComponent<ContextCalculateAbilityParams>() == null)
@@ -305,7 +304,7 @@ namespace DarkCodex
         {
             Main.Patch(typeof(Patch_ChangeSpellElement));
 
-            foreach (var buff in Resource.Cache.Buff)
+            foreach (var buff in BpCache.Get<BlueprintBuff>())
             {
                 var changeElement = buff.GetComponent<ChangeSpellElementalDamage>();
                 if (changeElement != null)
@@ -661,7 +660,7 @@ namespace DarkCodex
                 new MetamagicReduceCostParametrized { ReduceByMostExpensive = true },
                 new SpellPerfection(),
                 Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15),
-                Helper.CreatePrerequisiteFeaturesFromList(Resource.Cache.Feature.Where(w => w.GetComponent<AddMetamagicFeat>() && w.IsClassFeature).ToAny(), 3)
+                Helper.CreatePrerequisiteFeaturesFromList(BpCache.Get<BlueprintFeature>().Where(w => w.GetComponent<AddMetamagicFeat>() && w.IsClassFeature).ToAny(), 3)
                 );
 
             Helper.AddFeats(feat);

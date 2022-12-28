@@ -197,7 +197,7 @@ namespace DarkCodex
             */
 
             var enchantment = Helper.CreateBlueprintWeaponEnchantment(
-                "Flame Blade", // TODO!! rename to FlameBladeEnchantment
+                "FlameBladeEnchantment",
                 "Flame Blade"
                 ).SetComponents(
                 new FlameBladeLogic(feat, 10)
@@ -440,6 +440,7 @@ namespace DarkCodex
             ab.Add(2, "d8f30625d1b1f9d41a24446cbf7ac52e"); //FireDomainSpellList
         }
 
+        [PatchInfo(Severity.Create, "Chill Touch", "spell: Chill Touch", false)]
         public static void CreateChillTouch()
         {
             /*
@@ -458,7 +459,7 @@ namespace DarkCodex
                 "ChillTouch_Effect",
                 "Chill Touch",
                 "A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.\nAn undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.",
-                icon: null,
+                icon: Helper.StealIcon("8ae04bd9df004d4e82e7b39075a17459"),
                 type: AbilityType.Spell,
                 actionType: UnitCommand.CommandType.Standard,
                 range: AbilityRange.Touch,
@@ -478,11 +479,36 @@ namespace DarkCodex
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionDealDamage(StatType.Strength, Helper.CreateContextDiceValue(DiceType.Zero, 0, 1))))
                         )
                     )
-                ).MakeStickySpell(out var cast);
+                ).MakeStickySpell(out var cast, Helper.ContextCasterLevel);
 
-            // AbilityCastRateUtils.GetChargesCount
-            // TouchSpellsController.OnAbilityEffectApplied
+            Main.Patch(typeof(Patch_TouchPersist)); // TODO: move to patches
 
+            cast.Add(1,
+                "98c05aeff6e3d384f8aec6d584973642", //BloodragerSpellList
+                "4d72e1e7bd6bc4f4caaea7aa43a14639", //MagusSpellList
+                "c0c40e42f07ff104fa85492da464ac69", //ShamanSpelllist
+                "ba0401fdeb4062f40a7aa95b6f07fe89", //WizardSpellList
+                "e17df9977b879b64e8a8cbb4b3569f19"  //WitchSpellList
+                );
+        }
+
+        // for debug only
+        public static void CreateDebugSpells()
+        {
+            Helper.CreateBlueprintAbility(
+                "DebugSummonEnemyWeak",
+                "Summon Dummy",
+                icon: Helper.StealIcon("970c6db48ff0c6f43afc9dbb48780d03"),
+                actionType: UnitCommand.CommandType.Free,
+                duration: Resource.Strings.OneMinute
+                ).SetComponents(
+                Helper.CreateContextSetAbilityParams(casterLevel: 20),
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateContextActionSpawnMonster(
+                        unit: "e881dabcd5323ae4bb5f90da2b763edf", //CR0_ArueshalaeNightmare
+                        duration: Helper.DurationOneMinute))
+                );
         }
 
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]

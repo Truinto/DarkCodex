@@ -13,6 +13,10 @@
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Remove="Resources\Blueprints.bin" />
+	</ItemGroup>
+
 	<!-- Nuget Packages -->
 	<ItemGroup>
 	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
@@ -61,6 +65,7 @@
 	
 	<!-- Other Files -->
 	<ItemGroup>
+	  <EmbeddedResource Include="Resources\Blueprints.bin" />
 	  <EmbeddedResource Include="Resources\Num0.png" />
 	  <EmbeddedResource Include="Resources\Num1.png" />
 	  <EmbeddedResource Include="Resources\Num2.png" />

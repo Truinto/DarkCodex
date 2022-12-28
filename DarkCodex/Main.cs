@@ -208,11 +208,11 @@ namespace Shared
             if (GUILayout.Button("Debug: Export LevelPlanData", GUILayout.ExpandWidth(false)))
                 ExportLevelPlanData();
             //if (GUILayout.Button("Debug: Date minus 1", GUILayout.ExpandWidth(false)))
-            //    DEBUG.Date.SetDate();
+            //    DarkCodex.DEBUG.Date.SetDate();
             //if (GUILayout.Button("Debug: Open Shared Stash", GUILayout.ExpandWidth(false)))
-            //    DEBUG.Loot.Open();
+            //    DarkCodex.DEBUG.Loot.Open();
             //if (GUILayout.Button("Debug: Export Icons", GUILayout.ExpandWidth(false)))
-            //    DEBUG.ExportAllIconTextures();
+            //    DarkCodex.DEBUG.ExportAllIconTextures();
             if (GUILayout.Button("Debug: Pause Area Fxs", GUILayout.ExpandWidth(false)))
                 Event_AreaEffects.Stop();
             if (GUILayout.Button("Debug: Continue Area Fxs", GUILayout.ExpandWidth(false)))
@@ -231,6 +231,8 @@ namespace Shared
             }
             if (GUILayout.Button("Debug: Generate bin files (will lag)", GUILayout.ExpandWidth(false)))
                 Resource.Cache.SaveBaseGame();
+            if (GUILayout.Button("Debug: Generate CodexLib bin files (will lag)", GUILayout.ExpandWidth(false)))
+                BpCache.ExportResources(Path.Combine(Helper.PathMods, "Blueprints.bin"));
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref state.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
             Checkbox(ref state.verbose, "Debug: Verbose");
@@ -382,7 +384,7 @@ namespace Shared
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnHideGUI = OnHideGUI;
 
-            Patch(typeof(Patch_LoadBlueprints));
+            MasterPatch.Run(typeof(CodexLib.BpCache)); // this must run very early
             //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
 
             //harmony.PatchAll(typeof(Main).Assembly);
@@ -410,12 +412,12 @@ namespace Shared
             MasterPatch.Run();
             Print("Loading Dark Codex");
             patchInfos = new(Settings.State);
-            Resource.Cache.Ensure();
 
-            // Debug
+            // for Debug
 #if DEBUG
             PatchSafe(typeof(DEBUG.WatchCalculateParams));
             PatchSafe(typeof(DEBUG.WatchSelectiveMetamagic));
+            PatchSafe(typeof(DEBUG.WatchWeaponEnchantment));
             //PatchSafe(typeof(DEBUG.WatchSharedValue));
             PatchSafe(typeof(DEBUG.Settlement1));
             PatchSafe(typeof(DEBUG.Settlement2));
@@ -428,6 +430,7 @@ namespace Shared
             LoadSafe(MartialArt.CreatePaladinVirtuousBravo);
             LoadSafe(Kineticist.FixBladeWhirlwind);
             LoadSafe(Spellcasters.CreateChannelForm);
+            LoadSafe(Spells.CreateChillTouch);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -472,6 +475,7 @@ namespace Shared
             //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early
+            LoadSafe(Spells.CreateDebugSpells);
             LoadSafe(Spells.CreateBladedDash);
             LoadSafe(Spells.CreateHealingFlames);
             LoadSafe(Spells.CreateFlameBlade);
@@ -621,6 +625,7 @@ namespace Shared
             LoadSafe(Kineticist.CreateExpandedElement);
 
             // Unlocks
+            LoadSafe(Unlock.UnlockSpells);
             LoadSafe(Unlock.UnlockAnimalCompanion);
             LoadSafe(Unlock.UnlockKineticist);
 

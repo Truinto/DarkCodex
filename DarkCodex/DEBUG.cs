@@ -56,6 +56,8 @@ using CodexLib;
 using Kingmaker.EntitySystem.Persistence;
 using System.Text.RegularExpressions;
 using Kingmaker.Blueprints.Root;
+using Kingmaker.View.Equipment;
+using Kingmaker.Visual.Particles;
 
 namespace DarkCodex
 {
@@ -230,15 +232,13 @@ namespace DarkCodex
             [PatchInfo(Severity.Extend | Severity.WIP, "Name All", "gives all enchantments a name and description", false)]
             public static void NameAll()
             {
-                Resource.Cache.Ensure();
-
                 StringBuilder sb = new();
 #if DEBUG
                 using (StreamWriter sw = new(Path.Combine(Main.ModPath, "enchantment-export.txt"), false)) // todo: remove debug log
                 {
                     sw.WriteLine("names");
 #endif
-                    foreach (var enchantment in Resource.Cache.Enchantment)
+                    foreach (var enchantment in BpCache.Get<BlueprintItemEnchantment>())
                     {
                         if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
                             continue;
@@ -276,7 +276,7 @@ namespace DarkCodex
 #if DEBUG
                     sw.WriteLine("descriptions");
 #endif
-                    foreach (var item in Resource.Cache.Item)
+                    foreach (var item in BpCache.Get<BlueprintItem>())
                     {
                         try
                         {
@@ -330,7 +330,7 @@ namespace DarkCodex
                     // prefix number blocks with '+'
                     if (name[i].IsNumber() && !name[i - 1].IsNumber())
                     {
-                        if (sb.IsNotSpaced()) 
+                        if (sb.IsNotSpaced())
                             sb.Append(' ');
                         sb.Append('+');
                     }
@@ -445,6 +445,22 @@ namespace DarkCodex
             public static void Postfix2(bool __result, ContextConditionSharedValueHigher __instance)
             {
                 Main.PrintDebug($"is shared DurationSecond={__instance.Context[AbilitySharedValue.DurationSecond]} 2={__instance.AbilityContext[AbilitySharedValue.DurationSecond]} r={__result}");
+            }
+        }
+
+        [HarmonyPatch(typeof(UnitViewHandSlotData), nameof(UnitViewHandSlotData.UpdateWeaponEnchantmentFx))]
+        public class WatchWeaponEnchantment
+        {
+            public static void Postfix(bool isVisible, UnitViewHandSlotData __instance)
+            {
+                bool hasSnaps = __instance.Slot?.FxSnapMap != null;
+                var enchantments = __instance.VisibleItem?.Enchantments?.Join(a =>
+                    {
+                        var fx = (a.Blueprint as BlueprintWeaponEnchantment)?.WeaponFxPrefab;
+                        return $"{a.Name} fx={fx} load={fx?.Load() != null} active={a.Active} preventFX={a.PreventFxSpawn}";
+                    }, "\t\n");
+
+                Main.PrintDebug($"{__instance.VisibleItem?.Name} isVisible={isVisible} isInHand={__instance.IsInHand} snapFlag={hasSnaps} enchantments=\n\t{enchantments}");
             }
         }
 

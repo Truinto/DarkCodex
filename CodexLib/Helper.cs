@@ -795,6 +795,14 @@ namespace CodexLib
             return true;
         }
 
+        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value, Func<TValue> getter)
+        {
+            if (dic.TryGetValue(key, out value))
+                return false;
+            dic[key] = value = getter();
+            return true;
+        }
+
         public static List<T> AddUnique<T>(this List<T> list, T item)
         {
             if (!list.Contains(item))
@@ -844,6 +852,33 @@ namespace CodexLib
             _list.CopyTo(result);
             _list.Clear();
             return result;
+        }
+
+        public static void Write(this FileStream stream, int value, byte[] buffer = null)
+        {
+            buffer ??= new byte[4];
+            buffer[0] = (byte)value;
+            buffer[1] = (byte)(value >> 8);
+            buffer[2] = (byte)(value >> 16);
+            buffer[3] = (byte)(value >> 24);
+
+            stream.Write(buffer, 0, 4);
+        }
+
+        public static void Write(this FileStream stream, string text, byte[] buffer = null)
+        {
+            int length;
+            if (buffer == null || text.Length > buffer.Length) 
+            {
+                buffer = Encoding.ASCII.GetBytes(text);
+                length = buffer.Length;
+            }
+            else
+            {
+                length = Encoding.ASCII.GetBytes(text, 0, text.Length, buffer, 0);
+            }
+
+            stream.Write(buffer, 0, length);
         }
 
         #endregion
@@ -1239,6 +1274,8 @@ namespace CodexLib
 
         #region Strings
 
+        public static string PathMods => UnityModManager.modsPath;
+
         private static LocalizedString _empty = new() { Key = "" };
 
         public static LocalizedString GetString(string key)
@@ -1425,7 +1462,7 @@ namespace CodexLib
             }
         }
 
-        public static T GetComponent<T>(this AnyRef any) where T : BlueprintComponent 
+        public static T GetComponent<T>(this AnyRef any) where T : BlueprintComponent
             => any.Get<BlueprintScriptableObject>()?.GetComponent<T>();
 
         public static T AddComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
@@ -1463,7 +1500,7 @@ namespace CodexLib
             return obj.AddComponents(Flush<BlueprintComponent>());
         }
 
-        public static void AddComponents(this AnyRef any, params BlueprintComponent[] components) 
+        public static void AddComponents(this AnyRef any, params BlueprintComponent[] components)
             => any.Get<BlueprintScriptableObject>()?.AddComponents(components);
 
         public static T SetComponents<T>(this T obj, params BlueprintComponent[] components) where T : BlueprintScriptableObject
@@ -1522,7 +1559,7 @@ namespace CodexLib
 
             return obj;
         }
-        
+
         public static void ReplaceComponent<TOrig, TRep>(this AnyRef any, TOrig original, TRep replacement)
             => (any.GetBlueprint() as BlueprintScriptableObject)?.SetComponents(original, replacement);
 
@@ -1906,6 +1943,9 @@ namespace CodexLib
         public static readonly ContextValue ContextStatBonus = CreateContextValue(AbilityRankType.StatBonus);
         public static readonly ContextValue ContextSpeedBonus = CreateContextValue(AbilityRankType.SpeedBonus);
 
+        public static readonly ContextValue ContextCasterLevel = CreateContextValue(AbilityParameterType.Level);
+        public static readonly ContextValue ContextCasterStatBonus = CreateContextValue(AbilityParameterType.CasterStatBonus);
+
         public static readonly ContextValue SharedDamage = CreateContextValue(AbilitySharedValue.Damage);
         public static readonly ContextValue SharedHeal = CreateContextValue(AbilitySharedValue.Heal);
         public static readonly ContextValue SharedDuration = CreateContextValue(AbilitySharedValue.Duration);
@@ -1930,9 +1970,19 @@ namespace CodexLib
         public static readonly ContextDiceValue SharedDiceDamageBonus = SharedDamageBonus.ToDice();
         public static readonly ContextDiceValue SharedDiceDungeon = SharedDungeon.ToDice();
 
+        public static readonly ContextDurationValue DurationZero = CreateContextDurationValue();
+        public static readonly ContextDurationValue DurationRoundsPerLevel = CreateContextDurationValue(bonus: CreateContextValue(AbilityParameterType.Level), rate: DurationRate.Rounds);
         public static readonly ContextDurationValue DurationMinutesPerLevel = CreateContextDurationValue(bonus: CreateContextValue(AbilityParameterType.Level), rate: DurationRate.Minutes);
+        public static readonly ContextDurationValue DurationHoursPerLevel = CreateContextDurationValue(bonus: CreateContextValue(AbilityParameterType.Level), rate: DurationRate.Hours);
         public static readonly ContextDurationValue DurationOneRound = CreateContextDurationValue(bonus: 1);
+        public static readonly ContextDurationValue DurationOneMinute = CreateContextDurationValue(bonus: 1, rate: DurationRate.Minutes);
+        public static readonly ContextDurationValue DurationOneHour = CreateContextDurationValue(bonus: 1, rate: DurationRate.Hours);
         public static readonly ContextDurationValue DurationOneDay = CreateContextDurationValue(bonus: 1, rate: DurationRate.Days);
+
+        public static ContextDiceValue ToDice(this int value)
+        {
+            return CreateContextDiceValue(DiceType.Zero, 0, value);
+        }
 
         public static ContextDiceValue ToDice(this ContextValue value)
         {
@@ -2410,7 +2460,7 @@ namespace CodexLib
             return b;
         }
 
-        public static BlueprintAbility MakeStickySpell(this BlueprintAbility effect, out BlueprintAbility cast)
+        public static BlueprintAbility MakeStickySpell(this BlueprintAbility effect, out BlueprintAbility cast, ContextValue count = null)
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
 
@@ -2421,7 +2471,10 @@ namespace CodexLib
                     .RemoveComponents<AbilityEffectRunAction>()
                     .RemoveComponents<AbilityExecuteActionOnCast>();
 
-            cast.AddComponents(CreateAbilityEffectStickyTouch(effect.ToRef()));
+            if (count == null)
+                cast.AddComponents(CreateAbilityEffectStickyTouch(effect.ToRef()));
+            else
+                cast.AddComponents(new AbilityEffectStickyTouchPersist(effect, count));
             cast.Range = AbilityRange.Touch;
             cast.Animation = CastAnimationStyle.Self;
 
@@ -3138,6 +3191,27 @@ namespace CodexLib
         {
             var result = new ContextActionAddFeature();
             result.m_PermanentFeature = permanent;
+            return result;
+        }
+
+        /// <param name="unit">type: <b>BlueprintUnit</b></param>
+        /// <param name="summonBuff">type: <b>BlueprintBuff</b></param>
+        /// <param name="summonPool">type: <b>BlueprintSummonPool</b></param>
+        /// <returns></returns>
+        public static ContextActionSpawnMonster CreateContextActionSpawnMonster(AnyRef unit, ContextDurationValue duration = null, ContextDiceValue count = null, ContextValue levelValue = null, AnyRef summonBuff = null, AnyRef summonPool = null, bool useLimit = false, bool linkToCaster = true, bool isControllable = false)
+        {
+            var result = new ContextActionSpawnMonster();
+            result.m_Blueprint = unit;
+
+            result.DurationValue = duration ?? Helper.DurationOneHour;
+            result.CountValue = count ?? 1.ToDice();
+            result.m_SummonPool = summonPool ?? ToRef<BlueprintSummonPoolReference>("d94c93e7240f10e41ae41db4c83d1cbe"); //SummonMonsterPool
+            result.AfterSpawn = CreateActionList(CreateContextActionApplyBuff(summonBuff ?? "8728e884eeaa8b047be04197ecf1a0e4", dispellable: false));
+            result.LevelValue = levelValue ?? result.LevelValue;
+            result.UseLimitFromSummonPool = useLimit;
+            result.DoNotLinkToCaster = !linkToCaster;
+            result.IsDirectlyControllable = isControllable;
+
             return result;
         }
 
@@ -3879,7 +3953,7 @@ namespace CodexLib
         {
             var result = new ContextActionApplyBuff();
             result.m_Buff = buff.ToRef();
-            result.DurationValue = duration;
+            result.DurationValue = duration ?? Helper.DurationZero;
             result.IsFromSpell = fromSpell;
             result.IsNotDispelable = !dispellable;
             result.ToCaster = toCaster;
@@ -3893,7 +3967,7 @@ namespace CodexLib
         {
             var result = new ContextActionApplyBuff();
             result.m_Buff = buff;
-            result.DurationValue = duration;
+            result.DurationValue = duration ?? Helper.DurationZero;
             result.IsFromSpell = fromSpell;
             result.IsNotDispelable = !dispellable;
             result.ToCaster = toCaster;

@@ -19,6 +19,7 @@ namespace CodexLib
     {
         public static List<Type> PatchList = new()
         {
+            typeof(BpCache),
             typeof(Patch_AbilityAtWill),
             typeof(Patch_AbilityIsFullRound),
             typeof(Patch_ActionBarConvert),
@@ -48,8 +49,8 @@ namespace CodexLib
         {
             if (PatchList == null || PatchList.Count == 0)
                 return;
-
-            var harmony = new Harmony("CodexLib");
+            
+            var harmony = Scope.Stack.First().harmony;
             foreach (var patch in PatchList)
                 PatchSafe(harmony, patch);
             PatchList.Clear();
@@ -72,7 +73,7 @@ namespace CodexLib
 
             bool contains = PatchList.Remove(type);
             if (contains)
-                PatchSafe(new Harmony("CodexLib"), type);
+                PatchSafe(Scope.Stack.First().harmony, type);
             return contains;
         }
 
@@ -80,12 +81,12 @@ namespace CodexLib
         {
             try
             {
-                Helper.Print("Patching " + patch.Name);
+                Scope.Stack.First().logger.Log("Patching " + patch.Name);
                 harmony.CreateClassProcessor(patch).Patch();
             }
             catch (Exception e)
             {
-                Helper.PrintException(e);
+                Scope.Stack.First().logger.LogException(e);
             }
         }
     }

@@ -120,7 +120,7 @@ namespace DarkCodex
 
             Main.RunLast("Split Hex", () =>
             {
-                foreach (var feat in Resource.Cache.Feature)
+                foreach (var feat in BpCache.Get<BlueprintFeature>())
                 {
                     var preq = feat.GetComponents<PrerequisiteFeature>();
                     int rank = preq.Any(a => a.m_Feature.Equals(major)) ? 1 : preq.Any(a => a.m_Feature.Equals(grand)) ? 2 : 0;

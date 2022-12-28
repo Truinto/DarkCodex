@@ -19,7 +19,7 @@ namespace DarkCodex
 {
     [PatchInfo(Severity.Harmony | Severity.Hidden, "Patch: Load Blueprints", "needed to load blueprints of other mods", false)]
     [HarmonyPatch]
-    public class Patch_LoadBlueprints
+    public class Patch_LoadBlueprints // TOUNDO
     {
         [HarmonyPatch(typeof(BlueprintsCache), nameof(BlueprintsCache.AddCachedBlueprint))]
         [HarmonyPostfix]
@@ -27,7 +27,7 @@ namespace DarkCodex
         {
             try
             {
-                if (bp is BlueprintAbility ability && !Resource.Cache.Ability.Contains(ability))
+                if (bp is BlueprintAbility ability && !BpCache.Get<BlueprintAbility>().Contains(ability))
                     Resource.Cache.Ability.Add(ability);
                 else if (bp is BlueprintBuff buff && !Resource.Cache.Buff.Contains(buff))
                     Resource.Cache.Buff.Add(buff);

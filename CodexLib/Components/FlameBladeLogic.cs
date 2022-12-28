@@ -116,7 +116,9 @@ namespace CodexLib
             if (evt.Weapon != this.Owner)
                 return;
 
-            bool spellResisted = Rulebook.Trigger(new RuleSpellResistanceCheck(this.Context, evt.Target)).IsSpellResisted;
+            var ruleSpellResistance = new RuleSpellResistanceCheck(this.Context, evt.Target);
+            ruleSpellResistance.DisableBattleLogSelf = false;
+            bool spellResisted = Rulebook.Trigger(ruleSpellResistance).IsSpellResisted;
             if (spellResisted)
                 evt.AutoMiss = true;
 

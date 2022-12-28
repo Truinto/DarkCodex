@@ -47,7 +47,8 @@ namespace CodexLib
 
         public void Dispose()
         {
-            Stack.Pop();
+            if (Stack.Count > 1) // always leave first instance
+                Stack.Pop();
         }
 
         static Scope()

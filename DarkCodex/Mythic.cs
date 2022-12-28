@@ -58,7 +58,7 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
 
             // mod Homebrew Archetypes: Evangelist
-            if (Helper.Get("973c613b8443cf14495c283e293d35f9") is BlueprintAbilityResource evangelist_resource
+            if (Helper.Get("43385175fd022c546865e7b37bcc08ce") is BlueprintAbilityResource evangelist_resource
                 && Helper.Get("8ba4962b1a4b4344ba5dbcb041ab0efa") is BlueprintFeature evangelist_prereq)
             {
                 limitless.AddComponents(Helper.CreatePrerequisiteFeature(evangelist_prereq));
@@ -72,7 +72,7 @@ namespace DarkCodex
             var limitless2 = Helper.CreateBlueprintFeature(
                 "LimitlessRagingSong",
                 "Limitless Raging Song",
-                "Your inspire ferocity in your allies.\nBenefit: You no longer have a limited amount of Raging Song rounds per day.",
+                "You inspire ferocity in your allies.\nBenefit: You no longer have a limited amount of Raging Song rounds per day.",
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(ragesong_prereq)
@@ -101,8 +101,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Limitless Witch Hexes", "mythic ability: Hexes ignore their cooldown", true)]
         public static void CreateLimitlessWitchHexes()
         {
-            Resource.Cache.Ensure();
-
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessWitchHexes",
                 "Limitless Witch Hexes",
@@ -111,7 +109,7 @@ namespace DarkCodex
                 );
 
             // cooldown based
-            foreach (var ability in Resource.Cache.Ability)
+            foreach (var ability in BpCache.Get<BlueprintAbility>())
             {
                 if (!ability.name.StartsWith("WitchHex") && !ability.name.StartsWith("ShamanHex"))
                     continue;
@@ -282,7 +280,7 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility
                 );
 
-            foreach (var ability in Resource.Cache.Ability)
+            foreach (var ability in BpCache.Get<BlueprintAbility>())
             {
                 var logic = ability.GetComponent<AbilityResourceLogic>();
                 if (logic == null)
@@ -295,7 +293,7 @@ namespace DarkCodex
                 logic.ResourceCostDecreasingFacts.Add(limitless.ToRef2());
             }
 
-            foreach (var ability in Resource.Cache.Activatable)
+            foreach (var ability in BpCache.Get<BlueprintActivatableAbility>())
             {
                 var logic = ability.GetComponent<ActivatableAbilityResourceLogic>();
                 if (logic == null)
@@ -397,15 +395,15 @@ namespace DarkCodex
                 icon: Helper.StealIcon("2a681cb9fcaab664286cb36fff761245") //DragonFerocity
                 ).SetComponents(
                 Helper.CreatePureRecommendation(),
-                Helper.CreatePrerequisiteFeaturesFromList(Resource.Cache.Feature.Where(w => rx_prequisite.IsMatch(w.name)).ToAny()),
+                Helper.CreatePrerequisiteFeaturesFromList(BpCache.Get<BlueprintFeature>().Where(w => rx_prequisite.IsMatch(w.name)).ToAny()),
                 new OverrideResourceLogic(
                     new AbilityResourceLogicCooldown("bebe2a97cc091934189fd8255e903b1f", 4), //BloodlineDraconicBreathWeaponResource
-                    Resource.Cache.Ability.Where(w => rx_breath.IsMatch(w.name)).ToAny())
+                    BpCache.Get<BlueprintAbility>().Where(w => rx_breath.IsMatch(w.name)).ToAny())
                 );
 
             SetResourceDecreasing(BlueprintGuid.Parse("5be91334e3de5aa458ade509cc16daff"), limitless); //BloodlineDraconicClawsResource
 
-            foreach (var ab in Resource.Cache.Ability.Where(w => rx_form.IsMatch(w.name)))
+            foreach (var ab in BpCache.Get<BlueprintAbility>().Where(w => rx_form.IsMatch(w.name)))
                 ab.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
 
             Helper.AddMythicTalent(limitless);
@@ -920,10 +918,9 @@ namespace DarkCodex
 
         public static void SetResourceDecreasing(BlueprintGuid resource, AnyRef limitless, bool repeat = false)
         {
-            Resource.Cache.Ensure();
             repeat |= Settings.State.reallyFreeCost;
 
-            foreach (var ability in Resource.Cache.Ability)
+            foreach (var ability in BpCache.Get<BlueprintAbility>())
             {
                 var logic = ability.GetComponent<AbilityResourceLogic>();
                 if (logic == null || logic.m_RequiredResource?.deserializedGuid != resource)
@@ -936,7 +933,7 @@ namespace DarkCodex
                     logic.ResourceCostDecreasingFacts.Add(limitless);
             }
 
-            foreach (var ability in Resource.Cache.Activatable)
+            foreach (var ability in BpCache.Get<BlueprintFeature>())
             {
                 var logic = ability.GetComponent<ActivatableAbilityResourceLogic>();
                 if (logic == null || logic.m_RequiredResource?.deserializedGuid != resource)

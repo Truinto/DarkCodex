@@ -134,7 +134,7 @@ namespace DarkCodex
             Main.RunLast("Combat Style Master", () => 
             {
                 preqStyles.Amount = 2;
-                preqStyles.m_Features = Resource.Cache.Feature.Where(w => w.Groups.Any(FeatureGroup.StyleFeat)).ToRef<BlueprintFeatureReference>();
+                preqStyles.m_Features = BpCache.Get<BlueprintFeature>().Where(w => w.Groups.Any(FeatureGroup.StyleFeat)).ToRef<BlueprintFeatureReference>();
             });
         }
 

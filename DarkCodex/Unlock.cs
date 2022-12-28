@@ -19,6 +19,15 @@ namespace DarkCodex
 {
     public class Unlock
     {
+        [PatchInfo(Severity.Create, "Unlock Spells", "unlocks some spells: Transformation", true)]
+        public static void UnlockSpells()
+        {
+            var TransformationBuff = Helper.Get<BlueprintBuff>("287682389d2011b41b5a65195d9cbc84"); //TransformationBuff
+            TransformationBuff.GetComponents<ContextRankConfig>().ForEach(noMax());
+
+            static Action<ContextRankConfig> noMax() => f => f.m_UseMax = false;
+        }
+
         [PatchInfo(Severity.Create | Severity.WIP, "Unlock Animal Companion", "allows animal companions to reach up to level 40", true, Requirement: typeof(Patch_UnlockClassLevels))]
         public static void UnlockAnimalCompanion()
         {

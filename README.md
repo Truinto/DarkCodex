@@ -125,12 +125,12 @@ Content
 |Rogue.CreateBleedingAttack|rogue talent: Bleeding Attack; basic talent: Flensing Strike|:book:|:heavy_check_mark:|
 |Rogue.CreateExtraRogueTalent|basic feat: Extra Rogue Talent|:book:|:heavy_check_mark:|
 |Spellcasters.CreateBestowHope|basic feat: channel energy reduces fear|:book:|:heavy_check_mark:|
-|Spellcasters.CreateChannelForm|basic feat: collection of abilities to shape channel energy into new forms|:house:|:heavy_check_mark:|
 |Spellcasters.CreateEnergyChannel|basic feat: channel energy through weapon attacks|:book:|:heavy_check_mark:|
 |Spellcasters.CreatePurifyingChannel|basic feat: channel positive energy deals fire damage|:book:|:heavy_check_mark:|
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
+|Spells.CreateChillTouch|spell: Chill Touch|:book:|:heavy_check_mark:|
 |Spells.CreateDivineTrident|spell: Gozreh's Trident|:book:|:heavy_check_mark:|
 |Spells.CreateFlameBlade|spell: Flame Blade, feat: Flame Blade Dervish Combat|:book:|:heavy_check_mark:|
 |Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
@@ -138,6 +138,7 @@ Content
 |Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|
 |Unlock.UnlockAnimalCompanion|allows animal companions to reach up to level 40|:house:|:construction:|
 |Unlock.UnlockKineticist|adds infusion, wild talent, and element focus up to level 40|:house:|:heavy_check_mark:|
+|Unlock.UnlockSpells|unlocks some spells: Transformation|:house:|:heavy_check_mark:|
 |Witch.CreateCackleActivatable|Cackle/Chant can be toggled to use move action passively|:house:|:heavy_check_mark:|
 |Witch.CreateExtraHex|basic feat: Extra Hex|:book:|:heavy_check_mark:|
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|

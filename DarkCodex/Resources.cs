@@ -57,7 +57,7 @@ namespace DarkCodex
         public class Cache
         {
             public static bool IsLoaded;
-            public static List<BlueprintAbility> Ability = new();
+            public static List<BlueprintAbility> Ability = new(); // TOUNDO
             public static List<BlueprintBuff> Buff = new();
             public static List<BlueprintFeature> Feature = new();
             public static List<BlueprintActivatableAbility> Activatable = new();

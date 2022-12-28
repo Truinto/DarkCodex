@@ -9,63 +9,23 @@ using System.Collections.Generic;
 
 namespace CodexLib.Patches
 {
+
+    // GetFullSelectionItems(): unit independent full selection of items; item must exist for CanSelect and IFeatureSelection logic
+    // ExtractSelectionItems(): unit dependent full selection of items
+    // CanSelect(): whenever the item is selectable
+    // 
+    // remarks:
+    // - any spell selection (if ParameterType=FeatureParameterType.Custom & Group=ParameterizedAbilitySelection)
+    // - specific spell list (if m_SpellList is not null)
+    // - spell level range min-max (SpellLevelPenalty=min SpellLevel=max)
+    // - any known spell selection (if Group=KnownSpell)
+    // - any known ability (if Group=KnownAbility)
     /// <summary>
     /// Custom logic for parametrized feature. Allows selection of any spells/abilities.
     /// </summary>
     [HarmonyPatch]
     public class Patch_SpellSelectionParametrized
     {
-        //[HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.ExtractItemsFromSpellbooks))]
-        //[HarmonyPrefix]
-        public static bool old_Prefix1(UnitDescriptor unit, BlueprintParametrizedFeature __instance, ref IEnumerable<FeatureUIData> __result)
-        {
-            if (__instance.Prerequisite != null)
-                return true;
-
-            var list = new List<FeatureUIData>();
-
-            foreach (Spellbook spellbook in unit.Spellbooks)
-            {
-                foreach (SpellLevelList spellLevel in spellbook.Blueprint.SpellList.SpellsByLevel)
-                {
-                    if (spellLevel.SpellLevel <= spellbook.MaxSpellLevel)
-                    {
-                        foreach (BlueprintAbility blueprintAbility in spellLevel.SpellsFiltered)
-                        {
-                            list.Add(new FeatureUIData(__instance, blueprintAbility, blueprintAbility.Name, blueprintAbility.Description, blueprintAbility.Icon, blueprintAbility.name));
-                        }
-                    }
-                }
-            }
-            __result = list;
-            return false;
-        }
-
-        // TODO: check what this does
-        //[HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.CanSelect))]
-        //[HarmonyPrefix]
-        public static bool old_Prefix2(BlueprintParametrizedFeature __instance, ref bool __result, UnitDescriptor unit, LevelUpState state, FeatureSelectionState selectionState, IFeatureSelectionItem item)
-        {
-            if (__instance.ParameterType != FeatureParameterType.Custom)
-                return true;
-
-            if (item.Param == null)
-                __result = false;
-            else if (__instance.Items.FirstOrDefault(i => i.Feature == item.Feature && i.Param == item.Param) == null)
-                __result = false;
-            else if (unit.GetFeature(__instance, item.Param) != null)
-                __result = false;
-            else if (item.Param.Blueprint is BlueprintFact fact && !unit.HasFact(fact))
-                __result = !__instance.RequireProficiency;
-            else
-                __result = !__instance.HasNoSuchFeature;
-
-            return false;
-        }
-
-
-
-
         public static bool IsCustom(BlueprintParametrizedFeature __instance)
         {
             return __instance != null && __instance.ParameterType == FeatureParameterType.Custom && __instance.HasGroup(Const.ParameterizedAbilitySelection);
@@ -150,22 +110,25 @@ namespace CodexLib.Patches
             }
 
             // if none of the above matches, filter for all spells; these are stored in cache
-            foreach (var v in ResourcesLibrary.BlueprintsCache.m_LoadedBlueprints)
+            foreach (var spell in BpCache.Get<BlueprintAbility>())
             {
-                if (v.Value.Blueprint is not BlueprintAbility spell
-                    || spell.Hidden
-                    || spell.m_Parent != null
+                //Helper.PrintDebug($"parametrized name={spell.name} hidden={spell.Hidden} parent={spell.m_Parent?.Get()?.name} comp={spell.GetComponent<SpellListComponent>() == null} key={spell.m_DisplayName.IsEmptyKey()} dn={spell.m_DisplayName}");
+
+                if (spell.Hidden
+                    || spell.m_Parent.NotEmpty()
                     || spell.GetComponent<SpellListComponent>() == null
                     || spell.m_DisplayName.IsEmptyKey())
+                {
                     continue;
+                }
 
                 int min = 10;
                 int max = 0;
 
-                foreach (var a in spell.GetComponents<SpellListComponent>())
+                foreach (var spellComp in spell.GetComponents<SpellListComponent>())
                 {
-                    if (a.SpellLevel < min) min = a.SpellLevel;
-                    if (a.SpellLevel > max) max = a.SpellLevel;
+                    if (spellComp.SpellLevel < min) min = spellComp.SpellLevel;
+                    if (spellComp.SpellLevel > max) max = spellComp.SpellLevel;
                 }
 
                 if (minLevel <= max && maxLevel >= min)
@@ -195,6 +158,9 @@ namespace CodexLib.Patches
             return false;
         }
 
+        /// <summary>
+        /// Fix call that usually tries to get generic view and replace the list with unit specific version.
+        /// </summary>
         [HarmonyPatch(typeof(FeatureSelectionState), nameof(FeatureSelectionState.SetupViewState))]
         [HarmonyPriority(Priority.High)]
         [HarmonyPrefix]
@@ -232,43 +198,5 @@ namespace CodexLib.Patches
 
             __instance.Item ??= new FeatureUIData(feature, param, feature.Name, feature.Description, feature.Icon, feature.name);
         }
-
-        [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.GetGroup))]
-        [HarmonyPostfix]
-        public static void SelectionGroup(BlueprintParametrizedFeature __instance, ref FeatureGroup __result)
-        {
-            if (IsCustom(__instance))
-                __result = FeatureGroup.MythicAdditionalProgressions;
-        }
-
-        public static void X()
-        {
-            var x = new BlueprintParametrizedFeature();
-
-            x.ParameterType = FeatureParameterType.Custom;
-            x.Groups = new FeatureGroup[0];
-            x.CustomParameterVariants = new AnyBlueprintReference[0];
-            x.IgnoreParameterFeaturePrerequisites = false; // only used with BlueprintFeature; if true CanSelect will not check BlueprintFeature's prerequisites
-            x.SpecificSpellLevel = false;
-            x.SpellLevel = 0;
-            x.SpellLevelPenalty = 0;
-            x.m_SpellcasterClass = null;
-            x.m_SpellList = null;
-        }
-
-        // GetFullSelectionItems(): unit independent full selection of items; item must exist for CanSelect and IFeatureSelection logic
-        // ExtractSelectionItems(): unit dependent full selection of items
-        // CanSelect(): whenever the item is selectable
-        // 
-        // checklist:
-        // - any spell selection (if ParameterType=FeatureParameterType.Custom & Group=ParameterizedAbilitySelection)
-        // - specific spell list (if m_SpellList is not null; this list doesn't need to be in assets)
-        // - spell level range min-max (SpellLevelPenalty=min SpellLevel=max)
-        // - any known spell selection (if Group=KnownSpell)
-        // - any known ability (if Group=KnownAbility)
-        // - test if patching BlueprintParametrizedFeature.GetGroup() with FeatureGroup.MythicAdditionalProgressions puts it after spell selection
-        // 
-        // remarks:
-        // - m_SpellList could be set to a pseudo blueprint (no guid)
     }
 }

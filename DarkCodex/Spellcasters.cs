@@ -254,7 +254,7 @@ namespace DarkCodex
             Helper.AddFeats(feat);
         }
 
-        [PatchInfo(Severity.Create, "Channel Form", "basic feat: collection of abilities to shape channel energy into new forms", true)]
+        [PatchInfo(Severity.Create | Severity.Hidden, "Channel Form", "basic feat: collection of abilities to shape channel energy into new forms", true)]
         public static void CreateChannelForm()
         {
             /*
@@ -266,7 +266,7 @@ namespace DarkCodex
             - 30-foot cone
             */
 
-            AnyRef[] channels = Resource.Cache.Ability.Where(w => w.SpellDescriptor.HasAnyFlag(
+            AnyRef[] channels = BpCache.Get<BlueprintAbility>().Where(w => w.SpellDescriptor.HasAnyFlag(
                 SpellDescriptor.ChannelNegativeHarm
                 | SpellDescriptor.ChannelNegativeHeal
                 | SpellDescriptor.ChannelPositiveHarm
@@ -282,32 +282,56 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreateAbilityDeliverProjectile(
                     projectile: Resource.Projectile.RayOfExhaustion00,
-                    weapon: "f6ef95b1f7bb52b408a5b345a330ffe8"), //RayItem
-                new ActivatableVariants(channels),
-                new VariantSelectionApplyEffect()
+                    type: AbilityProjectileType.Simple,
+                    length: 0.Feet(),
+                    width: 5.Feet(),
+                    weapon: "f6ef95b1f7bb52b408a5b345a330ffe8")//, //RayItem
+                //new ActivatableVariants(channels),
+                //new VariantSelectionApplyEffect()
                 ); // TODO: this shows up as a 50ft line?
 
             var burst = Helper.CreateBlueprintAbility(
                 "ChannelFormBurst",
                 "Channel Burst",
-                "Alter your channel energy area into a 20 feet radius burst."
+                "Alter your channel energy area into a 10 feet radius burst.",
+                icon: channels.First().Get<BlueprintAbility>().Icon,
+                range: AbilityRange.Close
+                ).SetComponents(
+                Helper.CreateAbilityDeliverProjectile(
+                    projectile: Resource.Projectile.Fireball00,
+                    type: AbilityProjectileType.Simple,
+                    length: 0.Feet(),
+                    width: 5.Feet()),
+                Helper.CreateAbilityTargetsAround(10.Feet())
                 );
 
             var line = Helper.CreateBlueprintAbility(
                 "ChannelFormLine",
                 "Channel Line",
-                "Alter your channel energy area into a 60 feet line."
+                "Alter your channel energy area into a 60 feet line.",
+                icon: null,
+                range: AbilityRange.Projectile
+                ).SetComponents(
+                Helper.CreateAbilityDeliverProjectile(
+                    projectile: Resource.Projectile.FireLine00,
+                    type: AbilityProjectileType.Line,
+                    length: 60.Feet(),
+                    width: 5.Feet())
                 );
 
             var cone = Helper.CreateBlueprintAbility(
                 "ChannelFormCone",
                 "Channel Cone",
-                "Alter your channel energy area into a 30 feet cone."
+                "Alter your channel energy area into a 30 feet cone.",
+                icon: null,
+                range: AbilityRange.Projectile
+                ).SetComponents(
+                Helper.CreateAbilityDeliverProjectile(
+                    projectile: Resource.Projectile.FireCone30Feet00,
+                    type: AbilityProjectileType.Cone,
+                    length: 30.Feet(),
+                    width: 5.Feet())
                 );
-
-            _ = Resource.Projectile.FireLine00;
-            _ = Resource.Projectile.FireCone30Feet00;
-            _ = Resource.Projectile.Fireball00;
 
             var feat = Helper.CreateBlueprintFeature(
                 "ChannelFormFeat",
@@ -315,7 +339,7 @@ namespace DarkCodex
                 "As a free action you may alter your channel energy area into new forms."
                 ).SetComponents(
                 Helper.CreatePureRecommendation(),
-                Helper.CreateAddFacts(ray),
+                Helper.CreateAddFacts(ray, burst, line, cone),
                 Helper.Get<BlueprintFeature>("fd30c69417b434d47b6b03b9c1f568ff").GetComponents<PrerequisiteFeature>(f => f.Group == Prerequisite.GroupType.Any) //SelectiveChannel
                 );
 

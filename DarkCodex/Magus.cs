@@ -26,8 +26,7 @@ namespace DarkCodex
             Helper.MakeStickySpell(Helper.Get<BlueprintAbility>("3105d6e9febdc3f41a08d2b7dda1fe74"), out var baleful, out _);
 
             // touch hexes
-            Resource.Cache.Ensure();
-            var hexes_harmful = Resource.Cache.Ability.Where(w => w.EffectOnEnemy == AbilityEffectOnUnit.Harmful && (w.name.StartsWith("WitchHex") || w.name.StartsWith("ShamanHex"))).ToArray();
+            var hexes_harmful = BpCache.Get<BlueprintAbility>().Where(w => w.EffectOnEnemy == AbilityEffectOnUnit.Harmful && (w.name.StartsWith("WitchHex") || w.name.StartsWith("ShamanHex"))).ToArray();
             var accursed_strike_variants = new List<BlueprintAbility>();
             foreach (var hex in hexes_harmful)
             {

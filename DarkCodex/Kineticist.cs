@@ -113,13 +113,12 @@ namespace DarkCodex
             // kinetic knight also gets bonuses with whips
             var maneuver = Helper.CreateBlueprintFeature(
                 "KineticKnightManeuverBonus",
-                "",
-                ""
+                "Whip Maneuver Bonus",
+                "Kinetic Knight's kinetic whip has the disarm and trip weapon qualities, granting a +2 bonus to these maneuvers."
                 ).SetComponents(
-                new ManeuverBonus() { Type = CombatManeuver.Trip, Bonus = 4 },
-                new ManeuverBonus() { Type = CombatManeuver.Disarm, Bonus = 4 }
+                new ManeuverBonusHasFact(buff, 2, CombatManeuver.Trip),
+                new ManeuverBonusHasFact(buff, 2, CombatManeuver.Disarm)
                 );
-            maneuver.HideInUI = true;
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, whip.ToRef());
             knight.AddFeature(5, whip);
