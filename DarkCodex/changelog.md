@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.12]
+- fixed limitless features ignoring activatables
+
 ## [1.5.11]
 - fixed Kinetic Knight maneuver bonus while whip is active #185
 - added Unlock Spells: unlocks some spells: Transformation

@@ -919,6 +919,7 @@ namespace DarkCodex
         public static void SetResourceDecreasing(BlueprintGuid resource, AnyRef limitless, bool repeat = false)
         {
             repeat |= Settings.State.reallyFreeCost;
+            Main.PrintDebug($"SetResourceDecreasing {limitless.Get().name}");
 
             foreach (var ability in BpCache.Get<BlueprintAbility>())
             {
@@ -928,18 +929,22 @@ namespace DarkCodex
                 if (logic.CostIsCustom)
                     continue;
 
+                Main.PrintDebug($"-free ability {ability.name}");
+
                 int total = !repeat ? 1 : logic.Amount + logic.ResourceCostIncreasingFacts.Count;
                 for (int i = 0; i < total; i++)
                     logic.ResourceCostDecreasingFacts.Add(limitless);
             }
 
-            foreach (var ability in BpCache.Get<BlueprintFeature>())
+            foreach (var ability in BpCache.Get<BlueprintActivatableAbility>())
             {
                 var logic = ability.GetComponent<ActivatableAbilityResourceLogic>();
                 if (logic == null || logic.m_RequiredResource?.deserializedGuid != resource)
                     continue;
 
-                if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
+                Main.PrintDebug($"-free activatable {ability.name}");
+
+                if (logic.m_FreeBlueprint.NotEmpty())
                     Main.Print($"ERROR: {ability.name} has already a FreeBlueprint");
                 logic.m_FreeBlueprint = limitless;
             }
