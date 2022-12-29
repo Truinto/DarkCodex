@@ -229,8 +229,6 @@ namespace Shared
                     if (!info.IsEvent && !info.IsHidden)
                         sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
-            if (GUILayout.Button("Debug: Generate bin files (will lag)", GUILayout.ExpandWidth(false)))
-                Resource.Cache.SaveBaseGame();
             if (GUILayout.Button("Debug: Generate CodexLib bin files (will lag)", GUILayout.ExpandWidth(false)))
                 BpCache.ExportResources(Path.Combine(Helper.PathMods, "Blueprints.bin"));
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
@@ -472,6 +470,7 @@ namespace Shared
             PatchSafe(typeof(Patch_ParryAlways));
             PatchSafe(typeof(Patch_AzataFavorableMagic));
             PatchSafe(typeof(Patch_RespecPartially));
+            PatchSafe(typeof(Patch_LimitlessActivatables));
             //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early

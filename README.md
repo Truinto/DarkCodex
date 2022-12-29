@@ -164,6 +164,7 @@ Content
 |Patch.Patch_FixQuickenMetamagic|fixed quickened abilities taking more time than normal, if you already have used your swift action|:book:|:heavy_check_mark:|
 |Patch.Patch_HexcrafterSpellStrike|hexes with touch range can be used with Spell Strike|:house:|:heavy_check_mark:|
 |Patch.Patch_KineticistAllowOpportunityAttack|allows Attack of Opportunities with anything but standard Kinetic Blade; so that Kinetic Whip works; also allows natural attacks to be used, if Whip isn't available|:book:|:heavy_check_mark:|
+|Patch.Patch_LimitlessActivatables|makes it so activatables with infinite resources start out of combat and stay on after combat|:book:|:heavy_check_mark:|
 |Patch.Patch_MagicItemAdept|patches for Magic Item Adept|:house:|:heavy_check_mark:|
 |Patch.Patch_ParryAlways|use parry even if attack would have missed anyway|:book:|:heavy_check_mark:|
 |Patch.Patch_Polymorph|allows debug flags to keep inventory or model during polymorph|:book:|:heavy_check_mark:|

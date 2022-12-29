@@ -379,6 +379,12 @@ namespace CodexLib
             }
         }
 
+        public void ReplaceNOP()
+        {
+            Code[Index].opcode = OpCodes.Nop;
+            Code[Index].operand = null;
+        }
+
         public void NextJumpAlways()
         {
             for (; Index < Code.Count; Index++)

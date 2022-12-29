@@ -44,6 +44,8 @@ namespace DarkCodex
         {
             var bardic_resource = BlueprintGuid.Parse("e190ba276831b5c4fa28737e5e49e6a6");
             var bardic_prereq = Helper.ToRef<BlueprintFeatureReference>("019ada4530c41274a885dfaa0fbf6218");
+            var martyr_resource = BlueprintGuid.Parse("875aac46f5e879f4c9ec3ba46847d86e");
+            var martyr_prereq = Helper.ToRef<BlueprintFeatureReference>("8504fad23ce93d44caf69550b8059e7b");
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessBardicPerformance",
@@ -51,10 +53,12 @@ namespace DarkCodex
                 "Your inspiration knows no bounds.\nBenefit: You no longer have a limited amount of Bardic Performance rounds per day.",
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature(bardic_prereq)
+                Helper.CreatePrerequisiteFeature(bardic_prereq),
+                Helper.CreatePrerequisiteFeature(martyr_prereq)
                 );
 
             SetResourceDecreasing(bardic_resource, limitless);
+            SetResourceDecreasing(martyr_resource, limitless);
             Helper.AddMythicTalent(limitless);
 
             // mod Homebrew Archetypes: Evangelist
