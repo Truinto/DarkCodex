@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.14]
+- fixed spell resistance with Bladed Dash #198
+- fix for selection #189
+
 ## [1.5.13]
 - added Martyr (Paladin) to Limitless Bardic Performance #196
 - added Patch: Fix limitless activatables; makes it so activatables with infinite resources start out of combat and stay on after combat #195

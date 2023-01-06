@@ -471,6 +471,7 @@ namespace Shared
             PatchSafe(typeof(Patch_AzataFavorableMagic));
             PatchSafe(typeof(Patch_RespecPartially));
             PatchSafe(typeof(Patch_LimitlessActivatables));
+            PatchSafe(typeof(Patch_FixFeatureSelection));
             //PatchSafe(typeof(Patch_FixEldritchArcherSpellstrike)); // TODO: fix or remove
 
             // Spells - early

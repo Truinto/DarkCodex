@@ -65,7 +65,7 @@ namespace DarkCodex
                 school,
                 craft
                 ).TargetEnemy(point: true);
-
+            greater.SpellResistance = false;
 
             var normal = Helper.CreateBlueprintAbility(
                 "BladedDash",
@@ -98,7 +98,6 @@ namespace DarkCodex
                 craft
                 ).TargetEnemy(point: true);
             normal.SpellResistance = false;
-            greater.SpellResistance = false;
 
             normal.Add(2, "4d72e1e7bd6bc4f4caaea7aa43a14639", "25a5013493bdcf74bb2424532214d0c8"); // Magus, Bard
             greater.Add(5, "4d72e1e7bd6bc4f4caaea7aa43a14639", "25a5013493bdcf74bb2424532214d0c8"); // Magus, Bard

@@ -160,6 +160,7 @@ Content
 |Patch.Patch_EnvelopingWindsCap|removes 50% evasion cap for Hurricane Queen|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaDoubleDamage|fixes area effects triggering twice when cast|:book:|:heavy_check_mark:|
 |Patch.Patch_FixAreaEndOfTurn|in turn-based mode area effects happen at the end of each unit's round, instead of all at once at the start of the caster's round|:book:|:heavy_check_mark:|
+|Patch.Patch_FixFeatureSelection|fixes issue #189|:book:|:heavy_check_mark:|
 |Patch.Patch_FixPolymorphGather|makes it so polymorphed creatures can use Gather Power and creatures with hands Kinetic Blade|:book:|:heavy_check_mark:|
 |Patch.Patch_FixQuickenMetamagic|fixed quickened abilities taking more time than normal, if you already have used your swift action|:book:|:heavy_check_mark:|
 |Patch.Patch_HexcrafterSpellStrike|hexes with touch range can be used with Spell Strike|:house:|:heavy_check_mark:|
