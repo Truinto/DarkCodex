@@ -13,6 +13,7 @@ using CodexLib;
 
 namespace DarkCodex
 {
+    [PatchInfo(Severity.Harmony, "Patch: Unlock Class Levels", "let's you pick class levels after level 20 with any class; this won't add new features except basic feats and won't allow character levels beyond 20 (which can be done with champion mythic path or Toybox)", true)]
     [HarmonyPatch]
     public class Patch_UnlockClassLevels
     {

@@ -53,8 +53,8 @@ namespace DarkCodex
                 "Your inspiration knows no bounds.\nBenefit: You no longer have a limited amount of Bardic Performance rounds per day.",
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature(bardic_prereq),
-                Helper.CreatePrerequisiteFeature(martyr_prereq)
+                Helper.CreatePrerequisiteFeature(bardic_prereq, true),
+                Helper.CreatePrerequisiteFeature(martyr_prereq, true)
                 );
 
             SetResourceDecreasing(bardic_resource, limitless);

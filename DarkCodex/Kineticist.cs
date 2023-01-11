@@ -604,7 +604,7 @@ namespace DarkCodex
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Electric),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Electric)
                 ).TargetEnemy(CastAnimationStyle.Kineticist);
-            electric_chain_ab.SpellResistance = false;
+            thunderstorm_chain_ab.SpellResistance = true;
             Helper.AppendAndReplace(ref actions.Actions, new ContextActionChangeRankValue(AbilityRankChangeType.Add, AbilityRankType.DamageDice, -1));
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, chain_feat.ToRef());

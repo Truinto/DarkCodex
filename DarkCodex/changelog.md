@@ -1,6 +1,11 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.15]
+- fixed conflicting prerequisites #204
+- fixed spell resistance with chain infusion #205
+- added patch info to Patch_UnlockClassLevels
+
 ## [1.5.14]
 - fixed spell resistance with Bladed Dash #198
 - fix for selection #189
