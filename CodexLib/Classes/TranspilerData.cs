@@ -249,57 +249,115 @@ namespace CodexLib
 
         #region Manipulation
 
+        /// <summary>
+        /// Injects IL code.
+        /// </summary>
         public void InsertBefore(OpCode opcode, object operand = null)
         {
             Code.Insert(Index++, new CodeInstruction(opcode, operand));
         }
 
         /// <summary>
-        /// Injects call.
+        /// Injects call. Return value must equal first argument. Can define __instance and any of the original's parameters in any order. <br/>
+        /// This function will inject necessary load OpCodes. Will not validate __result type. Make sure the value on the stack is correct!
         /// </summary>
-        /// <param name="func"><b>[T] Function([object instance])</b></param>
+        /// <param name="func"><b>[T] Function([T __result], [object __instance], [object arg0], [object arg1...])</b></param>
         public void InsertBefore(Delegate func)
         {
             var mi = func.GetMethodInfo();
-            var parameters = mi.GetParameters();
-            if (parameters.Length <= 0)
-            { }
-            else if (parameters.Length > 1)
-                throw new ArgumentException("Delegate must have 1 or no arguments!");
-            else if (!parameters[0].ParameterType.IsAssignableFrom(Original.DeclaringType))
-                throw new ArgumentException("Delegate first argument must be object or declaring class!");
-            else if (IsStatic)
-                InsertBefore(OpCodes.Ldnull);
-            else
-                InsertBefore(OpCodes.Ldarg_0);
+            var parametersFunc = mi.GetParameters();
+            var parametersOriginal = Original.GetParameters();
 
+            // handle parameters
+            for (int i = 0; i < parametersFunc.Length; i++)
+            {
+                // can replace value on stack by returning the same value type
+                if (i == 0 && mi.ReturnType != typeof(void))
+                {
+                    if (mi.ReturnType != parametersFunc[i].ParameterType)
+                        throw new ArgumentException("Delegate return value must equal it's first argument (unless it returns void)!");
+                    continue;
+                }
+
+                // special case for __instance
+                if (parametersFunc[i].Name == "__instance")
+                {
+                    if (IsStatic)
+                        throw new ArgumentException($"Delegate can't use __instance because method is static");
+                    if (!parametersFunc[i].ParameterType.IsAssignableFrom(Original.DeclaringType))
+                        throw new ArgumentException($"Delegate argument {parametersFunc[i].Name} mismatch type '{parametersFunc[i].ParameterType}' - '{Original.DeclaringType}'!");
+                    InsertBefore(OpCodes.Ldarg_0);
+                    continue;
+                }
+
+                // load arguments by name
+                int index = parametersOriginal.FindIndex(f => f.Name == parametersFunc[i].Name);
+                if (index < 0)
+                    throw new ArgumentException($"Delegate unknown parameter name '{parametersFunc[i].Name}'");
+                if (!IsStatic) // in non-static methods the first argument is 'this'
+                    index++;
+                if (!parametersFunc[i].ParameterType.IsAssignableFrom(parametersOriginal[index].ParameterType))
+                    throw new ArgumentException($"Delegate argument {parametersFunc[i].Name} mismatch type '{parametersFunc[i].ParameterType}' - '{parametersOriginal[index].ParameterType}'!");
+                InsertBefore(OpCodes.Ldarg, index);
+            }
+
+            // inject call
             InsertBefore(OpCodes.Call, mi);
         }
 
+        /// <summary>
+        /// Injects IL code. Points to this new injection.
+        /// </summary>
         public void InsertAfter(OpCode opcode, object operand = null)
         {
             Code.Insert(++Index, new CodeInstruction(opcode, operand));
         }
 
         /// <summary>
-        /// Injects call.
+        /// Injects call. Return value must equal first argument. Can define __instance and any of the original's parameters in any order. <br/>
+        /// This function will inject necessary load OpCodes. Will not validate __result type. Make sure the value on the stack is correct!
         /// </summary>
-        /// <param name="func"><b>[T] Function([object instance])</b></param>
+        /// <param name="func"><b>[T] Function([T __result], [object __instance], [object arg0], [object arg1...])</b></param>
         public void InsertAfter(Delegate func)
         {
             var mi = func.GetMethodInfo();
-            var parameters = mi.GetParameters();
-            if (parameters.Length <= 0)
-            { }
-            else if (parameters.Length > 1)
-                throw new ArgumentException("Delegate must have 1 or no arguments!");
-            else if (!parameters[0].ParameterType.IsAssignableFrom(Original.DeclaringType))
-                throw new ArgumentException("Delegate first argument must be object or declaring class!");
-            else if (IsStatic)
-                InsertAfter(OpCodes.Ldnull);
-            else
-                InsertAfter(OpCodes.Ldarg_0);
+            var parametersFunc = mi.GetParameters();
+            var parametersOriginal = Original.GetParameters();
 
+            // handle parameters
+            for (int i = 0; i < parametersFunc.Length; i++)
+            {
+                // can replace value on stack by returning the same value type
+                if (i == 0 && mi.ReturnType != typeof(void))
+                {
+                    if (mi.ReturnType != parametersFunc[i].ParameterType)
+                        throw new ArgumentException("Delegate return value must equal it's first argument (unless it returns void)!");
+                    continue;
+                }
+
+                // special case for __instance
+                if (parametersFunc[i].Name == "__instance")
+                {
+                    if (IsStatic)
+                        throw new ArgumentException($"Delegate can't use __instance because method is static");
+                    if (!parametersFunc[i].ParameterType.IsAssignableFrom(Original.DeclaringType))
+                        throw new ArgumentException($"Delegate argument {parametersFunc[i].Name} mismatch type '{parametersFunc[i].ParameterType}' - '{Original.DeclaringType}'!");
+                    InsertAfter(OpCodes.Ldarg_0);
+                    continue;
+                }
+
+                // load arguments by name
+                int index = parametersOriginal.FindIndex(f => f.Name == parametersFunc[i].Name);
+                if (index < 0)
+                    throw new ArgumentException($"Delegate unknown parameter name '{parametersFunc[i].Name}'");
+                if (!parametersFunc[i].ParameterType.IsAssignableFrom(parametersOriginal[index].ParameterType))
+                    throw new ArgumentException($"Delegate argument {parametersFunc[i].Name} mismatch type '{parametersFunc[i].ParameterType}' - '{parametersOriginal[index].ParameterType}'!");
+                if (!IsStatic) // in non-static methods the first argument is 'this'
+                    index++;
+                InsertAfter(OpCodes.Ldarg, index);
+            }
+
+            // inject call
             InsertAfter(OpCodes.Call, mi);
         }
 
@@ -339,7 +397,7 @@ namespace CodexLib
         /// Injects function to access stack variable. Call is injected before TranspilerData.Current.
         /// </summary>
         /// <param name="func"><b>void Function(T value, object instance)</b></param>
-        public void EditStack(Delegate func)
+        public void EditStackBefore(Delegate func)
         {
             // delegate sanity check
             var mi = func.GetMethodInfo();

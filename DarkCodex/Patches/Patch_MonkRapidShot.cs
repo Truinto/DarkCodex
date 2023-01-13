@@ -17,16 +17,14 @@ namespace DarkCodex
             var data = new TranspilerData(instructions, generator, original);
 
             data.Last().Rewind(typeof(HandSlot), nameof(HandSlot.HasShield));
-            data.Seek(OpCodes.And);
             data.InsertAfter(Patch);
-            data.InsertAfter(OpCodes.And);
 
             return data.Code;
         }
 
-        public static bool Patch(MonkNoArmorAndMonkWeaponFeatureUnlock __instance)
+        public static bool Patch(bool hasShield, MonkNoArmorAndMonkWeaponFeatureUnlock __instance)
         {
-            return !__instance.Owner.Descriptor.HasFact(RapidShot);
+            return hasShield || __instance.Owner.Descriptor.HasFact(RapidShot);
         }
 
         public static BlueprintBuff RapidShot = Helper.ToRef<BlueprintBuffReference>("0f310c1e709e15e4fa693db15a4baeb4"); //RapidShotBuff

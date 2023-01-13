@@ -12,7 +12,7 @@ namespace DarkCodex
 {
     public class Monk
     {
-        [PatchInfo(Severity.Create, "Feral Combat Training", "basic feat: Feral Combat Training", true, Requirement: typeof(Patch_FeralCombat))]
+        [PatchInfo(Severity.Create, "Feral Combat Training", "basic feat: Feral Combat Training", true)]
         public static void CreateFeralCombatTraining()
         {
             Main.Patch(typeof(Patch_FeralCombat));
@@ -39,7 +39,8 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(unarmedstrike),
                 Helper.CreatePrerequisiteFeature(weaponfocus),
-                Helper.CreatePrerequisiteNoArchetype(zenarcher, Helper.ToRef<BlueprintCharacterClassReference>("e8f21e5b58e0569468e420ebea456124"))
+                Helper.CreatePrerequisiteNoArchetype(zenarcher, Helper.ToRef<BlueprintCharacterClassReference>("e8f21e5b58e0569468e420ebea456124")),
+                Helper.CreateAddMechanicsFeature(AddMechanicsFeature.MechanicsFeatureType.IterativeNaturalAttacks)
                 );
 
             Resource.Cache.FeatureFeralCombat.SetReference(feature);
@@ -131,7 +132,7 @@ namespace DarkCodex
 
             Helper.AddCombatFeat(feat);
 
-            Main.RunLast("Combat Style Master", () => 
+            Main.RunLast("Combat Style Master", () =>
             {
                 preqStyles.Amount = 2;
                 preqStyles.m_Features = BpCache.Get<BlueprintFeature>().Where(w => w.Groups.Any(FeatureGroup.StyleFeat)).ToRef<BlueprintFeatureReference>();

@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.16]
+- Feral Combat Training unlocks iterative natural attacks #206
+
 ## [1.5.15]
 - fixed conflicting prerequisites #204
 - fixed spell resistance with chain infusion #205

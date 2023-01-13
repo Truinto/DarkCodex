@@ -17,7 +17,7 @@ namespace DarkCodex
 
             data.Seek(typeof(UnitMechanicFeatures), nameof(UnitMechanicFeatures.TricksterMobilityFastMovement));
             data.Seek(OpCodes.Mul);
-            data.EditStack(Patch);
+            data.EditStackBefore(Patch);
 
             return data.Code;
         }
