@@ -84,11 +84,13 @@ namespace DarkCodex
         //}
         [HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), typeof(RuleAttackWithWeapon))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // general & styles strikes
         {
             var data = new TranspilerData(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
             data.InsertAfter(Patch1);
+            data.First().Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
+            data.InsertAfter(Patch1b);
             return data.Code;
         }
         public static WeaponCategory Patch1(WeaponCategory category, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
@@ -97,7 +99,12 @@ namespace DarkCodex
                 return WeaponCategory.UnarmedStrike;
             return category;
         }
-
+        public static BlueprintWeaponType Patch1b(BlueprintWeaponType weaponType, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
+        {
+            if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                return Resource.Cache.WeaponTypeUnarmed.Get();
+            return weaponType;
+        }
 
         [HarmonyPatch(typeof(AbilityCasterMainWeaponCheck), nameof(AbilityCasterMainWeaponCheck.IsCasterRestrictionPassed))]
         [HarmonyPostfix]
@@ -139,7 +146,7 @@ namespace DarkCodex
         //}
         [HarmonyPatch(typeof(MonkNoArmorAndMonkWeaponFeatureUnlock), nameof(MonkNoArmorAndMonkWeaponFeatureUnlock.CheckEligibility))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // flurry of blows
         {
             var data = new TranspilerData(instructions, generator, original);
 
@@ -211,6 +218,44 @@ namespace DarkCodex
             return category;
         }
 
+
+        [HarmonyPatch(typeof(AddOutgoingPhysicalDamageProperty), nameof(AddOutgoingPhysicalDamageProperty.OnEventDidTrigger), typeof(RulePrepareDamage))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler7(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // Ki Strike
+        {
+            var data = new TranspilerData(instructions, generator, original);
+            data.Seek(typeof(AddOutgoingPhysicalDamageProperty), nameof(AddOutgoingPhysicalDamageProperty.CheckWeaponType));
+            data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
+            data.InsertAfter(Patch7);
+            return data.Code;
+        }
+        public static BlueprintWeaponType Patch7(BlueprintWeaponType weaponType, AddOutgoingPhysicalDamageProperty __instance, RulePrepareDamage evt)
+        {
+            if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() 
+                && evt.DamageBundle.Weapon.Blueprint.IsNatural 
+                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                return Resource.Cache.WeaponTypeUnarmed.Get();
+            return weaponType;
+        }
+
+
+        [HarmonyPatch(typeof(IgnoreDamageReductionOnAttack), nameof(IgnoreDamageReductionOnAttack.CheckCondition), typeof(RuleAttackWithWeapon))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler8(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // Shattering Punch
+        {
+            var data = new TranspilerData(instructions, generator, original);
+            data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
+            data.InsertAfter(Patch8);
+            return data.Code;
+        }
+        public static BlueprintWeaponType Patch8(BlueprintWeaponType weaponType, IgnoreDamageReductionOnAttack __instance, RuleAttackWithWeapon evt)
+        {
+            if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() 
+                && evt.Weapon.Blueprint.IsNatural 
+                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                return Resource.Cache.WeaponTypeUnarmed.Get();
+            return weaponType;
+        }
     }
 
 }

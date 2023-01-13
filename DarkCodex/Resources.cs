@@ -63,6 +63,8 @@ namespace DarkCodex
             public static readonly BlueprintItemWeaponReference WeaponBlastPhysical = Helper.ToRef<BlueprintItemWeaponReference>("65951e1195848844b8ab8f46d942f6e8"); //KineticBlastPhysicalWeapon
             public static readonly BlueprintItemWeaponReference WeaponBlastEnergy = Helper.ToRef<BlueprintItemWeaponReference>("4d3265a5b9302ee4cab9c07adddb253f"); //KineticBlastEnergyWeapon
 
+            public static readonly BlueprintWeaponTypeReference WeaponTypeUnarmed = Helper.ToRef<BlueprintWeaponTypeReference>("fcca8e6b85d19b14786ba1ab553e23ad"); //Unarmed
+
             // Sprites
             public static readonly Texture IconPotBlack = Helper.CreateTexture(Path.Combine(Main.ModPath, "icons", "pot black.png"), 16, 16);
             public static readonly Texture IconBookBlack = Helper.CreateTexture(Path.Combine(Main.ModPath, "icons", "book black.png"), 16, 16);

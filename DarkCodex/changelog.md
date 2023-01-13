@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.17]
+- fixed Ki Strikes and Shattering Punch with Feral Combat Training
+
 ## [1.5.16]
 - Feral Combat Training unlocks iterative natural attacks #206
 
