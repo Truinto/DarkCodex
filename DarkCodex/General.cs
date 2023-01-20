@@ -142,6 +142,8 @@ namespace DarkCodex
             //Powerful Maneuvers
             //ImprovedBullRush.b3614622866fe7046b787a548bbd7f59
             //ImprovedSunder.9719015edcbf142409592e2cbaab7fe1
+
+            Helper.Get<BlueprintFeature>("6a556375036ac8b4ebd80e74d308d108").RemoveComponents(r => r.GetType().Name.StartsWith("Recommendation")); //PiranhaStrikeFeature
         }
 
         [PatchInfo(Severity.Create, "Preferred Spell", "basic feat: Preferred Spell, spontaneously cast a specific spell", false, Requirement: typeof(Patch_PreferredSpellMetamagic))]

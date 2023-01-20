@@ -30,14 +30,18 @@ namespace CodexLib
             itemPart.MetamagicData ??= new();
             itemPart.MetamagicData.Add(this.Context.Params.Metamagic);
             this.Data.Applied.MakeNotLootable();
-            if (!this.Owner.Body.PrimaryHand.CanInsertItem(this.Data.Applied))
+
+            using (ContextData<ItemEntity.CanBeEquippedForce>.Request())
             {
-                this.Data.Applied = null;
-                return;
-            }
-            using (ContextData<ItemsCollection.SuppressEvents>.Request())
-            {
-                this.Owner.Body.PrimaryHand.InsertItem(this.Data.Applied);
+                if (!this.Owner.Body.PrimaryHand.CanInsertItem(this.Data.Applied))
+                {
+                    this.Data.Applied = null;
+                    return;
+                }
+                using (ContextData<ItemsCollection.SuppressEvents>.Request())
+                {
+                    this.Owner.Body.PrimaryHand.InsertItem(this.Data.Applied);
+                }
             }
         }
 

@@ -1,6 +1,13 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.18]
+- removed broken logic from KineticArtifact #210
+- removed recommendation from Piranha Strike #208
+- changed weapon type 'Flame Blade' to scimitar, 'Divine Trident' to trident #197
+- added Limitless Animal Focus, mythic ability: gain the Hunter capstone 'Master Hunter' #209
+- added Limitless Inquisitor Bane, mythic ability: infinite inquisitor bane #203
+
 ## [1.5.17]
 - fixed Ki Strikes and Shattering Punch with Feral Combat Training
 

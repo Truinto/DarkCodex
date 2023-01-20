@@ -413,6 +413,36 @@ namespace DarkCodex
             Helper.AddMythicTalent(limitless);
         }
 
+        [PatchInfo(Severity.Create, "Limitless Inquisitor Bane", "mythic ability: infinite inquisitor bane", true)]
+        public static void CreateLimitlessInquisitorBane()
+        {
+            var bane_resource = BlueprintGuid.Parse("a708945b17c56fa4196e8d20f8af1b0d");
+
+            var limitless = Helper.CreateBlueprintFeature(
+                "LimitlessInquisitorBane",
+                "Limitless Inquisitor Bane",
+                "Benefit: You can use your Bane ability at will.",
+                group: FeatureGroup.MythicAbility,
+                icon: Helper.StealIcon("7f45f4c3a0d93ac4f9b96584c6123e5d")
+                ).SetComponents(
+                Helper.CreatePrerequisiteFeature("7ddf7fbeecbe78342b83171d888028cf") //InquisitorBaneNormalFeatureAdd
+                );
+
+            SetResourceDecreasing(bane_resource, limitless);
+
+            Helper.AddMythicTalent(limitless);
+        }
+
+        [PatchInfo(Severity.Extend, "Limitless Animal Focus", "mythic ability: gain the Hunter capstone 'Master Hunter'", true)]
+        public static void ExtendLimitlessAnimalFocus()
+        {
+            var limitless = Helper.Get<BlueprintFeature>("d8a126a3ed3b62943a597c937a4bf840"); //MasterHunter
+
+            limitless.m_Description = "The hunter becomes a master hunter. He gains the ability to receive the animal focus benefits any amount of times per day.".CreateString();
+
+            Helper.AddMythicTalent(limitless);
+        }
+
         [PatchInfo(Severity.Create, "Kinetic Mastery", "mythic feat: physical Kinetic Blasts gain attack bonus equal to mythic level, or half with energy Blasts", true)]
         public static void CreateKineticMastery()
         {

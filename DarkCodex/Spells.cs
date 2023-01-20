@@ -185,9 +185,6 @@ namespace DarkCodex
             Helper.AddFeats(feat);
 
             /*
-            https://www.d20pfsrd.com/gamemastering/Combat/#TOC-Cast-a-Spell1
-            I think you get a free touch attack with casting this spell. So I made this a move action, like unsheating a weapon.
-
             Flame Blade
             School evocation [fire]; Level druid 2, shaman 2
             Casting Time 1 standard action
@@ -197,6 +194,7 @@ namespace DarkCodex
 
             A 3-foot-long, blazing beam of red-hot fire springs forth from your hand. You wield this blade-like beam as if it were a scimitar. Attacks with the flame blade are melee touch attacks. The blade deals 1d8 points of fire damage + 1 point per two caster levels (maximum +10). Since the blade is immaterial, your Strength modifier does not apply to the damage. A flame blade can ignite combustible materials such as parchment, straw, dry sticks, and cloth.
             */
+            // https://www.d20pfsrd.com/gamemastering/Combat/#TOC-Cast-a-Spell1
 
             var enchantment = Helper.CreateBlueprintWeaponEnchantment(
                 "FlameBladeEnchantment",
@@ -211,7 +209,7 @@ namespace DarkCodex
                 "FlameBladeWeapon",
                 "Flame Blade",
                 icon: icon,
-                weaponType: "ba9cd5a303b089f458aa9f07aa10ea10", //TouchType
+                weaponType: "d9fbec4637d71bd4ebc977628de3daf3", //Scimitar
                 cloneVisuals: "d9fbec4637d71bd4ebc977628de3daf3", //Scimitar
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
@@ -262,7 +260,7 @@ namespace DarkCodex
                 );
         }
 
-        [PatchInfo(Severity.Create, "Gozreh's Trident", "spell: Gozreh's Trident", false)]
+        [PatchInfo(Severity.Create, "Divine Trident", "spell: Divine Trident", false)]
         public static void CreateDivineTrident()
         {
             Sprite icon = Helper.StealIcon("877bf08948dd654478dc3c113af6eaf8");
@@ -277,7 +275,7 @@ namespace DarkCodex
                 );
 
             /*
-            Gozreh's Trident
+            Divine Trident
             School evocation [electricity]; Level bloodrager 2, cleric 2, druid 2, hunter 2, oracle 2, warpriest 2, witch 2 (Gozreh)
             Casting Time 1 standard action
             Range personal
@@ -289,7 +287,7 @@ namespace DarkCodex
 
             var enchantment = Helper.CreateBlueprintWeaponEnchantment(
                 "DivineTridentEnchantment",
-                "Gozreh's Trident"
+                "Divine Trident"
                 ).SetComponents(
                 new FlameBladeLogic(feat, 10)
                 );
@@ -298,9 +296,9 @@ namespace DarkCodex
 
             var weapon = Helper.CreateBlueprintItemWeapon(
                 "DivineTridentWeapon",
-                "Gozreh's Trident",
+                "Divine Trident",
                 icon: icon,
-                weaponType: "ba9cd5a303b089f458aa9f07aa10ea10", //TouchType
+                weaponType: "6ff66364e0a2c89469c2e52ebb46365e", //Trident
                 cloneVisuals: "6ff66364e0a2c89469c2e52ebb46365e", //Trident
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Electricity),
@@ -319,7 +317,7 @@ namespace DarkCodex
 
             var ab = Helper.CreateBlueprintAbility(
                 "DivineTridentAbility",
-                "Gozreh's Trident",
+                "Divine Trident",
                 "A 4-foot-long, blazing, forked bolt of electricity springs forth from your hand. You wield this spear-like bolt as if it were a trident (you are considered proficient with the bolt). Attacks with Gozreh’s trident are melee touch attacks. The bolt deals 1d8 points of electricity damage + 1 point per 2 caster levels (maximum +10). Since the bolt is immaterial, your Strength modifier does not apply to the damage. The bolt can ignite combustible materials such as parchment, straw, dry sticks, and cloth.",
                 icon: icon,
                 type: AbilityType.Spell,
@@ -378,12 +376,12 @@ namespace DarkCodex
                 "ProduceFlameEnchantment",
                 "Produce Flame"
                 ).SetComponents(
-                new FlameBladeLogic(null, step: 1, max: 5),
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
                     Helper.CreateActionList(
                         Helper.CreateContextActionReduceBuffDuration(buff, 10)),
                     OnlyHit: false
-                    )
+                    ),
+                new FlameBladeLogic(null, step: 1, max: 5)
                 );
             enchantment.m_HiddenInUI = true;
 

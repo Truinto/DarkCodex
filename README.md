@@ -95,6 +95,7 @@ Content
 |Mythic.CreateLimitlessBloodlineClaws|mythic ability: use claws from bloodlines at will, use breath weapon more often, use dragon disciple form II at will|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessBombs|mythic ability: infinite alchemist bombs and incenses|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessDomain|mythic ability: use domain powers at will|:house:|:heavy_check_mark:|
+|Mythic.CreateLimitlessInquisitorBane|mythic ability: infinite inquisitor bane|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessKi|mythic ability: reduce ki costs by 1|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessShaman|mythic ability: infinite spirit weapon uses (shaman, spirit hunter)|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessSmite|mythic ability: infinite Smites (chaotic and evil), requires Abundant Smite|:house:|:heavy_check_mark:|
@@ -109,6 +110,7 @@ Content
 |Mythic.CreateResourcefulCaster|mythic ability: regain spells that fail because of spell failure, concentration, SR, saving throws|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHex|mythic ability: hexes other than grant can be used as a swift action|:house:|:heavy_check_mark:|
 |Mythic.CreateSwiftHuntersBond|mythic ability: ranger's Hunter's Bond can be used as a swift action|:house:|:heavy_check_mark:|
+|Mythic.ExtendLimitlessAnimalFocus|mythic ability: gain the Hunter capstone 'Master Hunter'|:house:|:heavy_check_mark:|
 |Mythic.PatchAscendantSummons|buffed Ascendant Summons by +4 stats and DR 10|:house:|:heavy_check_mark:|
 |Mythic.PatchBoundlessHealing|Boundless Healing also grants healing spells to spellbooks|:house:|:heavy_check_mark:|
 |Mythic.PatchBoundlessInjury|mythic ability: like Boundless Injury but for harm spells|:house:|:heavy_check_mark:|
@@ -131,7 +133,7 @@ Content
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
 |Spells.CreateChillTouch|spell: Chill Touch|:book:|:heavy_check_mark:|
-|Spells.CreateDivineTrident|spell: Gozreh's Trident|:book:|:heavy_check_mark:|
+|Spells.CreateDivineTrident|spell: Divine Trident|:book:|:heavy_check_mark:|
 |Spells.CreateFlameBlade|spell: Flame Blade, feat: Flame Blade Dervish Combat|:book:|:heavy_check_mark:|
 |Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
 |Spells.CreateProduceFlame|spell: Produce Flame|:book:|:heavy_check_mark:|

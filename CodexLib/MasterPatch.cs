@@ -29,6 +29,7 @@ namespace CodexLib
             typeof(Patch_ContextStatValue),
             typeof(Patch_DebugReport),
             typeof(Patch_FixAbilityTargets),
+            typeof(Patch_FlameBlade),
             typeof(Patch_GetTargetProjectileFix),
             typeof(Patch_LevelUp),
             typeof(Patch_MaterialComponent),

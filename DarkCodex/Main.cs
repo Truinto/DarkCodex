@@ -526,7 +526,9 @@ namespace Shared
             LoadSafe(Mythic.CreateLimitlessShaman);
             LoadSafe(Mythic.CreateLimitlessWarpriest);
             LoadSafe(Mythic.CreateLimitlessWarpriestBlessing);
+            LoadSafe(Mythic.CreateLimitlessInquisitorBane);
             LoadSafe(Mythic.CreateLimitlessBloodlineClaws);
+            LoadSafe(Mythic.ExtendLimitlessAnimalFocus);
             LoadSafe(Mythic.CreateKineticMastery);
             LoadSafe(Mythic.CreateMagicItemAdept);
             LoadSafe(Mythic.CreateResourcefulCaster);

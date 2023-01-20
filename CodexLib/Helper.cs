@@ -868,7 +868,7 @@ namespace CodexLib
         public static void Write(this FileStream stream, string text, byte[] buffer = null)
         {
             int length;
-            if (buffer == null || text.Length > buffer.Length) 
+            if (buffer == null || text.Length > buffer.Length)
             {
                 buffer = Encoding.ASCII.GetBytes(text);
                 length = buffer.Length;
@@ -4465,13 +4465,13 @@ namespace CodexLib
             return result;
         }
 
-        [Obsolete("see overload; use named parameters")]
-        public static BlueprintItemWeapon CreateBlueprintItemWeapon(string a, string b, string c, BlueprintWeaponTypeReference d, DiceFormula? e, DamageTypeDescription f, BlueprintItemWeaponReference g, bool h, int i)
+        [Obsolete]
+        private static BlueprintItemWeapon CreateBlueprintItemWeapon(string a, string b, string c, BlueprintWeaponTypeReference d, DiceFormula? e, DamageTypeDescription f, BlueprintItemWeaponReference g, bool h, int i)
          => CreateBlueprintItemWeapon(a, b, c, null, d, e, f, g, h, i, null, null);
 
         /// <param name="weaponType">type: <b>BlueprintWeaponType</b></param>
         /// <param name="secondWeapon">type: <b>BlueprintItemWeapon</b></param>
-        /// <param name="cloneVisuals">type: <b>BlueprintWeaponType</b></param>
+        /// <param name="cloneVisuals">type: <b>BlueprintWeaponType</b> or <b>BlueprintItemWeapon</b></param>
         /// <param name="enchantments">type: <b>BlueprintWeaponEnchantment[]</b></param>
         public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, Sprite icon = null, AnyRef weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, AnyRef secondWeapon = null, bool primaryNatural = false, int price = 1000, AnyRef cloneVisuals = null, params AnyRef[] enchantments)
         {
@@ -4512,15 +4512,23 @@ namespace CodexLib
 
             result.m_Enchantments = enchantments.ToRef<BlueprintWeaponEnchantmentReference>();
 
-            // not sure
-            if (cloneVisuals != null)
-                result.m_VisualParameters = cloneVisuals.Get<BlueprintWeaponType>()?.m_VisualParameters;
-            if (result.m_VisualParameters == null)
-            {
-                result.OnEnableWithLibrary();
-                result.m_VisualParameters.m_Projectiles = Array.Empty<BlueprintProjectileReference>();
-                result.m_VisualParameters.m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>();
-            }
+            // visuals
+            if (cloneVisuals?.Get() is BlueprintItemWeapon parentWeapon)
+                result.m_VisualParameters = parentWeapon.m_VisualParameters;
+            else if (cloneVisuals?.Get() is BlueprintWeaponType parentType)
+                result.m_VisualParameters = new()
+                {
+                    Prototype = parentType.m_VisualParameters,
+                    m_Projectiles = Array.Empty<BlueprintProjectileReference>(),
+                    m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>(),
+                };
+            else
+                result.m_VisualParameters = new()
+                {
+                    Prototype = result.Type.m_VisualParameters,
+                    m_Projectiles = Array.Empty<BlueprintProjectileReference>(),
+                    m_PossibleAttachSlots = Array.Empty<UnitEquipmentVisualSlotType>(),
+                };
 
             AddAsset(result, guid);
             return result;

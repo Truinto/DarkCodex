@@ -50,7 +50,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create | Severity.Faulty | Severity.Hidden, "Kinetic Artifact", "new weapon for Kineticists", true)]
         public static void CreateKineticArtifact()
         {
-            // see  #105
+            // see  #105 #210
             var bladetype = Helper.ToRef<BlueprintWeaponTypeReference>("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
             var staff = Helper.Get<BlueprintItemWeapon>("e33fd75689190094f897a57a227fa272"); //BurnedAshwoodItem
             var enchant_air = Helper.ToRef<BlueprintWeaponEnchantmentReference>("1d64abd0002b98043b199c0e3109d3ee"); //AirKineticBladeEnchantment
@@ -66,31 +66,32 @@ namespace DarkCodex
                 type: AbilityType.Special,
                 actionType: UnitCommand.CommandType.Standard,
                 range: AbilityRange.Close
-                ).TargetEnemy()
-                .SetComponents(air_damage.Components)
-                .RemoveComponents<AbilityShowIfCasterHasFact>();
+                ).TargetEnemy();
+                //.SetComponents(air_damage.Components)
+                //.RemoveComponents<AbilityShowIfCasterHasFact>();
             fake_blade_damage.Hidden = true;
 
             var fake_blade_burn = Helper.CreateBlueprintAbility(
                 "KineticCatalystBurn",
                 "",
                 "",
-                icon: null, 
+                icon: null,
                 type: AbilityType.Special,
                 actionType: UnitCommand.CommandType.Free,
                 range: AbilityRange.Close
-                ).TargetSelf()
-                .SetComponents(air_burn.Components);
+                ).TargetSelf();
+                //.SetComponents(air_burn.Components);
             fake_blade_burn.Hidden = true;
 
             var enchant_kinetic = Helper.CreateBlueprintWeaponEnchantment(
                 "KineticCatalystEnchantment",
                 "Catalyst",
                 "Apply enchantment bonus to kinetic blasts."
-                ).SetComponents(
-                new KineticBlastEnhancement(),
-                new AddUnitFactEquipment() { m_Blueprint = fake_blade_damage.ToRef2() },
-                new AddUnitFactEquipment() { m_Blueprint = fake_blade_burn.ToRef2() });
+                //).SetComponents(
+                //new KineticBlastEnhancement(),
+                //new AddUnitFactEquipment() { m_Blueprint = fake_blade_damage.ToRef2() },
+                //new AddUnitFactEquipment() { m_Blueprint = fake_blade_burn.ToRef2() }
+                );
 
             var weapon = new BlueprintItemWeapon();
             weapon.m_Type = bladetype;
