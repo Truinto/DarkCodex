@@ -336,6 +336,26 @@ namespace DarkCodex
                         ifTrue: Helper.CreateContextActionAddFeature(element.BlastFeature).ObjToArray()));
                 }
             }
+
+            // add missing boost/admixture cases
+            foreach (var boost in t.GetAll(boost: true))
+            {
+                KineticistTree.Boost current = (KineticistTree.Boost)boost;
+                list.Add(Helper.CreateConditional(
+                    new Condition[]
+                    {
+                        new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = current.IsGreaterVersion ? 15 : 7},
+                        Helper.CreateContextConditionHasFact(boost.BlastFeature, true),
+                        Helper.CreateContextConditionHasFact(boost.Parent1.BlastFeature),
+                        new ConditionChecker
+                        {
+                            Operation = Operation.Or,
+                            Conditions = t.GetAll(basic: current.ModifiesSimple, composite: current.ModifiesComposite, onlyPhysical: current.IsOnlyPhysical, onlyEnergy: current.IsOnlyEnergy)
+                                .Select(s => Helper.CreateContextConditionHasFact(AnyRef.ToAny(s.BlastFeature))).ToArray()
+                        }
+                    },
+                    ifTrue: Helper.CreateContextActionAddFeature(boost.BlastFeature).ObjToArray()));
+            }
             t.CompositeBuff.Get().GetComponent<AddFactContextActions>().Activated.Actions = list.ToArray();
 
             // move CompositeBlastBuff to BlastFeature

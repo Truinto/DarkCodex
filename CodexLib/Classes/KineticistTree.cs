@@ -617,6 +617,102 @@ namespace CodexLib
                 DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing, DamageEnergyType.Cold)
             };
 
+            Boost_Aetheric = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("34F4DDBC9F3542D598A0CC9E0AE019BB"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("799FD079B82A40E0A2C29061FD0C2182"),
+                Parent1 = Telekinetic,
+                Parent2 = null,
+                Blade = null,
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
+                ModifiesSimple = true,
+                ModifiesComposite = false,
+                ModifiesEnergy = true,
+                ModifiesPhysical true
+            };
+
+            Boost_AethericGreater = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("4E2D370657B24DD78239A64B1949010D"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0167EBDED6F145B681EE94ADF02DD052"),
+                Parent1 = Telekinetic,
+                Parent2 = null,
+                Blade = null,
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing),
+                ModifiesSimple = true,
+                ModifiesComposite = true,
+                ModifiesEnergy = true,
+                ModifiesPhysical true
+            };
+
+            Boost_Gravitic = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("60f9f403494546bba5866f456e799b2d"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("a9cf8aa916e4420d8c5eacbfd794a1b7"),
+                Parent1 = Gravity,
+                Parent2 = null,
+                Blade = null,
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing),
+                ModifiesSimple = true,
+                ModifiesComposite = false,
+                ModifiesEnergy = false,
+                ModifiesPhysical true
+            };
+
+            Boost_GraviticGreater = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("A8D83675D00544469F1FEA2CD371F4E1"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("2F2FD6C377F54912AEE78917B9E1D3CD"),
+                Parent1 = Gravity,
+                Parent2 = null,
+                Blade = null,
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing),
+                ModifiesSimple = true,
+                ModifiesComposite = true,
+                ModifiesEnergy = false,
+                ModifiesPhysical true
+            };
+
+            Boost_NegativeAdmixture = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("b0b71503bb864c78adc0a3cbdfa6fc51"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("2e62673f2e63442197b1f71e5a886205"),
+                Parent1 = Negative,
+                Parent2 = null,
+                Blade = null,
+                DamageType = GetDamageType(e1: DamageEnergyType.NegativeEnergy),
+                ModifiesSimple = true,
+                ModifiesComposite = false,
+                ModifiesEnergy = true,
+                ModifiesPhysical false
+            };
+
+            Boost_PositiveAdmixture = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("dcacf5d46c814dbfbb8cf82c0b25c518"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0f1c8705825b494ba25525a7f05c0fb6"),
+                Parent1 = Positive,
+                Parent2 = null,
+                Blade = null,
+                DamageType = GetDamageType(e1: DamageEnergyType.PositiveEnergy),
+                ModifiesSimple = true,
+                ModifiesComposite = false,
+                ModifiesEnergy = true,
+                ModifiesPhysical false
+            };
+
             #endregion
 
             #region Focus
@@ -1442,7 +1538,7 @@ namespace CodexLib
             }
         }
 
-        public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)
+        public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool boost = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)
         {
             bool mod1 = modded && EnabledElementsExpanded;
 
@@ -1502,6 +1598,30 @@ namespace CodexLib
                 if (!onlyPhysical)
                 {
                     yield return Composite_BlueFlame;
+                }
+            }
+            if (boost) 
+            {
+                if (!onlyEnergy)
+                {
+                    if (mod1)
+                    {
+                        yield return Boost_Gravitic;
+                        yield return Boost_GraviticGreater;
+                    }
+                }
+                if (!onlyPhysical)
+                {
+                    if (mod1)
+                    {
+                        yield return Boost_NegativeAdmixture;
+                        yield return Boost_PositiveAdmixture;
+                    }
+                }
+                if (mod1)
+                {
+                    yield return Boost_Aetheric;
+                    yield return Boost_AethericGreater;
                 }
             }
         }
@@ -1782,11 +1902,16 @@ namespace CodexLib
         public Focus FocusAether;
         public Element Telekinetic;
         public Element Composite_Force;
+        public Boost Boost_Aetheric;
+        public Boost Boost_AethericGreater;
 
         public Focus FocusVoid;
         public Element Gravity;
         public Element Negative;
         public Element Composite_Void;
+        public Boost Boost_Gravitic;
+        public Boost Boost_GraviticGreater;
+        public Boost Boost_NegativeAdmixture;
 
         public Focus FocusWood;
         public Element Wood;
@@ -1796,6 +1921,7 @@ namespace CodexLib
         public Element Composite_Spring;
         public Element Composite_Summer;
         public Element Composite_Winter;
+        public Boost Boost_PositiveAdmixture;
 
         public Infusion BladeWhirlwind;
         public Infusion KineticBlade;
@@ -1932,6 +2058,17 @@ namespace CodexLib
             {
                 return BlastFeature?.Get()?.name;
             }
+        }
+
+        public class Boost : KineticistTree.Element
+        {
+            public bool ModifiesSimple;
+            public bool ModifiesComposite;
+            public bool ModifiesEnergy;
+            public bool ModifiesPhysical;
+            public bool IsGreaterVersion { get => ModifiesComposite; }
+            public bool IsOnlyPhysical { get => ModifiesPhysical && !ModifiesEnergy; }
+            public bool IsOnlyEnergy { get => !ModifiesPhysical && ModifiesEnergy; }
         }
 
         public class Focus
