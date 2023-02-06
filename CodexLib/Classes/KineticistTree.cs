@@ -626,11 +626,11 @@ namespace CodexLib
                 Parent1 = Telekinetic,
                 Parent2 = null,
                 Blade = null,
-                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing),
                 ModifiesSimple = true,
                 ModifiesComposite = false,
                 ModifiesEnergy = true,
-                ModifiesPhysical true
+                ModifiesPhysical = true,
             };
 
             Boost_AethericGreater = new()
@@ -646,7 +646,7 @@ namespace CodexLib
                 ModifiesSimple = true,
                 ModifiesComposite = true,
                 ModifiesEnergy = true,
-                ModifiesPhysical true
+                ModifiesPhysical = true,
             };
 
             Boost_Gravitic = new()
@@ -662,7 +662,7 @@ namespace CodexLib
                 ModifiesSimple = true,
                 ModifiesComposite = false,
                 ModifiesEnergy = false,
-                ModifiesPhysical true
+                ModifiesPhysical = true,
             };
 
             Boost_GraviticGreater = new()
@@ -678,7 +678,7 @@ namespace CodexLib
                 ModifiesSimple = true,
                 ModifiesComposite = true,
                 ModifiesEnergy = false,
-                ModifiesPhysical true
+                ModifiesPhysical = true,
             };
 
             Boost_NegativeAdmixture = new()
@@ -694,7 +694,7 @@ namespace CodexLib
                 ModifiesSimple = true,
                 ModifiesComposite = false,
                 ModifiesEnergy = true,
-                ModifiesPhysical false
+                ModifiesPhysical = false,
             };
 
             Boost_PositiveAdmixture = new()
@@ -710,7 +710,7 @@ namespace CodexLib
                 ModifiesSimple = true,
                 ModifiesComposite = false,
                 ModifiesEnergy = true,
-                ModifiesPhysical false
+                ModifiesPhysical = false,
             };
 
             #endregion

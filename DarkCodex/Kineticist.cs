@@ -326,8 +326,7 @@ namespace DarkCodex
                 if (element.Parent1 != null && element.Parent2 != null)
                 {
                     list.Add(Helper.CreateConditional(
-                        new Condition[]
-                        {
+                        new Condition[] {
                             new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = 7 },
                             Helper.CreateContextConditionHasFact(element.BlastFeature, true),
                             Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature),
@@ -338,21 +337,15 @@ namespace DarkCodex
             }
 
             // add missing boost/admixture cases
-            foreach (var boost in t.GetAll(boost: true))
+            foreach (var boost in t.GetAll(boost: true).Cast<KineticistTree.Boost>())
             {
-                KineticistTree.Boost current = (KineticistTree.Boost)boost;
                 list.Add(Helper.CreateConditional(
-                    new Condition[]
-                    {
-                        new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = current.IsGreaterVersion ? 15 : 7},
+                    new Condition[] {
+                        new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = boost.IsGreaterVersion ? 15 : 7},
                         Helper.CreateContextConditionHasFact(boost.BlastFeature, true),
                         Helper.CreateContextConditionHasFact(boost.Parent1.BlastFeature),
-                        new ConditionChecker
-                        {
-                            Operation = Operation.Or,
-                            Conditions = t.GetAll(basic: current.ModifiesSimple, composite: current.ModifiesComposite, onlyPhysical: current.IsOnlyPhysical, onlyEnergy: current.IsOnlyEnergy)
-                                .Select(s => Helper.CreateContextConditionHasFact(AnyRef.ToAny(s.BlastFeature))).ToArray()
-                        }
+                        Helper.CreateConditionOr(t.GetAll(basic: boost.ModifiesSimple, composite: boost.ModifiesComposite, onlyPhysical: boost.IsOnlyPhysical, onlyEnergy: boost.IsOnlyEnergy)
+                                .Select(s => Helper.CreateContextConditionHasFact(s.BlastFeature)).ToArray())
                     },
                     ifTrue: Helper.CreateContextActionAddFeature(boost.BlastFeature).ObjToArray()));
             }
@@ -1358,7 +1351,7 @@ namespace DarkCodex
                 list.Add(Helper.CreateContextActionDealDamage(p, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, writeShare: isComposite));
             if (e != (DamageEnergyType)255)
                 list.Add(Helper.CreateContextActionDealDamage(e, dice, isAOE, isAOE, false, half, isComposite, AbilitySharedValue.DurationSecond, readShare: isComposite));
-            
+
             var runaction = Helper.CreateAbilityEffectRunAction(save, ifFalse: list.ToArray());
             actions = runaction.Actions;
             return runaction;

@@ -37,30 +37,30 @@
 	
 	<!-- Project References -->
 	<ItemGroup>		
-		<Reference Include="0Harmony_public" HintPath="$(WrathManaged)\0Harmony_public.dll" />
-		<Reference Include="Assembly-CSharp_public" HintPath="$(WrathManaged)\Assembly-CSharp_public.dll" />
-		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(WrathManaged)\Owlcat.Runtime.UI_public.dll" />
+		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\0Harmony_public.dll" />
+		<Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
+		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
 		
-		<Reference Include="UnityModManager" HintPath="$(WrathManaged)\UnityModManager\UnityModManager.dll" />
-		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(WrathManaged)\Assembly-CSharp-firstpass.dll" />
-		<Reference Include="Newtonsoft.Json" HintPath="$(WrathManaged)\Newtonsoft.Json.dll" />
-		<Reference Include="UniRx" HintPath="$(WrathManaged)\UniRx.dll" />
-		<Reference Include="DotNetZip" HintPath="$(WrathManaged)\DotNetZip.dll" />
-		<Reference Include="Owlcat.SharedTypes" HintPath="$(WrathManaged)\Owlcat.SharedTypes.dll" />
-		<Reference Include="Owlcat.Runtime.Core" HintPath="$(WrathManaged)\Owlcat.Runtime.Core.dll" />
-		<Reference Include="Owlcat.Runtime.Validation" HintPath="$(WrathManaged)\Owlcat.Runtime.Validation.dll" />
-		<Reference Include="UnityEngine" HintPath="$(WrathManaged)\UnityEngine.dll" />
-		<Reference Include="UnityTextMeshPro" HintPath="$(WrathManaged)\Unity.TextMeshPro.dll" />
-		<Reference Include="UnityEngine.UI" HintPath="$(WrathManaged)\UnityEngine.UI.dll" />
-		<Reference Include="UnityEngine.AnimationModule" HintPath="$(WrathManaged)\UnityEngine.AnimationModule.dll" />
-		<Reference Include="UnityEngine.CoreModule" HintPath="$(WrathManaged)\UnityEngine.CoreModule.dll" />
-		<Reference Include="UnityEngine.ImageConversionModule" HintPath="$(WrathManaged)\UnityEngine.ImageConversionModule.dll" />
-		<Reference Include="UnityEngine.IMGUIModule" HintPath="$(WrathManaged)\UnityEngine.IMGUIModule.dll" />
-		<Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(WrathManaged)\UnityEngine.JSONSerializeModule.dll" />
-		<Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(WrathManaged)\UnityEngine.ParticleSystemModule.dll" />
-		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(WrathManaged)\UnityEngine.TextRenderingModule.dll" />
-		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(WrathManaged)\UnityEngine.InputLegacyModule.dll" />
-		<Reference Include="UnityEngine.UIModule" HintPath="$(WrathManaged)\UnityEngine.UIModule.dll" />
+		<Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
+		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
+		<Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
+		<Reference Include="UniRx" HintPath="$(GameManaged)\UniRx.dll" />
+		<Reference Include="DotNetZip" HintPath="$(GameManaged)\DotNetZip.dll" />
+		<Reference Include="Owlcat.SharedTypes" HintPath="$(GameManaged)\Owlcat.SharedTypes.dll" />
+		<Reference Include="Owlcat.Runtime.Core" HintPath="$(GameManaged)\Owlcat.Runtime.Core.dll" />
+		<Reference Include="Owlcat.Runtime.Validation" HintPath="$(GameManaged)\Owlcat.Runtime.Validation.dll" />
+		<Reference Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
+		<Reference Include="UnityTextMeshPro" HintPath="$(GameManaged)\Unity.TextMeshPro.dll" />
+		<Reference Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
+		<Reference Include="UnityEngine.AnimationModule" HintPath="$(GameManaged)\UnityEngine.AnimationModule.dll" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
+		<Reference Include="UnityEngine.ImageConversionModule" HintPath="$(GameManaged)\UnityEngine.ImageConversionModule.dll" />
+		<Reference Include="UnityEngine.IMGUIModule" HintPath="$(GameManaged)\UnityEngine.IMGUIModule.dll" />
+		<Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(GameManaged)\UnityEngine.JSONSerializeModule.dll" />
+		<Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(GameManaged)\UnityEngine.ParticleSystemModule.dll" />
+		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
+		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
 	</ItemGroup>
 	
 	<!-- Other Files -->
@@ -81,11 +81,11 @@
 	<!-- Publicize -->
 	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
 		<ItemGroup>
-			<PublicizeInput Include="$(WrathManaged)\Assembly-CSharp.dll" />
-			<PublicizeInput Include="$(WrathManaged)\UnityModManager\0Harmony.dll" />
-			<PublicizeInput Include="$(WrathManaged)\Owlcat.Runtime.UI.dll" />
+			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
+			<PublicizeInput Include="$(GameManaged)\UnityModManager\0Harmony.dll" />
+			<PublicizeInput Include="$(GameManaged)\Owlcat.Runtime.UI.dll" />
 		</ItemGroup>
-		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(WrathManaged)\" />
+		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(GameManaged)\" />
 	</Target>
 
 	<!-- Increase build version -->

@@ -3897,6 +3897,13 @@ namespace CodexLib
             return c;
         }
 
+        public static OrAndLogic CreateConditionOr(params Condition[] condition)
+        {
+            var result = new OrAndLogic();
+            result.ConditionsChecker = new() { Operation = Operation.Or, Conditions = condition };
+            return result;
+        }
+
         public static ContextActionConditionalSaved CreateContextActionConditionalSaved(GameAction succeed = null, GameAction failed = null)
         {
             var result = new ContextActionConditionalSaved();
