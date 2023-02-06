@@ -98,9 +98,7 @@
 			<_CopyItems Include="$(TargetDir)\*" />
 		</ItemGroup>
 
-		<Copy SourceFiles="$(SolutionDir)CodexLib\bin\$(Configuration)\net472\CodexLib.dll" DestinationFolder="$(ModFolder)\$(TargetName)\" />
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
-		
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />		
 		<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />		
 	</Target>

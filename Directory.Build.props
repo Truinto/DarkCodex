@@ -5,7 +5,6 @@
   
   <ItemDefinitionGroup>
     <Reference Private="false" />
-    <ProjectReference Private="false" />
   </ItemDefinitionGroup>
   
   <PropertyGroup>
