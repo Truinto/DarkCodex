@@ -1,6 +1,8 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+- added Oathbreakers Bane Ability to Limitless Smite
+
 ## [1.5.18]
 - removed broken logic from KineticArtifact #210
 - removed recommendation from Piranha Strike #208

@@ -32,8 +32,6 @@ using System.Threading.Tasks;
 using Shared;
 using CodexLib;
 using System.Text.RegularExpressions;
-//using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
-//global using FeatureRef = Kingmaker.Blueprints.BlueprintFeatureReference;
 
 namespace DarkCodex
 {
@@ -177,6 +175,14 @@ namespace DarkCodex
                 mark_of_injustice.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
                 if (Settings.State.reallyFreeCost)
                     mark_of_injustice.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
+            }
+
+            // ExpandedContent
+            if (Helper.Get("507879c44d4f49d082159c43c3842ffd") is BlueprintAbility oathbreakers_bane //OathbreakersBaneAbility
+                && Helper.Get("b35ce8ee32c24bfd8884740f13aaee12") is BlueprintCharacterClass oathbreakers) //OathbreakerClass
+            {
+                oathbreakers_bane.GetComponent<AbilityResourceLogic>()?.ResourceCostDecreasingFacts.Add(limitless);
+                limitless.Get().AddComponents(Helper.CreatePrerequisiteClassLevel(oathbreakers, 1, true));
             }
         }
 
