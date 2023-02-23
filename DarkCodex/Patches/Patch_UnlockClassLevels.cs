@@ -19,29 +19,36 @@ namespace DarkCodex
     {
         [HarmonyPatch(typeof(BlueprintCharacterClass), nameof(BlueprintCharacterClass.MeetsPrerequisites))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> MeetsPrerequisites(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> MeetsPrerequisites(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var lines = instr.ToList();
-            int count = 0;
+            //var lines = instructions.ToList();
+            //int count = 0;
 
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (lines[i].LoadsConstant(20))// || lines[i].LoadsConstant(10))
-                {
-                    Main.PrintDebug("Patched at " + i);
-                    lines[i] = CodeInstruction.Call(typeof(Patch_UnlockClassLevels), nameof(GetMaxLevel));
-                    lines.Insert(i, new CodeInstruction(OpCodes.Ldarg_0));
+            //for (int i = 0; i < lines.Count; i++)
+            //{
+            //    if (lines[i].LoadsConstant(20))// || lines[i].LoadsConstant(10))
+            //    {
+            //        Main.PrintDebug("Patched at " + i);
+            //        lines[i] = CodeInstruction.Call(typeof(Patch_UnlockClassLevels), nameof(GetMaxLevel));
+            //        lines.Insert(i, new CodeInstruction(OpCodes.Ldarg_0));
 
-                    count++;
-                }
-            }
+            //        count++;
+            //    }
+            //}
 
-            if (count != 1)
-                Main.PrintDebug("unexcepted count: " + count);
+            //if (count != 1)
+            //    Main.PrintDebug("unexcepted count: " + count);
 
-            return lines;
+            //return lines;
+
+            var data = new TranspilerTool(instructions, generator, original);
+
+            data.Seek(f => f.IsLoadConstant(20));
+            data.ReplaceCall(GetMaxLevel);
+
+            return data;
         }
-        public static int GetMaxLevel(BlueprintCharacterClass instance)
+        public static int GetMaxLevel(BlueprintCharacterClass __instance)
         {
             return 40; // instance.Progression.LevelEntries.Length;
         }

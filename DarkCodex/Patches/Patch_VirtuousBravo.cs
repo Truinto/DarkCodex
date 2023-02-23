@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 
 namespace DarkCodex
 {
@@ -13,11 +14,11 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(UnitMechanicFeatures), nameof(UnitMechanicFeatures.TricksterMobilityFastMovement));
             data.Seek(OpCodes.Mul);
-            data.EditStackBefore(Patch);
+            data.InsertBefore(Patch);
 
             return data.Code;
         }

@@ -15,11 +15,13 @@ namespace DarkCodex
     {
         [HarmonyPatch(typeof(AddKineticistInfusionDamageTrigger), nameof(AddKineticistInfusionDamageTrigger.ApplyInternal))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var list = instr as List<CodeInstruction> ?? instr.ToList();
-            Helper.RemoveMethods(list, typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), new Type[] { typeof(LogChannel), typeof(string), typeof(object[]) });
-            return list;
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), Empty, new Type[] { typeof(LogChannel), typeof(string), typeof(object[]) });
+            return data;
         }
+
+        public static void Empty(LogChannel channel, string msgFormat, params object[] @params) { }
     }
 }

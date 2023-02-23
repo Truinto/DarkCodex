@@ -50,8 +50,7 @@ namespace DarkCodex
                 if (!memorizedBlueprints.Contains(meta.Blueprint))
                     continue;
 
-                if (meta.SpellLevelInSpellbook == null)
-                    meta.SpellLevelInSpellbook = __instance.GetMinSpellLevel(meta.Blueprint);
+                meta.SpellLevelInSpellbook ??= __instance.GetMinSpellLevel(meta.Blueprint);
 
                 var spell = new AbilityData(meta.Blueprint, __instance, meta.SpellLevelInSpellbook.Value);
                 spell.MetamagicData = meta.MetamagicData?.Clone();
@@ -138,16 +137,17 @@ namespace DarkCodex
         /// </summary>
         [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.Memorize))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var original = AccessTools.Field(typeof(BlueprintSpellbook), nameof(BlueprintSpellbook.IsArcanist));
+            var original1 = AccessTools.Field(typeof(BlueprintSpellbook), nameof(BlueprintSpellbook.IsArcanist));
 
-            foreach (var line in instr)
-            {
-                if (line.Calls(original))
-                    line.ReplaceCall(Helper.FakeAlwaysFalse);
-                yield return line;
-            }
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(BlueprintSpellbook), nameof(BlueprintSpellbook.IsArcanist), Patch5);
+            return data;
+        }
+        public static bool Patch5(BlueprintSpellbook instance)
+        {
+            return false;
         }
 
         /// <summary>

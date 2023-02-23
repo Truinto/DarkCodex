@@ -6,12 +6,19 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Logic for Energy Channel.
+    /// </summary>
     public class EnergyChannelApplyEffect : AbilityApplyEffect, IAbilityRestriction
     {
         public BlueprintBuffReference Buff;
         public DamageEnergyType Element;
 
+        /// <summary>
+        /// Logic for Energy Channel.
+        /// </summary>
         /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        /// <param name="element">Damage type</param>
         public EnergyChannelApplyEffect(AnyRef buff, DamageEnergyType element)
         {
             this.Buff = buff;

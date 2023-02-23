@@ -20,28 +20,20 @@ namespace DarkCodex
     {
         [HarmonyPatch(typeof(RestrictionCanGatherPower), nameof(RestrictionCanGatherPower.IsAvailable))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var code = instructions as List<CodeInstruction> ?? instructions.ToList();
-            var m_isPolymorphed = AccessTools.PropertyGetter(typeof(UnitBody), nameof(UnitBody.IsPolymorphed));
-            //var m_ = AccessTools.Method(typeof(), nameof());
-
-            for (int i = 0; i < code.Count; i++)
-            {
-                if (code[i].Calls(m_isPolymorphed)) // replace with true value after call
-                {
-                    code.Insert(++i, new CodeInstruction(OpCodes.Pop));
-                    code.Insert(++i, new CodeInstruction(OpCodes.Ldc_I4_0));
-                }
-            }
-
-            //Main.PrintDebug(code.Join(null, "\n"));
-            return code;
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(UnitBody), nameof(UnitBody.IsPolymorphed), Patch1);
+            return data;
+        }
+        public static bool Patch1(UnitBody __instance)
+        {
+            return false;
         }
 
-        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[0])]
+        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[] { typeof(UnitDescriptor) })]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions) => Transpiler1(instructions);
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler1(instructions, generator, original);
 
         //[HarmonyPatch(typeof(RestrictionCanGatherPower), nameof(RestrictionCanGatherPower.IsAvailable))]
         //[HarmonyPrefix]

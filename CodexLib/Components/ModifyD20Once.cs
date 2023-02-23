@@ -83,7 +83,7 @@ namespace CodexLib
         public void OnEventAboutToTrigger(RuleRollD20 evt)
         {
             var previousEvent = Rulebook.CurrentContext.PreviousEvent;
-            if (previousEvent == null || !this.CheckRule(previousEvent))
+            if (previousEvent == null || !CheckRule(previousEvent))
                 return;
 
             if (this.AgainstAlignment && !previousEvent.Initiator.Alignment.ValueRaw.HasComponent(this.Alignment))

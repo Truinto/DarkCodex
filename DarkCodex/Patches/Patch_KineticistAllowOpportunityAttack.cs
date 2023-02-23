@@ -26,11 +26,15 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var code = instr as List<CodeInstruction> ?? instr.ToList();
-            code.RemoveMethods(typeof(UnitState), nameof(UnitState.AddCondition));
-            return code;
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(UnitState), nameof(UnitState.AddCondition), Patch1);
+            return data;
+        }
+
+        public static void Patch1(UnitState __instance, UnitCondition condition, Buff source, UnitConditionExceptions exceptions)
+        {
         }
 
         //[HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
@@ -93,17 +97,16 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(UnitCombatState), nameof(UnitCombatState.AttackOfOpportunity))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            return instr.ReplaceCall(typeof(UnitHelper), nameof(UnitHelper.GetThreatHand), newFunc: GetThreatHand_AttackOfOpportunity);
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(UnitHelper), nameof(UnitHelper.GetThreatHand), GetThreatHand_AttackOfOpportunity);
+            return data;
         }
 
         [HarmonyPatch(typeof(UnitAttackOfOpportunity), nameof(UnitAttackOfOpportunity.Init))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler6(IEnumerable<CodeInstruction> instr)
-        {
-            return instr.ReplaceCall(typeof(UnitHelper), nameof(UnitHelper.GetThreatHand), newFunc: GetThreatHand_AttackOfOpportunity);
-        }
+        public static IEnumerable<CodeInstruction> Transpiler6(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler5(instructions, generator, original);
 
         public static WeaponSlot GetThreatHand_AttackOfOpportunity(UnitEntityData unit)
         {

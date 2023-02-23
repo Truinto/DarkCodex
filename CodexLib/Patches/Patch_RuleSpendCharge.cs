@@ -21,27 +21,26 @@ namespace CodexLib.Patches
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var code = instructions as List<CodeInstruction> ?? instructions.ToList();
-            int index = 0;
+            var data = new TranspilerTool(instructions, generator, original);
 
-            code.AddCondition(ref index, Trigger, generator);
-            code.RemoveMethods(typeof(AbilityData), nameof(AbilityData.SpendMaterialComponent));
+            data.InsertReturn(Trigger, true);
+            data.ReplaceAllCalls(typeof(AbilityData), nameof(AbilityData.SpendMaterialComponent), Patch0);
 
-            //Helper.PrintDebug(code.Join(null, "\n"));
-            return code;
+            return data;
         }
 
-        public static bool Trigger(object obj)
+        public static bool Trigger(AbilityData __instance)
         {
-            if (obj is not AbilityData __instance)
-                return true;
-
             var ruleSpend = Rulebook.Trigger(new RuleSpendCharge(__instance));
 
             if (ruleSpend.ShouldConsumeMaterial)
                 __instance.SpendMaterialComponent();
 
             return ruleSpend.ShouldSpend;
+        }
+
+        public static void Patch0(AbilityData __instance)
+        {
         }
     }
 }

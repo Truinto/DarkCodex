@@ -7,5 +7,6 @@
 		<GameManaged Condition="!Exists('$(ProgramFolder)')">..\..\..\@non-backup\KM2 sources\Wrath_Data\Managed</GameManaged>
 		<ModFolder Condition="Exists('$(ProgramFolder)')">$(ProgramFolder)Pathfinder Wrath of the Righteous\Mods</ModFolder>
 		<ModFolder Condition="!Exists('$(ProgramFolder)')">..\..\..\@non-backup\KM2 sources\Wrath_Data\Managed</ModFolder>
+		<ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
 	</PropertyGroup>
 </Project>

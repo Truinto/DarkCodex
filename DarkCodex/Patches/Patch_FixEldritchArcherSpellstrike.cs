@@ -19,21 +19,6 @@ namespace DarkCodex
     [PatchInfo(Severity.Harmony | Severity.Faulty | Severity.DefaultOff, "Fix Eldritch Archer Spellstrike", "fixes spellstrike not working with swift rays", false)]
     public class Patch_FixEldritchArcherSpellstrike
     {
-        //[HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.Init))]
-        //public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions/*, ILGenerator generator, MethodBase original*/)
-        //{
-        //    var code = instructions as List<CodeInstruction> ?? instructions.ToList();
-        //    int index;
-        //    var call = AccessTools.PropertyGetter(typeof(UnitCommand), nameof(UnitCommand.Type));
-        //    for (index = code.Count - 1; index >= 0; index--)
-        //    {
-        //        if (code[index].Calls(call))
-        //            break;
-        //    }
-        //    code.NextJumpNever(ref index);
-        //    return code;
-        //}
-
         [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.OnAction))]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
@@ -51,7 +36,7 @@ namespace DarkCodex
             if (code[index].opcode != OpCodes.Ldarg_0)
                 throw new Exception();
 
-            code.AddCondition(ref index, Patch, generator, typeof(int));
+            //code.AddCondition(ref index, Patch, generator, typeof(int));
 
 
 

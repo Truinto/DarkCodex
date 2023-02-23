@@ -38,6 +38,7 @@ global using Kingmaker.UnitLogic.Mechanics.Conditions;
 global using Kingmaker.UnitLogic.Mechanics.Properties;
 global using Kingmaker.Utility;
 global using Newtonsoft.Json;
+global using Shared;
 global using System;
 global using System.Collections.Generic;
 global using System.Diagnostics;

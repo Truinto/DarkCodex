@@ -44,7 +44,7 @@ namespace CodexLib
 
             Bonuses.RemoveAll(f => f.Source == source.Fact);
             if (Bonuses.Count == 0)
-                this.RemoveSelf();
+                RemoveSelf();
         }
 
         public override void OnApplyPostLoadFixes()
@@ -53,6 +53,7 @@ namespace CodexLib
             // to do reapply all missing bonuses
         }
 
+#pragma warning disable IDE0060 // Nicht verwendete Parameter entfernen
         public void HandleModifierChanged(ModifiableValue modifiableValue, ModifiableValue.Modifier modifier)
         {
             if (modifier.StackMode == ModifiableValue.StackMode.ForceStack)

@@ -331,8 +331,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Backgrounds", "basic feat: Additional Traits\ntraits: Magical Lineage, Metamagic Master, Fate’s Favored", false)]
         public static void CreateBackgrounds()
         {
-            var specialization = Helper.Get<BlueprintParametrizedFeature>("f327a765a4353d04f872482ef3e48c35"); //SpellSpecializationFirst
-
             /*
 
             Magical Knack: Magic Traits

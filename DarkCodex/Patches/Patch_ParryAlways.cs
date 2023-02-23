@@ -16,7 +16,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             //data.Seek(true, f => f.Calls(typeof(RuleAttackRoll), nameof(RuleAttackRoll.Parry)), f => f.Is(OpCodes.Brfalse_S));
             data.Last();

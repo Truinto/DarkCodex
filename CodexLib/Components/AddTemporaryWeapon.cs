@@ -73,8 +73,8 @@ namespace CodexLib
         {
             if (this.Data.Applied == null)
             {
-                this.OnActivate();
-                this.OnTurnOn();
+                OnActivate();
+                OnTurnOn();
             }
         }
     }

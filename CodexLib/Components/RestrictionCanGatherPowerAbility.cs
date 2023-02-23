@@ -35,8 +35,7 @@ namespace CodexLib
             UnitBody body = caster.Body;
 
             ItemEntity maybeItem = body.PrimaryHand.MaybeItem;
-            ItemEntityWeapon itemEntityWeapon = maybeItem as ItemEntityWeapon;
-            bool flag = itemEntityWeapon != null && itemEntityWeapon.Blueprint.Category == WeaponCategory.KineticBlast;
+            bool flag = maybeItem is ItemEntityWeapon itemEntityWeapon && itemEntityWeapon.Blueprint.Category == WeaponCategory.KineticBlast;
             ItemEntity maybeItem2 = body.SecondaryHand.MaybeItem;
             ItemEntityShield maybeShield = body.SecondaryHand.MaybeShield;
             ArmorProficiencyGroup? armorProficiencyGroup = (maybeShield != null) ? new ArmorProficiencyGroup?(maybeShield.Blueprint.Type.ProficiencyGroup) : default(ArmorProficiencyGroup?);

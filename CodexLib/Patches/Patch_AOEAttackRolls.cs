@@ -13,33 +13,26 @@ namespace CodexLib.Patches
     [HarmonyPriority(380)]
     public class Patch_AOEAttackRolls
     {
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var line = instr.ToList();
             var original1 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.D20));
             var original2 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.CriticalConfirmationD20));
+            var data = new TranspilerTool(instructions, generator, original);
 
-            for (int i = 0; i < line.Count; i++)
-            {
-                if (line[i].Calls(original1))
-                    line[i].ReplaceCall(typeof(Patch_AOEAttackRolls), nameof(SetD20));
-                else if(line[i].Calls(original2))
-                    line[i].ReplaceCall(typeof(Patch_AOEAttackRolls), nameof(SetD20Crit));
-            }
+            data.ReplaceAllCalls(original1, SetD20);
+            data.ReplaceAllCalls(original2, SetD20Crit);
 
-            return line;
+            return data;
         }
 
-        public static void SetD20(RuleAttackRoll instance, RuleRollD20 d20)
+        public static void SetD20(RuleAttackRoll instance, RuleRollD20 value)
         {
-            if (instance.D20 == null)
-                instance.D20 = d20;
+            instance.D20 ??= value;
         }
 
-        public static void SetD20Crit(RuleAttackRoll instance, RuleRollD20 d20)
+        public static void SetD20Crit(RuleAttackRoll instance, RuleRollD20 value)
         {
-            if (instance.CriticalConfirmationD20 == null)
-                instance.CriticalConfirmationD20 = d20;
+            instance.CriticalConfirmationD20 ??= value;
         }
     }
 

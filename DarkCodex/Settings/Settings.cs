@@ -11,7 +11,7 @@ namespace DarkCodex
 {
     public class Settings : BaseSettings<Settings>
     {
-        public Settings() => version = 4;
+        public Settings() => Version = 4;
 
         [JsonProperty]
         public bool showBootupWarning = true;
@@ -53,7 +53,7 @@ namespace DarkCodex
 
         protected override bool OnUpdate()
         {
-            if (version < 4 && Whitelist != null && Blacklist != null)
+            if (Version < 4 && Whitelist != null && Blacklist != null)
             {
                 showBootupWarning = true;
                 var hash = new HashSet<string>();

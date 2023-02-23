@@ -7,12 +7,14 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
+#pragma warning disable CS1591
+
 namespace CodexLib
 {
     /// <summary>
-    /// Experiment for storing flags. Abandoned.
+    /// Experiment for storing flags. Abandoned in favor of CountableFlagArray.
     /// </summary>
-    public class FlagArray
+    internal class FlagArray
     {
         [JsonProperty]
         public Dictionary<Type, long> Data = new();
@@ -74,38 +76,26 @@ namespace CodexLib
         }
 
         //[OnSerializing]
-        private void OnSerializing()
-        {
-            foreach (var key in this.Data.Keys.ToArray())
-            {
-                if (this.Data[key] == 0)
-                    this.Data.Remove(key);
-            }
-        }
+        //private void OnSerializing()
+        //{
+        //    foreach (var key in this.Data.Keys.ToArray())
+        //    {
+        //        if (this.Data[key] == 0)
+        //            this.Data.Remove(key);
+        //    }
+        //}
 
         //[OnDeserialized]
-        private void OnDeserialized() 
-        {
-            Helper.PrintDebug("OnDeserialized FlagArray");
-        }
+        //private void OnDeserialized() 
+        //{
+        //    Helper.PrintDebug("OnDeserialized FlagArray");
+        //}
 
         //[OnError]
-        private void OnError(StreamingContext context, ErrorContext errorContext)
-        {
-            Helper.PrintException(errorContext.Error);
-            errorContext.Handled = true;
-        }
-
-        private static void Debug()
-        {
-            var f = new FlagArray();
-
-            f.AddFlags(Test.None);
-        }
-
-        private enum Test
-        {
-            None
-        }
+        //private void OnError(StreamingContext context, ErrorContext errorContext)
+        //{
+        //    Helper.PrintException(errorContext.Error);
+        //    errorContext.Handled = true;
+        //}
     }
 }

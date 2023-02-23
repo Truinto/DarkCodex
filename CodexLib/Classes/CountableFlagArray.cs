@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// List of enums with a counter of retains. Count is tracked individually by type and value.<br/>
+    /// E.g. SpellSchool.Conjuration (0b10) and SpellSchool.Divination (0b11) do not overlap.
+    /// </summary>
     public class CountableFlagArray
     {
         [JsonProperty]
-        public Dictionary<Enum, CountableFlag> Data = new();
+        private readonly Dictionary<Enum, CountableFlag> Data = new();
 
         public void Retain<T>(T key) where T : Enum
         {
@@ -49,6 +53,11 @@ namespace CodexLib
             if (Data.TryGetValue(key, out var flag))
                 return flag.Count;
             return 0;
+        }
+
+        public bool IsEmpty()
+        {
+            return Data.Count == 0;
         }
     }
 }

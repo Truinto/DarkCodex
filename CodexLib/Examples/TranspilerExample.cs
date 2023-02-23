@@ -13,11 +13,11 @@ namespace CodexLib.Examples
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             // stuff here
 
-            return data.Code;
+            return data;
         }
     }
 }

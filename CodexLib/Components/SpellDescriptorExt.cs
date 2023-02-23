@@ -104,7 +104,7 @@ namespace CodexLib
             this.Descriptor = (SpellDescriptor)buffer[0];
         }
 
-        public static int Register(string id)
+        public static int Register(string id = null)
         {
             return counter++;
         }

@@ -181,13 +181,6 @@ namespace CodexLib
             return max;
         }
 
-        private static void GetTTT()
-        {
-            //namespace TabletopTweaks.Core
-            //static Main.TTTContext
-            //TTTContext.Fixes.MythicFeats.IsDisabled("ExpandedArsenal")
-        }
-
         #endregion
 
         #region Patching/Harmony
@@ -255,9 +248,7 @@ namespace CodexLib
                 if (patch.GetCustomAttributes(false).FirstOrDefault(f => f is HarmonyPatch) is not HarmonyPatch attr)
                     throw new ArgumentException("Type must have HarmonyPatch attribute");
 
-                MethodBase orignal = attr.info.GetOriginalMethod();
-                if (orignal == null)
-                    throw new Exception($"GetOriginalMethod returned null {attr.info}");
+                var orignal = attr.info.GetOriginalMethod() ?? throw new Exception($"GetOriginalMethod returned null {attr.info}");
                 var info = Harmony.GetPatchInfo(orignal);
                 return info != null && (info.Prefixes.Any() || info.Postfixes.Any() || info.Transpilers.Any());
             }
@@ -273,9 +264,7 @@ namespace CodexLib
                 var list = new List<Patch>();
                 foreach (var patch in processor.patchMethods)
                 {
-                    var orignal = patch.info.GetOriginalMethod();
-                    if (orignal == null)
-                        throw new Exception($"GetOriginalMethod returned null {patch.info}");
+                    var orignal = patch.info.GetOriginalMethod() ?? throw new Exception($"GetOriginalMethod returned null {patch.info}");
 
                     // if unpatched, no conflict
                     var info = Harmony.GetPatchInfo(orignal);
@@ -333,295 +322,6 @@ namespace CodexLib
             return null;
         }
 
-        public static bool Calls(this CodeInstruction code, MemberInfo member)
-        {
-            if (member is MethodInfo mi)
-                return (code.opcode == OpCodes.Call || code.opcode == OpCodes.Callvirt) && object.Equals(code.operand, mi);
-            if (member is FieldInfo fi)
-                return code.opcode == OpCodes.Ldfld && object.Equals(code.operand, fi);
-
-            throw new ArgumentException($"could not find anything for type={member.GetType()} name={member.Name}");
-        }
-
-        public static Type GetLocType(this CodeInstruction code, IList<LocalVariableInfo> locals)
-        {
-            if (code.operand is LocalBuilder lb)
-                return lb.LocalType;
-            if (code.operand is Type type)
-                return type;
-
-            if (locals == null)
-                return null;
-
-            var op = code.opcode;
-            if (op == OpCodes.Ldloc_0 || op == OpCodes.Stloc_0)
-                return locals[0].LocalType;
-            if (op == OpCodes.Ldloc_1 || op == OpCodes.Stloc_1)
-                return locals[1].LocalType;
-            if (op == OpCodes.Ldloc_2 || op == OpCodes.Stloc_2)
-                return locals[2].LocalType;
-            if (op == OpCodes.Ldloc_3 || op == OpCodes.Stloc_3)
-                return locals[3].LocalType;
-
-            return null;
-        }
-
-        public static MemberInfo GetMemberInfo(Type type, string name)
-        {
-            var mi = type.GetMethod(name, Helper.BindingAll) ?? type.GetProperty(name, Helper.BindingAll)?.GetMethod;
-            if (mi != null)
-                return mi;
-
-            var fi = type.GetField(name, Helper.BindingAll);
-            if (fi != null)
-                return fi;
-
-            throw new ArgumentException($"could not find anything for type={type} name={name}");
-        }
-
-        public static IEnumerable<CodeInstruction> _TestTranspiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
-        {
-            foreach (var line in instructions)
-            {
-                Console.WriteLine($"{line.opcode} : {line.operand?.GetType()}");
-            }
-            return instructions;
-        }
-
-        public static void ReplaceCall(this CodeInstruction code, Type type, string name, Type[] parameters = null, Type[] generics = null)
-        {
-            var repl = CodeInstruction.Call(type, name, parameters, generics);
-            code.opcode = repl.opcode;
-            code.operand = repl.operand;
-        }
-
-        public static void ReplaceCall(this CodeInstruction code, Delegate newFunc)
-        {
-            code.opcode = OpCodes.Call;
-            code.operand = newFunc.Method;
-        }
-
-        public static IEnumerable<CodeInstruction> ReplaceCall(this IEnumerable<CodeInstruction> instr, Type type, string name, Delegate newFunc, Type[] parameters = null, Type[] generics = null)
-        {
-            var original = AccessTools.Method(type, name, parameters, generics);
-
-            foreach (var line in instr)
-            {
-                if (line.Calls(original))
-                    line.ReplaceCall(newFunc);
-
-                yield return line;
-            }
-        }
-
-        /// <summary>
-        /// Inserts a check and return block. Method returns, if func returns false (like HarmonyPrefix). Original method must return void!
-        /// </summary>
-        /// <remarks>
-        /// End result:
-        /// <code>
-        /// if (!func(__instance))
-        ///     return;
-        /// </code>
-        /// </remarks>
-        public static void AddCondition(this List<CodeInstruction> code, ref int index, ILFunction func, ILGenerator generator)
-        {
-            PrintDebug($"Transpiler AddCondition @{index}");
-
-            Label label1 = generator.DefineLabel();
-
-            code.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
-            code.Insert(index++, new CodeInstruction(OpCodes.Call, func.GetMethodInfo()));
-            code.Insert(index++, new CodeInstruction(OpCodes.Brtrue, label1));
-            code.Insert(index++, new CodeInstruction(OpCodes.Ret));
-            code[index++].labels.Add(label1);
-        }
-
-        /// <summary>
-        /// Inserts a check and return block. Method returns, if func returns false (like HarmonyPrefix). Original method must return a value. Use unbox, if it's a value type.
-        /// </summary>
-        /// <param name="unbox">Type of original return type.</param>
-        /// <remarks>
-        /// End result:
-        /// <code>
-        /// object __result;
-        /// if (!func(__instance, ref __result))
-        ///     return __result;
-        /// </code>
-        /// </remarks>
-        public static void AddCondition(this List<CodeInstruction> code, ref int index, ILFunctionRet func, ILGenerator generator, Type unbox = null)
-        {
-            PrintDebug($"Transpiler AddCondition @{index}");
-
-            var local1 = generator.DeclareLocal(typeof(object));
-            Label label1 = generator.DefineLabel();
-
-            code.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
-            code.Insert(index++, new CodeInstruction(OpCodes.Ldloca, local1));
-            code.Insert(index++, new CodeInstruction(OpCodes.Call, func.GetMethodInfo()));
-            code.Insert(index++, new CodeInstruction(OpCodes.Brtrue, label1));
-            code.Insert(index++, new CodeInstruction(OpCodes.Ldloc, local1));
-            if (unbox != null) code.Insert(index++, new CodeInstruction(OpCodes.Unbox_Any, unbox));
-            code.Insert(index++, new CodeInstruction(OpCodes.Ret));
-            code[index++].labels.Add(label1);
-        }
-
-        /// <summary>
-        /// Subject to change! Expect signature changes. May not work with ref/out keywords. May not work if return value isn't void.
-        /// </summary>
-        public static void RemoveMethods(this List<CodeInstruction> code, Type type, string name, Type[] parameters = null, Type[] generics = null)
-        {
-            var mi = AccessTools.Method(type, name, parameters, generics);
-            int count = mi.GetParameters().Length;
-            if (!mi.IsStatic) count++;
-
-            for (int i = 0; i < code.Count; i++)
-            {
-                if (code[i].Calls(mi))
-                {
-                    PrintDebug($"Transpiler RemoveMethods @{i} {mi.Name}");
-
-                    code[i].opcode = OpCodes.Nop;
-                    code[i++].operand = null;
-
-                    for (int j = 0; j < count; j++)
-                        code.Insert(i++, new CodeInstruction(OpCodes.Pop));
-
-                    if (mi.ReturnType == typeof(void))
-                    {
-                    }
-                    else if (mi.ReturnType.IsValueType)
-                    {
-                        code.Insert(i++, new CodeInstruction(OpCodes.Ldc_I4_0));
-                        if (mi.ReturnType == typeof(long))
-                            code.Insert(i++, new CodeInstruction(OpCodes.Conv_I8));
-                    }
-                    else
-                    {
-                        code.Insert(i++, new CodeInstruction(OpCodes.Ldnull));
-                    }
-                }
-            }
-
-            /*
-             * Notes:
-             * - out and ref behave identical
-             * - an out/ref caller loads an address instead of the value with 'ldloca.s V_X' where X depends on the address
-             * - if a method has a return value, it will load it on the stack; unused return values are discarded with 'pop'
-             * - 'box : Type' boxes the valuetype on the stack
-             * - 'box.any : Type' unboxes the valuetype and puts in on the stack
-             */
-        }
-
-        public static void NextJumpAlways(this List<CodeInstruction> code, ref int index)
-        {
-            for (; index < code.Count; index++)
-            {
-                var line = code[index];
-
-                if (line.opcode.FlowControl != FlowControl.Cond_Branch || line.opcode == OpCodes.Switch)
-                    continue;
-
-                PrintDebug($"Transpiler NextJumpAlways @{index} {line.opcode}");
-
-                if (line.opcode.OperandType == OperandType.InlineBrTarget)
-                    code.Insert(++index, new CodeInstruction(OpCodes.Br, line.operand));
-
-                else if (line.opcode.OperandType == OperandType.ShortInlineBrTarget)
-                    code.Insert(++index, new CodeInstruction(OpCodes.Br_S, line.operand));
-
-                else
-                    throw new Exception("Did not expect this OpCode");
-
-                return;
-            }
-        }
-
-        public static void NextJumpNever(this List<CodeInstruction> code, ref int index)
-        {
-            for (; index < code.Count; index++)
-            {
-                var line = code[index];
-
-                if (line.opcode.FlowControl != FlowControl.Cond_Branch || line.opcode == OpCodes.Switch)
-                    continue;
-
-                PrintDebug($"Transpiler NextJumpNever @{index} {line.opcode}");
-
-                if (line.opcode.StackBehaviourPush != StackBehaviour.Push0)
-                    throw new Exception("Cond_Branch should not push onto stack");
-
-                var num = line.opcode.StackBehaviourPop.GetStackChange();
-                if (num == 0)
-                {
-                    line.opcode = OpCodes.Nop;
-                    line.operand = null;
-                }
-                else if (num == -1)
-                {
-                    line.opcode = OpCodes.Pop;
-                    line.operand = null;
-                }
-                else if (num == -2)
-                {
-                    line.opcode = OpCodes.Pop;
-                    line.operand = null;
-                    code.Insert(index++, new CodeInstruction(OpCodes.Pop));
-                }
-                else
-                    throw new Exception("Cond_Branch should not pop more than 2");
-
-                return;
-            }
-        }
-
-        public static int GetStackChange(this StackBehaviour stack)
-        {
-            switch (stack)
-            {
-                case StackBehaviour.Pop0:
-                case StackBehaviour.Push0:
-                    return 0;
-                case StackBehaviour.Pop1:
-                case StackBehaviour.Popi:
-                case StackBehaviour.Popref:
-                case StackBehaviour.Varpop:
-                    return -1;
-                case StackBehaviour.Push1:
-                case StackBehaviour.Pushi:
-                case StackBehaviour.Pushi8:
-                case StackBehaviour.Pushr4:
-                case StackBehaviour.Pushr8:
-                case StackBehaviour.Pushref:
-                case StackBehaviour.Varpush:
-                    return 1;
-                case StackBehaviour.Pop1_pop1:
-                case StackBehaviour.Popi_pop1:
-                case StackBehaviour.Popi_popi:
-                case StackBehaviour.Popi_popi8:
-                case StackBehaviour.Popi_popr4:
-                case StackBehaviour.Popi_popr8:
-                case StackBehaviour.Popref_pop1:
-                case StackBehaviour.Popref_popi:
-                    return -2;
-                case StackBehaviour.Push1_push1:
-                    return 2;
-                case StackBehaviour.Popref_popi_pop1:
-                case StackBehaviour.Popref_popi_popi:
-                case StackBehaviour.Popref_popi_popi8:
-                case StackBehaviour.Popref_popi_popr4:
-                case StackBehaviour.Popref_popi_popr8:
-                case StackBehaviour.Popref_popi_popref:
-                case StackBehaviour.Popi_popi_popi:
-                    return -3;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static bool FakeAlwaysFalse(object obj) => false;
-        public static bool FakeAlwaysTrue(object obj) => true;
-
         #endregion
 
         #region Arrays
@@ -645,8 +345,8 @@ namespace CodexLib
         /// <summary>Appends objects on array.</summary>
         public static T[] Append<T>(this T[] orig, params T[] objs)
         {
-            if (orig == null) orig = new T[0];
-            if (objs == null) objs = new T[0];
+            orig ??= new T[0];
+            objs ??= new T[0];
 
             int i, j;
             T[] result = new T[orig.Length + objs.Length];
@@ -667,8 +367,8 @@ namespace CodexLib
         /// <summary>Appends objects on array and overwrites the original.</summary>
         public static void AppendAndReplace<T>(ref T[] orig, params T[] objs)
         {
-            if (orig == null) orig = new T[0];
-            if (objs == null) objs = new T[0];
+            orig ??= new T[0];
+            objs ??= new T[0];
 
             int i, j;
             T[] result = new T[orig.Length + objs.Length];
@@ -681,7 +381,7 @@ namespace CodexLib
 
         public static void AppendAndReplace<T>(ref T[] orig, List<T> objs)
         {
-            if (orig == null) orig = new T[0];
+            orig ??= new T[0];
 
             T[] result = new T[orig.Length + objs.Count];
             int i;
@@ -694,7 +394,7 @@ namespace CodexLib
 
         public static void AppendAndReplace<T>(ref T[] orig, IEnumerable<T> objs)
         {
-            if (orig == null) orig = new T[0];
+            orig ??= new T[0];
 
             T[] result = new T[orig.Length + objs.Count()];
             int i;
@@ -707,8 +407,8 @@ namespace CodexLib
 
         public static void AppendAndReplace<T>(ref T[] orig, params AnyRef[] objs) where T : BlueprintReferenceBase, new()
         {
-            if (orig == null) orig = new T[0];
-            if (objs == null) objs = new AnyRef[0];
+            orig ??= new T[0];
+            objs ??= new AnyRef[0];
 
             int i, j;
             T[] result = new T[orig.Length + objs.Length];
@@ -721,7 +421,7 @@ namespace CodexLib
 
         public static void InsertAt<T>(ref T[] orig, T obj, int index = -1)
         {
-            if (orig == null) orig = new T[0];
+            orig ??= new T[0];
             if (index < 0 || index > orig.Length) index = orig.Length;
 
             T[] result = new T[orig.Length + 1];
@@ -737,7 +437,7 @@ namespace CodexLib
 
         public static void RemoveAt<T>(ref T[] orig, int index)
         {
-            if (orig == null) orig = new T[0];
+            orig ??= new T[0];
             if (index < 0 || index >= orig.Length) return;
 
             T[] result = new T[orig.Length - 1];
@@ -992,27 +692,6 @@ namespace CodexLib
             BinaryExpression assign = Expression.Assign(Expression.Field(target, stackTraceStringField), stackTraceString);
             return Expression.Lambda<Func<Exception, StackTrace, Exception>>(Expression.Block(assign, target), target, stack).Compile();
         })();
-
-        //private static Exception SetStackTrace2(this Exception target) => _SetStackTrace2(target);
-        //private static readonly Func<Exception, Exception> _SetStackTrace2 = new Func<Func<Exception, Exception>>(() =>
-        //{
-        //    // Exception Set(Exception ex)
-        //    // {
-        //    //      ex._stackTraceString = new StackTrace(true).ToString(TraceFormat.Normal);
-        //    // }
-        //    //
-        //    ParameterExpression target = Expression.Parameter(typeof(Exception));
-        //    Type traceFormatType = typeof(StackTrace).GetNestedType("TraceFormat", BindingFlags.NonPublic);
-        //    MethodInfo toString = typeof(StackTrace).GetMethod("ToString", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { traceFormatType }, null);
-        //    object normalTraceFormat = Enum.GetValues(traceFormatType).GetValue(0); // Enum.ToObject(traceFormatType, 0);
-        //    FieldInfo stackTraceStringField = typeof(Exception).GetField("_stackTraceString", BindingFlags.NonPublic | BindingFlags.Instance);
-        //    ConstructorInfo newStackInfo = typeof(StackTrace).GetConstructor(new Type[] { typeof(bool) });
-        //    //
-        //    NewExpression newStack = Expression.New(newStackInfo, Expression.Constant(false, typeof(bool)));
-        //    MethodCallExpression stackTraceString = Expression.Call(newStack, toString, Expression.Constant(normalTraceFormat, traceFormatType));
-        //    BinaryExpression assign = Expression.Assign(Expression.Field(target, stackTraceStringField), stackTraceString);
-        //    return Expression.Lambda<Func<Exception, Exception>>(Expression.Block(assign, target), target).Compile();
-        //})();
 
         #endregion
 
@@ -1472,8 +1151,7 @@ namespace CodexLib
             for (int i = 0; i < obj.Components.Length; i++)
             {
                 var comp = obj.Components[i];
-                if (comp.name == null)
-                    comp.name = $"${comp.GetType().Name}${obj.AssetGuid}${i}";
+                comp.name ??= $"${comp.GetType().Name}${obj.AssetGuid}${i}";
                 if (comp.OwnerBlueprint == null)
                     comp.OwnerBlueprint = obj;
                 else if (comp.OwnerBlueprint != obj)
@@ -1831,37 +1509,11 @@ namespace CodexLib
             return false;
         }
 
-        public static TData GetFactData<TComp, TData>(this UnitEntityData unit, BlueprintFeature blueprintFeature = null) where TComp : UnitFactComponentDelegate<TData> where TData : class, new()
-        {
-            foreach (var feature in unit.Facts.GetAll<Feature>())
-            {
-                if (blueprintFeature != null && blueprintFeature != feature?.Blueprint)
-                    continue;
-
-                var data = Helper.GetDataExt<TData>(feature);
-                if (data != null)
-                    return data;
-            }
-            return null;
-        }
-
-        public static TData GetDataExt<TData>(this EntityFact fact) where TData : class, new()
-        {
-            if (fact == null)
-                return null;
-
-            foreach (var component in fact.Components)
-            {
-                var data = Helper.GetDataExt<TData>(component);
-                if (data != null)
-                    return data;
-            }
-            return null;
-        }
-
         /// <summary>
-        /// Use this instead of GetData&lt;<typeparamref name="TData"/>&gt;. This returns null instead of an exception.
+        /// Get runtime data of <typeparamref name="TData"/> from a specific component or null, if no match found.
         /// </summary>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="component">Component to get runtime data from.</param>
         public static TData GetDataExt<TData>(this EntityFactComponent component) where TData : class, new()
         {
             if (component is EntityFactComponentDelegate<UnitEntityData, TData>.ComponentRuntime runtime)
@@ -1873,6 +1525,75 @@ namespace CodexLib
             return null;
         }
 
+        /// <summary>
+        /// Get runtime data of <typeparamref name="TData"/> from a specific fact or null, if no match found.<br/>
+        /// Only the first instance is returned, if the data type exists multiple times.
+        /// </summary>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="fact">Fact to get runtime data from.</param>
+        public static TData GetDataExt<TData>(this EntityFact fact) where TData : class, new()
+        {
+            if (fact == null)
+                return null;
+
+            foreach (var component in fact.Components)
+            {
+                var data = GetDataExt<TData>(component);
+                if (data != null)
+                    return data;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get all runtime data of <typeparamref name="TData"/> from a specific fact.<br/>
+        /// Never returns null.
+        /// </summary>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="fact">Fact to get runtime data from.</param>
+        public static IEnumerable<TData> GetDataAllExt<TData>(this EntityFact fact) where TData : class, new()
+        {
+            if (fact == null)
+                yield break;
+
+            foreach (var component in fact.Components)
+            {
+                var data = GetDataExt<TData>(component);
+                if (data != null)
+                    yield return data;
+            }
+        }
+
+        /// <summary>
+        /// Get all runtime data of <typeparamref name="TData"/> from all of a unit's features. Optionally filtered for a specific blueprint.<br/>
+        /// Never returns null.
+        /// </summary>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="unit">Unit</param>
+        /// <param name="blueprintFeature">type: BlueprintFeature</param>
+        public static IEnumerable<TData> GetDataAllExt<TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TData : class, new()
+        {
+            foreach (var fact in unit.Facts.m_Facts)
+            {
+                if (blueprintFeature != null && blueprintFeature.deserializedGuid != fact.Blueprint?.AssetGuid)
+                    continue;
+
+                foreach (var component in fact.Components)
+                {
+                    var data = GetDataExt<TData>(component);
+                    if (data != null)
+                        yield return data;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get runtime data of <typeparamref name="TData"/> from a specific fact or null, if no match found.<br/>
+        /// Only the first instance is returned, if the data type exists multiple times.
+        /// </summary>
+        /// <typeparam name="TComponent">Component type on blueprint.</typeparam>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="fact">Fact to get runtime data from.</param>
         public static TData GetDataExt<TComponent, TData>(this EntityFact fact) where TComponent : class where TData : class, new()
         {
             if (fact == null)
@@ -1883,52 +1604,111 @@ namespace CodexLib
                 if (component.SourceBlueprintComponent is not TComponent)
                     continue;
 
-                var data = Helper.GetDataExt<TData>(component);
+                var data = GetDataExt<TData>(component);
                 if (data != null)
                     return data;
             }
             return null;
         }
 
-        /// <param name="blueprintFeature">type: BlueprintFeature</param>
-        public static IEnumerable<TData> GetDataAllExt<TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TData : class, new()
+        /// <summary>
+        /// Get all runtime data of <typeparamref name="TData"/> from a specific fact.<br/>
+        /// Never returns null.
+        /// </summary>
+        /// <typeparam name="TComponent">Component type on blueprint.</typeparam>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="fact">Fact to get runtime data from.</param>
+        public static IEnumerable<TData> GetDataAllExt<TComponent, TData>(this EntityFact fact) where TComponent : class where TData : class, new()
         {
-            foreach (var feature in unit.Facts.GetAll<Feature>())
+            if (fact == null)
+                yield break;
+
+            foreach (var component in fact.Components)
             {
-                if (blueprintFeature != null && blueprintFeature.deserializedGuid != feature?.Blueprint?.AssetGuid)
+                if (component.SourceBlueprintComponent is not TComponent)
                     continue;
 
-                foreach (var component in feature.Components)
+                var data = GetDataExt<TData>(component);
+                if (data != null)
+                    yield return data;
+            }
+        }
+
+        /// <summary>
+        /// Get all runtime data of <typeparamref name="TData"/> from all of a unit's features. Optionally filtered for a specific blueprint.<br/>
+        /// Never returns null.
+        /// </summary>
+        /// <typeparam name="TComponent">Component type on blueprint.</typeparam>
+        /// <typeparam name="TData">Runtime data type to be returned.</typeparam>
+        /// <param name="unit">Unit</param>
+        /// <param name="blueprintFeature">type: BlueprintFeature</param>
+        public static IEnumerable<TData> GetDataAllExt<TComponent, TData>(this UnitEntityData unit, AnyRef blueprintFeature = null) where TComponent : class where TData : class, new()
+        {
+            foreach (var fact in unit.Facts.m_Facts)
+            {
+                if (blueprintFeature != null && blueprintFeature.deserializedGuid != fact.Blueprint?.AssetGuid)
+                    continue;
+
+                foreach (var component in fact.Components)
                 {
-                    var data = Helper.GetDataExt<TData>(component);
+                    if (component.SourceBlueprintComponent is not TComponent)
+                        continue;
+
+                    var data = GetDataExt<TData>(component);
                     if (data != null)
                         yield return data;
                 }
             }
         }
 
-        public static IEnumerable<EntityFactComponent> GetRuntimeComponents<TComp>(this UnitEntityData unit) where TComp : class
+        /// <summary>
+        /// Get runtime component of <typeparamref name="TComponent"/> from a specific fact or null, if no match found.<br/>
+        /// Only the first instance is returned, if the component type exists multiple times.
+        /// </summary>
+        /// <typeparam name="TComponent">Component type on blueprint.</typeparam>
+        /// <param name="fact">Fact to get runtime component from.</param>
+        public static EntityFactComponent GetRuntimeComponent<TComponent>(this EntityFact fact) where TComponent : class
+        {
+            foreach (var comp in fact.Components)
+            {
+                if (comp.SourceBlueprintComponent is TComponent)
+                    return comp;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Get all runtime components of <typeparamref name="TComponent"/> from a specific fact.<br/>
+        /// Never returns null.
+        /// </summary>
+        /// <typeparam name="TComponent">Component type on blueprint.</typeparam>
+        /// <param name="fact">Fact to get runtime component from.</param>
+        public static IEnumerable<EntityFactComponent> GetRuntimeComponents<TComponent>(this EntityFact fact) where TComponent : class
+        {
+            foreach (var comp in fact.Components)
+            {
+                if (comp.SourceBlueprintComponent is TComponent)
+                    yield return comp;
+            }
+        }
+
+        /// <summary>
+        /// Get all runtime components of <typeparamref name="TComponent"/> from all of a unit's features.<br/>
+        /// Never returns null.
+        /// </summary>
+        /// <typeparam name="TComponent">Component type on blueprint.</typeparam>
+        /// <param name="unit">Unit</param>
+        public static IEnumerable<EntityFactComponent> GetRuntimeComponents<TComponent>(this UnitEntityData unit) where TComponent : class
         {
             //return unit.Progression.Features.SelectFactComponents<TComp>();
             foreach (var fact in unit.Facts.m_Facts)
             {
                 foreach (var comp in fact.Components)
                 {
-                    if (comp.SourceBlueprintComponent is TComp)
+                    if (comp.SourceBlueprintComponent is TComponent)
                         yield return comp;
                 }
             }
-        }
-
-        public static EntityFactComponent GetRuntimeComponent<TComp>(this EntityFact fact) where TComp : class
-        {
-            fact.GetComponent<BlueprintComponent>();
-            foreach (var comp in fact.Components)
-            {
-                if (comp.SourceBlueprintComponent is TComp)
-                    return comp;
-            }
-            return null;
         }
 
         #endregion
@@ -2082,7 +1862,9 @@ namespace CodexLib
         /// BlueprintFeature: IsPrerequisiteFor
         /// BlueprintAbility: m_Parent
         /// </summary>
-        /// <param name="guid2">guid to merge with, use for dynamic blueprints (unknown list of blueprints), otherwise empty</param>
+        /// <param name="obj">Object to clone.</param>
+        /// <param name="name">New blueprint name.</param>
+        /// <param name="guid2">Guid to merge with, use for dynamic blueprints (unknown list of blueprints), otherwise empty.</param>
         public static T Clone<T>(this T obj, string name, string guid2 = null) where T : SimpleBlueprint
         {
             string guid;
@@ -2141,7 +1923,7 @@ namespace CodexLib
         }
 
         /// <summary>
-        /// Creates deep copy of IEnumerable<BlueprintComponent>.
+        /// Creates deep copy of <see cref="BlueprintComponent"/>.
         /// </summary>
         public static List<T> Clone<T>(this IEnumerable<T> obj, Action<T> action = null) where T : BlueprintComponent
         {
@@ -2201,16 +1983,13 @@ namespace CodexLib
         }
         public static void AddCombatFeat(BlueprintFeature feats)
         {
-            if (_combatfeats1 == null) //FighterFeatSelection
-                _combatfeats1 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("41c8486641f7d6d4283ca9dae4147a9f");
+            _combatfeats1 ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("41c8486641f7d6d4283ca9dae4147a9f");
             AppendAndReplace(ref _combatfeats1.m_AllFeatures, feats.ToRef());
 
-            if (_combatfeats2 == null) //CombatTrick
-                _combatfeats2 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c5158a6622d0b694a99efb1d0025d2c1");
+            _combatfeats2 ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c5158a6622d0b694a99efb1d0025d2c1");
             AppendAndReplace(ref _combatfeats2.m_AllFeatures, feats.ToRef());
 
-            if (_combatfeats3 == null) //ExtraFeatMythicFeat
-                _combatfeats3 = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
+            _combatfeats3 ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
             AppendAndReplace(ref _combatfeats3.m_AllFeatures, feats.ToRef());
 
             AddFeats(feats);
@@ -2221,10 +2000,8 @@ namespace CodexLib
         private static BlueprintFeatureSelection _mythicextratalents;
         public static void AddMythicTalent(BlueprintFeature feat)
         {
-            if (_mythictalents == null)
-                _mythictalents = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
-            if (_mythicextratalents == null)
-                _mythicextratalents = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
+            _mythictalents ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
+            _mythicextratalents ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
 
             AppendAndReplace(ref _mythictalents.m_AllFeatures, feat.ToRef());
             _mythicextratalents.m_AllFeatures = _mythictalents.m_AllFeatures;
@@ -2232,8 +2009,7 @@ namespace CodexLib
 
         public static void AddMythicFeat(BlueprintFeature feat)
         {
-            if (_mythicfeats == null)
-                _mythicfeats = ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81");
+            _mythicfeats ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81");
 
             AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat.ToRef());
         }
@@ -2245,18 +2021,12 @@ namespace CodexLib
         private static BlueprintFeatureSelection _vivsectionistfeats;
         public static void AddRogueFeat(BlueprintFeature feat)
         {
-            if (_roguefeats == null)
-                _roguefeats = Get<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
-            if (_slayerfeats1 == null)
-                _slayerfeats1 = Get<BlueprintFeatureSelection>("04430ad24988baa4daa0bcd4f1c7d118");
-            if (_slayerfeats2 == null)
-                _slayerfeats2 = Get<BlueprintFeatureSelection>("43d1b15873e926848be2abf0ea3ad9a8");
-            if (_slayerfeats3 == null)
-                _slayerfeats3 = Get<BlueprintFeatureSelection>("913b9cf25c9536949b43a2651b7ffb66");
-            if (_vivsectionistfeats == null)
-                _vivsectionistfeats = Get<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
-            if (_tricksterhexes == null)
-                _tricksterhexes = Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452");
+            _roguefeats ??= Get<BlueprintFeatureSelection>("c074a5d615200494b8f2a9c845799d93");
+            _slayerfeats1 ??= Get<BlueprintFeatureSelection>("04430ad24988baa4daa0bcd4f1c7d118");
+            _slayerfeats2 ??= Get<BlueprintFeatureSelection>("43d1b15873e926848be2abf0ea3ad9a8");
+            _slayerfeats3 ??= Get<BlueprintFeatureSelection>("913b9cf25c9536949b43a2651b7ffb66");
+            _vivsectionistfeats ??= Get<BlueprintFeatureSelection>("67f499218a0e22944abab6fe1c9eaeee");
+            _tricksterhexes ??= Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452");
 
             var reference = feat.ToRef();
 
@@ -2295,8 +2065,7 @@ namespace CodexLib
         /// <param name="blueprintFeature">type: BlueprintFeature</param>
         public static void AddInfusion(AnyRef blueprintFeature)
         {
-            if (_infusions == null)
-                _infusions = Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
+            _infusions ??= Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
             AppendAndReplace(ref _infusions.m_AllFeatures, blueprintFeature);
         }
 
@@ -2304,8 +2073,7 @@ namespace CodexLib
         /// <param name="blueprintFeature">type: BlueprintFeature</param>
         public static void AddWildTalent(AnyRef blueprintFeature)
         {
-            if (_wildtalents == null)
-                _wildtalents = Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
+            _wildtalents ??= Get<BlueprintFeatureSelection>("5c883ae0cd6d7d5448b7a420f51f8459");
             AppendAndReplace(ref _wildtalents.m_AllFeatures, blueprintFeature);
         }
 
@@ -2501,7 +2269,13 @@ namespace CodexLib
             effect.Animation = CastAnimationStyle.Touch;
         }
 
+        /// <summary>
+        /// Creates an action list and adds a single apply buff action.
+        /// </summary>
         /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        /// <param name="duration"></param>
+        /// <param name="dispellable"></param>
+        /// <param name="toCaster"></param>
         public static AbilityEffectRunAction MakeRunActionApplyBuff(AnyRef buff, ContextDurationValue duration = null, bool dispellable = false, bool toCaster = false)
         {
             var result = new AbilityEffectRunAction();
@@ -2567,7 +2341,9 @@ namespace CodexLib
             return ability;
         }
 
-        /// <summary>Puts a new Conditional infront of existing ActionList.</summary>
+        /// <summary>
+        /// Puts a new Conditional infront of existing ActionList.
+        /// </summary>
         public static ActionList InjectCondition(this ActionList actionList, Condition condition, bool ifTrue = true)
         {
             if (ifTrue)
@@ -2634,6 +2410,10 @@ namespace CodexLib
 
         #region Blueprint Weapon
 
+        /// <summary>
+        /// Overwrite weapon enchantments.
+        /// </summary>
+        /// <param name="bp">Weapon to set enchantments</param>
         /// <param name="BlueprintWeaponEnchantment">direct type, reference, or string</param>
         public static BlueprintItemWeapon SetEnchantment(this BlueprintItemWeapon bp, params object[] BlueprintWeaponEnchantment)
         {
@@ -2657,11 +2437,11 @@ namespace CodexLib
 
         public static void GenerateEnchantedWeapons(this BlueprintWeaponType weaponType, List<BlueprintItemWeapon> list, BlueprintWeaponEnchantment enchantment, bool full, params object[] BlueprintWeaponEnchantment)
         {
-            var plus1 = ToRef<BlueprintWeaponEnchantmentReference>("d42fc23b92c640846ac137dc26e000d4");
-            var plus2 = ToRef<BlueprintWeaponEnchantmentReference>("eb2faccc4c9487d43b3575d7e77ff3f5");
-            var plus3 = ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b");
-            var plus4 = ToRef<BlueprintWeaponEnchantmentReference>("783d7d496da6ac44f9511011fc5f1979");
-            var plus5 = ToRef<BlueprintWeaponEnchantmentReference>("bdba267e951851449af552aa9f9e3992");
+            //var plus1 = ToRef<BlueprintWeaponEnchantmentReference>("d42fc23b92c640846ac137dc26e000d4");
+            //var plus2 = ToRef<BlueprintWeaponEnchantmentReference>("eb2faccc4c9487d43b3575d7e77ff3f5");
+            //var plus3 = ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b");
+            //var plus4 = ToRef<BlueprintWeaponEnchantmentReference>("783d7d496da6ac44f9511011fc5f1979");
+            //var plus5 = ToRef<BlueprintWeaponEnchantmentReference>("bdba267e951851449af552aa9f9e3992");
 
             throw new NotImplementedException();
         }
@@ -2868,7 +2648,12 @@ namespace CodexLib
                 _spells1[i].BlueprintParameterVariants = newAllSpells;
         }
 
-        /// <param name="blueprintSpellList">type: <b>BlueprintSpellList[]</b></param>
+        /// <summary>
+        /// Expands a spell list by the given spell at a specific spell level.
+        /// </summary>
+        /// <param name="spell">Spell which is added to spell list</param>
+        /// <param name="level">Spell Level</param>
+        /// <param name="blueprintSpellList">type: <b>BlueprintSpellList[]</b><br/>spell list to expand</param>
         public static void Add(this BlueprintAbility spell, int level, params AnyRef[] blueprintSpellList)
         {
             foreach (var spellList in blueprintSpellList.Get<BlueprintSpellList>())
@@ -2993,12 +2778,16 @@ namespace CodexLib
             return feature;
         }
 
+        /// <summary>
+        /// BlueprintAbility component to consume resource on use.
+        /// </summary>
         /// <param name="resource">type: <b>BlueprintAbilityResource</b></param>
+        /// <param name="amount">Amount of resource required to use the ability.</param>
         public static AbilityResourceLogic CreateAbilityResourceLogic(AnyRef resource, int amount = 1)
         {
             var result = new AbilityResourceLogic();
             result.m_RequiredResource = resource;
-            result.Amount = 1;
+            result.Amount = amount;
             return result;
         }
 
@@ -3194,9 +2983,18 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Spawn creatures.
+        /// </summary>
         /// <param name="unit">type: <b>BlueprintUnit</b></param>
-        /// <param name="summonBuff">type: <b>BlueprintBuff</b></param>
-        /// <param name="summonPool">type: <b>BlueprintSummonPool</b></param>
+        /// <param name="duration">Summon duration. Defaults to 1 hour.</param>
+        /// <param name="count">Number of creatures to summon. Defaults to 1.</param>
+        /// <param name="levelValue"></param>
+        /// <param name="summonBuff">type: <b>BlueprintBuff</b><br/>Defaults to SummonedUnitBuff.</param>
+        /// <param name="summonPool">type: <b>BlueprintSummonPool</b><br/>Defaults to SummonMonsterPool.</param>
+        /// <param name="useLimit">If true use limit from summon pool (if any).</param>
+        /// <param name="linkToCaster"></param>
+        /// <param name="isControllable">If false is controlled by AI.</param>
         /// <returns></returns>
         public static ContextActionSpawnMonster CreateContextActionSpawnMonster(AnyRef unit, ContextDurationValue duration = null, ContextDiceValue count = null, ContextValue levelValue = null, AnyRef summonBuff = null, AnyRef summonPool = null, bool useLimit = false, bool linkToCaster = true, bool isControllable = false)
         {
@@ -3395,8 +3193,7 @@ namespace CodexLib
 
         public static ContextCalculateSharedValue CreateContextCalculateSharedValue(AbilitySharedValue ValueType = AbilitySharedValue.Damage, ContextDiceValue Value = null, double Modifier = 1.0)
         {
-            if (Value == null)
-                Value = CreateContextDiceValue(DiceType.One, AbilityRankType.DamageDice, AbilityRankType.DamageBonus);
+            Value ??= CreateContextDiceValue(DiceType.One, AbilityRankType.DamageDice, AbilityRankType.DamageBonus);
 
             var result = new ContextCalculateSharedValue();
             result.ValueType = ValueType;
@@ -3595,7 +3392,14 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Reduces on extends buff duration. Used by spells that like Call Lightning that reduce remaining duration on use.
+        /// </summary>
         /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        /// <param name="duration">Time to extend or reduce the duration. Use positive values only.</param>
+        /// <param name="rate"></param>
+        /// <param name="increase">If false will reduces the duration, otherwise extend the duration.</param>
+        /// <param name="toTarget">If false will affect the caster.</param>
         public static ContextActionReduceBuffDuration CreateContextActionReduceBuffDuration(AnyRef buff, int duration, DurationRate rate = DurationRate.Rounds, bool increase = false, bool toTarget = false)
         {
             var result = new ContextActionReduceBuffDuration();
@@ -3640,8 +3444,14 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Spawns a projectile. Can include an attack roll.
+        /// </summary>
         /// <param name="projectile">type: <b>BlueprintProjectile</b></param>
-        /// <param name="weapon">type: <b></b></param>
+        /// <param name="type">Projectile type</param>
+        /// <param name="weapon">type: <b>BlueprintItemWeapon</b><br/>Needs attack roll, if set. Otherwise no roll needed.</param>
+        /// <param name="length">Length of line or cone area effect.</param>
+        /// <param name="width">Width of line area effect.</param>
         public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(AnyRef projectile, AbilityProjectileType type = AbilityProjectileType.Simple, AnyRef weapon = null, Feet length = default, Feet width = default)
         {
             var result = new AbilityDeliverProjectile();
@@ -3676,7 +3486,11 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Hide ability, if caster doesn't have fact. Invertable.
+        /// </summary>
         /// <param name="UnitFact">type: <b>BlueprintUnitFact</b></param>
+        /// <param name="not">Invert logic.</param>
         public static AbilityShowIfCasterHasFact CreateAbilityShowIfCasterHasFact(AnyRef UnitFact, bool not = false)
         {
             var result = new AbilityShowIfCasterHasFact();
@@ -3817,7 +3631,11 @@ namespace CodexLib
             return hasBuff;
         }
 
+        /// <summary>
+        /// Condition caster has buff. Invertable.
+        /// </summary>
         /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        /// <param name="not">Invert logic.</param>
         public static ContextConditionHasBuff CreateContextConditionHasBuff(AnyRef buff, bool not = false)
         {
             return new ContextConditionHasBuff()
@@ -3969,7 +3787,15 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Apply buff to target or caster.
+        /// </summary>
         /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        /// <param name="duration"></param>
+        /// <param name="fromSpell"></param>
+        /// <param name="dispellable"></param>
+        /// <param name="toCaster"></param>
+        /// <param name="asChild"></param>
         public static ContextActionApplyBuff CreateContextActionApplyBuff(AnyRef buff, ContextDurationValue duration = null, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false)
         {
             var result = new ContextActionApplyBuff();
@@ -4049,7 +3875,11 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Prerequisite Feature
+        /// </summary>
         /// <param name="feat">type: <b>BlueprintFeature</b></param>
+        /// <param name="any">Prerequisite.GroupType.Any or .All</param>
         public static PrerequisiteFeature CreatePrerequisiteFeature(this AnyRef feat, bool any = false)
         {
             var result = new PrerequisiteFeature();
@@ -4066,7 +3896,12 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Prerequisite levels in a character class.
+        /// </summary>
         /// <param name="class">type: <b>BlueprintCharacterClass</b></param>
+        /// <param name="level"></param>
+        /// <param name="any">Prerequisite.GroupType.Any or .All</param>
         public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(AnyRef @class, int level, bool any = false) => CreatePrerequisiteClassLevel((BlueprintCharacterClassReference)@class, level, any);
         public static PrerequisiteClassLevel CreatePrerequisiteClassLevel(BlueprintCharacterClassReference @class, int level, bool any = false)
         {
@@ -4095,16 +3930,22 @@ namespace CodexLib
             return result;
         }
 
+        /// <summary>
+        /// Prerequisite parametrized feature. Priority: Spell, SpellSchool, WeaponCategory
+        /// </summary>
         /// <param name="feature">type: <b>BlueprintFeature</b></param>
+        /// <param name="weaponCategory"></param>
+        /// <param name="spellSchool"></param>
         /// <param name="spell">type: <b>BlueprintAbility</b></param>
-        public static PrerequisiteParametrizedFeature CreatePrerequisiteParametrizedFeature(AnyRef feature, WeaponCategory weaponCategory = 0, SpellSchool spellSchool = 0, AnyRef spell = null, bool any = false)
+        /// <param name="any">Prerequisite.GroupType.Any or .All</param>
+        public static PrerequisiteParametrizedFeature CreatePrerequisiteParametrizedFeature(AnyRef feature, WeaponCategory weaponCategory = WeaponCategory.UnarmedStrike, SpellSchool spellSchool = SpellSchool.None, AnyRef spell = null, bool any = false)
         {
             var result = new PrerequisiteParametrizedFeature();
             result.m_Feature = feature;
             result.WeaponCategory = weaponCategory;
             result.SpellSchool = spellSchool;
             result.m_Spell = spell;
-            result.ParameterType = spell != null ? FeatureParameterType.SpellSpecialization : spellSchool != 0 ? FeatureParameterType.SpellSpecialization : FeatureParameterType.WeaponCategory;
+            result.ParameterType = spell != null ? FeatureParameterType.SpellSpecialization : spellSchool != SpellSchool.None ? FeatureParameterType.SpellSpecialization : FeatureParameterType.WeaponCategory;
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
             return result;
         }
@@ -4476,8 +4317,19 @@ namespace CodexLib
         private static BlueprintItemWeapon CreateBlueprintItemWeapon(string a, string b, string c, BlueprintWeaponTypeReference d, DiceFormula? e, DamageTypeDescription f, BlueprintItemWeaponReference g, bool h, int i)
          => CreateBlueprintItemWeapon(a, b, c, null, d, e, f, g, h, i, null, null);
 
+        /// <summary>
+        /// Create weapon blueprint.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="displayName"></param>
+        /// <param name="description"></param>
+        /// <param name="icon"></param>
         /// <param name="weaponType">type: <b>BlueprintWeaponType</b></param>
+        /// <param name="damageOverride"></param>
+        /// <param name="form"></param>
         /// <param name="secondWeapon">type: <b>BlueprintItemWeapon</b></param>
+        /// <param name="primaryNatural"></param>
+        /// <param name="price"></param>
         /// <param name="cloneVisuals">type: <b>BlueprintWeaponType</b> or <b>BlueprintItemWeapon</b></param>
         /// <param name="enchantments">type: <b>BlueprintWeaponEnchantment[]</b></param>
         public static BlueprintItemWeapon CreateBlueprintItemWeapon(string name, string displayName = null, string description = null, Sprite icon = null, AnyRef weaponType = null, DiceFormula? damageOverride = null, DamageTypeDescription form = null, AnyRef secondWeapon = null, bool primaryNatural = false, int price = 1000, AnyRef cloneVisuals = null, params AnyRef[] enchantments)

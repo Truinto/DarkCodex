@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Grants extra charges for each Fact a creature has.
+    /// </summary>
     public class IncreaseResourceAmountPlus : UnitFactComponentDelegate, IResourceAmountBonusHandler
     {
         public BlueprintAbilityResourceReference Resource;
@@ -14,7 +17,11 @@ namespace CodexLib
 
         public int Multiplier;
 
+        /// <summary>
+        /// Grants extra charges for each Fact a creature has.
+        /// </summary>
         /// <param name="resource">type: <b>BlueprintAbilityResource</b></param>
+        /// <param name="multiplier">Extra resources per matching fact.</param>
         /// <param name="increasingFacts">type: <b>BlueprintUnitFact</b></param>
         public IncreaseResourceAmountPlus(AnyRef resource, int multiplier = 1, params AnyRef[] increasingFacts)
         {

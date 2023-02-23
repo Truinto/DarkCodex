@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net472</TargetFrameworks>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Authors>Truinto</Authors>
+		<Title>$(MSBuildProjectName)</Title>
+		<RepositoryUrl>https://github.com/Truinto/</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<RootNamespace>Shared</RootNamespace>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<ItemDefinitionGroup>
+		<Reference Private="false" />
+		<ProjectReference Private="false" />
+	</ItemDefinitionGroup>
+
+	<!-- Library Path -->
+	<PropertyGroup>
+		<Lib Condition="'$(Lib)' == ''">..\non-public\lib\</Lib>
+	</PropertyGroup>
+
+	<!-- Nuget Packages -->
+	<ItemGroup>
+		<PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" ExcludeAssets="runtime" />
+	</ItemGroup>
+
+	<!-- Project References -->
+	<ItemGroup>
+		<Reference Include="0Harmony_public" HintPath="$(Lib)\0Harmony_public.dll" />
+		<Reference Include="Newtonsoft.Json" HintPath="$(Lib)\Newtonsoft.Json.dll" />
+		<Reference Include="UnityModManager" HintPath="$(Lib)\UnityModManager.dll" />
+		<Reference Include="UnityEngine" HintPath="$(Lib)\UnityEngine.dll" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="$(Lib)\UnityEngine.CoreModule.dll" />
+		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(Lib)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Include="UnityEngine.UI" HintPath="$(Lib)\UnityEngine.UI.dll" />
+	</ItemGroup>
+
+	<!-- Other Files -->
+	<ItemGroup>
+		<GlobalAnalyzerConfigFiles Include="..\.globalconfiguration" Link=".globalconfiguration" />
+	</ItemGroup>
+
+	<!-- Publicize -->
+	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
+		<ItemGroup>
+			<PublicizeInput Include="$(Lib)\0Harmony.dll" />
+		</ItemGroup>
+		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(Lib)\" />
+	</Target>
+
+	<!-- Update build version -->
+	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
+		<ItemGroup>
+			<VersioningInput Include="Properties\AssemblyInfo.cs" />
+			<VersioningOutput Include="Properties\AssemblyInfo.cs" />
+		</ItemGroup>
+		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningOutput)" AutoIncrease="true" MaxMatch="3" TouchFiles="false" />
+	</Target>
+
+	<!-- Copy to solution folder -->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<ItemGroup>
+			<_CopyItems Include="$(TargetDir)$(TargetName).dll" />
+			<_CopyItems Include="$(TargetDir)$(TargetName).xml" />
+		</ItemGroup>
+		
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="..\" />
+	</Target>
+
+</Project>

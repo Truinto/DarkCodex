@@ -55,8 +55,8 @@ namespace DarkCodex
             var staff = Helper.Get<BlueprintItemWeapon>("e33fd75689190094f897a57a227fa272"); //BurnedAshwoodItem
             var enchant_air = Helper.ToRef<BlueprintWeaponEnchantmentReference>("1d64abd0002b98043b199c0e3109d3ee"); //AirKineticBladeEnchantment
             var enchant_3 = Helper.ToRef<BlueprintWeaponEnchantmentReference>("80bb8a737579e35498177e1e3c75899b"); //Enhancement3
-            var air_damage = Helper.Get<BlueprintAbility>("89cc522f2e1444b40ba1757320c58530"); //AirBlastKineticBladeDamage
-            var air_burn = Helper.Get<BlueprintAbility>("77cb8c607b263194894a929c8ac59708"); //KineticBladeAirBlastBurnAbility
+            //var air_damage = Helper.Get<BlueprintAbility>("89cc522f2e1444b40ba1757320c58530"); //AirBlastKineticBladeDamage
+            //var air_burn = Helper.Get<BlueprintAbility>("77cb8c607b263194894a929c8ac59708"); //KineticBladeAirBlastBurnAbility
 
             var fake_blade_damage = Helper.CreateBlueprintAbility(
                 "KineticCatalystDamage",

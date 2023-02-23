@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
+#pragma warning disable CS1591
 
 namespace Shared
 {
@@ -34,13 +34,13 @@ namespace Shared
         public bool Disabled;
         public bool DisabledAll;
 
-        public bool IsWIP => (PatchType & Severity.WIP) > 0;
-        public bool IsFaulty => (PatchType & Severity.Faulty) > 0;
-        public bool IsDangerous => (PatchType & Severity.Create) > 0;
-        public bool IsHarmony => (PatchType & Severity.Harmony) > 0;
-        public bool IsEvent => (PatchType & Severity.Event) > 0;
-        public bool IsHidden => (PatchType & Severity.Hidden) > 0;
-        public bool IsDefaultOff => (PatchType & Severity.DefaultOff) > 0;
+        public bool IsWIP => (PatchType & Severity.WIP) != 0;
+        public bool IsFaulty => (PatchType & Severity.Faulty) != 0;
+        public bool IsDangerous => (PatchType & Severity.Create) != 0;
+        public bool IsHarmony => (PatchType & Severity.Harmony) != 0;
+        public bool IsEvent => (PatchType & Severity.Event) != 0;
+        public bool IsHidden => (PatchType & Severity.Hidden) != 0;
+        public bool IsDefaultOff => (PatchType & Severity.DefaultOff) != 0;
 
         public string FullName => Class + "." + Method;
         public string HomebrewStr => Homebrew ? ":house:" : ":book:";

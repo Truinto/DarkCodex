@@ -14,7 +14,7 @@ namespace DarkCodex
 {
     public class MartialArt
     {
-        [PatchInfo(Severity.Create | Severity.WIP | Severity.Hidden, "Paladin Virtuous Bravo", "archetype", false)]
+        [PatchInfo(Severity.Create | Severity.WIP, "Paladin Virtuous Bravo", "archetype", false)]
         public static void CreatePaladinVirtuousBravo()
         {
             var paladin = Helper.ToRef<BlueprintCharacterClassReference>("bfa11238e7ae3544bbeb4d0b92e897ec"); //PaladinClass
@@ -132,7 +132,8 @@ namespace DarkCodex
             var bleedbuff1 = Helper.CreateBlueprintBuff(
                 "Panache_BleedingWound_SelfBuff",
                 "Bleeding Wound",
-                "As a free action you can spend 1 panache point to have your next light or one-handed piercing melee weapon attack deal additional bleed damage. The amount of bleed damage dealt is equal to the swashbuckler’s Dexterity modifier."
+                "As a free action you can spend 1 panache point to have your next light or one-handed piercing melee weapon attack deal additional bleed damage. The amount of bleed damage dealt is equal to the swashbuckler’s Dexterity modifier.",
+                icon: Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
                 ).SetComponents(
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
                     Helper.CreateActionList(new ContextActionRemoveSelf(), new ContextActionIncreaseBleed(false)),
@@ -154,7 +155,8 @@ namespace DarkCodex
             var bleedbuff2 = Helper.CreateBlueprintBuff(
                 "Panache_GreaterBleedingWound_SelfBuff",
                 "Greater Bleeding Wound",
-                "As a free action you can spend 2 panache point to have your next light or one-handed piercing melee weapon attack deal additional 1d4 points of Constitution bleed damage."
+                "As a free action you can spend 2 panache point to have your next light or one-handed piercing melee weapon attack deal additional 1d4 points of Constitution bleed damage.",
+                icon: Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
                 ).SetComponents(
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
                     Helper.CreateActionList(new ContextActionRemoveSelf(), Helper.CreateContextActionApplyBuff("f80de2a32fc2a7141b23ec29bc36f395")), //BleedConst1d4Buff
@@ -225,7 +227,7 @@ namespace DarkCodex
                 "TargetedStrikeDisarm",
                 "Targeted Strike: Disarm",
                 "Arms: The target takes no damage from the attack, but you disarm it. If successful, the target cannot use his weapons for 1 {g|Encyclopedia:Combat_Round}round{/g}. For every 5 by which your {g|Encyclopedia:Attack}attack{/g} exceeds your opponent's {g|Encyclopedia:AC}AC{/g}, the disarmed condition lasts 1 additional round.",
-                icon: null,
+                icon: Helper.StealIcon("45d94c6db453cfc4a9b99b72d6afe6f6"),
                 type: AbilityType.Extraordinary,
                 range: AbilityRange.Weapon
                 ).TargetEnemy(
@@ -241,7 +243,7 @@ namespace DarkCodex
                 "TargetedStrikeConfuse",
                 "Targeted Strike: Confuse",
                 "Head: The target is confused for 1 round. This is a mind-affecting effect.",
-                icon: null,
+                icon: Helper.StealIcon("cf6c901fb7acc904e85c63b342e9c949"),
                 type: AbilityType.Extraordinary,
                 range: AbilityRange.Weapon
                 ).TargetEnemy(
@@ -258,7 +260,7 @@ namespace DarkCodex
                 "TargetedStrikeTrip",
                 "Targeted Strike: Trip",
                 "Legs: The target is knocked prone. Creatures with four or more legs or that are immune to trip attacks are immune to this effect.",
-                icon: null,
+                icon: Helper.StealIcon("6fd05c4ecfebd6f4d873325de442fc17"),
                 type: AbilityType.Extraordinary,
                 range: AbilityRange.Weapon
                 ).SetComponents(
@@ -274,7 +276,7 @@ namespace DarkCodex
                 "TargetedStrikeStagger",
                 "Targeted Strike: Stagger",
                 "Torso or Wings: The target is staggered for 1 round.",
-                icon: null,
+                icon: Helper.StealIcon("df3950af5a783bd4d91ab73eb8fa0fd3"),
                 type: AbilityType.Extraordinary,
                 range: AbilityRange.Weapon
                 ).SetComponents(
@@ -349,6 +351,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref paladin.Get().m_Archetypes, archetype.ToRef());
         }
 
+        [PatchInfo(Severity.Create | Severity.WIP, "Bladed Brush", "combat feat: use glaive with Weapon Finesse and Precise Strike", false)]
         public static void CreateBladedBrush()
         {
             var feat = Helper.CreateBlueprintFeature(

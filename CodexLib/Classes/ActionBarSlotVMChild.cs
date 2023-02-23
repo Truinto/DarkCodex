@@ -9,23 +9,29 @@ using System.Threading.Tasks;
 namespace CodexLib
 {
     /// <summary>
-    /// remembers parent ActionBarSlotVM
+    /// Remembers parent ActionBarSlotVM of converted slots.
     /// </summary>
     public class ActionBarSlotVMChild : ActionBarSlotVM
     {
+        /// <summary>Parent slot that has this open in a convert box.</summary>
         public ActionBarSlotVM Parent;
 
+        /// <inheritdoc cref="ActionBarSlotVMChild"/>
         public ActionBarSlotVMChild(ActionBarSlotVM parent, MechanicActionBarSlot abs, int index = -1, int spellLevel = -1) : base(abs, index, spellLevel)
         {
             this.Parent = parent;
         }
 
+        /// <inheritdoc/>
         public override void DisposeImplementation()
         {
             Parent = null;
             base.DisposeImplementation();
         }
 
+        /// <summary>
+        /// Updates icon and border for <see cref="MechanicActionBarSlotVariantSelection"/>.
+        /// </summary>
         public override void OnMainClick()
         {
             base.OnMainClick();

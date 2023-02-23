@@ -24,7 +24,7 @@ namespace CodexLib
 
             var data = this.Owner.GetFact(parent).GetDataExt<IActionBarConvert, VariantSelectionData>();
 
-            if (data?.Selected is not BlueprintAbility selection)
+            if (data?.Selected is not BlueprintAbility /*selection*/)
                 return;
 
             // stuff here

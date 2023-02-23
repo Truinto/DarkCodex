@@ -1,4 +1,5 @@
 ﻿using Kingmaker.Designers.Mechanics.Buffs;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             data.Last().Rewind(typeof(HandSlot), nameof(HandSlot.HasShield));
             data.InsertAfter(Patch);

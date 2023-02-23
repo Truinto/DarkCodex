@@ -132,23 +132,13 @@ namespace DarkCodex
         {
             var knight = Helper.Get<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
             var infusion_selection = Helper.Get<BlueprintFeatureSelection>("58d6f8e9eea63f6418b107ce64f315ea");
-            var demoncharge = Helper.Get<BlueprintAbility>("1b677ed598d47a048a0f6b4b671b8f84"); //DemonChargeMainAbility
             var blade = Helper.ToRef<BlueprintFeatureReference>("9ff81732daddb174aa8138ad1297c787"); //KineticBladeInfusion
             var kineticist_class = Helper.ToRef<BlueprintCharacterClassReference>("42a455d9ec1ad924d889272429eb8391"); //KineticistClass
-            var dimensiondoor = Helper.ToRef<BlueprintAbilityReference>("a9b8be9b87865744382f7c64e599aeb2"); //DimensionDoorCasterOnly
             var flashstep = Helper.Get<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
 
             string name = "Blade Rush";
             string description = "Element: universal\nType: form infusion\nLevel: 2\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou use your element’s power to instantly move 30 feet, manifest a kinetic blade, and attack once. You gain a +2 bonus on the attack roll and take a –2 penalty to your AC until the start of your next turn. The movement doesn’t provoke attacks of opportunity, though activating blade rush does.";
             Sprite icon = Helper.StealIcon("4c349361d720e844e846ad8c19959b1e");
-
-            var buff = Helper.CreateBlueprintBuff(
-                "KineticBladeRushBuff",
-                "KineticBladeRushBuff",
-                ""
-                ).SetComponents(
-                Helper.CreateAddFactContextActions(on: Helper.CreateContextActionMeleeAttack(true).ObjToArray())
-                ).Flags(hidden: true);
 
             var ability = Helper.CreateBlueprintAbility(
                 "KineticBladeRushAbility",
@@ -161,12 +151,7 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreateAbilityExecuteActionOnCast(
                     Helper.CreateContextActionApplyBuff(BlueprintRoot.Instance.SystemMechanics.ChargeBuff, 1, toCaster: true)
-                    //Helper.CreateContextActionApplyBuff(buff, 3f, toCaster: true)
-                    //Helper.CreateContextActionCastSpell(dimensiondoor)
-                    //new ContextActionMeleeAttackPoint()
-                    //Helper.CreateContextActionMeleeAttack(true)
                     ),
-                //demoncharge.GetComponent<AbilityCustomTeleportation>(),
                 flashstep.GetComponent<AbilityCustomFlashStep>(),   // bug: m_FlashShot would trigger two attacks (impossible rare)
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
@@ -1190,7 +1175,7 @@ namespace DarkCodex
                     );
 
                 focus.Third.Get()?.AddComponents(
-                    new AddFeatureOnApplyPrerequisite(2, mastery, focus.First, focus.Knight, focus.Second)
+                    new AddFeatureOnApplyPrerequisite(2, mastery, focus.First, focus.Second, focus.Knight)
                     ).RemoveComponents<PrerequisiteNoFeature>();
             }
         }

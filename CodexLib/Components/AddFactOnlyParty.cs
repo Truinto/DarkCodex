@@ -14,13 +14,21 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Add fact, but only to playable characters.
+    /// </summary>
     public class AddFactOnlyParty : UnitFactComponentDelegate, IUnitLevelUpHandler
     {
         public BlueprintUnitFactReference Feature;
         public int Level;
         public FeatureParam Parameter;
 
+        /// <summary>
+        /// Add fact, but only to playable characters.
+        /// </summary>
         /// <param name="feature">type: <b>BlueprintUnitFact</b></param>
+        /// <param name="level">Minimum level the character must have.</param>
+        /// <param name="parameter">For parameterized features.</param>
         public AddFactOnlyParty(AnyRef feature, int level = 0, FeatureParam parameter = null)
         {
             this.Feature = feature;

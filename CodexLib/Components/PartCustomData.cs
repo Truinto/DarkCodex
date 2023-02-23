@@ -18,7 +18,7 @@ namespace CodexLib
 
         public bool IsEmpty()
         {
-            return flags == null || flags.Data == null || flags.Data.Count == 0;
+            return flags == null || flags.IsEmpty();
         }
     }
 

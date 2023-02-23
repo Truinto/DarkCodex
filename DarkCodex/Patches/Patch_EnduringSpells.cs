@@ -36,22 +36,13 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(EnduringSpells), nameof(EnduringSpells.HandleBuffDidAdded))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            bool flag = true;
 
-            foreach (var line in instr)
-            {
-                if (flag && line.opcode == OpCodes.Ret)
-                {
-                    line.opcode = OpCodes.Nop;
-                    flag = false;
-                }
-                yield return line;
-            }
-
-            if (flag)
-                throw new Exception("Transpiler patch illegal state.");
+            var data = new TranspilerTool(instructions, generator, original);
+            data.Seek(OpCodes.Ret);
+            data.ReplaceNOP();
+            return data;
         }
 
         public static BlueprintFeatureReference EnduringSpellsGreater = Helper.ToRef<BlueprintFeatureReference>("13f9269b3b48ae94c896f0371ce5e23c");

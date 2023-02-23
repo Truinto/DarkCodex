@@ -56,19 +56,28 @@ namespace CodexLib
     /// </summary>
     public class AnyRef : BlueprintReferenceBase
     {
+        /// <summary>List of delayed actions to execute after blueprint is generated.</summary>
         public List<Action<BlueprintScriptableObject>> Actions;
 
+        /// <inheritdoc cref="AnyRef"/>
         public AnyRef()
         {
         }
 
+        /// <inheritdoc cref="AnyRef"/>
         public AnyRef(Action<BlueprintScriptableObject> action)
         {
             AddDelayedPatch(action);
         }
 
-        public SimpleBlueprint Value { get => this; set => Set(value); }
+        /// <summary>
+        /// Property to access <see cref="Get()"/> and <see cref="Set(SimpleBlueprint)"/>
+        /// </summary>
+        public BlueprintScriptableObject Value { get => this; set => Set(value); }
 
+        /// <summary>
+        /// Add a delayed action. Will execute immedately if blueprint is already loaded. Otherwise will wait.
+        /// </summary>
         public void AddDelayedPatch(Action<BlueprintScriptableObject> action)
         {
             if (this.Cached is BlueprintScriptableObject obj)
@@ -77,6 +86,9 @@ namespace CodexLib
                 (Actions ??= new()).Add(action);
         }
 
+        /// <summary>
+        /// Sets blueprint to reference. Will throw, if guid mismatch. Runs delayed actions, then clears them.
+        /// </summary>
         public void Set(SimpleBlueprint bp)
         {
             this.SetReference(bp);
@@ -89,8 +101,18 @@ namespace CodexLib
             }
         }
 
+        /// <summary>
+        /// Returns blueprint.
+        /// </summary>
+        /// <remarks>
+        /// This returns <see cref="BlueprintScriptableObject"/> instead of <see cref="SimpleBlueprint"/>, because almost all inherit the former. This allows access to Components without cast.<br/>
+        /// If the blueprint does not inherit it, this returns null. In that case use Get&lt;SimpleBlueprint&gt;().
+        /// </remarks>
         public BlueprintScriptableObject Get() => Get<BlueprintScriptableObject>();
 
+        /// <summary>
+        /// Returns blueprint. If the blueprint isn't <typeparamref name="T"/> or the reference is empty, then an error is printed and null returned.
+        /// </summary>
         public T Get<T>() where T : SimpleBlueprint
         {
             var bp = this.Cached;
@@ -111,21 +133,29 @@ namespace CodexLib
             return null;
         }
 
+        /// <summary>
+        /// Converts to a BlueprintReference of <typeparamref name="T"/>. Does not validate.
+        /// </summary>
         public T ToRef<T>() where T : BlueprintReferenceBase, new()
         {
             return new T() { deserializedGuid = this.deserializedGuid };
         }
 
+        /// <inheritdoc cref="Get{T}()"/>
         public static T Get<T>(AnyRef bp) where T : SimpleBlueprint
         {
             return bp?.Get<T>();
         }
 
+        /// <inheritdoc cref="ToRef{T}()"/>
         public static T ToRef<T>(AnyRef bp) where T : BlueprintReferenceBase, new()
         {
             return bp?.ToRef<T>();
         }
 
+        /// <summary>
+        /// Converts to AnyRef. <paramref name="obj"/> can be any blueprint, blueprint reference type, or guid string.
+        /// </summary>
         public static AnyRef ToAny(object obj)
         {
             if (obj is AnyRef any)
@@ -140,17 +170,25 @@ namespace CodexLib
             return null;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is BlueprintReferenceBase bp)
                 return this.deserializedGuid == bp.deserializedGuid;
+            if (obj is string str)
+                return this.deserializedGuid == BlueprintGuid.Parse(str);
+            if (obj is SimpleBlueprint sb)
+                return this.deserializedGuid == sb.AssetGuid;
             return base.Equals(obj);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
+
+#pragma warning disable CS1591 // Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 
         public static implicit operator AnyRef(string guid) => guid == null ? null : new() { deserializedGuid = BlueprintGuid.Parse(guid) };
         public static implicit operator AnyRef(SimpleBlueprint bp) => bp == null ? null : new() { deserializedGuid = bp.AssetGuid };

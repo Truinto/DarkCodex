@@ -36,21 +36,16 @@ namespace DarkCodex
 
         [HarmonyPatch(typeof(ModifiableValueSkill), nameof(ModifiableValueSkill.AddBackgroundSkillSource))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var original = AccessTools.Method(typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), new Type[] { typeof(LogChannel), typeof(string), typeof(object[]) });
-
-            foreach (var line in instr)
-            {
-                if (line.Calls(original))
-                    line.ReplaceCall(Empty);
-                yield return line;
-            }
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), Empty, new Type[] { typeof(LogChannel), typeof(string), typeof(object[]) });
+            return data;
         }
 
         [HarmonyPatch(typeof(ModifiableValueSkill), nameof(ModifiableValueSkill.RemoveBackgroundSkillSource))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instr) => Transpiler1(instr);
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler1(instructions, generator, original);
 
         public static void Empty(LogChannel channel, string msgFormat, params object[] @params) { }
     }

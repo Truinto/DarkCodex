@@ -133,10 +133,7 @@ namespace CodexLib
             }
 
             var pEnchant = weapon.AddEnchantment(PoisonEnchantment.Enchantment, this.Context);
-            if (pEnchant != null)
-            {
-                pEnchant.CallComponents<PoisonEnchantment>(c => c.CoatWeapon(Poison, dc, sticky));
-            }
+            pEnchant?.CallComponents<PoisonEnchantment>(c => c.CoatWeapon(Poison, dc, sticky));
         }
     }
 }

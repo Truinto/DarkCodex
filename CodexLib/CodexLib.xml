@@ -1,0 +1,1146 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CodexLib</name>
+    </assembly>
+    <members>
+        <member name="T:CodexLib.BpCache">
+            <summary>
+            Fast blueprint cache for specified types. Preloads from base game guids. Also watches for manual additions from mods.
+            </summary>
+        </member>
+        <member name="F:CodexLib.BpCache.DefaultTypes">
+            <summary>
+            Default types to export and cache.
+            </summary>
+        </member>
+        <member name="P:CodexLib.BpCache.IsLoaded">
+            <summary>
+            True if LoadResources was called before, otherwise false.
+            </summary>
+        </member>
+        <member name="M:CodexLib.BpCache.Get(System.Type)">
+            <summary>
+            Gets read-only collection of given type or empty collection.
+            </summary>
+            <param name="type">Type of blueprint</param>
+        </member>
+        <member name="M:CodexLib.BpCache.Get``1">
+            <summary>
+            Gets read-only collection of given type or empty collection.
+            </summary>
+            <typeparam name="T">Type of blueprint</typeparam>
+        </member>
+        <member name="M:CodexLib.BpCache.ExportResources(System.String,System.Type[])">
+            <summary>
+            Filters base game blueprints and exports guid into file. Can be embedded into 'CodexLib.Resources.Blueprints.bin' for loading.
+            </summary>
+            <param name="path">File path to save to</param>
+            <param name="types">Types of blueprints to filter for</param>
+        </member>
+        <member name="M:CodexLib.BpCache.LoadResources(System.IO.Stream,System.Boolean)">
+            <summary>
+            Load blueprints from stream. Format must be as ExportResources().<br/>
+            Tries to load embedded CodexLib.Resources.Blueprints.bin, if null.
+            </summary>
+        </member>
+        <member name="M:CodexLib.BpCache.AddResource(Kingmaker.Blueprints.SimpleBlueprint)">
+            <summary>
+            Manual adding blueprint to cache. Should not be necessary as 'BlueprintsCache.AddCachedBlueprint' also adds this.
+            </summary>
+        </member>
+        <member name="T:CodexLib.ActionBarConvertedVMAny">
+            <summary>
+            Overwrites logic to use any MechanicActionBarSlot.
+            </summary>
+        </member>
+        <member name="M:CodexLib.ActionBarConvertedVMAny.#ctor(Kingmaker.UI.MVVM._VM.ActionBar.ActionBarSlotVM,System.Collections.Generic.List{Kingmaker.UI.UnitSettings.MechanicActionBarSlot},System.Action)">
+            <inheritdoc cref="T:CodexLib.ActionBarConvertedVMAny"/>
+        </member>
+        <member name="T:CodexLib.ActionBarSlotVMChild">
+            <summary>
+            Remembers parent ActionBarSlotVM of converted slots.
+            </summary>
+        </member>
+        <member name="F:CodexLib.ActionBarSlotVMChild.Parent">
+            <summary>Parent slot that has this open in a convert box.</summary>
+        </member>
+        <member name="M:CodexLib.ActionBarSlotVMChild.#ctor(Kingmaker.UI.MVVM._VM.ActionBar.ActionBarSlotVM,Kingmaker.UI.UnitSettings.MechanicActionBarSlot,System.Int32,System.Int32)">
+            <inheritdoc cref="T:CodexLib.ActionBarSlotVMChild"/>
+        </member>
+        <member name="M:CodexLib.ActionBarSlotVMChild.DisposeImplementation">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.ActionBarSlotVMChild.OnMainClick">
+            <summary>
+            Updates icon and border for <see cref="T:CodexLib.MechanicActionBarSlotVariantSelection"/>.
+            </summary>
+        </member>
+        <member name="T:CodexLib.AmbigiousCollection`1">
+            <summary>
+            Read-only wrapper for any type of IList. Casts items. Throws if cast not possible.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.#ctor(System.Collections.IList)">
+            <inheritdoc cref="T:CodexLib.AmbigiousCollection`1"/>
+        </member>
+        <member name="P:CodexLib.AmbigiousCollection`1.Item(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="P:CodexLib.AmbigiousCollection`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="P:CodexLib.AmbigiousCollection`1.IsReadOnly">
+            <inheritdoc/>
+        </member>
+        <member name="P:CodexLib.AmbigiousCollection`1.IsFixedSize">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Add(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Add(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Clear">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Contains(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Contains(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.CopyTo(System.Array,System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.CopyTo(`0[],System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.IndexOf(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.IndexOf(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Insert(System.Int32,System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Insert(System.Int32,`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Remove(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Remove(`0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.RemoveAt(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="T:CodexLib.AmbigiousCollection`1.Enumerator">
+            <inheritdoc/>
+        </member>
+        <member name="P:CodexLib.AmbigiousCollection`1.Enumerator.Current">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Enumerator.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AmbigiousCollection`1.Enumerator.MoveNext">
+            <inheritdoc/>
+        </member>
+        <member name="T:CodexLib.AnyRef">
+            <summary>
+            Wrapper class that combines common references into one. Will implicitly cast into most types. Usually does not throw, but may return null.
+            </summary>
+        </member>
+        <member name="F:CodexLib.AnyRef.Actions">
+            <summary>List of delayed actions to execute after blueprint is generated.</summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.#ctor">
+            <inheritdoc cref="T:CodexLib.AnyRef"/>
+        </member>
+        <member name="M:CodexLib.AnyRef.#ctor(System.Action{Kingmaker.Blueprints.BlueprintScriptableObject})">
+            <inheritdoc cref="T:CodexLib.AnyRef"/>
+        </member>
+        <member name="P:CodexLib.AnyRef.Value">
+            <summary>
+            Property to access <see cref="M:CodexLib.AnyRef.Get"/> and <see cref="M:CodexLib.AnyRef.Set(Kingmaker.Blueprints.SimpleBlueprint)"/>
+            </summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.AddDelayedPatch(System.Action{Kingmaker.Blueprints.BlueprintScriptableObject})">
+            <summary>
+            Add a delayed action. Will execute immedately if blueprint is already loaded. Otherwise will wait.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.Set(Kingmaker.Blueprints.SimpleBlueprint)">
+            <summary>
+            Sets blueprint to reference. Will throw, if guid mismatch. Runs delayed actions, then clears them.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.Get">
+            <summary>
+            Returns blueprint.
+            </summary>
+            <remarks>
+            This returns <see cref="T:Kingmaker.Blueprints.BlueprintScriptableObject"/> instead of <see cref="T:Kingmaker.Blueprints.SimpleBlueprint"/>, because almost all inherit the former. This allows access to Components without cast.<br/>
+            If the blueprint does not inherit it, this returns null. In that case use Get&lt;SimpleBlueprint&gt;().
+            </remarks>
+        </member>
+        <member name="M:CodexLib.AnyRef.Get``1">
+            <summary>
+            Returns blueprint. If the blueprint isn't <typeparamref name="T"/> or the reference is empty, then an error is printed and null returned.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.ToRef``1">
+            <summary>
+            Converts to a BlueprintReference of <typeparamref name="T"/>. Does not validate.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.Get``1(CodexLib.AnyRef)">
+            <inheritdoc cref="M:CodexLib.AnyRef.Get``1"/>
+        </member>
+        <member name="M:CodexLib.AnyRef.ToRef``1(CodexLib.AnyRef)">
+            <inheritdoc cref="M:CodexLib.AnyRef.ToRef``1"/>
+        </member>
+        <member name="M:CodexLib.AnyRef.ToAny(System.Object)">
+            <summary>
+            Converts to AnyRef. <paramref name="obj"/> can be any blueprint, blueprint reference type, or guid string.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AnyRef.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:CodexLib.AnyRef.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:CodexLib.CountableFlagArray">
+            <summary>
+            List of enums with a counter of retains. Count is tracked individually by type and value.<br/>
+            E.g. SpellSchool.Conjuration (0b10) and SpellSchool.Divination (0b11) do not overlap.
+            </summary>
+        </member>
+        <member name="T:CodexLib.DefGroup">
+            <summary>
+            Container for Ability Group
+            </summary>
+        </member>
+        <member name="T:CodexLib.BlueprintGuidListConverter">
+            <summary>
+            This really shouldn't be necessary. But BlueprintGuidConverter does not deserialize since 1.4.
+            </summary>
+        </member>
+        <member name="T:CodexLib.DiceValue">
+            <summary>
+            A simplified ContextDiceValue without context.
+            </summary>
+        </member>
+        <member name="T:CodexLib.FlagArray">
+            <summary>
+            Experiment for storing flags. Abandoned in favor of CountableFlagArray.
+            </summary>
+        </member>
+        <member name="M:CodexLib.KineticistTree.GetComposites(CodexLib.KineticistTree.Element,CodexLib.KineticistTree.Element)">
+            <summary>Returns composite of two elements or no elements, if no composite matches.</summary>
+        </member>
+        <member name="M:CodexLib.KineticistTree.GetBlasts(System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>Only returns non null values.</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.DefaultAbility">
+            <summary>Special case: Feature is empty</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Element.Selection">
+            <summary>can be null</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Element.Progession">
+            <summary>only on basics</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Element.Parent1">
+            <summary>only on composites</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Element.Parent2">
+            <summary>only on composites other than metal and blueFlame</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Focus.Element2">
+            <summary>can be null (earth, fire)</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Infusion.Buff">
+            <summary>can be null (only exists on substance infusions)</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Infusion.Variants">
+            <summary>can be null (only exists on form infusions)</summary>
+        </member>
+        <member name="F:CodexLib.KineticistTree.Infusion.Activator">
+            <summary>can be null (BlueprintActivatable, BlueprintAbility, BlueprintBuff, BlueprintFeature)</summary>
+        </member>
+        <member name="T:CodexLib.MechanicActionBarSlotGroup">
+            <summary>
+            Logic for Ability Group
+            </summary>
+        </member>
+        <member name="T:CodexLib.MechanicActionBarSlotPlaceholder">
+            <summary>
+            Logic to display not available ability
+            </summary>
+        </member>
+        <member name="T:CodexLib.MechanicActionBarSlotSpellGroup">
+            <summary>
+            Logic for Spell Group
+            </summary>
+        </member>
+        <member name="M:CodexLib.MechanicActionBarSlotSpellGroup.UpdateAutoUse">
+            <returns>true if AutoUse is managed by this group</returns>
+        </member>
+        <member name="T:CodexLib.MetamagicExt">
+            <summary>
+            WIP; suspect to change
+            </summary>
+            
+            RuleCollectMetamagic, AddMetamagicFeat
+            RuleApplyMetamagic
+            MetamagicData
+            MetamagicBuilder 
+            SpellBookMetamagicMixer?
+            UIUtilityTexts .GetMetamagicList .GetMetamagicName
+            Game.Instance.BlueprintRoot.LocalizedTexts.MetamagicNames
+            
+        </member>
+        <member name="T:CodexLib.SpellSlotLevel">
+            <summary>
+            Container to compare Spell Slots. Equal when itself, converted from itself, or same level of the same spontaneous spellbook.
+            </summary>
+        </member>
+        <member name="T:CodexLib.AbilityDeliverChainAttack">
+            <summary>
+            Ability logic for chaining spells (Chain Lightning)
+            </summary>
+        </member>
+        <member name="T:CodexLib.AbilityDeliverTeleportTrample">
+            <summary>
+            Ability logic to teleport caster to point and return targets inbetween plus reach
+            </summary>
+        </member>
+        <member name="T:CodexLib.AbilityRequirementHasBuffTimed">
+            <summary>
+            Only the first buff found will check against the condition.
+            </summary>
+        </member>
+        <member name="T:CodexLib.ActivatableVariants">
+            <summary>
+            Component to add foldable to any BlueprintAbility or BlueprintActivatableAbility. Takes priority over existing conversions, if any.
+            </summary>
+        </member>
+        <member name="M:CodexLib.ActivatableVariants.#ctor(CodexLib.AnyRef[])">
+            <param name="facts">type: <b>BlueprintUnitFact</b></param>
+        </member>
+        <member name="M:CodexLib.ActivatableVariants.OnEventAboutToTrigger">
+            <summary>Example</summary>
+        </member>
+        <member name="T:CodexLib.AddCasterLevelLimit">
+            <summary>
+            increase caster level, up to HD limit
+            </summary>
+        </member>
+        <member name="T:CodexLib.AddDamageResistancePhysicalImproved">
+            <summary>
+            Improves existing Damage reduction
+            </summary>
+        </member>
+        <member name="T:CodexLib.AddDuelistWeapon">
+            <summary>
+            WeaponCategory counts as duelist weapon (one-handed piercing weapon).
+            </summary>
+        </member>
+        <member name="T:CodexLib.AddFactOnlyParty">
+            <summary>
+            Add fact, but only to playable characters.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AddFactOnlyParty.#ctor(CodexLib.AnyRef,System.Int32,Kingmaker.Blueprints.Classes.Selection.FeatureParam)">
+            <summary>
+            Add fact, but only to playable characters.
+            </summary>
+            <param name="feature">type: <b>BlueprintUnitFact</b></param>
+            <param name="level">Minimum level the character must have.</param>
+            <param name="parameter">For parameterized features.</param>
+        </member>
+        <member name="T:CodexLib.AddFactsSafe">
+            <summary>
+            Like AddFacts, but will disable Activatables before level up.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AddFactsSafe.#ctor(CodexLib.AnyRef[])">
+            <param name="facts">type: <b>BlueprintUnitFact</b> but not BlueprintParametrizedFeature, BlueprintFeatureSelection</param>
+        </member>
+        <member name="M:CodexLib.AddFeatureOnApplyPrerequisite.#ctor(System.Int32,CodexLib.AnyRef,CodexLib.AnyRef[])">
+            <summary>
+            Same as <see cref="T:Kingmaker.Designers.Mechanics.Facts.AddFeatureOnApply"/>, but prerequisites are required.
+            </summary>
+            <param name="amount">Count of prerequisites that must be fulfilled.</param>
+            <param name="prerequisites">type: <b>BlueprintFeatureReference</b></param>
+            <param name="feature">type: <b>BlueprintFeatureReference</b></param>
+        </member>
+        <member name="T:CodexLib.AddFeatureSelection">
+            <summary>
+            Adds another feature when gaining a feature. Can be a BlueprintFeatureSelection, in which case a new tab is generated.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AddTemporaryWeapon.#ctor(CodexLib.AnyRef)">
+            <param name="weapon">type: <b>BlueprintItemWeapon</b></param>
+        </member>
+        <member name="T:CodexLib.AddUndeadCompanion">
+            <summary>
+            TODO: AddUndeadCompanion
+            fix: need to save data in UnitPart instead of RuntimeData? or new interface?
+            </summary>
+        </member>
+        <member name="F:CodexLib.BleedBuff.BuffBleed">
+            <summary>type: <b>BlueprintBuff</b></summary>
+        </member>
+        <member name="M:CodexLib.ContextActionUndoAction.#ctor(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType,System.Single,System.Boolean)">
+            <summary>
+            Restore action time. Cooldown is usually 6 seconds, except for CommandType.Move where 3 seconds is one move action and 6 seconds are 2 move actions.
+            </summary>
+            <param name="command"></param>
+            <param name="amount">Time to refund. Negative values will steal time instead.</param>
+            <param name="forceMove"></param>
+        </member>
+        <member name="T:CodexLib.ConvertSpellSlots">
+            <summary>
+            Consumes spell slots in place of item charges.
+            </summary>
+        </member>
+        <member name="T:CodexLib.ElementalBarrage">
+            <summary>
+            Unused.
+            </summary>
+        </member>
+        <member name="T:CodexLib.EnergyChannelApplyEffect">
+            <summary>
+            Logic for Energy Channel.
+            </summary>
+        </member>
+        <member name="M:CodexLib.EnergyChannelApplyEffect.#ctor(CodexLib.AnyRef,Kingmaker.Enums.Damage.DamageEnergyType)">
+            <summary>
+            Logic for Energy Channel.
+            </summary>
+            <param name="buff">type: <b>BlueprintBuff</b></param>
+            <param name="element">Damage type</param>
+        </member>
+        <member name="T:CodexLib.FlameBladeLogic">
+            <summary>
+            Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
+            </summary>
+        </member>
+        <member name="M:CodexLib.FlameBladeLogic.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue,System.Int32,System.Int32)">
+            <summary>
+            Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
+            </summary>
+            <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
+            <param name="drReduction">Amount of DR ignored, if creature has flameBladeDervish.</param>
+            <param name="step">Bonus damage per caster level.</param>
+            <param name="max">Maximal bonus damage.</param>
+        </member>
+        <member name="T:CodexLib.IncreaseResourceAmountPlus">
+            <summary>
+            Grants extra charges for each Fact a creature has.
+            </summary>
+        </member>
+        <member name="M:CodexLib.IncreaseResourceAmountPlus.#ctor(CodexLib.AnyRef,System.Int32,CodexLib.AnyRef[])">
+            <summary>
+            Grants extra charges for each Fact a creature has.
+            </summary>
+            <param name="resource">type: <b>BlueprintAbilityResource</b></param>
+            <param name="multiplier">Extra resources per matching fact.</param>
+            <param name="increasingFacts">type: <b>BlueprintUnitFact</b></param>
+        </member>
+        <member name="T:CodexLib.ManeuverBonusHasFact">
+            <summary>
+            Grants bonus to a combat maneuver while owner has Fact.
+            </summary>
+        </member>
+        <member name="M:CodexLib.ManeuverBonusHasFact.#ctor(CodexLib.AnyRef,System.Int32,Kingmaker.RuleSystem.Rules.CombatManeuver,Kingmaker.Enums.ModifierDescriptor)">
+            <summary>
+            Grants bonus to a combat maneuver while owner has Fact.
+            </summary>
+            <param name="feature">type: <b>BlueprintUnitFact</b></param>
+            <param name="bonus">Maneuver bonus amount.</param>
+            <param name="type">Type of combat maneuver.</param>
+            <param name="descriptor">ModifierDescriptor of maneuver bonus.</param>
+        </member>
+        <member name="T:CodexLib.OverrideResourceLogic">
+            <summary>
+            Replace ResourceLogic of specific abilities.
+            </summary>
+        </member>
+        <member name="M:CodexLib.OverrideResourceLogic.#ctor(Kingmaker.UnitLogic.Abilities.Components.Base.IAbilityResourceLogic,CodexLib.AnyRef[])">
+            <summary>
+            Replace ResourceLogic of specific abilities.
+            </summary>
+            <param name="resourceLogic">Resource logic to take precedence.</param>
+            <param name="spells">type: <b>BlueprintAbility</b></param>
+        </member>
+        <member name="T:CodexLib.AbilityResourceLogicCooldown">
+            <summary>
+            Resource-free use of ability, if not on cooldown.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AbilityResourceLogicCooldown.#ctor(CodexLib.AnyRef,System.Int32,System.Boolean)">
+            <summary>
+            Resource-free use of ability, if not on cooldown.
+            </summary>
+            <param name="resource">type: <b>BlueprintAbilityResource</b></param>
+            <param name="cooldown">Cooldown in rounds.</param>
+            <param name="isSpend">If false, all uses are free without cooldown.</param>
+        </member>
+        <member name="T:CodexLib.PanacheDodge">
+            <summary>
+            Runs after an attack already hit. Will check if the bonus would prevent it and change the result post factum.
+            </summary>
+        </member>
+        <member name="T:CodexLib.PartCooldown">
+            <summary>
+            Storage for ability specific cooldowns. Is not saved in save files. This is only used in combat, where you cannot save.
+            </summary>
+        </member>
+        <member name="F:CodexLib.PoisonEnchantment.Enchantment">
+            <summary>type: <b>BlueprintWeaponEnchantment</b></summary>
+        </member>
+        <member name="T:CodexLib.ReduceDamageResistance">
+            <summary>
+            Owner ignores specified amount of DR.
+            </summary>
+        </member>
+        <member name="M:CodexLib.RemoveFeatureOnApplyToPet.#ctor(CodexLib.AnyRef)">
+            <param name="feature">type: <b>BlueprintUnitFact</b></param>
+        </member>
+        <member name="T:CodexLib.SpellPerfection">
+            <summary>
+            Solution 1: Check every fact and condition of all feats that are doubled.<br/>
+            Solution 2: Change the modifier to "Feat", then apply modifiers of type "Feat" in result of OnEventDidTrigger a second time. Only works for RuleCalculateAbilityParams, since other rules have immediate effects.<br/>
+            Solution 3: Change the modifier to "Feat". Enforce this component comes last and double "Feat" modifier in OnEventAboutToTrigger.<br/>
+            <br/>
+            Uses solution 3.
+            </summary>
+        </member>
+        <member name="T:CodexLib.UnitConditionExceptionsFromBuff">
+            <summary>Don't apply condition, if its source is in Exceptions.</summary>
+        </member>
+        <member name="T:CodexLib.UnitPartModifierBonus">
+            <summary>Unfinished; use IncreaseModifierBonus instead.</summary>
+        </member>
+        <member name="T:CodexLib.AbilityEffectStickyTouchPersist">
+            <summary>
+            Multi touch attacks. E.g. Chill Touch.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AbilityEffectStickyTouchPersist.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue)">
+            <summary>
+            Multi touch attacks. E.g. Chill Touch.
+            </summary>
+            <param name="blueprintAbility">type: <b>BlueprintAbility</b></param>
+            <param name="count">Count of uses before effect wears off.</param>
+        </member>
+        <member name="T:CodexLib.VariantSelectionApplyEffect">
+            <summary>
+            Mimic properties of selected VariantSelection:<br/>
+            - ability restriction (only AbilityResourceLogic)<br/>
+            - ContextRankConfig, ContextCalculateSharedValue, ContextAbilityParamsCalculator<br/>
+            - AbilityApplyEffect
+            </summary>
+        </member>
+        <member name="T:CodexLib.Const">
+            <summary>
+            Collection of const values. Mostly custom Enums or key strings.
+            </summary>
+        </member>
+        <member name="T:CodexLib.ActivatableVariantsBuffExample">
+            <summary>
+            This is an example on how to get the variant data from a buff applied from activatable ability.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Examples.OnCastDoX">
+            <summary>
+            Example: Useful for custom ability logic
+            </summary>
+        </member>
+        <member name="T:CodexLib.Helper">
+            <summary>
+            Extensions for Blueprint handling and other conveniences.
+            </summary>
+            <remarks>
+            BlueprintComponent has a field OwnerBlueprint. When components are shared between blueprints, these may cause weird bugs.
+            </remarks>
+        </member>
+        <member name="M:CodexLib.Helper.GetFullName(System.Type)">
+            <summary>
+            Returns string sufficient for <b>Type.GetType(string)</b>, without version, culture, or token.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetStat(Kingmaker.EntitySystem.Entities.UnitEntityData,Kingmaker.EntitySystem.Stats.StatType[])">
+            <summary>
+            Returns max stat value or null.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.Check(HarmonyLib.PatchClassProcessor)">
+            <summary>
+            Prints possible patching conflicts.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.IsPatched(System.Type)">
+            <summary>
+            Only works if all harmony attributes are on the class. Does not support bulk patches.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.Append``1(``0[],``0[])">
+            <summary>Appends objects on array.</summary>
+        </member>
+        <member name="M:CodexLib.Helper.AppendAndReplace``1(``0[]@,``0[])">
+            <summary>Appends objects on array and overwrites the original.</summary>
+        </member>
+        <member name="M:CodexLib.Helper.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@)">
+            <summary>
+            Get dictionary by key and create new value with standard constructor, if it did not exist.
+            </summary>
+            <returns>true if new value was created</returns>
+        </member>
+        <member name="M:CodexLib.Helper.GetList">
+            <summary>
+            Gets a static list object. Do not save reference.
+            Call <b>Flush&lt;T&gt;()</b> to receive output.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.Flush``1">
+            <summary>
+            Use when finished with <b>GetList()</b>
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.PrintDebug(System.String)">
+            <summary>Only prints message, if compiled on DEBUG.</summary>
+        </member>
+        <member name="F:CodexLib.Helper._SetStackTrace">
+            <summary>Source: https://stackoverflow.com/a/63685720</summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateString(Kingmaker.Localization.LocalizedString,System.String)">
+            <summary>
+            Overwrite existing LocalizedString with new value.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.TrySubstring(System.String,System.Char,System.Int32,System.Boolean)">
+            <summary>Returns substring. Always excludes char 'c'. Returns null, if index is out of range or char not found.</summary>
+            <param name="str">source string</param>
+            <param name="c">char to search for</param>
+            <param name="start">start index; negative number search last index instead</param>
+            <param name="tail">get tail instead of head</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetIInitiator``1(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get components that are subscribed for a unit.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetITarget``1(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get components that are subscribed for a unit.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetIGlobal``1(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get components that are subscribed.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetISubscribers``1(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get components that are subscribed for a unit. Slow.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetISubscribers``2(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get components that are subscribed for a unit.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetISubscriber``2(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get last component that is subscribed for a unit.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataExt``1(Kingmaker.EntitySystem.EntityFactComponent)">
+            <summary>
+            Get runtime data of <typeparamref name="TData"/> from a specific component or null, if no match found.
+            </summary>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="component">Component to get runtime data from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataExt``1(Kingmaker.EntitySystem.EntityFact)">
+            <summary>
+            Get runtime data of <typeparamref name="TData"/> from a specific fact or null, if no match found.<br/>
+            Only the first instance is returned, if the data type exists multiple times.
+            </summary>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="fact">Fact to get runtime data from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataAllExt``1(Kingmaker.EntitySystem.EntityFact)">
+            <summary>
+            Get all runtime data of <typeparamref name="TData"/> from a specific fact.<br/>
+            Never returns null.
+            </summary>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="fact">Fact to get runtime data from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataAllExt``1(Kingmaker.EntitySystem.Entities.UnitEntityData,CodexLib.AnyRef)">
+            <summary>
+            Get all runtime data of <typeparamref name="TData"/> from all of a unit's features. Optionally filtered for a specific blueprint.<br/>
+            Never returns null.
+            </summary>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="unit">Unit</param>
+            <param name="blueprintFeature">type: BlueprintFeature</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataExt``2(Kingmaker.EntitySystem.EntityFact)">
+            <summary>
+            Get runtime data of <typeparamref name="TData"/> from a specific fact or null, if no match found.<br/>
+            Only the first instance is returned, if the data type exists multiple times.
+            </summary>
+            <typeparam name="TComponent">Component type on blueprint.</typeparam>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="fact">Fact to get runtime data from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataAllExt``2(Kingmaker.EntitySystem.EntityFact)">
+            <summary>
+            Get all runtime data of <typeparamref name="TData"/> from a specific fact.<br/>
+            Never returns null.
+            </summary>
+            <typeparam name="TComponent">Component type on blueprint.</typeparam>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="fact">Fact to get runtime data from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetDataAllExt``2(Kingmaker.EntitySystem.Entities.UnitEntityData,CodexLib.AnyRef)">
+            <summary>
+            Get all runtime data of <typeparamref name="TData"/> from all of a unit's features. Optionally filtered for a specific blueprint.<br/>
+            Never returns null.
+            </summary>
+            <typeparam name="TComponent">Component type on blueprint.</typeparam>
+            <typeparam name="TData">Runtime data type to be returned.</typeparam>
+            <param name="unit">Unit</param>
+            <param name="blueprintFeature">type: BlueprintFeature</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetRuntimeComponent``1(Kingmaker.EntitySystem.EntityFact)">
+            <summary>
+            Get runtime component of <typeparamref name="TComponent"/> from a specific fact or null, if no match found.<br/>
+            Only the first instance is returned, if the component type exists multiple times.
+            </summary>
+            <typeparam name="TComponent">Component type on blueprint.</typeparam>
+            <param name="fact">Fact to get runtime component from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetRuntimeComponents``1(Kingmaker.EntitySystem.EntityFact)">
+            <summary>
+            Get all runtime components of <typeparamref name="TComponent"/> from a specific fact.<br/>
+            Never returns null.
+            </summary>
+            <typeparam name="TComponent">Component type on blueprint.</typeparam>
+            <param name="fact">Fact to get runtime component from.</param>
+        </member>
+        <member name="M:CodexLib.Helper.GetRuntimeComponents``1(Kingmaker.EntitySystem.Entities.UnitEntityData)">
+            <summary>
+            Get all runtime components of <typeparamref name="TComponent"/> from all of a unit's features.<br/>
+            Never returns null.
+            </summary>
+            <typeparam name="TComponent">Component type on blueprint.</typeparam>
+            <param name="unit">Unit</param>
+        </member>
+        <member name="M:CodexLib.Helper.Clone``1(``0,System.String,System.String)">
+            <summary>
+            This creates a deep copy of ComponentsArray, but other references might still be shared and morphing can happen.<br/><br/>
+            Watch out for these fields:<br/>
+            BlueprintFeature: IsPrerequisiteFor
+            BlueprintAbility: m_Parent
+            </summary>
+            <param name="obj">Object to clone.</param>
+            <param name="name">New blueprint name.</param>
+            <param name="guid2">Guid to merge with, use for dynamic blueprints (unknown list of blueprints), otherwise empty.</param>
+        </member>
+        <member name="M:CodexLib.Helper.Clone``1(``0,System.Action{``0})">
+            <summary>
+            Creates deep copy of BlueprintComponent, but shallow copy of anything else.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.Clone``1(System.Collections.Generic.IEnumerable{``0},System.Action{``0})">
+            <summary>
+            Creates deep copy of <see cref="T:Kingmaker.Blueprints.BlueprintComponent"/>.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.AddInfusion(CodexLib.AnyRef)">
+            <param name="blueprintFeature">type: BlueprintFeature</param>
+        </member>
+        <member name="M:CodexLib.Helper.AddWildTalent(CodexLib.AnyRef)">
+            <param name="blueprintFeature">type: BlueprintFeature</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateContextActionSavingThrow(Kingmaker.EntitySystem.Stats.SavingThrowType,Kingmaker.ElementsSystem.GameAction[])">
+            <summary>
+            Use MakeContextActionSavingThrow instead, if you want to inline ContextActionConditionalSaved.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.MakeRunActionApplyBuff(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextDurationValue,System.Boolean,System.Boolean)">
+            <summary>
+            Creates an action list and adds a single apply buff action.
+            </summary>
+            <param name="buff">type: <b>BlueprintBuff</b></param>
+            <param name="duration"></param>
+            <param name="dispellable"></param>
+            <param name="toCaster"></param>
+        </member>
+        <member name="M:CodexLib.Helper.InjectCondition(Kingmaker.ElementsSystem.ActionList,Kingmaker.ElementsSystem.Condition,System.Boolean)">
+            <summary>
+            Puts a new Conditional infront of existing ActionList.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.SetEnchantment(Kingmaker.Blueprints.Items.Weapons.BlueprintItemWeapon,System.Object[])">
+            <summary>
+            Overwrite weapon enchantments.
+            </summary>
+            <param name="bp">Weapon to set enchantments</param>
+            <param name="BlueprintWeaponEnchantment">direct type, reference, or string</param>
+        </member>
+        <member name="M:CodexLib.Helper.AddEntries(Kingmaker.Blueprints.Classes.BlueprintProgression,System.Collections.Generic.List{Kingmaker.Blueprints.Classes.LevelEntry})">
+            <summary>Merges LevelEntries or appends new ones.</summary>
+        </member>
+        <member name="M:CodexLib.Helper.Add(Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility,System.Int32,CodexLib.AnyRef[])">
+            <summary>
+            Expands a spell list by the given spell at a specific spell level.
+            </summary>
+            <param name="spell">Spell which is added to spell list</param>
+            <param name="level">Spell Level</param>
+            <param name="blueprintSpellList">type: <b>BlueprintSpellList[]</b><br/>spell list to expand</param>
+        </member>
+        <member name="M:CodexLib.Helper.StickyResolve(Kingmaker.Blueprints.BlueprintAbilityReference[])">
+            <summary>
+            Replace references with their sticky variant.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAbilityResourceLogic(CodexLib.AnyRef,System.Int32)">
+            <summary>
+            BlueprintAbility component to consume resource on use.
+            </summary>
+            <param name="resource">type: <b>BlueprintAbilityResource</b></param>
+            <param name="amount">Amount of resource required to use the ability.</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAddAbilityResources(CodexLib.AnyRef)">
+            <param name="BlueprintAbilityResource">type: <b>BlueprintAbilityResource</b></param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateContextActionSpawnMonster(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextDurationValue,Kingmaker.UnitLogic.Mechanics.ContextDiceValue,Kingmaker.UnitLogic.Mechanics.ContextValue,CodexLib.AnyRef,CodexLib.AnyRef,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Spawn creatures.
+            </summary>
+            <param name="unit">type: <b>BlueprintUnit</b></param>
+            <param name="duration">Summon duration. Defaults to 1 hour.</param>
+            <param name="count">Number of creatures to summon. Defaults to 1.</param>
+            <param name="levelValue"></param>
+            <param name="summonBuff">type: <b>BlueprintBuff</b><br/>Defaults to SummonedUnitBuff.</param>
+            <param name="summonPool">type: <b>BlueprintSummonPool</b><br/>Defaults to SummonMonsterPool.</param>
+            <param name="useLimit">If true use limit from summon pool (if any).</param>
+            <param name="linkToCaster"></param>
+            <param name="isControllable">If false is controlled by AI.</param>
+            <returns></returns>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAddFeatureIfHasFact(CodexLib.AnyRef)">
+            <summary>Adds a fact, but only fact not already granted through other means.</summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateContextActionReduceBuffDuration(CodexLib.AnyRef,System.Int32,Kingmaker.UnitLogic.Mechanics.DurationRate,System.Boolean,System.Boolean)">
+            <summary>
+            Reduces on extends buff duration. Used by spells that like Call Lightning that reduce remaining duration on use.
+            </summary>
+            <param name="buff">type: <b>BlueprintBuff</b></param>
+            <param name="duration">Time to extend or reduce the duration. Use positive values only.</param>
+            <param name="rate"></param>
+            <param name="increase">If false will reduces the duration, otherwise extend the duration.</param>
+            <param name="toTarget">If false will affect the caster.</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAbilityDeliverProjectile(CodexLib.AnyRef,Kingmaker.UnitLogic.Abilities.Components.AbilityProjectileType,CodexLib.AnyRef,Kingmaker.Utility.Feet,Kingmaker.Utility.Feet)">
+            <summary>
+            Spawns a projectile. Can include an attack roll.
+            </summary>
+            <param name="projectile">type: <b>BlueprintProjectile</b></param>
+            <param name="type">Projectile type</param>
+            <param name="weapon">type: <b>BlueprintItemWeapon</b><br/>Needs attack roll, if set. Otherwise no roll needed.</param>
+            <param name="length">Length of line or cone area effect.</param>
+            <param name="width">Width of line area effect.</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAbilityShowIfCasterHasFact(CodexLib.AnyRef,System.Boolean)">
+            <summary>
+            Hide ability, if caster doesn't have fact. Invertable.
+            </summary>
+            <param name="UnitFact">type: <b>BlueprintUnitFact</b></param>
+            <param name="not">Invert logic.</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAbilityEffectRunAction(Kingmaker.EntitySystem.Stats.SavingThrowType,Kingmaker.ElementsSystem.GameAction[])">
+            <summary>
+            Runs actions when ability hits. Waits for projectiles. Processes targets. If not 'SavingThrowType.Unknown', will run actions only at failed saving throw.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAbilityEffectRunAction(Kingmaker.EntitySystem.Stats.SavingThrowType,Kingmaker.ElementsSystem.Condition[],Kingmaker.ElementsSystem.GameAction[],Kingmaker.ElementsSystem.GameAction[])">
+            <summary>
+            Runs in conditional or with saving throw. Cannot process both at the same time.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAbilityExecuteActionOnCast(Kingmaker.ElementsSystem.GameAction[])">
+            <summary>
+            Runs action before ability is cast. Does not wait for sfx or projectiles. Does not process targets.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateContextConditionHasBuff(CodexLib.AnyRef,System.Boolean)">
+            <summary>
+            Condition caster has buff. Invertable.
+            </summary>
+            <param name="buff">type: <b>BlueprintBuff</b></param>
+            <param name="not">Invert logic.</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateContextActionApplyBuff(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextDurationValue,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Apply buff to target or caster.
+            </summary>
+            <param name="buff">type: <b>BlueprintBuff</b></param>
+            <param name="duration"></param>
+            <param name="fromSpell"></param>
+            <param name="dispellable"></param>
+            <param name="toCaster"></param>
+            <param name="asChild"></param>
+        </member>
+        <member name="M:CodexLib.Helper.CreatePrerequisiteFeature(CodexLib.AnyRef,System.Boolean)">
+            <summary>
+            Prerequisite Feature
+            </summary>
+            <param name="feat">type: <b>BlueprintFeature</b></param>
+            <param name="any">Prerequisite.GroupType.Any or .All</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreatePrerequisiteClassLevel(CodexLib.AnyRef,System.Int32,System.Boolean)">
+            <summary>
+            Prerequisite levels in a character class.
+            </summary>
+            <param name="class">type: <b>BlueprintCharacterClass</b></param>
+            <param name="level"></param>
+            <param name="any">Prerequisite.GroupType.Any or .All</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreatePrerequisiteParametrizedFeature(CodexLib.AnyRef,Kingmaker.Enums.WeaponCategory,Kingmaker.Blueprints.Classes.Spells.SpellSchool,CodexLib.AnyRef,System.Boolean)">
+            <summary>
+            Prerequisite parametrized feature. Priority: Spell, SpellSchool, WeaponCategory
+            </summary>
+            <param name="feature">type: <b>BlueprintFeature</b></param>
+            <param name="weaponCategory"></param>
+            <param name="spellSchool"></param>
+            <param name="spell">type: <b>BlueprintAbility</b></param>
+            <param name="any">Prerequisite.GroupType.Any or .All</param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAddFeatureOnApply(CodexLib.AnyRef)">
+            <param name="blueprintFeature">type: <b>BlueprintFeature</b></param>
+        </member>
+        <member name="M:CodexLib.Helper.CreateBlueprintItemWeapon(System.String,System.String,System.String,UnityEngine.Sprite,CodexLib.AnyRef,System.Nullable{Kingmaker.RuleSystem.DiceFormula},Kingmaker.RuleSystem.Rules.Damage.DamageTypeDescription,CodexLib.AnyRef,System.Boolean,System.Int32,CodexLib.AnyRef,CodexLib.AnyRef[])">
+            <summary>
+            Create weapon blueprint.
+            </summary>
+            <param name="name"></param>
+            <param name="displayName"></param>
+            <param name="description"></param>
+            <param name="icon"></param>
+            <param name="weaponType">type: <b>BlueprintWeaponType</b></param>
+            <param name="damageOverride"></param>
+            <param name="form"></param>
+            <param name="secondWeapon">type: <b>BlueprintItemWeapon</b></param>
+            <param name="primaryNatural"></param>
+            <param name="price"></param>
+            <param name="cloneVisuals">type: <b>BlueprintWeaponType</b> or <b>BlueprintItemWeapon</b></param>
+            <param name="enchantments">type: <b>BlueprintWeaponEnchantment[]</b></param>
+        </member>
+        <member name="M:CodexLib.Helper.SetReference(Kingmaker.Blueprints.BlueprintReferenceBase,Kingmaker.Blueprints.SimpleBlueprint)">
+            <summary>
+            Set a specific BlueprintReference to a specific Blueprint. The main purpose is to ensure guids match.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.ToRef``1(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Converts a collection of strings, references, and blueprints into a specified reference type.<br/>
+            Can handle multiple different types and will recursively resolve collections.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.ToAny(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Converts a collection of strings, references, and blueprints into a AnyRef reference type.<br/>
+            Can handle multiple different types and will recursively resolve collections.
+            </summary>
+        </member>
+        <member name="T:CodexLib.IActionBarConvert">
+            <summary>
+            Allow custom action bar convertions (unfoldable variants).
+            </summary>
+        </member>
+        <member name="T:CodexLib.IActionBarDisableDrag">
+            <summary>
+            If attached to a component, will cause convertables to not drag.
+            </summary>
+        </member>
+        <member name="T:CodexLib.IAfterRule">
+            <summary>
+            Use the IAfterRule interface to place your component after all other.
+            Requires master patch.
+            </summary>
+        </member>
+        <member name="T:CodexLib.IBeforeRule">
+            <summary>
+            Use the IBeforeRule interface to place your component before any other.
+            Requires master patch.
+            </summary>
+        </member>
+        <member name="T:CodexLib.IMechanicGroup">
+            <summary>
+            Interface for Ability/Spell Group
+            </summary>
+        </member>
+        <member name="T:CodexLib.IMechanicRecalculate">
+            <summary>
+            Manipulate calculation for ranks/ability params.<br/>
+            Greater priority runs first.<br/>
+            Use priority:<br/>
+            400 = change rank value<br/>
+            300 = change shared value
+            </summary>
+        </member>
+        <member name="T:CodexLib.MasterPatch">
+            <summary>
+            If your mod uses components, run this code. Some components will not work properly without these patches.<br/>
+            <br/>
+            <code>MasterPatch.Run();</code>
+            </summary>
+        </member>
+        <member name="M:CodexLib.MasterPatch.Run">
+            <summary>
+            Call at least once, if you plan to use components.
+            </summary>
+        </member>
+        <member name="M:CodexLib.MasterPatch.Run(System.Type)">
+            <summary>
+            Use this if you want to enable only a specific patch. Ensures patch is only used once.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_AbilityAtWill">
+            <summary>
+            Provides logic for at will spells.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_ActivatableActionBar">
+            <summary>
+            Adds logic for automatic-only activatable. Set WeightInGroup to restrict use of Activatable.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_AOEAttackRolls">
+            <summary>
+            Logic for ContextConditionAttackRoll to make AOE attack rolls.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_ConditionExemption">
+            <summary>
+            Adds logic to ignore status effects under certain conditions.<br/>
+            Used by AddConditionExceptions.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_ContextStatValue">
+            <summary>
+            Override of ContextValue by ContextStatValue.<br/>
+            This patch makes ContextValue.Calculate quasi virtual.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_DebugReport">
+            <summary>
+            If a component causes an exception, it will try to resolve the asset name.<br/>
+            If that name is null or wrong formated, it will crash the report and hide any meaningful log entries.<br/>
+            This patch fills the missing data with nonsense to prevent that bug.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_FixAbilityTargets">
+            <summary>
+            If no AoERadiusProvider component is present, it will always default to TargetType.Any.
+            This patch checks the blueprint's settings CanTargetFriends and CanTargetEnemies instead.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_GetTargetProjectileFix">
+            <summary>
+            Fixes AbilityDeliverTeleportTrample not returning worldPosition.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_RulebookEventBusPriority">
+            <summary>
+            Use the IBeforeRule interface to place your component before any other.<br/>
+            This patch ensures IBeforeRule comes first.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_RuleSpendCharge">
+            <summary>
+            Patch to trigger custom rule RuleSpendCharge.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_SpellSelectionParametrized">
+            <summary>
+            Custom logic for parametrized feature. Allows selection of any spells/abilities.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.GetAllItems(Kingmaker.Blueprints.Classes.Selection.BlueprintParametrizedFeature,System.Collections.Generic.IEnumerable{Kingmaker.Blueprints.Classes.Selection.IFeatureSelectionItem}@)">
+            <summary>
+            Returns 'empty' item collection, since we don't actually need it.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.GetItemsForUnit(Kingmaker.UnitLogic.UnitDescriptor,Kingmaker.UnitLogic.UnitDescriptor,Kingmaker.Blueprints.Classes.Selection.BlueprintParametrizedFeature,System.Collections.Generic.IEnumerable{Kingmaker.Blueprints.Classes.Selection.IFeatureSelectionItem}@)">
+            <summary>
+            Custom selection logic.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.CanSelectFeature(Kingmaker.UnitLogic.UnitDescriptor,Kingmaker.UnitLogic.Class.LevelUp.LevelUpState,Kingmaker.UnitLogic.Class.LevelUp.FeatureSelectionState,Kingmaker.Blueprints.Classes.Selection.IFeatureSelectionItem,Kingmaker.Blueprints.Classes.Selection.BlueprintParametrizedFeature,System.Boolean@)">
+            <summary>
+            Can select any item that's not already picked.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.FixView(Kingmaker.UnitLogic.Class.LevelUp.FeatureSelectionState,System.Collections.Generic.List{Kingmaker.UnitLogic.Class.LevelUp.FeatureSelectionViewState}@)">
+            <summary>
+            Fix call that usually tries to get generic view and replace the list with unit specific version.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.LevelUpActionPostLoad(Kingmaker.UnitLogic.Class.LevelUp.Actions.SelectFeature)">
+            <summary>
+            Fix for 'empty' Items collection.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_WeaponCategory">
+            <summary>
+            Use Helper.EnumCreateWeaponCategory(..) to add new weapon categories.<br/>
+            This patch adds them to the selection.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patch_ResourceOverride">
+            <summary>
+            Fix for overriding 'AbilityData.OverridenResourceLogic', when the logic is also IAbilityRestriction.
+            </summary>
+        </member>
+        <member name="T:CodexLib.RuleCombatManeuverWithWeapon">
+            <summary>
+            Maneuver rule to use weapon attack bonus.
+            </summary>
+        </member>
+        <member name="T:CodexLib.RuleResolveFunction">
+            <summary>
+            Simple rule for delayed execution. E.g for projectiles.
+            </summary>
+        </member>
+        <member name="T:CodexLib.RuleSpendCharge">
+            <summary>
+            Triggers before AbilityData consumes charges or material. May skip charge and/or material consumption.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Scope">
+            <summary>
+            Override logger and path for blueprint resolution. Helper calls that generate guids must be called in your scope, otherwise guids will be dumped outside your project.<br/>
+            <br/>
+            <code>using var scope = new Scope(Main.ModPath, Main.logger);</code>
+            </summary>
+        </member>
+    </members>
+</doc>

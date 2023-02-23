@@ -11,16 +11,15 @@
 		<RootNamespace>CodexLib</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Remove="Resources\Blueprints.bin" />
-	</ItemGroup>
 
 	<!-- Nuget Packages -->
 	<ItemGroup>
-	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.2" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Common References -->
@@ -34,13 +33,13 @@
 		<Reference Include="System.Data" />
 		<Reference Include="System.Net.Http" />
 	</ItemGroup>
-	
+
 	<!-- Project References -->
-	<ItemGroup>		
-		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\0Harmony_public.dll" />
+	<ItemGroup>
+		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\UnityModManager\0Harmony_public.dll" />
 		<Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
 		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
-		
+
 		<Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
 		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
 		<Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
@@ -61,23 +60,26 @@
 		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
 		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
+
+		<Reference Include="UnityMod" HintPath="$(SolutionDir)\@Shared\UnityMod.dll" />
 	</ItemGroup>
-	
+
 	<!-- Other Files -->
 	<ItemGroup>
-	  <EmbeddedResource Include="Resources\Blueprints.bin" />
-	  <EmbeddedResource Include="Resources\Num0.png" />
-	  <EmbeddedResource Include="Resources\Num1.png" />
-	  <EmbeddedResource Include="Resources\Num2.png" />
-	  <EmbeddedResource Include="Resources\Num3.png" />
-	  <EmbeddedResource Include="Resources\Num4.png" />
-	  <EmbeddedResource Include="Resources\Num5.png" />
-	  <EmbeddedResource Include="Resources\Num6.png" />
-	  <EmbeddedResource Include="Resources\Num7.png" />
-	  <EmbeddedResource Include="Resources\Num8.png" />
-	  <EmbeddedResource Include="Resources\Num9.png" />
+		<GlobalAnalyzerConfigFiles Include="$(SolutionDir)\@Shared\.globalconfiguration" Link=".globalconfiguration" />
+		<EmbeddedResource Include="Resources\Blueprints.bin" />
+		<EmbeddedResource Include="Resources\Num0.png" />
+		<EmbeddedResource Include="Resources\Num1.png" />
+		<EmbeddedResource Include="Resources\Num2.png" />
+		<EmbeddedResource Include="Resources\Num3.png" />
+		<EmbeddedResource Include="Resources\Num4.png" />
+		<EmbeddedResource Include="Resources\Num5.png" />
+		<EmbeddedResource Include="Resources\Num6.png" />
+		<EmbeddedResource Include="Resources\Num7.png" />
+		<EmbeddedResource Include="Resources\Num8.png" />
+		<EmbeddedResource Include="Resources\Num9.png" />
 	</ItemGroup>
-	
+
 	<!-- Publicize -->
 	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
 		<ItemGroup>
@@ -96,9 +98,18 @@
 		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningInput)" AutoIncrease="true" MaxMatch="3" TouchFiles="false" />
 	</Target>
 
-	<!-- Copy to solution folder -->
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release'">
-		<Copy Condition="'$(Configuration)'=='Release'" SourceFiles="$(TargetDir)\CodexLib.dll" DestinationFolder="$(SolutionDir)CodexLib\" />
+	<!-- ILMerge and copy to solution folder -->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<ItemGroup>
+			<_MergeItems Include="$(TargetDir)$(TargetName).dll" />
+			<_MergeItems Include="$(SolutionDir)@Shared\UnityMod.dll" />
+			
+			<_CopyItems Include="$(TargetDir)$(TargetName).dll" />
+			<_CopyItems Include="$(TargetDir)$(TargetName).xml" />
+		</ItemGroup>
+		
+		<ILRepack Parallel="true" Union="true" CopyAttributes="true" AllowMultiple="true" Internalize="false" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" TargetKind="Dll" OutputFile="$(TargetDir)$(TargetName).dll" />
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(SolutionDir)CodexLib\" />
 	</Target>
 
 </Project>

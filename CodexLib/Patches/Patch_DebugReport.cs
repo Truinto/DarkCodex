@@ -14,8 +14,7 @@ namespace CodexLib.Patches
     {
         public static void Prefix(Element __instance)
         {
-            if (__instance.name == null)
-                __instance.name = "$$empty";
+            __instance.name ??= "$$empty";
         }
     }
 }

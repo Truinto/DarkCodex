@@ -16,7 +16,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(ActivatableAbility), nameof(ActivatableAbility.Stop));
             data.ReplaceCall(Patch1);
@@ -32,12 +32,10 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(BlueprintActivatableAbility), nameof(BlueprintActivatableAbility.ActivateOnCombatStarts));
-            data.ReplaceNOP();
-            data--;
-            data.ReplaceCall(Patch3);
+            data.InsertAfter(Patch3);
 
             return data.Code;
         }
@@ -48,10 +46,10 @@ namespace DarkCodex
                 ability.Stop(forceRemovedBuff);
         }
 
-        public static bool Patch3(ActivatableAbility ability)
+        public static bool Patch3(bool __stack, ActivatableAbility __instance)
         {
             //Main.PrintDebug("ActivatableAbility.TryStart");
-            return ability.Blueprint.ActivateOnCombatStarts && !IsFree(ability);
+            return __stack && !IsFree(__instance);
         }
 
         public static bool IsFree(ActivatableAbility ability)

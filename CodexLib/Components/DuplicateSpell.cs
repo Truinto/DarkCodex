@@ -32,7 +32,7 @@ namespace CodexLib
                 return;
 
             AbilityData spell = evt.Spell;
-            UnitEntityData newTarget = this.GetNewTarget(spell, evt.SpellTarget.Unit);
+            UnitEntityData newTarget = GetNewTarget(spell, evt.SpellTarget.Unit);
             if (newTarget == null)
                 return;
             Rulebook.Trigger(new RuleCastSpell(spell, newTarget)

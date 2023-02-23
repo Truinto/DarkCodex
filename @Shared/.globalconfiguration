@@ -1,16 +1,32 @@
-[*.cs]
+is_global = true
+#[*.cs]
+
+#### Benutzerdefiniert ####
+# none: komplett ignoriert
+# silent: als Mitteilung
+# suggestion: als Mitteilung und inline Hinweis
+# warning: als Warnung
+# error: als Fehler
 
 # IDE0017: Initialisierung von Objekten vereinfachen
 dotnet_diagnostic.IDE0017.severity = none
-
-# IDE0062: Lokale Funktion als "static" festlegen
-dotnet_diagnostic.IDE0062.severity = none
 
 # IDE0044: Modifizierer "readonly" hinzufügen
 dotnet_diagnostic.IDE0044.severity = none
 
 # IDE0060: Nicht verwendete Parameter entfernen
-dotnet_diagnostic.IDE0060.severity = none
+dotnet_diagnostic.IDE0060.severity = suggestion
+
+# IDE0062: Lokale Funktion als "static" festlegen
+dotnet_diagnostic.IDE0062.severity = none
+
+# CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
+dotnet_diagnostic.CS1591.severity = suggestion
+
+# CA2211: Nicht konstante Felder dürfen nicht sichtbar sein
+dotnet_diagnostic.CA2211.severity = none
+
+
 
 #### Wichtige EditorConfig-Optionen ####
 
@@ -61,6 +77,7 @@ dotnet_style_prefer_auto_properties = true
 dotnet_style_prefer_compound_assignment = true
 dotnet_style_prefer_conditional_expression_over_assignment = true
 dotnet_style_prefer_conditional_expression_over_return = true
+dotnet_style_prefer_foreach_explicit_cast_in_source = when_strongly_typed
 dotnet_style_prefer_inferred_anonymous_type_member_names = true
 dotnet_style_prefer_inferred_tuple_names = true
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true
@@ -71,7 +88,7 @@ dotnet_style_prefer_simplified_interpolation = true
 dotnet_style_readonly_field = true
 
 # Einstellungen für Parameter
-dotnet_code_quality_unused_parameters = all
+dotnet_code_quality_unused_parameters = non_public
 
 # Unterdrückungseinstellungen
 dotnet_remove_unnecessary_suppression_exclusions = none
@@ -100,29 +117,37 @@ csharp_style_expression_bodied_properties = true
 # Einstellungen für den Musterabgleich
 csharp_style_pattern_matching_over_as_with_null_check = true
 csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_prefer_extended_property_pattern = true
 csharp_style_prefer_not_pattern = true
 csharp_style_prefer_pattern_matching = true
-csharp_style_prefer_switch_expression = true
+csharp_style_prefer_switch_expression = false
 
 # Einstellungen für NULL-Überprüfung
 csharp_style_conditional_delegate_call = true
 
 # Einstellungen für Modifizierer
 csharp_prefer_static_local_function = true
-csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async
+csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async
+csharp_style_prefer_readonly_struct = true
 
 # Einstellungen für Codeblöcke
 csharp_prefer_braces = true
 csharp_prefer_simple_using_statement = true
+csharp_style_namespace_declarations = block_scoped
+csharp_style_prefer_method_group_conversion = true
+csharp_style_prefer_top_level_statements = true
 
 # Einstellungen für Ausdrucksebene
-csharp_prefer_simple_default_expression = true
-csharp_style_deconstructed_variable_declaration = true
+csharp_prefer_simple_default_expression = false
+csharp_style_deconstructed_variable_declaration = false
 csharp_style_implicit_object_creation_when_type_is_apparent = true
-csharp_style_inlined_variable_declaration = true
-csharp_style_pattern_local_over_anonymous_function = true
-csharp_style_prefer_index_operator = true
-csharp_style_prefer_range_operator = true
+csharp_style_inlined_variable_declaration = false
+csharp_style_prefer_index_operator = false
+csharp_style_prefer_local_over_anonymous_function = true
+csharp_style_prefer_null_check_over_type_check = true
+csharp_style_prefer_range_operator = false
+csharp_style_prefer_tuple_swap = true
+csharp_style_prefer_utf8_string_literals = true
 csharp_style_throw_expression = true
 csharp_style_unused_value_assignment_preference = discard_variable
 csharp_style_unused_value_expression_statement_preference = discard_variable
@@ -223,19 +248,3 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
-
-# CS8625: Ein NULL-Literal kann nicht in einen Non-Nullable-Verweistyp konvertiert werden.
-dotnet_diagnostic.CS8625.severity = none
-
-# CS8618: Ein Non-Nullable-Feld muss beim Beenden des Konstruktors einen Wert ungleich NULL enthalten. Erwägen Sie die Deklaration als Nullable.
-dotnet_diagnostic.CS8618.severity = none
-
-# CS8600: Das NULL-Literal oder ein möglicher NULL-Wert wird in einen Non-Nullable-Typ konvertiert.
-dotnet_diagnostic.CS8600.severity = none
-
-# CS8602: Dereferenzierung eines möglichen Nullverweises.
-dotnet_diagnostic.CS8602.severity = silent
-
-[*.{cs,vb}]
-dotnet_style_qualification_for_method=false:silent
-dotnet_style_qualification_for_property=true:silent

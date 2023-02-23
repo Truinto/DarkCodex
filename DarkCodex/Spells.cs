@@ -28,7 +28,7 @@ namespace DarkCodex
             // sfx from CallLightningAbility AbilitySpawnFx
             // StormwalkerFlashStepAbility AbilityCustomFlashStep
             // DragonsBreathBlue AbilityDeliverProjectile
-            var flashstep = Helper.Get<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
+            //var flashstep = Helper.Get<BlueprintAbility>("e10424c1afe70cb4384090f4dab8d437"); //StormwalkerFlashStepAbility
 
             var checkWeapon = Helper.CreateAbilityRequirementHasItemInHands();
             var school = Helper.CreateSpellComponent(SpellSchool.Transmutation);
@@ -479,7 +479,9 @@ namespace DarkCodex
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionDealDamage(StatType.Strength, Helper.CreateContextDiceValue(DiceType.Zero, 0, 1))))
                         )
                     )
-                ).MakeStickySpell(out var cast, Helper.ContextCasterLevel);
+                );
+
+            effect.MakeStickySpell(out var cast, Helper.ContextCasterLevel);
 
             Main.Patch(typeof(Patch_TouchPersist)); // TODO: move to patches
 

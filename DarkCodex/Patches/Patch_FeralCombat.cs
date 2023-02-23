@@ -62,31 +62,11 @@ namespace DarkCodex
         //OK: MonkNoArmorAndMonkWeaponFeatureUnlock	MonkNoArmorAndMonkWeaponOrFeralCombatFeatureUnlock
         //OK: AdditionalStatBonusOnAttackDamage		AdditionalStatBonusOnAttackDamageOrFeralCombat
 
-        //[HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), typeof(RuleAttackWithWeapon))]
-        //[HarmonyTranspiler]
-        //public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
-        //{
-        //    List<CodeInstruction> list = instr.ToList();
-        //    MethodInfo reference = AccessTools.PropertyGetter(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
-        //    int index = list.FindIndex(f => f.Calls(reference)) + 2; //68
-        //    int label = index - 1;
-        //    //for (int i = 64; i <= 70; i++) Helper.PrintInstruction(list[i], i.ToString());
-        //    Main.Print("Patching at " + index);
-        //    list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
-        //    list.Insert(index++, new CodeInstruction(OpCodes.Ldarg_1));
-        //    list.Insert(index++, CodeInstruction.Call(typeof(Patch_FeralCombat), nameof(Patch1)));
-        //    list.Insert(index++, new CodeInstruction(OpCodes.Brtrue_S, list[label].operand)); //label=11
-        //    return list;
-        //}
-        //public static bool Patch1(AddInitiatorAttackWithWeaponTrigger instance, RuleAttackWithWeapon evt)
-        //{
-        //    return instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat);
-        //}
         [HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), typeof(RuleAttackWithWeapon))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // general & styles strikes
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
             data.InsertAfter(Patch1);
             data.First().Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
@@ -148,18 +128,8 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // flurry of blows
         {
-            var data = new TranspilerData(instructions, generator, original);
-
-            while (!data.IsLast)
-            {
-                if (data.Calls(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsMonk)))
-                {
-                    data.InsertBefore(OpCodes.Ldarg_0);
-                    data.ReplaceCall(Patch3);
-                }
-                data++;
-            }
-
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllCalls(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsMonk), Patch3);
             return data.Code;
         }
         public static bool Patch3(BlueprintItemWeapon weapon, MonkNoArmorAndMonkWeaponFeatureUnlock __instance)
@@ -172,7 +142,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler4(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // dragon style
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
             data.InsertAfter(Patch4);
             return data.Code;
@@ -189,7 +159,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // elemental fist
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
             data.InsertAfter(Patch5);
             return data.Code;
@@ -206,7 +176,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler6(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // elemental fist
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
             data.InsertAfter(Patch6);
             return data.Code;
@@ -223,7 +193,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler7(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // Ki Strike
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(AddOutgoingPhysicalDamageProperty), nameof(AddOutgoingPhysicalDamageProperty.CheckWeaponType));
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
             data.InsertAfter(Patch7);
@@ -243,7 +213,7 @@ namespace DarkCodex
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler8(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // Shattering Punch
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
             data.InsertAfter(Patch8);
             return data.Code;

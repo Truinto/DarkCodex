@@ -53,8 +53,7 @@ namespace CodexLib
 
         public BlueprintAbility GetEligible(BlueprintAbility spell)
         {
-            var bp = this.Param.Blueprint as BlueprintAbility;
-            if (bp == null)
+            if (this.Param.Blueprint is not BlueprintAbility bp)
                 return null;
             if (bp == spell)
                 return spell;

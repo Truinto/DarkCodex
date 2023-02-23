@@ -57,11 +57,7 @@ namespace CodexLib
         private static List<string> _ids;
         public static Metamagic Get(string id)
         {
-            if (_ids == null)
-            {
-                // to do load from disk
-                _ids = new();
-            }
+            _ids ??= new(); // to do load from disk
 
             int index = _ids.IndexOf(id);
             if (index < 0)

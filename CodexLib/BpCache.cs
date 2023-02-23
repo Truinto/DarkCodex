@@ -158,9 +158,7 @@ namespace CodexLib
                     // read type
                     reader.Read(buffer, 0, length);
                     string typeName = Encoding.ASCII.GetString(buffer, 0, length);
-                    var type = Type.GetType(typeName);
-                    if (type == null)
-                        throw new FormatException($"Type couldn't be parsed '{typeName}', length={length}");
+                    var type = Type.GetType(typeName) ?? throw new FormatException($"Type couldn't be parsed '{typeName}', length={length}");
 
                     // get list
                     if (_blueprints.Ensure(type, out var list, typeof(List<>).MakeGenericType(type)))

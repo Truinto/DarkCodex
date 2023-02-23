@@ -161,7 +161,7 @@ namespace CodexLib
                         spawnedPet.SetMaster(this.Owner, Const.PetUndead);
                         spawnedPet.IsInGame = this.Owner.IsInGame;
                     }
-                    this.TryLevelUpPet();
+                    TryLevelUpPet();
                     if (!flag && Game.Instance.Player.PartyCharacters.Contains(this.Owner))
                     {
                         EventBus.RaiseEvent<IPartyHandler>(h => h.HandleAddCompanion(spawnedPet), true);

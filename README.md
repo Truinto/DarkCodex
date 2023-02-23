@@ -82,6 +82,8 @@ Content
 |Magus.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
 |Magus.FixHexcrafterProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
 |Magus.PatchSwordSaint|allow Sword Saint to pick any weapon focus|:house:|:heavy_check_mark:|
+|MartialArt.CreateBladedBrush|combat feat: use glaive with Weapon Finesse and Precise Strike|:book:|:construction:|
+|MartialArt.CreatePaladinVirtuousBravo|archetype|:book:|:construction:|
 |MartialArt.CreateProdigiousTwoWeaponFighting|combat feat: use STR for TWF and always treat offhand as light|:book:|:heavy_check_mark:|
 |Monk.CreateFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
 |Monk.PatchSoheiRapidShot|disallow rapid shot for Sohei|:house:|:heavy_check_mark:|
@@ -198,6 +200,5 @@ A: These cannot be disabled during a playthrough. They become save permanent. I 
 Build
 -----------
 * Clone repo
-* Install nuget AssemblyPublicizer by vikigenius
 * Rename Directory.Build.props.default to Directory.Build.props.user
 * Open and edit Directory.Build.props.user with your game location

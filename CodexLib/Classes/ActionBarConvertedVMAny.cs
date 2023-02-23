@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 namespace CodexLib
 {
     /// <summary>
-    /// overwrites logic to use any MechanicActionBarSlot
+    /// Overwrites logic to use any MechanicActionBarSlot.
     /// </summary>
     public class ActionBarConvertedVMAny : ActionBarConvertedVM
     {
+        /// <inheritdoc cref="ActionBarConvertedVMAny"/>
         public ActionBarConvertedVMAny(ActionBarSlotVM parent, List<MechanicActionBarSlot> list, Action onClose) : base(new(), onClose)
         {
             foreach (var item in list)

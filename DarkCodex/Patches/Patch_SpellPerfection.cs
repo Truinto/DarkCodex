@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.Enums;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,23 +16,19 @@ namespace DarkCodex
     {
         [HarmonyPatch(typeof(SchoolMasteryParametrized), nameof(SchoolMasteryParametrized.OnEventAboutToTrigger))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instr)
+        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            foreach (var line in instr)
-            {
-                if (line.opcode == OpCodes.Ldc_I4_S && Convert.ToInt32(line.operand) == 25)
-                    line.operand = 30;
-
-                yield return line;
-            }
+            var data = new TranspilerTool(instructions, generator, original);
+            data.ReplaceAllConstant(ModifierDescriptor.UntypedStackable, ModifierDescriptor.Feat);
+            return data;
         }
 
         [HarmonyPatch(typeof(SpellPenetrationMythicBonus), nameof(SpellPenetrationMythicBonus.OnEventAboutToTrigger))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instr) => Transpiler1(instr);
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler1(instructions, generator, original);
 
         [HarmonyPatch(typeof(SpellSpecializationParametrized), nameof(SpellSpecializationParametrized.OnEventAboutToTrigger))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instr) => Transpiler1(instr);
+        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler1(instructions, generator, original);
     }
 }

@@ -1,5 +1,13 @@
 ﻿# Changelog
 
+## [1.4.0]
+- added new UnityMod project, which can be imported into any Unity project (not just Pathfinder)
+- UnityMod is merged with CodexLib via ILRepack; can no longer use ReferenceProject and must use Reference to compiled library
+- UnityMod's namespace is 'Shared'
+- removed CodexLib.TranspilerData; now available as Shared.TranspilerTool
+- enabled XML documentation
+- removed CodexLib.CacheData; now available as Shared.CacheData
+
 ## [1.3.3]
 - added BpCache
 

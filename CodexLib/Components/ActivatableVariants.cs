@@ -48,12 +48,12 @@ namespace CodexLib
         public BlueprintUnitFact Selected => this.Data.Selected as BlueprintUnitFact;
 
         /// <summary>Example</summary>
-        private void OnEventAboutToTrigger()
+        public void OnEventAboutToTrigger()
         {
             if (this.Fact is not ActivatableAbility act || !act.IsOn)
                 return;
 
-            if (this.Data.Selected is not BlueprintUnitFact feature)
+            if (this.Data.Selected is not BlueprintUnitFact /*feature*/)
                 return;
         }
     }

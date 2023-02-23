@@ -173,8 +173,7 @@ namespace CodexLib
         public override void RunAction()
         {
             Buff buff = this.Target.Unit.Buffs.GetBuff(BleedBuff.BuffBleed);
-            if (buff == null)
-                buff = this.Target.Unit.Descriptor.AddBuff(BleedBuff.BuffBleed, this.Context);
+            buff ??= this.Target.Unit.Descriptor.AddBuff(BleedBuff.BuffBleed, this.Context);
             if (buff == null)
                 return;
 

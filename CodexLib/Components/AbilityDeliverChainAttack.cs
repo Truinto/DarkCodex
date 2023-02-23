@@ -125,7 +125,7 @@ namespace CodexLib
             foreach (UnitEntityData unitEntityData in Game.Instance.State.Units)
             {
                 float distance = (unitEntityData.Position - point).magnitude;
-                if (this.CheckTarget(context, unitEntityData) && distance <= radius && !usedTargets.Contains(unitEntityData) && distance < min)
+                if (CheckTarget(context, unitEntityData) && distance <= radius && !usedTargets.Contains(unitEntityData) && distance < min)
                 {
                     min = distance;
                     result = unitEntityData;

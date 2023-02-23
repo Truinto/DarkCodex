@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Authors>Truinto</Authors>
+		<Title>$(MSBuildProjectName)</Title>
+		<RepositoryUrl>https://github.com/Truinto/</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+		<PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
+		<PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+		<PackageReference Include="coverlet.collector" Version="3.1.2" />
+	</ItemGroup>
+
+	<!-- Library Path -->
+	<PropertyGroup>
+		<Lib Condition="'$(Lib)' == ''">..\non-public\lib\</Lib>
+	</PropertyGroup>
+
+	<!-- Project References -->
+	<ItemGroup>
+		<Reference Private="True" Include="0Harmony" HintPath="$(Lib)\0Harmony.dll" />
+		<Reference Private="True" Include="Newtonsoft.Json" HintPath="$(Lib)\Newtonsoft.Json.dll" />
+		<Reference Private="True" Include="UnityModManager" HintPath="$(Lib)\UnityModManager.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\UnityMod\UnityMod.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,7 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.19]
 - added Oathbreakers Bane Ability to Limitless Smite
+- changed project
+- added Paladin Virtuous Bravo for testing only #87
 
 ## [1.5.18]
 - removed broken logic from KineticArtifact #210

@@ -234,75 +234,73 @@ namespace DarkCodex
             {
                 StringBuilder sb = new();
 #if DEBUG
-                using (StreamWriter sw = new(Path.Combine(Main.ModPath, "enchantment-export.txt"), false)) // todo: remove debug log
-                {
-                    sw.WriteLine("names");
+                using StreamWriter sw = new(Path.Combine(Main.ModPath, "enchantment-export.txt"), false); // todo: remove debug log
+                sw.WriteLine("names");
 #endif
-                    foreach (var enchantment in BpCache.Get<BlueprintItemEnchantment>())
+                foreach (var enchantment in BpCache.Get<BlueprintItemEnchantment>())
+                {
+                    if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
+                        continue;
+
+                    string name = enchantment.name;
+                    if (name == null) continue;
+                    name = name.Replace("Enchantment", "");
+                    name = name.Replace("Enchant", "");
+                    name = name.Replace("Plus", "");
+                    if (name.Length < 1) continue;
+                    sb.Clear();
+                    sb.Append(name[0]);
+                    for (int i = 1; i < name.Length; i++)
                     {
-                        if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
+                        // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
+                        if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
+                            sb.Append(' ');
+
+                        if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
+                            sb.Append('+');
+
+                        if (name[i] != '_')         // print char, except '_'
+                            sb.Append(name[i]);
+                        else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
+                            sb.Append(' ');
+                    }
+
+                    enchantment.m_EnchantName = sb.ToString().CreateString();
+#if DEBUG
+                    sw.Write(enchantment.AssetGuid);
+                    sw.Write("\t");
+                    sw.WriteLine(sb);
+#endif
+                }
+#if DEBUG
+                sw.WriteLine("descriptions");
+#endif
+                foreach (var item in BpCache.Get<BlueprintItem>())
+                {
+                    try
+                    {
+                        if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty() || item.m_DescriptionText == "")
                             continue;
 
-                        string name = enchantment.name;
-                        if (name == null) continue;
-                        name = name.Replace("Enchantment", "");
-                        name = name.Replace("Enchant", "");
-                        name = name.Replace("Plus", "");
-                        if (name.Length < 1) continue;
-                        sb.Clear();
-                        sb.Append(name[0]);
-                        for (int i = 1; i < name.Length; i++)
+                        foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty() || w.m_Description == ""))
                         {
-                            // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
-                            if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
-                                sb.Append(' ');
-
-                            if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
-                                sb.Append('+');
-
-                            if (name[i] != '_')         // print char, except '_'
-                                sb.Append(name[i]);
-                            else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
-                                sb.Append(' ');
+                            enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
+#if DEBUG
+                            sw.Write(enchantent.AssetGuid);
+                            sw.Write("\t");
+                            sw.WriteLine(enchantent.m_Description.ToString());
+#endif
                         }
-
-                        enchantment.m_EnchantName = sb.ToString().CreateString();
-#if DEBUG
-                        sw.Write(enchantment.AssetGuid);
-                        sw.Write("\t");
-                        sw.WriteLine(sb);
-#endif
                     }
-#if DEBUG
-                    sw.WriteLine("descriptions");
-#endif
-                    foreach (var item in BpCache.Get<BlueprintItem>())
+                    catch (Exception)
                     {
-                        try
-                        {
-                            if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty() || item.m_DescriptionText == "")
-                                continue;
-
-                            foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty() || w.m_Description == ""))
-                            {
-                                enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
 #if DEBUG
-                                sw.Write(enchantent.AssetGuid);
-                                sw.Write("\t");
-                                sw.WriteLine(enchantent.m_Description.ToString());
+                        sw.WriteLine(item.AssetGuid + "\tcaused crash");
 #endif
-                            }
-                        }
-                        catch (Exception)
-                        {
-#if DEBUG
-                            sw.WriteLine(item.AssetGuid + "\tcaused crash");
-#endif
-                        }
-                        // regex to fix linebreaks "\n(?![a-f0-9]{32}\t)", "\\n"
                     }
-#if DEBUG
+                    // regex to fix linebreaks "\n(?![a-f0-9]{32}\t)", "\\n"
                 }
+#if DEBUG
 #endif
             }
 
@@ -351,11 +349,9 @@ namespace DarkCodex
         {
             public static void Leader()
             {
-                var attacker = Game.Instance.TacticalCombat.Data.Attacker.LeaderData;
-                var defender = Game.Instance.TacticalCombat.Data.Defender.LeaderData;
-
-                bool isAttacking = attacker.Faction == ArmyFaction.Crusaders;
-
+                //var attacker = Game.Instance.TacticalCombat.Data.Attacker.LeaderData;
+                //var defender = Game.Instance.TacticalCombat.Data.Defender.LeaderData;
+                //bool isAttacking = attacker.Faction == ArmyFaction.Crusaders;
                 //Game.Instance.TacticalCombat.Data.Turn.
             }
 
@@ -373,11 +369,9 @@ namespace DarkCodex
                 if (!__instance.TurnEnded)
                     return;
 
-                return;
-
-                __instance.m_PrevTurnEndTime = null;
-                turn.UsedActionsCount = 0;
-                turn.UpdateStandardAction(false);
+                //__instance.m_PrevTurnEndTime = null;
+                //turn.UsedActionsCount = 0;
+                //turn.UpdateStandardAction(false);
             }
         }
 

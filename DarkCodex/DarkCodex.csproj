@@ -12,15 +12,15 @@
 		<RootNamespace>DarkCodex</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
-	
+
 	<!-- Shared Libs -->
-	<Import Project="..\CodexShared\CodexShared.projitems" Label="Shared" />
-	
+
 	<!-- Nuget Packages -->
 	<ItemGroup>
-	  <PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-	  <PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Common References -->
@@ -34,13 +34,13 @@
 		<Reference Include="System.Data" />
 		<Reference Include="System.Net.Http" />
 	</ItemGroup>
-		
+
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\0Harmony_public.dll" />
+		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\UnityModManager\0Harmony_public.dll" />
 		<Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
 		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
-		
+
 		<Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
 		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
 		<Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
@@ -61,14 +61,15 @@
 		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
 		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
-		
-		<ProjectReference Include="..\CodexLib\CodexLib.csproj" Project="{c518e346-ddbd-498a-bef9-d50ff314ad38}" Name="CodexLib" Private="False" />
+
+		<Reference Include="CodexLib" HintPath="$(SolutionDir)\CodexLib\CodexLib.dll" />
 	</ItemGroup>
 
 	<!-- Other Files -->
 	<ItemGroup>
-	  <None Update="changelog.md" CopyToOutputDirectory="PreserveNewest" />
-	  <None Update="info.json" CopyToOutputDirectory="PreserveNewest" />
+		<GlobalAnalyzerConfigFiles Include="$(SolutionDir)\@Shared\.globalconfiguration" Link=".globalconfiguration" />
+		<None Update="changelog.md" CopyToOutputDirectory="PreserveNewest" />
+		<None Update="info.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
 	<!-- Publicize -->
@@ -96,11 +97,12 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<ItemGroup>
 			<_CopyItems Include="$(TargetDir)\*" />
+			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
 		</ItemGroup>
 
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />		
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
 		<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />
-		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />		
+		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>
 
 </Project>

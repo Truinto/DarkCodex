@@ -20,7 +20,7 @@ namespace CodexLib
         public override void OnTurnOn()
         {
             int index = (int)Condition;
-            var exceptions = Owner.State.m_ConditionsExceptions;
+            var exceptions = this.Owner.State.m_ConditionsExceptions;
             if (exceptions[index] == null)
                 exceptions[index] = new();
             exceptions[index].Add(Exception);
@@ -29,9 +29,8 @@ namespace CodexLib
         public override void OnTurnOff()
         {
             int index = (int)Condition;
-            var exceptions = Owner.State.m_ConditionsExceptions;
-            if (exceptions[index] != null)
-                exceptions[index].Remove(Exception);
+            var exceptions = this.Owner.State.m_ConditionsExceptions;
+            exceptions[index]?.Remove(Exception);
         }
     }
 }

@@ -10,7 +10,7 @@
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
-            var data = new TranspilerData(instructions, generator, original);
+            var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(IAbilityRestriction), nameof(IAbilityRestriction.IsAbilityRestrictionPassed));
             data.ReplaceCall(Patch);

@@ -62,8 +62,7 @@ namespace CodexLib
             bool hasMainTarget = false;
             int targetLimit = TargetLimit;
             var caster = context.Caster;
-            var units = new List<UnitEntityData>();
-            units.Add(caster);
+            var units = new List<UnitEntityData>() { caster };
             AbilityCustomDimensionDoor.AddMounts(units);
 
             var targetPoint = spellTarget.Point;
@@ -165,7 +164,7 @@ namespace CodexLib
                     if (usedUnits.Contains(bystander))
                         continue;
 
-                    if (this.WouldTargetUnitLine(context.Ability, bystander, sourcePosition, direction2d, passedDistance))
+                    if (WouldTargetUnitLine(context.Ability, bystander, sourcePosition, direction2d, passedDistance))
                     {
                         usedUnits.Add(bystander);
                         yield return new AbilityDeliveryTarget(bystander)

@@ -14,11 +14,18 @@ namespace CodexLib
         public int Count;
     }
 
+    /// <summary>
+    /// Multi touch attacks. E.g. Chill Touch.
+    /// </summary>
     public class AbilityEffectStickyTouchPersist : AbilityEffectStickyTouch
     {
         public ContextValue Count;
 
+        /// <summary>
+        /// Multi touch attacks. E.g. Chill Touch.
+        /// </summary>
         /// <param name="blueprintAbility">type: <b>BlueprintAbility</b></param>
+        /// <param name="count">Count of uses before effect wears off.</param>
         public AbilityEffectStickyTouchPersist(AnyRef blueprintAbility, ContextValue count)
         {
             this.m_TouchDeliveryAbility = blueprintAbility;
@@ -47,7 +54,7 @@ namespace CodexLib
     }
 
     [HarmonyPatch]
-    public class Patch_TouchPersist
+    public class Patch_TouchPersist // TODO
     {
         [HarmonyPatch(typeof(TouchSpellsController), nameof(TouchSpellsController.OnAbilityEffectApplied))]
         public static bool Prefix1(AbilityExecutionContext context, TouchSpellsController __instance)

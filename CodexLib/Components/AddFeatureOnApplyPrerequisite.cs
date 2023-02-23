@@ -15,6 +15,10 @@ namespace CodexLib
         public BlueprintFeatureReference[] Prerequisites;
         public BlueprintFeatureReference Feature;
 
+        /// <summary>
+        /// Same as <see cref="AddFeatureOnApply"/>, but prerequisites are required.
+        /// </summary>
+        /// <param name="amount">Count of prerequisites that must be fulfilled.</param>
         /// <param name="prerequisites">type: <b>BlueprintFeatureReference</b></param>
         /// <param name="feature">type: <b>BlueprintFeatureReference</b></param>
         public AddFeatureOnApplyPrerequisite(int amount, AnyRef feature, params AnyRef[] prerequisites)
@@ -58,10 +62,6 @@ namespace CodexLib
             {
                 this.Owner.Progression.Features.AddFeature(feature, null);
             }
-
-
-
-
         }
     }
 }

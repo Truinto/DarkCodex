@@ -16,23 +16,26 @@ namespace CodexLib
         private IList _list;
         [NonSerialized] private object _syncRoot;
 
+        /// <inheritdoc cref="AmbigiousCollection{T}"/>
         public AmbigiousCollection(IList list)
         {
             this._list = list ?? new List<object>();
         }
 
+        /// <inheritdoc/>
         public T this[int index]
         {
             get => (T)_list[index];
-            set => throw new Exception();
+            set => throw new InvalidCastException();
         }
 
         object IList.this[int index]
         { 
             get => _list[index]; 
-            set => throw new Exception(); 
+            set => throw new InvalidCastException(); 
         }
 
+        /// <inheritdoc/>
         public int Count => _list.Count;
 
         object ICollection.SyncRoot
@@ -53,45 +56,55 @@ namespace CodexLib
 
         bool ICollection.IsSynchronized => false;
 
+        /// <inheritdoc/>
         public bool IsReadOnly => true;
 
+        /// <inheritdoc/>
         public bool IsFixedSize => true;
 
+        /// <inheritdoc/>
         public int Add(object value)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public void Add(T item)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public void Clear()
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public bool Contains(object value)
         {
             return _list.Contains(value);
         }
 
+        /// <inheritdoc/>
         public bool Contains(T item)
         {
             return _list.Contains(item);
         }
 
+        /// <inheritdoc/>
         public void CopyTo(Array array, int index)
         {
             _list.CopyTo(array, index);
         }
 
+        /// <inheritdoc/>
         public void CopyTo(T[] array, int arrayIndex)
         {
             _list.CopyTo(array, arrayIndex);
         }
 
+        /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator()
         {
             return new Enumerator(this);
@@ -102,41 +115,49 @@ namespace CodexLib
             return _list.GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public int IndexOf(object value)
         {
             return _list.IndexOf(value);
         }
 
+        /// <inheritdoc/>
         public int IndexOf(T item)
         {
             return _list.IndexOf(item);
         }
 
+        /// <inheritdoc/>
         public void Insert(int index, object value)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public void Insert(int index, T item)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public void Remove(object value)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public bool Remove(T item)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public void RemoveAt(int index)
         {
             throw new Exception();
         }
 
+        /// <inheritdoc/>
         public struct Enumerator : IEnumerator<T>
         {
             private IList<T> list;
@@ -147,6 +168,7 @@ namespace CodexLib
 
             private T current;
 
+            /// <inheritdoc/>
             public T Current => current;
 
             object IEnumerator.Current => current;
@@ -159,10 +181,12 @@ namespace CodexLib
                 current = default(T);
             }
 
+            /// <inheritdoc/>
             public void Dispose()
             {
             }
 
+            /// <inheritdoc/>
             public bool MoveNext()
             {
                 if (index < _size)

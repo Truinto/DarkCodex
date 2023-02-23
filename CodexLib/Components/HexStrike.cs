@@ -15,7 +15,7 @@ namespace CodexLib
 
         public void OnEventAboutToTrigger(RuleAttackWithWeapon evt)
         {
-            if (!IsOn || this.Data.Selected is not BlueprintAbility ab)
+            if (!this.IsOn || this.Data.Selected is not BlueprintAbility)
                 return;
 
             //evt.IsFirstAttack

@@ -5,6 +5,11 @@ namespace CodexLib.Patches
     [HarmonyPatch]
     public class Patch_FlameBlade
     {
+        // Kingmaker.Blueprints.Items.Weapons.BlueprintItemWeapon.AttackType
+        //  -> patch: check for component to return different value
+        // Kingmaker.UI.Common.UIUtility.GetDamageBonus (low prio)
+        //  -> patch return value
+
         [HarmonyPatch(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.AttackType), MethodType.Getter)]
         [HarmonyPostfix]
         public static void Postfix1(BlueprintItemWeapon __instance, ref AttackType __result)

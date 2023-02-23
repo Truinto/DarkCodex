@@ -144,7 +144,7 @@ namespace DarkCodex
             var abundant_smite = Helper.ToRef<BlueprintFeatureReference>("7e5b63faeca24474db0bfd019167dda4");
             var abundant_smitechaos = Helper.ToRef<BlueprintFeatureReference>("4cdc155e26204491ba4d193646cb4443");
 
-            var limitless = Helper.CreateBlueprintFeature(
+            AnyRef limitless = Helper.CreateBlueprintFeature(
                 "LimitlessSmite",
                 "Limitless Smite",
                 "Benefit: You no longer have a limited amount of Smite per day.",
@@ -153,7 +153,7 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(abundant_smite, true),
                 Helper.CreatePrerequisiteFeature(abundant_smitechaos, true)
-                ).ToRef<BlueprintUnitFactReference>();
+                );
 
             smite_evil.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
             smite_chaos.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
@@ -161,7 +161,7 @@ namespace DarkCodex
             if (Settings.State.reallyFreeCost)
                 mark_of_justice.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
 
-            Helper.AddMythicTalent(limitless.ToRef<BlueprintFeatureReference>());
+            Helper.AddMythicTalent(limitless);
 
             // MicroscopicContentExpansion
             if (Helper.Get("09a8551df5e041b4a872bd33f67d70a3") is BlueprintAbility smite_good //AntipaladinSmiteGoodAbility

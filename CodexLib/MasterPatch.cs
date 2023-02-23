@@ -56,7 +56,6 @@ namespace CodexLib
                 PatchSafe(harmony, patch);
             PatchList.Clear();
             PatchList = null;
-            harmony = null;
 
             Helper.EnumCreateModifierDescriptor(Const.Intelligence, "Intelligence", "");
             Helper.EnumCreateModifierDescriptor(Const.Charisma, "Charisma", "");
