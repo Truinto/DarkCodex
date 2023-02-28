@@ -10,20 +10,27 @@ namespace CodexLib
 {
     /// <summary>
     /// List of enums with a counter of retains. Count is tracked individually by type and value.<br/>
-    /// E.g. SpellSchool.Conjuration (0b10) and SpellSchool.Divination (0b11) do not overlap.
+    /// E.g. SpellSchool.Conjuration (0b10) and SpellSchool.Divination (0b11) do not overlap.<br/>
+    /// All values are boxed, because they are cast into <see cref="Enum"/>.
     /// </summary>
     public class CountableFlagArray
     {
         [JsonProperty]
         private readonly Dictionary<Enum, CountableFlag> Data = new();
 
-        public void Retain<T>(T key) where T : Enum
+        /// <summary>
+        /// Increases count for a specific enum value.
+        /// </summary>
+        public void Retain(Enum key)
         {
             Data.Ensure(key, out var flag);
             flag.Retain();
         }
 
-        public void Release<T>(T key) where T : Enum
+        /// <summary>
+        /// Decreases count for a specific enum value.
+        /// </summary>
+        public void Release(Enum key)
         {
             if (Data.TryGetValue(key, out var flag))
             {
@@ -34,30 +41,51 @@ namespace CodexLib
             }
         }
 
-        public void ReleaseAll<T>(T key) where T : Enum
+        /// <summary>
+        /// Remove a specific enum value. Same as setting count to zero.
+        /// </summary>
+        public void ReleaseAll(Enum key)
         {
             Data.Remove(key);
         }
 
-        public bool HasFlag<T>(T key) where T : Enum
+        /// <summary>
+        /// True if enum value count is one or more. Otherwise false.
+        /// </summary>
+        public bool HasFlag(Enum key)
         {
             return Data.ContainsKey(key);
-
-            //if (Data.TryGetValue(key, out var flag))
-            //    return flag.Value;
-            //return false;
         }
 
-        public int GetCount<T>(T key) where T : Enum
-        {
-            if (Data.TryGetValue(key, out var flag))
-                return flag.Count;
-            return 0;
-        }
-
+        /// <summary>
+        /// True if no values are saved in this instance.
+        /// </summary>
         public bool IsEmpty()
         {
             return Data.Count == 0;
+        }
+
+        /// <summary>
+        /// Accessor to count of a specific enum value.
+        /// </summary>
+        public int this[Enum key]
+        {
+            get
+            {
+                if (Data.TryGetValue(key, out var flag))
+                    return flag.Count;
+                return 0;
+            }
+            set
+            {
+                if (value <= 0)
+                    Data.Remove(key);
+                else
+                {
+                    Data.Ensure(key, out var flag);
+                    flag.m_Count = (short)value;
+                }
+            }
         }
     }
 }

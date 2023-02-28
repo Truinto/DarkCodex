@@ -26,21 +26,21 @@ private static void EnsureCodexLib(string modPath)
 {
     if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("CodexLib, ")))
     {
-        PrintDebug("CodexLib already loaded.");
+        Console.WriteLine("CodexLib already loaded.");
         return;
     }
 
     string path = null;
     Version version = null;
     modPath = new DirectoryInfo(modPath).Parent.FullName;
-    PrintDebug("Looking for CodexLib in " + modPath);
+    Console.WriteLine("Looking for CodexLib in " + modPath);
 
     foreach (string cPath in Directory.GetFiles(modPath, "CodexLib.dll", SearchOption.AllDirectories))
     {
         try
         {
             var cVersion = new Version(FileVersionInfo.GetVersionInfo(cPath).FileVersion);
-            PrintDebug($"Found: newer={version == null || cVersion > version} version={cVersion} @ {cPath}");
+            Console.WriteLine($"Found: newer={version == null || cVersion > version} version={cVersion} @ {cPath}");
             if (version == null || cVersion > version)
             {
                 path = cPath;
@@ -75,5 +75,5 @@ Things to note
 * Method signatures should not changed during versions. If there is a major change, you will need to recompile your project.
 * I will usually keep original method signatures for a while and mark them as obsolete. Check your compiler warnings.
 * PS: I plan to rework or remove the ToRef methods.
-* If you want to use CodexLib without potential update issues, you can merge your project with ILMerge or ILRepack. This will isolate your instance of CodexLib. But beware that this changes the deserialization $type and could be relevant to some component's save data. It also blocks any cross mod compatability.
+* I recommend to NOT use ILMerge or ILRepack on CodexLib. If you merge the assemblies, it will isolate your instance of CodexLib. This will prevent potential update issues, but also cause unexpected behaviour. It blocks all cross mod compatability, may cause issues with deserialization in save data, and some components might not work. Specifically these that require Harmony patches to work. You must not use MasterPatch.Run() when merging assemblies. Otherwise you will call the patches in your instance and cause bugs with other mods using CodexLib.
 

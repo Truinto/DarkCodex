@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.4.1]
+- removed unnecessary generics from CountableFlagArray and PartExtensions
+
 ## [1.4.0]
 - added new UnityMod project, which can be imported into any Unity project (not just Pathfinder)
 - UnityMod is merged with CodexLib via ILRepack; can no longer use ReferenceProject and must use Reference to compiled library

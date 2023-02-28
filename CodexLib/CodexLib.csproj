@@ -78,6 +78,10 @@
 		<EmbeddedResource Include="Resources\Num7.png" />
 		<EmbeddedResource Include="Resources\Num8.png" />
 		<EmbeddedResource Include="Resources\Num9.png" />
+
+		<None Remove="CodexLib.dll" />
+		<None Remove="CodexLib.xml" />
+		<None Remove="update_codexlib.bat" />
 	</ItemGroup>
 
 	<!-- Publicize -->
@@ -103,12 +107,13 @@
 		<ItemGroup>
 			<_MergeItems Include="$(TargetDir)$(TargetName).dll" />
 			<_MergeItems Include="$(SolutionDir)@Shared\UnityMod.dll" />
-			
+
 			<_CopyItems Include="$(TargetDir)$(TargetName).dll" />
 			<_CopyItems Include="$(TargetDir)$(TargetName).xml" />
 		</ItemGroup>
-		
-		<ILRepack Parallel="true" Union="true" CopyAttributes="true" AllowMultiple="true" Internalize="false" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" TargetKind="Dll" OutputFile="$(TargetDir)$(TargetName).dll" />
+
+		<ILRepack XmlDocumentation="true" Union="true" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
+		<!--<ILMerge ToolPath="packages\ilmerge.2.13.0307" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" SearchDirectories="$(GameManaged);$(GameManaged)\UnityModManager" />-->
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(SolutionDir)CodexLib\" />
 	</Target>
 
