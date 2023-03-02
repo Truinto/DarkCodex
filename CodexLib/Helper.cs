@@ -998,10 +998,13 @@ namespace CodexLib
                 {
                     if (File.Exists(path))
                     {
-                        map = Deserialize<Dictionary<string, string>>(path: path);
+                        var data = Deserialize<Dictionary<string, string>>(path: path);
                         var pack = LocalizationManager.CurrentPack;
-                        foreach (var entry in map)
+                        foreach (var entry in data)
+                        {
                             pack.PutString(entry.Key, entry.Value);
+                            map.Add(entry.Key, entry.Value);
+                        }
                     }
                 }
                 catch (Exception e) { Print($"Could not read lanaguage file for {LocalizationManager.CurrentPack.Locale}: {e.Message}"); }
