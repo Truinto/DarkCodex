@@ -476,10 +476,13 @@ namespace CodexLib
         }
 
         /// <summary>
-        /// Get dictionary by key and create new value with standard constructor, if it did not exist.
+        /// Get dictionary value by key and create new value with standard constructor, if it did not exist.<br/>
+        /// Returns true, if new value was created.
         /// </summary>
-        /// <returns>true if new value was created</returns>
-        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value) where TValue : new()
+        /// <remarks>
+        /// Remember: If you set value to a new instance, it won't be stored in the dictionary. Use the overload with 'getter' instead.
+        /// </remarks>
+        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value) where TValue : class, new()
         {
             if (dic.TryGetValue(key, out value))
                 return false;
@@ -487,7 +490,14 @@ namespace CodexLib
             return true;
         }
 
-        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value, Type type)
+        /// <summary>
+        /// Get dictionary value by key and create new value with standard constructor of given type, if it did not exist.<br/>
+        /// Returns true, if new value was created.
+        /// </summary>
+        /// <remarks>
+        /// Remember: If you set value to a new instance, it won't be stored in the dictionary. Use the overload with 'getter' instead.
+        /// </remarks>
+        public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value, Type type) where TValue : class
         {
             if (dic.TryGetValue(key, out value))
                 return false;
@@ -495,6 +505,10 @@ namespace CodexLib
             return true;
         }
 
+        /// <summary>
+        /// Get dictionary value by key and create new value with given function, if it did not exist.<br/>
+        /// Returns true, if new value was created.
+        /// </summary>
         public static bool Ensure<TKey, TValue>(this Dictionary<TKey, TValue> dic, TKey key, out TValue value, Func<TValue> getter)
         {
             if (dic.TryGetValue(key, out value))
@@ -983,31 +997,26 @@ namespace CodexLib
         private static Dictionary<string, Dictionary<string, string>> _mappedStrings = new();
 
         private static Dictionary<string, string> GetStringMap()
-        {
-            string modPath = Scope.ModPath;
-
-            if (_mappedStrings.Ensure(modPath, out var map) && !Scope.AllowGuidGeneration)
-            {
-                load(Path.Combine(modPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json"));
-            }
+        {        
+            _mappedStrings.Ensure(Scope.ModPath, out var map, load);
             return map;
 
-            void load(string path)
+            Dictionary<string, string> load()
             {
                 try
                 {
-                    if (File.Exists(path))
+                    string path = Path.Combine(Scope.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json");
+                    if (File.Exists(path) && !Scope.AllowGuidGeneration)
                     {
                         var data = Deserialize<Dictionary<string, string>>(path: path);
                         var pack = LocalizationManager.CurrentPack;
-                        foreach (var entry in data)
-                        {
+                        foreach (var entry in data)                        
                             pack.PutString(entry.Key, entry.Value);
-                            map.Add(entry.Key, entry.Value);
-                        }
+                        return data;
                     }
                 }
                 catch (Exception e) { Print($"Could not read lanaguage file for {LocalizationManager.CurrentPack.Locale}: {e.Message}"); }
+                return new();
             }
         }
 

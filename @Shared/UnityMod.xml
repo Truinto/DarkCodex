@@ -214,11 +214,6 @@
             Prints to standard output.
             </summary>
         </member>
-        <member name="T:Shared.PathTool">
-            <summary>
-            Tool to handle all path operations.
-            </summary>
-        </member>
         <member name="T:Shared.SerializationTool">
             <summary>
             Tool to handle (de-)serialization.

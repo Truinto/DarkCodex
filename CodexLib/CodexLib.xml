@@ -669,9 +669,27 @@
         </member>
         <member name="M:CodexLib.Helper.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@)">
             <summary>
-            Get dictionary by key and create new value with standard constructor, if it did not exist.
+            Get dictionary value by key and create new value with standard constructor, if it did not exist.<br />
+            Returns true, if new value was created.
             </summary>
-            <returns>true if new value was created</returns>
+            <remarks>
+            Remember: If you set value to a new instance, it won't be stored in the dictionary. Use the overload with 'getter' instead.
+            </remarks>
+        </member>
+        <member name="M:CodexLib.Helper.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@,System.Type)">
+            <summary>
+            Get dictionary value by key and create new value with standard constructor of given type, if it did not exist.<br />
+            Returns true, if new value was created.
+            </summary>
+            <remarks>
+            Remember: If you set value to a new instance, it won't be stored in the dictionary. Use the overload with 'getter' instead.
+            </remarks>
+        </member>
+        <member name="M:CodexLib.Helper.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@,System.Func{``1})">
+            <summary>
+            Get dictionary value by key and create new value with given function, if it did not exist.<br />
+            Returns true, if new value was created.
+            </summary>
         </member>
         <member name="M:CodexLib.Helper.GetList">
             <summary>
@@ -1408,11 +1426,6 @@
         <member name="M:Shared.Logger.PrintException(System.Exception)">
             <summary>
             Prints to standard output.
-            </summary>
-        </member>
-        <member name="T:Shared.PathTool">
-            <summary>
-            Tool to handle all path operations.
             </summary>
         </member>
         <member name="T:Shared.SerializationTool">
