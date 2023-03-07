@@ -4,6 +4,7 @@
 		<Company>Truinto</Company>
 		<Authors>Truinto</Authors>
 		<Copyright>Copyright © Truinto 2023</Copyright>
+		<DoILRepack>false</DoILRepack>
 	</PropertyGroup>
 	
 	<ItemDefinitionGroup>

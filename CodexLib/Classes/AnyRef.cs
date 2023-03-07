@@ -113,7 +113,7 @@ namespace CodexLib
         /// <summary>
         /// Returns blueprint. If the blueprint isn't <typeparamref name="T"/> or the reference is empty, then an error is printed and null returned.
         /// </summary>
-        public T Get<T>() where T : SimpleBlueprint
+        public T Get<T>()
         {
             var bp = this.Cached;
             if (bp == null)
@@ -130,7 +130,7 @@ namespace CodexLib
             else
                 Helper.PrintError($"AnyRef {this.deserializedGuid} is not {typeof(T)}, it is {bp.GetType()}");
 
-            return null;
+            return default;
         }
 
         /// <summary>
@@ -140,6 +140,18 @@ namespace CodexLib
         {
             return new T() { deserializedGuid = this.deserializedGuid };
         }
+
+        /// <inheritdoc cref="Equals(object)"/>
+        public bool Is(BlueprintReferenceBase bp) => bp != null && this.deserializedGuid.Equals(bp.deserializedGuid);
+
+        /// <inheritdoc cref="Equals(object)"/>
+        public bool Is(SimpleBlueprint bp) => bp != null && this.deserializedGuid.Equals(bp.AssetGuid);
+
+        /// <inheritdoc cref="Equals(object)"/>
+        public bool Is(BlueprintGuid bp) => bp != null && this.deserializedGuid.Equals(bp);
+
+        /// <inheritdoc cref="Equals(object)"/>
+        public bool Is(string bp) => this.deserializedGuid == bp;
 
         /// <inheritdoc cref="Get{T}()"/>
         public static T Get<T>(AnyRef bp) where T : SimpleBlueprint
@@ -179,6 +191,8 @@ namespace CodexLib
                 return this.deserializedGuid == BlueprintGuid.Parse(str);
             if (obj is SimpleBlueprint sb)
                 return this.deserializedGuid == sb.AssetGuid;
+            if (obj is BlueprintGuid guid)
+                return this.deserializedGuid == guid;
             return base.Equals(obj);
         }
 

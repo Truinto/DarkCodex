@@ -177,9 +177,9 @@ namespace DarkCodex
                 "Flame Blade Dervish Combat",
                 "Benefit(s): When you cast flame blade, you gain a +10 enhancement bonus to your base speed as long as the spell persists, along with a +4 competence bonus on all Acrobatics checks. You add your Charisma modifier to damage rolls with your flame blade, and ignore the first 10 points of fire resistance possessed by a creature you hit with the flame blade for the purposes of determining the damage dealt by the flame blade. Against undead foes, you ignore the first 30 points of fire resistance. Immunity to fire still completely protects against damage from your flame blade.\nYou may use this with Gozreh's Trident instead.",
                 icon: icon
-                ).SetComponents(
-                Helper.CreatePrerequisiteClassLevel("610d836f3a3a9ed42a4349b62f002e96", 3, true), //DruidClass
-                Helper.CreatePrerequisiteClassLevel("145f1d3d360a7ad48bd95d392c81b38e", 3, true)  //ShamanClass
+                //).SetComponents(
+                //Helper.CreatePrerequisiteClassLevel("610d836f3a3a9ed42a4349b62f002e96", 3, true), //DruidClass
+                //Helper.CreatePrerequisiteClassLevel("145f1d3d360a7ad48bd95d392c81b38e", 3, true)  //ShamanClass                
                 );
 
             Helper.AddFeats(feat);
@@ -258,6 +258,8 @@ namespace DarkCodex
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
                 "c0c40e42f07ff104fa85492da464ac69"  //ShamanSpelllist
                 );
+
+            feat.SetComponents(new PrerequisiteKnowsSpell(ab, true));
         }
 
         [PatchInfo(Severity.Create, "Divine Trident", "spell: Divine Trident", false)]
@@ -265,14 +267,6 @@ namespace DarkCodex
         {
             Sprite icon = Helper.StealIcon("877bf08948dd654478dc3c113af6eaf8");
             AnyRef feat = "4df40f35e124455c9e20dd44e7cacf12";
-
-            feat.Get()?.AddComponents(
-                Helper.CreatePrerequisiteClassLevel("67819271767a9dd4fbfd4ae700befea0", 3, true), //ClericClass
-                Helper.CreatePrerequisiteClassLevel("d77e67a814d686842802c9cfd8ef8499", 7, true), //BloodragerClass
-                Helper.CreatePrerequisiteClassLevel("34ecd1b5e1b90b9498795791b0855239", 4, true), //HunterClass
-                Helper.CreatePrerequisiteClassLevel("30b5e47d47a0e37438cc5a80c96cfb99", 4, true), //WarpriestClass
-                Helper.CreatePrerequisiteClassLevel("1b9873f1e7bfe5449bc84d03e9c8e3cc", 3, true)  //WitchClass
-                );
 
             /*
             Divine Trident
@@ -350,6 +344,10 @@ namespace DarkCodex
                 "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
                 "c5a1b8df32914d74c9b44052ba3e686a", //WarpriestSpelllist
                 "e17df9977b879b64e8a8cbb4b3569f19"  //WitchSpellList
+                );
+
+            feat.Get()?.AddComponents(
+                new PrerequisiteKnowsSpell(ab, true)
                 );
         }
 

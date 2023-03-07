@@ -200,6 +200,18 @@
             Converts to a BlueprintReference of <typeparamref name="T" />. Does not validate.
             </summary>
         </member>
+        <member name="M:CodexLib.AnyRef.Is(Kingmaker.Blueprints.BlueprintReferenceBase)">
+            <inheritdoc cref="M:CodexLib.AnyRef.Equals(System.Object)" />
+        </member>
+        <member name="M:CodexLib.AnyRef.Is(Kingmaker.Blueprints.SimpleBlueprint)">
+            <inheritdoc cref="M:CodexLib.AnyRef.Equals(System.Object)" />
+        </member>
+        <member name="M:CodexLib.AnyRef.Is(Kingmaker.Blueprints.BlueprintGuid)">
+            <inheritdoc cref="M:CodexLib.AnyRef.Equals(System.Object)" />
+        </member>
+        <member name="M:CodexLib.AnyRef.Is(System.String)">
+            <inheritdoc cref="M:CodexLib.AnyRef.Equals(System.Object)" />
+        </member>
         <member name="M:CodexLib.AnyRef.Get``1(CodexLib.AnyRef)">
             <inheritdoc cref="M:CodexLib.AnyRef.Get``1" />
         </member>
@@ -575,6 +587,30 @@
         </member>
         <member name="F:CodexLib.PoisonEnchantment.Enchantment">
             <summary>type: <b>BlueprintWeaponEnchantment</b></summary>
+        </member>
+        <member name="T:CodexLib.PrerequisiteKnowsSpell">
+            <summary>
+            Check spell is known in any spellbook.
+            </summary>
+        </member>
+        <member name="F:CodexLib.PrerequisiteKnowsSpell.Spell">
+            <summary>type: <b>BlueprintAbility</b></summary>
+        </member>
+        <member name="M:CodexLib.PrerequisiteKnowsSpell.#ctor(CodexLib.AnyRef,System.Boolean)">
+            <inheritdoc cref="T:CodexLib.PrerequisiteKnowsSpell" />
+            <param name="spell">type: <b>BlueprintAbility</b></param>
+            <param name="any">Prerequisite.GroupType.Any or .All</param>
+        </member>
+        <member name="M:CodexLib.PrerequisiteKnowsSpell.CheckInternal(Kingmaker.UnitLogic.Class.LevelUp.FeatureSelectionState,Kingmaker.UnitLogic.UnitDescriptor,Kingmaker.UnitLogic.Class.LevelUp.LevelUpState)">
+            <inheritdoc cref="T:CodexLib.PrerequisiteKnowsSpell" />
+        </member>
+        <member name="M:CodexLib.PrerequisiteKnowsSpell.GetUITextInternal(Kingmaker.UnitLogic.UnitDescriptor)">
+            <summary>
+            UI text: "Able to cast {spell}"
+            </summary>
+        </member>
+        <member name="F:CodexLib.PrerequisiteKnowsSpell.Text">
+            <summary>UI text: "Able to cast "</summary>
         </member>
         <member name="T:CodexLib.ReduceDamageResistance">
             <summary>

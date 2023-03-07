@@ -288,35 +288,38 @@ namespace DarkCodex
                 "Limitless Domain Powers",
                 "You are chosen by your deity.\nBenefit: You can use the abilities of your domains at will.",
                 group: FeatureGroup.MythicAbility
-                );
+                ).ToRef2();
 
-            foreach (var ability in BpCache.Get<BlueprintAbility>())
+            Main.RunLast("Limitless Domain", () =>
             {
-                var logic = ability.GetComponent<AbilityResourceLogic>();
-                if (logic == null)
-                    continue;
-                if (logic.CostIsCustom)
-                    continue;
-                if (!ability.name.Contains("Domain"))
-                    continue;
+                var rx = new Regex("[Dd]omain", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-                logic.ResourceCostDecreasingFacts.Add(limitless.ToRef2());
-            }
+                foreach (var ability in BpCache.Get<BlueprintAbility>())
+                {
+                    var logic = ability.GetComponent<AbilityResourceLogic>();
+                    if (logic == null)
+                        continue;
+                    if (!rx.IsMatch(ability.name))
+                        continue;
 
-            foreach (var ability in BpCache.Get<BlueprintActivatableAbility>())
-            {
-                var logic = ability.GetComponent<ActivatableAbilityResourceLogic>();
-                if (logic == null)
-                    continue;
-                if (!ability.name.Contains("Domain"))
-                    continue;
+                    logic.ResourceCostDecreasingFacts.Add(limitless);
+                }
 
-                if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
-                    Main.Print($"ERROR: {ability.name} has already a FreeBlueprint");
-                logic.m_FreeBlueprint = limitless.ToRef2();
-            }
+                foreach (var ability in BpCache.Get<BlueprintActivatableAbility>())
+                {
+                    var logic = ability.GetComponent<ActivatableAbilityResourceLogic>();
+                    if (logic == null)
+                        continue;
+                    if (!rx.IsMatch(ability.name))
+                        continue;
 
-            Helper.AddMythicTalent(limitless);
+                    if (logic.m_FreeBlueprint != null && !logic.m_FreeBlueprint.IsEmpty())
+                        Main.Print($"ERROR: {ability.name} has already a FreeBlueprint");
+                    logic.m_FreeBlueprint = limitless;
+                }
+            });
+
+            Helper.AddMythicTalent((BlueprintFeature)limitless.Get());
         }
 
         [PatchInfo(Severity.Create, "Limitless Shaman", "mythic ability: infinite spirit weapon uses (shaman, spirit hunter)", true, Priority: 200)]

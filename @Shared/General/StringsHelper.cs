@@ -385,7 +385,7 @@ namespace Shared
                     var match = matches[i];
                     if (index < match.Index)
                     {
-                        sb.Append(input.AsSpan(index, match.Index - index));
+                        sb.Append(input, index, match.Index - index);
                         index = match.Index + match.Length;
                     }
                     sb.Append(evaluator(match, i, matches.Count));
@@ -393,7 +393,7 @@ namespace Shared
 
                 if (index < input.Length)
                 {
-                    sb.Append(input.AsSpan(index, input.Length - index));
+                    sb.Append(input, index, input.Length - index);
                 }
             }
             catch (Exception) { }
