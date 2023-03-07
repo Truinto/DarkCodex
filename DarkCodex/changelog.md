@@ -1,6 +1,9 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.22]
+- update
+
 ## [1.5.21]
 - made limitless domain more inclusive regarding 3rd party mods
 - fixed so Flame Blade Dervish Combat checks for the actual spell, instead of classes #216

@@ -182,7 +182,7 @@ namespace DarkCodex
                 //Helper.CreatePrerequisiteClassLevel("145f1d3d360a7ad48bd95d392c81b38e", 3, true)  //ShamanClass                
                 );
 
-            Helper.AddFeats(feat);
+            Helper.AddCombatFeat(feat);
 
             /*
             Flame Blade

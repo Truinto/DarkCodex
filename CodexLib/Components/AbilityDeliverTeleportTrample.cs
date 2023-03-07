@@ -182,7 +182,7 @@ namespace CodexLib
             yield break;
         }
 
-        public override bool WouldTargetUnit(AbilityData ability, Vector3 targetPos, UnitEntityData unit)
+        public override bool WouldTargetUnit(AbilityData ability, Vector3 targetPos, UnitEntityData unit, AbilityParams cachedParams = null)
         {
             var caster = ability.Caster.Unit;
             Vector3 normalized = (targetPos - caster.Position).normalized;
