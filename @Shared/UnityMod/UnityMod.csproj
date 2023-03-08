@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net472</TargetFrameworks>
-		<LangVersion>latest</LangVersion>
+		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<Authors>Truinto</Authors>
@@ -24,7 +24,7 @@
 
 	<!-- Library Path -->
 	<PropertyGroup>
-		<Lib Condition="'$(Lib)' == ''">..\non-public\lib\</Lib>
+		<!--<Lib Condition="'$(Lib)' == ''">..\non-public\lib\</Lib>-->
 	</PropertyGroup>
 
 	<!-- Nuget Packages -->
@@ -36,13 +36,13 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Include="0Harmony_public" HintPath="$(Lib)\0Harmony_public.dll" />
-		<Reference Include="Newtonsoft.Json" HintPath="$(Lib)\Newtonsoft.Json.dll" />
-		<Reference Include="UnityModManager" HintPath="$(Lib)\UnityModManager.dll" />
-		<Reference Include="UnityEngine" HintPath="$(Lib)\UnityEngine.dll" />
-		<Reference Include="UnityEngine.CoreModule" HintPath="$(Lib)\UnityEngine.CoreModule.dll" />
-		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(Lib)\UnityEngine.InputLegacyModule.dll" />
-		<Reference Include="UnityEngine.UI" HintPath="$(Lib)\UnityEngine.UI.dll" />
+		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\0Harmony_public.dll" />
+		<Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
+		<Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
+		<Reference Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
+		<Reference Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
+		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
 	</ItemGroup>
 
 	<!-- Other Files -->
@@ -53,9 +53,9 @@
 	<!-- Publicize -->
 	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
 		<ItemGroup>
-			<PublicizeInput Include="$(Lib)\0Harmony.dll" />
+			<PublicizeInput Include="$(GameManaged)\0Harmony.dll" />
 		</ItemGroup>
-		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(Lib)\" />
+		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(GameManaged)\" />
 	</Target>
 
 	<!-- Update build version -->
