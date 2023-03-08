@@ -200,5 +200,5 @@ A: These cannot be disabled during a playthrough. They become save permanent. I 
 Build
 -----------
 * Clone repo
-* Rename Directory.Build.props.default to Directory.Build.props.user
+* Create a copy of Directory.Build.props.default named Directory.Build.props.user
 * Open and edit Directory.Build.props.user with your game location
