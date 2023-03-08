@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
-		<LangVersion>latest</LangVersion>
+		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<Authors>Truinto</Authors>
@@ -37,7 +37,7 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\UnityModManager\0Harmony_public.dll" />
+		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\0Harmony_public.dll" />
 		<Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
 		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
 
