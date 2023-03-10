@@ -63,8 +63,14 @@ namespace DarkCodex
             if (Helper.Get("43385175fd022c546865e7b37bcc08ce") is BlueprintAbilityResource evangelist_resource
                 && Helper.Get("8ba4962b1a4b4344ba5dbcb041ab0efa") is BlueprintFeature evangelist_prereq)
             {
-                limitless.AddComponents(Helper.CreatePrerequisiteFeature(evangelist_prereq));
+                limitless.AddComponents(Helper.CreatePrerequisiteFeature(evangelist_prereq, true));
                 SetResourceDecreasing(evangelist_resource.AssetGuid, limitless);
+            }
+
+            // mod Homebrew Archetypes: Dervish of the Dawn
+            if ( Helper.Get("a077d4fe75dd0b846a1507f64bff71f8") is BlueprintFeature dervish_prereq)
+            {
+                limitless.AddComponents(Helper.CreatePrerequisiteFeature(dervish_prereq, true));
             }
 
             // same again for skald raging song
@@ -191,8 +197,9 @@ namespace DarkCodex
         {
             var bomb_resource = BlueprintGuid.Parse("1633025edc9d53f4691481b48248edd7");
             var incense_resource = BlueprintGuid.Parse("d03d97aac38e798479b81dfa9eda55c6");
-            var bomb_prereq = Helper.ToRef<BlueprintFeatureReference>("54c57ce67fa1d9044b1b3edc459e05e2"); //AlchemistBombsFeature
+            var bomb_prereq = Helper.ToRef<BlueprintFeatureReference>("c59b2f256f5a70a4d896568658315b7d"); //AlchemistBombsFeature
             var incense_prereq = Helper.ToRef<BlueprintFeatureReference>("7614401346b64a8409f7b8c367db488f"); //IncenseFogFeature
+            var incense30_prereq = Helper.ToRef<BlueprintFeatureReference>("27c7f9e491a540243a535ac9aabb8ea5"); //IncenseFog30Feature
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessBombs",
@@ -202,7 +209,8 @@ namespace DarkCodex
                 icon: Helper.StealIcon("5fa0111ac60ed194db82d3110a9d0352")
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(bomb_prereq, true),
-                Helper.CreatePrerequisiteFeature(incense_prereq, true)
+                Helper.CreatePrerequisiteFeature(incense_prereq, true),
+                Helper.CreatePrerequisiteFeature(incense30_prereq, true)
                 );
 
             SetResourceDecreasing(bomb_resource, limitless);
