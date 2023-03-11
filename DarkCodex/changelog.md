@@ -2,6 +2,11 @@
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
 ## [1.5.22]
+- fixed Limitless Alchemist prerequisites #220
+- fixed cache for mods that load before the game's blueprints #222
+- added HarmoniousMage, mythic feat: ignore opposition schools #221
+
+## [1.5.22]
 - update
 
 ## [1.5.21]

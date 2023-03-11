@@ -2,11 +2,9 @@
 <Project>
 	<PropertyGroup>
 		<Zip7>C:\Program Files\7-Zip\7z.exe</Zip7>
-		<ProgramFolder>D:\Programme\GOG Galaxy\Games\</ProgramFolder>
-		<GameManaged>$(ProgramFolder)Pathfinder Wrath of the Righteous\Wrath_Data\Managed</GameManaged>
-		<GameManaged Condition="!Exists('$(GameManaged)')">..\..\..\@non-backup\KM2 sources\Wrath_Data\Managed</GameManaged>
-		<ModFolder>$(ProgramFolder)Pathfinder Wrath of the Righteous\Mods</ModFolder>
-		<ModFolder Condition="!Exists('$(ModFolder)')">..\..\..\@non-backup\KM2 sources\Wrath_Data\Managed</ModFolder>
-		<ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
+		<ProgramFolder>D:\Programme\GOG Galaxy\Games</ProgramFolder>
+		<GameManaged>$(ProgramFolder)\Pathfinder Wrath of the Righteous\Wrath_Data\Managed</GameManaged>
+		<ModFolder>$(ProgramFolder)\Pathfinder Wrath of the Righteous\Mods</ModFolder>
+		<!-- <Lib>$(GameManaged)</Lib> -->
 	</PropertyGroup>
 </Project>

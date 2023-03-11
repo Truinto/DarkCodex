@@ -659,9 +659,15 @@ namespace DarkCodex
                 ).SetComponents(
                 new MetamagicReduceCostParametrized { ReduceByMostExpensive = true },
                 new SpellPerfection(),
-                Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15),
-                Helper.CreatePrerequisiteFeaturesFromList(BpCache.Get<BlueprintFeature>().Where(w => w.GetComponent<AddMetamagicFeat>() && w.IsClassFeature).ToAny(), 3)
+                Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15)
                 );
+
+            Main.RunLast("Spell Perfection", () => 
+            {
+                feat.AddComponents(
+                    Helper.CreatePrerequisiteFeaturesFromList(BpCache.Get<BlueprintFeature>().Where(w => w.GetComponent<AddMetamagicFeat>() && w.IsClassFeature).ToAny(), 3)
+                    );
+            });
 
             Helper.AddFeats(feat);
             return;

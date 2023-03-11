@@ -65,7 +65,7 @@ namespace Shared
         internal static PatchInfoCollection patchInfos;
         internal static readonly List<string> appliedPatches = new();
         private static UnityModManager.ModEntry.ModLogger logger;
-        internal static bool applyNullFinalizer;
+        public static bool applyNullFinalizer;
 
         public static bool IsInGame => Game.Instance.Player?.Party?.Any() ?? false; // RootUIContext.Instance?.IsInGame ?? false; //
 
@@ -518,6 +518,7 @@ namespace Shared
             LoadSafe(Spells.PatchVarious);
 
             // General
+            LoadSafe(General.CreateSpellPerfection);
             LoadSafe(General.CreatePreferredSpell);
             LoadSafe(General.CreateHeritage);
             LoadSafe(General.CreateMadMagic);
@@ -574,6 +575,7 @@ namespace Shared
             LoadSafe(Mythic.CreateMythicEschewMaterials);
             LoadSafe(Mythic.CreateMythicCompanion);
             LoadSafe(Mythic.CreateNotAChance);
+            LoadSafe(Mythic.CreateHarmoniousMage);
             LoadSafe(Mythic.PatchKineticOvercharge);
             LoadSafe(Mythic.PatchLimitlessDemonRage);
             LoadSafe(Mythic.PatchUnstoppable);
@@ -634,7 +636,6 @@ namespace Shared
             LoadSafe(Ranger.CreateImprovedHuntersBond);
 
             // Extra Features - keep last
-            LoadSafe(General.CreateSpellPerfection); // keep last
             LoadSafe(General.CreateBackgrounds); // keep last
             LoadSafe(General.FixSpellElementChange); // keep last
             LoadSafe(Mythic.CreateLimitlessWitchHexes); // keep last

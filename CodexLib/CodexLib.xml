@@ -38,6 +38,11 @@
             <param name="path">File path to save to</param>
             <param name="types">Types of blueprints to filter for</param>
         </member>
+        <member name="M:CodexLib.BpCache.RegisterType(System.Type)">
+            <summary>
+            Add a new type to be recorded. If a mod adds a blueprint of that type, it's added to the cache.
+            </summary>
+        </member>
         <member name="M:CodexLib.BpCache.LoadResources(System.IO.Stream,System.Boolean)">
             <summary>
             Load blueprints from stream. Format must be as ExportResources().<br />

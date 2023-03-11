@@ -6,10 +6,10 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<Authors>Truinto</Authors>
-		<Title>DarkCodex</Title>
+		<Title>$(MSBuildProjectName)</Title>
 		<RepositoryUrl>https://github.com/Truinto/DarkCodex</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RootNamespace>DarkCodex</RootNamespace>
+		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<DebugType>embedded</DebugType>

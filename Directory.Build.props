@@ -5,11 +5,12 @@
 		<Authors>Truinto</Authors>
 		<Copyright>Copyright © Truinto 2023</Copyright>
 		<DoILRepack>false</DoILRepack>
+		<ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
 	</PropertyGroup>
 	
 	<ItemDefinitionGroup>
 		<Reference Private="false" />
-		<!--<ProjectReference Private="false" />-->
+		<ProjectReference Private="false" />
 	</ItemDefinitionGroup>
 
 	<Import Project="Directory.Build.props.default" />

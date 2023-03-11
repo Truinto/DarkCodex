@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HarmonyLib;
 
 namespace CodexLib
 {
@@ -21,7 +22,7 @@ namespace CodexLib
         /// <summary>
         /// Default types to export and cache.
         /// </summary>
-        public static Type[] DefaultTypes = new Type[]
+        public static readonly Type[] DefaultTypes = new Type[]
         {
             typeof(BlueprintAbility),
             typeof(BlueprintActivatableAbility),
@@ -31,7 +32,13 @@ namespace CodexLib
             typeof(BlueprintItemEnchantment),
         };
 
-        private static Dictionary<Type, IList> _blueprints = new();
+        private static readonly Dictionary<Type, IList> _blueprints = new();
+
+        static BpCache()
+        {
+            foreach (var type in DefaultTypes)            
+                _blueprints[type] = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));            
+        }
 
         /// <summary>
         /// True if LoadResources was called before, otherwise false.
@@ -129,6 +136,14 @@ namespace CodexLib
         }
 
         /// <summary>
+        /// Add a new type to be recorded. If a mod adds a blueprint of that type, it's added to the cache.
+        /// </summary>
+        public static void RegisterType(Type type)
+        {
+            _blueprints.Ensure(type, out _, typeof(List<>).MakeGenericType(type));
+        }
+
+        /// <summary>
         /// Load blueprints from stream. Format must be as ExportResources().<br/>
         /// Tries to load embedded CodexLib.Resources.Blueprints.bin, if null.
         /// </summary>
@@ -214,8 +229,10 @@ namespace CodexLib
 
                 var type = bp.GetType();
                 foreach (var entry in _blueprints)
+                {
                     if (entry.Key.IsAssignableFrom(type) && !entry.Value.Contains(bp))
                         entry.Value.Add(bp);
+                }
             }
             catch (Exception e) { Helper.PrintException(e); }
         }

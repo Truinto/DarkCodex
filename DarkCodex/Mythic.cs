@@ -83,7 +83,7 @@ namespace DarkCodex
                 "You inspire ferocity in your allies.\nBenefit: You no longer have a limited amount of Raging Song rounds per day.",
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature(ragesong_prereq)
+                Helper.CreatePrerequisiteFeature(ragesong_prereq, true)
                 );
 
             SetResourceDecreasing(ragesong_resource, limitless2);
@@ -99,7 +99,7 @@ namespace DarkCodex
                 "Your inspiration knows no bounds.\nBenefit: You no longer have a limited amount of Azata Performance rounds per day.",
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
-                Helper.CreatePrerequisiteFeature(azatasong_prereq)
+                Helper.CreatePrerequisiteFeature(azatasong_prereq, true)
                 );
 
             SetResourceDecreasing(azatasong_resource, limitless3);
@@ -197,9 +197,12 @@ namespace DarkCodex
         {
             var bomb_resource = BlueprintGuid.Parse("1633025edc9d53f4691481b48248edd7");
             var incense_resource = BlueprintGuid.Parse("d03d97aac38e798479b81dfa9eda55c6");
-            var bomb_prereq = Helper.ToRef<BlueprintFeatureReference>("c59b2f256f5a70a4d896568658315b7d"); //AlchemistBombsFeature
-            var incense_prereq = Helper.ToRef<BlueprintFeatureReference>("7614401346b64a8409f7b8c367db488f"); //IncenseFogFeature
-            var incense30_prereq = Helper.ToRef<BlueprintFeatureReference>("27c7f9e491a540243a535ac9aabb8ea5"); //IncenseFog30Feature
+            AnyRef bomb_prereq = "54c57ce67fa1d9044b1b3edc459e05e2"; //AlchemistBombsFeature
+            AnyRef bomb2_prereq = "0c7a9899e27cae6449ee1fb3049f128d"; //ArcaneBombSelection
+            AnyRef incense_prereq = "b67abcd73ec1b75479e5b9968365c272"; //IncenseFogResourceFact
+
+            // fix display name being empty
+            incense_prereq.Get<BlueprintFeature>().m_DisplayName = Helper.Get<BlueprintFeature>("7614401346b64a8409f7b8c367db488f").m_DisplayName; //IncenseFogFeature
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessBombs",
@@ -209,8 +212,8 @@ namespace DarkCodex
                 icon: Helper.StealIcon("5fa0111ac60ed194db82d3110a9d0352")
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(bomb_prereq, true),
-                Helper.CreatePrerequisiteFeature(incense_prereq, true),
-                Helper.CreatePrerequisiteFeature(incense30_prereq, true)
+                Helper.CreatePrerequisiteFeature(bomb2_prereq, true),
+                Helper.CreatePrerequisiteFeature(incense_prereq, true)
                 );
 
             SetResourceDecreasing(bomb_resource, limitless);
@@ -880,6 +883,21 @@ namespace DarkCodex
                 );
 
             Helper.AddMythicTalent(feat);
+        }
+
+        [PatchInfo(Severity.Create, "HarmoniousMage", "mythic feat: ignore opposition schools", true)]
+        public static void CreateHarmoniousMage()
+        {
+            var feat = Helper.CreateBlueprintFeature(
+                "HarmoniousMage",
+                "Harmonious Mage",
+                "You ignore the penalty of opposition schools. Preparing these spells now only requires one spell slot of the appropriate level instead of two."
+                ).SetComponents(
+                new HarmoniousMage(),
+                Helper.CreatePrerequisiteFeature("6c29030e9fea36949877c43a6f94ff31") //OppositionSchoolSelection
+                );
+
+            Helper.AddMythicFeat(feat);
         }
 
         [PatchInfo(Severity.Extend, "Ranging Shots", "doesn't get weaker when hitting", true)]

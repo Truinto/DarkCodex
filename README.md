@@ -90,6 +90,7 @@ Content
 |Mythic.CreateDemonLord|adds features of Demon Lords to the mythic Demon progression: teleport at will, ...|:house:|:construction:|
 |Mythic.CreateDemonMastery|mythic feat: requires demon lv6; change the rage effect of an demon aspect into a passive effect|:house:|:heavy_check_mark:|
 |Mythic.CreateExtraMythicFeats|mythic feat: can pick mythic abilities as feats and vice versa|:house:|:heavy_check_mark:|
+|Mythic.CreateHarmoniousMage|mythic feat: ignore opposition schools|:house:|:heavy_check_mark:|
 |Mythic.CreateKineticMastery|mythic feat: physical Kinetic Blasts gain attack bonus equal to mythic level, or half with energy Blasts|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessArcanePool|mythic ability: infinite arcane pool, expect spell recall|:house:|:heavy_check_mark:|
 |Mythic.CreateLimitlessArcaneReservoir|mythic ability: infinite arcane reservoir|:house:|:heavy_check_mark:|
@@ -200,5 +201,6 @@ A: These cannot be disabled during a playthrough. They become save permanent. I 
 Build
 -----------
 * Clone repo
-* Rename Directory.Build.props.default to Directory.Build.props.user
+* Create a copy of Directory.Build.props.default named Directory.Build.props.user
 * Open and edit Directory.Build.props.user with your game location
+* Start solution, switch to Debug configuration, then build (even if project throws errors)
