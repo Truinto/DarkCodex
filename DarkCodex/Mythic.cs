@@ -696,12 +696,15 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend, "Limitless Demon Rage", "Limitless Rage also applies to Demon Rage", true)]
         public static void PatchLimitlessDemonRage()
         {
-            var rage = Helper.Get<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
-            var rage2 = Helper.Get<BlueprintAbility>("260daa5144194a8ab5117ff568b680f5"); //DemonRageActivateAbility
             var limitless = Helper.ToRef<BlueprintUnitFactReference>("5cb58e6e406525342842a073fb70d068"); //LimitlessRage
+            var rage_new = Helper.Get<BlueprintActivatableAbility>("0999f99d6157e5c4888f4cfe2d1ce9d6"); //DemonRageAbility
+            rage_new.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
 
-            rage.GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless;
-            rage2.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
+            var rage_feat = Helper.ToRef<BlueprintFeatureReference>("6a8af3f208a0fa747a465b70b7043019"); //DemonRageFeature
+            Helper.AppendAndReplace(ref limitless.Get().GetComponent<PrerequisiteFeaturesFromList>().m_Features, rage_feat);
+
+            var rage_old = Helper.Get<BlueprintAbility>("260daa5144194a8ab5117ff568b680f5"); //DemonRageActivateAbility, this isn't used anymore
+            rage_old.GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless);
         }
 
         [PatchInfo(Severity.Extend, "Unstoppable", "Unstoppable works against more conditions like stun, daze, and confusion", true)]

@@ -38,7 +38,7 @@ namespace Shared
             if (path != null)
             {
                 //path = Path.Combine(Main.ModPath, path);
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                EnsureDir(path);
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(result);
                 sw.Close();
@@ -56,7 +56,7 @@ namespace Shared
             if (path != null)
             {
                 //path = Path.Combine(Main.ModPath, path);
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                EnsureDir(path);
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(result);
                 sw.Close();
@@ -122,7 +122,7 @@ namespace Shared
             try
             {
                 //path = Path.Combine(Main.ModPath, path);
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                EnsureDir(path);
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(content);
             }
@@ -134,7 +134,7 @@ namespace Shared
             try
             {
                 //path = Path.Combine(Main.ModPath, path);
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                EnsureDir(path);
                 File.WriteAllBytes(path, data);
             }
             catch (Exception e) { Logger.PrintException(e); }
@@ -158,6 +158,16 @@ namespace Shared
                 File.Delete(path);
             }
             catch (Exception e) { Logger.PrintException(e); }
+        }
+
+        private static void EnsureDir(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+            path = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(path))
+                return;
+            Directory.CreateDirectory(path);
         }
     }
 }

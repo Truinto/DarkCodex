@@ -507,7 +507,8 @@ namespace DarkCodex
                     SavingThrowType.Unknown,
                     Helper.CreateContextActionSpawnMonster(
                         unit: "e881dabcd5323ae4bb5f90da2b763edf", //CR0_ArueshalaeNightmare
-                        duration: Helper.DurationOneMinute))
+                        duration: Helper.DurationOneMinute,
+                        linkToCaster: false))
                 );
         }
 

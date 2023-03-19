@@ -673,6 +673,7 @@ namespace Shared
             PrintDebug("Running in debug.");
             ExportContent();
             Helper.ExportStrings();
+            Helper.ExportStrings("enchant");
             KineticistTree.Instance.Validate();
 #endif
         }

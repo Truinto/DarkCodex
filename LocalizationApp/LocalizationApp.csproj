@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>0.1.0</Version>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<Authors>Truinto</Authors>
+		<Title>$(MSBuildProjectName)</Title>
+		<RepositoryUrl>https://github.com/Truinto/DarkCodex</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<AllowedReferenceRelatedFileExtensions>none</AllowedReferenceRelatedFileExtensions>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="NetstandardProject" HintPath="..\@Shared\NetstandardProject.dll" Private="true" Condition="'$(Configuration)'=='Release'" />
+		<ProjectReference Include="..\@Shared\NetstandardProject\NetstandardProject.csproj" Private="true" Condition="'$(Configuration)'=='Debug'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<GlobalAnalyzerConfigFiles Include="$(SolutionDir)\@Shared\.globalconfiguration" Link=".globalconfiguration" />
+		<Content Include="icon.ico" />
+	</ItemGroup>
+
+</Project>

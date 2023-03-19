@@ -1,6 +1,10 @@
 # Changelog
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
+## [1.5.24]
+- added demon rage to possible limitless rage prerequisites
+- localized string cleanup
+
 ## [1.5.23]
 - fixed Limitless Alchemist prerequisites #220
 - fixed cache for mods that load before the game's blueprints #222

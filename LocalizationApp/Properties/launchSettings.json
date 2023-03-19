@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LocalizationApp": {
+      "commandName": "Project",
+      "commandLineArgs": "enGB.json"
+    }
+  }
+}

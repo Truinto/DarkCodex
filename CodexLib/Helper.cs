@@ -996,21 +996,21 @@ namespace CodexLib
         private static StringBuilder _sb1 = new();
         private static Dictionary<string, Dictionary<string, string>> _mappedStrings = new();
 
-        private static Dictionary<string, string> GetStringMap()
-        {        
-            _mappedStrings.Ensure(Scope.ModPath, out var map, load);
+        private static Dictionary<string, string> GetStringMap(string suffix)
+        {
+            _mappedStrings.Ensure(string.Concat(Scope.ModPath, suffix), out var map, load);
             return map;
 
             Dictionary<string, string> load()
             {
                 try
                 {
-                    string path = Path.Combine(Scope.ModPath, LocalizationManager.CurrentPack.Locale.ToString() + ".json");
+                    string path = Path.Combine(Scope.ModPath, $"{suffix}{LocalizationManager.CurrentPack.Locale}.json");
                     if (File.Exists(path) && !Scope.AllowGuidGeneration)
                     {
                         var data = Deserialize<Dictionary<string, string>>(path: path);
                         var pack = LocalizationManager.CurrentPack;
-                        foreach (var entry in data)                        
+                        foreach (var entry in data)
                             pack.PutString(entry.Key, entry.Value);
                         return data;
                     }
@@ -1020,7 +1020,15 @@ namespace CodexLib
             }
         }
 
-        public static LocalizedString CreateString(this string value, string key = null)
+        [Obsolete]
+        private static LocalizedString CreateString(this string value, string key) => CreateString(value, key, null);
+
+        /// <summary>
+        /// Create a new LocalizedString. If key is empty, then a new key is generate based on the string's SHA1 value.<br/>
+        /// Use suffix to split the localization into multiple files.<br/>
+        /// Print all generated LocalizedString with a specific suffix by calling <see cref="ExportStrings(string)"/>.
+        /// </summary>
+        public static LocalizedString CreateString(this string value, string key = null, string suffix = null)
         {
             if (value == null || value == "")
                 return new LocalizedString { Key = "" };
@@ -1034,7 +1042,7 @@ namespace CodexLib
                 _sb1.Clear();
             }
 
-            var map = GetStringMap();
+            var map = GetStringMap(suffix);
             if (!map.ContainsKey(key))
             {
                 map.Add(key, value);
@@ -1050,21 +1058,28 @@ namespace CodexLib
         public static void CreateString(this LocalizedString localizedString, string newString)
         {
             if (localizedString.m_Key != null && localizedString.m_Key != "")
-                CreateString(newString, localizedString.m_Key);
+                CreateString(newString, localizedString.m_Key, null);
             else if (localizedString?.Shared?.String?.m_Key != null && localizedString.Shared.String.m_Key != "")
-                CreateString(newString, localizedString?.Shared?.String?.m_Key);
+                CreateString(newString, localizedString?.Shared?.String?.m_Key, null);
             else
                 PrintDebug("Warning: CreateString failed since m_Key is empty");
         }
 
         [System.Diagnostics.Conditional("DEBUG")]
-        public static void ExportStrings()
+        [Obsolete]
+        private static void ExportStrings() => ExportStrings(null);
+
+        /// <summary>
+        /// Print all generated LocalizedString with a specific suffix to '{suffix}enGB.json' in the current mod directory.
+        /// </summary>
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void ExportStrings(string suffix = null)
         {
-            var map = GetStringMap();
+            var map = GetStringMap(suffix);
 
             try
             {
-                string path = Path.Combine(Scope.ModPath, "enGB.json");
+                string path = Path.Combine(Scope.ModPath, $"{suffix}enGB.json");
                 Serialize(map, path: path);
                 PrintDebug("Exported language file to " + path);
             }

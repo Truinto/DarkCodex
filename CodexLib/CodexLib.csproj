@@ -86,7 +86,7 @@
 	</ItemGroup>
 
 	<!-- Publicize -->
-	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
+	<Target Name="Publicize" BeforeTargets="BeforeBuild" AfterTargets="">
 		<ItemGroup>
 			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
 			<PublicizeInput Include="$(GameManaged)\UnityModManager\0Harmony.dll" />
@@ -96,7 +96,7 @@
 	</Target>
 
 	<!-- Increase build version -->
-	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
+	<Target Name="Versioning" BeforeTargets="BeforeBuild">
 		<ItemGroup>
 			<VersioningInput Include="Properties\AssemblyInfo.cs" />
 		</ItemGroup>
@@ -115,7 +115,7 @@
 
 		<ILRepack XmlDocumentation="true" Union="true" LibraryPath="$(GameManaged);$(GameManaged)\UnityModManager" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" />
 		<!--<ILMerge ToolPath="packages\ilmerge.2.13.0307" InputAssemblies="@(_MergeItems)" OutputFile="$(TargetDir)$(TargetName).dll" SearchDirectories="$(GameManaged);$(GameManaged)\UnityModManager" />-->
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(SolutionDir)CodexLib\" />
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(SolutionDir)CodexLib\" UseHardlinksIfPossible="true" />
 	</Target>
 
 </Project>

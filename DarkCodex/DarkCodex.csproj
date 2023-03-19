@@ -63,7 +63,8 @@
 		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
 
-		<Reference Include="CodexLib" HintPath="$(SolutionDir)\CodexLib\CodexLib.dll" Private="false" />
+		<ProjectReference Include="..\CodexLib\CodexLib.csproj" />
+		<ProjectReference Include="..\@Shared\UnityMod\UnityMod.csproj" />
 	</ItemGroup>
 
 	<!-- Other Files -->
@@ -73,8 +74,17 @@
 		<None Update="info.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
+	<!-- Use project reference for coding, but the merged CodexLib for building -->
+	<Target Name="DynamicReference" BeforeTargets="BuildOnlySettings">
+		<ItemGroup>
+			<ProjectReference Remove="..\CodexLib\CodexLib.csproj" />
+			<ProjectReference Remove="..\@Shared\UnityMod\UnityMod.csproj" />
+			<Reference Include="CodexLib" HintPath="$(SolutionDir)\CodexLib\CodexLib.dll" Private="false" />
+		</ItemGroup>
+	</Target>
+
 	<!-- Publicize -->
-	<Target Name="Publicize" BeforeTargets="PreBuildEvent" AfterTargets="">
+	<Target Name="Publicize" BeforeTargets="BeforeBuild" AfterTargets="">
 		<ItemGroup>
 			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
 			<PublicizeInput Include="$(GameManaged)\UnityModManager\0Harmony.dll" />
@@ -84,7 +94,7 @@
 	</Target>
 
 	<!-- Update build version -->
-	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
+	<Target Name="Versioning" BeforeTargets="BeforeBuild">
 		<ItemGroup>
 			<VersioningInput Include="changelog.md" />
 			<VersioningOutput Include="Properties\AssemblyInfo.cs" />
@@ -97,7 +107,7 @@
 	<!-- Copy to mod folder -->
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<ItemGroup>
-			<_CopyItems Include="$(TargetDir)\*" />
+			<_CopyItems Include="$(TargetDir)\DarkCodex.dll" />
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
 		</ItemGroup>
 

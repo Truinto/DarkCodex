@@ -252,8 +252,12 @@ namespace DarkCodex
                     sb.Append(name[0]);
                     for (int i = 1; i < name.Length; i++)
                     {
-                        // space uppercase char, unless the previous char was already spaced, unless the next char is lowercase (if any)
-                        if (name[i].IsUppercase() && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase())))
+                        // space uppercase char,
+                        // unless the previous char was already spaced, unless the next char is lowercase (if any)
+                        // also no double spaces
+                        if (name[i].IsUppercase()
+                            && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase()))
+                            && sb[i - 1] != ' ')
                             sb.Append(' ');
 
                         if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
@@ -265,7 +269,7 @@ namespace DarkCodex
                             sb.Append(' ');
                     }
 
-                    enchantment.m_EnchantName = sb.ToString().CreateString();
+                    enchantment.m_EnchantName = sb.ToString().CreateString(null, "enchant");
 #if DEBUG
                     sw.Write(enchantment.AssetGuid);
                     sw.Write("\t");
@@ -282,9 +286,10 @@ namespace DarkCodex
                         if (item == null || item.m_DescriptionText == null || item.m_DescriptionText.IsEmpty() || item.m_DescriptionText == "")
                             continue;
 
+                        int i = 0;
                         foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty() || w.m_Description == ""))
                         {
-                            enchantent.m_Description = ((string)item.m_DescriptionText).CreateString("enchant#" + item.m_DescriptionText.m_Key);
+                            enchantent.m_Description = ((string)item.m_DescriptionText).CreateString($"{i++}#{item.m_DescriptionText.m_Key}", "enchant");
 #if DEBUG
                             sw.Write(enchantent.AssetGuid);
                             sw.Write("\t");
