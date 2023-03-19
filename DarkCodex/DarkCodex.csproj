@@ -107,7 +107,7 @@
 	<!-- Copy to mod folder -->
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<ItemGroup>
-			<_CopyItems Include="$(TargetDir)\DarkCodex.dll" />
+			<_CopyItems Include="$(TargetDir)\*" />
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
 		</ItemGroup>
 

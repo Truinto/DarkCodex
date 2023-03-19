@@ -450,7 +450,7 @@ namespace Shared
 #if DEBUG
             PatchSafe(typeof(DEBUG.WatchCalculateParams));
             PatchSafe(typeof(DEBUG.WatchSelectiveMetamagic));
-            PatchSafe(typeof(DEBUG.WatchWeaponEnchantment));
+            //PatchSafe(typeof(DEBUG.WatchWeaponEnchantment));
             //PatchSafe(typeof(DEBUG.WatchSharedValue));
             PatchSafe(typeof(DEBUG.Settlement1));
             PatchSafe(typeof(DEBUG.Settlement2));

@@ -23,13 +23,15 @@ namespace CodexLib
 
         public override void OnActivate()
         {
+            this.Owner.MarkNotOptimizableInSave();
             this.Data.Applied = this.Weapon.Get().CreateEntity<ItemEntityWeapon>();
+            this.Data.Applied.MakeNotLootable();
+            this.Data.Applied.VisualSourceItemBlueprint = this.Weapon.Get();
             var itemPart = this.Data.Applied.Ensure<CraftedItemPart>();
             itemPart.CasterLevel = this.Context.Params.CasterLevel;
             itemPart.SpellLevel = this.Context.Params.SpellLevel;
             itemPart.MetamagicData ??= new();
             itemPart.MetamagicData.Add(this.Context.Params.Metamagic);
-            this.Data.Applied.MakeNotLootable();
 
             using (ContextData<ItemEntity.CanBeEquippedForce>.Request())
             {

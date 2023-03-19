@@ -252,19 +252,23 @@ namespace DarkCodex
                     sb.Append(name[0]);
                     for (int i = 1; i < name.Length; i++)
                     {
+                        char current = name[i];
+                        char previous = name[i - 1];
+                        char next = name.Length >= i + 1 ? '\0' : name[i + 1];
+
                         // space uppercase char,
                         // unless the previous char was already spaced, unless the next char is lowercase (if any)
                         // also no double spaces
-                        if (name[i].IsUppercase()
-                            && (!name[i - 1].IsUppercase() || (name.Length > i + 1 && name[i + 1].IsLowercase()))
-                            && sb[i - 1] != ' ')
+                        if (current.IsUppercase() 
+                            && (!previous.IsUppercase() || next.IsLowercase()) 
+                            && sb.IsNotSpaced())
                             sb.Append(' ');
 
-                        if (name[i].IsNumber() && !name[i - 1].IsNumber()) // prefix number blocks with '+'
+                        if (current.IsNumber() && !previous.IsNumber()) // prefix number blocks with '+'
                             sb.Append('+');
 
-                        if (name[i] != '_')         // print char, except '_'
-                            sb.Append(name[i]);
+                        if (current != '_')         // print char, except '_'
+                            sb.Append(current);
                         else if (sb.IsNotSpaced())  // replace '_' unless last char is already spacebar
                             sb.Append(' ');
                     }
@@ -456,7 +460,7 @@ namespace DarkCodex
                 var enchantments = __instance.VisibleItem?.Enchantments?.Join(a =>
                     {
                         var fx = (a.Blueprint as BlueprintWeaponEnchantment)?.WeaponFxPrefab;
-                        return $"{a.Name} fx={fx} load={fx?.Load() != null} active={a.Active} preventFX={a.PreventFxSpawn}";
+                        return $"{a.Name} fx={fx?.AssetId} load={fx?.Load() != null} active={a.Active} preventFX={a.PreventFxSpawn}";
                     }, "\t\n");
 
                 Main.PrintDebug($"{__instance.VisibleItem?.Name} isVisible={isVisible} isInHand={__instance.IsInHand} snapFlag={hasSnaps} enchantments=\n\t{enchantments}");

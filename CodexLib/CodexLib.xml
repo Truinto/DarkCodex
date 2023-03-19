@@ -484,9 +484,7 @@
             </summary>
         </member>
         <member name="M:CodexLib.FlameBladeLogic.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue,System.Int32,System.Int32)">
-            <summary>
-            Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
-            </summary>
+            <inheritdoc cref="T:CodexLib.FlameBladeLogic" />
             <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
             <param name="drReduction">Amount of DR ignored, if creature has flameBladeDervish.</param>
             <param name="step">Bonus damage per caster level.</param>
@@ -748,9 +746,21 @@
         <member name="F:CodexLib.Helper._SetStackTrace">
             <summary>Source: https://stackoverflow.com/a/63685720</summary>
         </member>
+        <member name="M:CodexLib.Helper.CreateString(System.String,System.String,System.String)">
+            <summary>
+            Create a new LocalizedString. If key is empty, then a new key is generate based on the string's SHA1 value.<br />
+            Use suffix to split the localization into multiple files.<br />
+            Print all generated LocalizedString with a specific suffix by calling <see cref="M:CodexLib.Helper.ExportStrings(System.String)" />.
+            </summary>
+        </member>
         <member name="M:CodexLib.Helper.CreateString(Kingmaker.Localization.LocalizedString,System.String)">
             <summary>
             Overwrite existing LocalizedString with new value.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.ExportStrings(System.String)">
+            <summary>
+            Print all generated LocalizedString with a specific suffix to '{suffix}enGB.json' in the current mod directory.
             </summary>
         </member>
         <member name="M:CodexLib.Helper.TrySubstring(System.String,System.Char,System.Int32,System.Boolean)">
@@ -759,6 +769,11 @@
             <param name="c">char to search for</param>
             <param name="start">start index; negative number search last index instead</param>
             <param name="tail">get tail instead of head</param>
+        </member>
+        <member name="M:CodexLib.Helper.IsNotSpaced(System.Text.StringBuilder)">
+            <summary>
+            Returns true, if last character is not a spacebar and the string is longer than 0.
+            </summary>
         </member>
         <member name="M:CodexLib.Helper.GetIInitiator``1(Kingmaker.EntitySystem.Entities.UnitEntityData)">
             <summary>

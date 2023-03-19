@@ -1114,19 +1114,22 @@ namespace CodexLib
 
         public static bool IsNumber(this char c)
         {
-            return c >= 48 && c <= 57;
+            return c >= '0' && c <= '9';
         }
 
         public static bool IsUppercase(this char c)
         {
-            return c >= 65 && c <= 90;
+            return c >= 'A' && c <= 'Z';
         }
 
         public static bool IsLowercase(this char c)
         {
-            return c >= 97 && c <= 122;
+            return c >= 'a' && c <= 'z';
         }
 
+        /// <summary>
+        /// Returns true, if last character is not a spacebar and the string is longer than 0.
+        /// </summary>
         public static bool IsNotSpaced(this StringBuilder sb)
         {
             if (sb.Length == 0)
@@ -4395,6 +4398,7 @@ namespace CodexLib
             result.m_FlavorText = "".CreateString();
             result.m_NonIdentifiedNameText = "".CreateString();
             result.m_NonIdentifiedDescriptionText = "".CreateString();
+            result.m_EquipmentEntity = new();
 
             result.m_Enchantments = enchantments.ToRef<BlueprintWeaponEnchantmentReference>();
 

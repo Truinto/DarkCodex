@@ -18,9 +18,7 @@ namespace CodexLib
         public int Step;
         public int Max;
 
-        /// <summary>
-        /// Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
-        /// </summary>
+        /// <inheritdoc cref="FlameBladeLogic"/>
         /// <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
         /// <param name="drReduction">Amount of DR ignored, if creature has flameBladeDervish.</param>
         /// <param name="step">Bonus damage per caster level.</param>
@@ -57,11 +55,6 @@ namespace CodexLib
             }
 
             //evt.DoNotScaleDamage = true;
-            
-            // TODO: debug
-            Helper.PrintDebug($"RuleCalculateWeaponStats context={this.Context.Params.Metamagic} reason={evt.Reason.Context.Params.Metamagic} craft={this.Owner.Get<CraftedItemPart>()?.MetamagicData?.MetamagicMask}");
-            this.Context.Params.Metamagic |= Metamagic.Heighten;
-            evt.Reason.Context.Params.Metamagic |= Metamagic.Persistent;
         }
 
         public void OnEventDidTrigger(RuleCalculateWeaponStats evt)
@@ -72,7 +65,7 @@ namespace CodexLib
             // remove strength bonus
             var dmg = evt.DamageDescription[0];
             var mod = dmg.m_Modifiers.m_Modifiers.FirstOrDefault(f => f.Stat == StatType.Strength && f.Fact == null);
-            if (mod.Value != 0)
+            if (mod.Stat != 0)
             {
                 dmg.m_Modifiers.m_Modifiers.Remove(mod);
                 dmg.Bonus -= mod.Value;
@@ -93,9 +86,6 @@ namespace CodexLib
 
             if (metamagic.Has(Metamagic.Empower))
                 evt.DamageBundle.First().EmpowerBonus.Set(1.5f, Metamagic.Empower);
-
-            // TODO: debug
-            Helper.PrintDebug($"RuleCalculateWeaponStats context={this.Context.Params.Metamagic} reason={evt.Reason.Context.Params.Metamagic}");
         }
 
         public void OnEventDidTrigger(RuleCalculateDamage evt)
@@ -130,9 +120,6 @@ namespace CodexLib
             bool spellResisted = Rulebook.Trigger(ruleSpellResistance).IsSpellResisted;
             if (spellResisted)
                 evt.AutoMiss = true;
-
-            // TODO: debug
-            Helper.PrintDebug($"RuleAttackRoll context={this.Context.Params.CasterLevel} reason={evt.Reason.Context.Params.CasterLevel}");
         }
 
         public void OnEventDidTrigger(RuleAttackRoll evt)

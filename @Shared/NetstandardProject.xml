@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NetstandardProject</name>
+    </assembly>
+    <members>
+        <member name="M:Shared.CollectionHelper.Append``1(``0[],``0[])">
+            <summary>Appends objects on array.</summary>
+        </member>
+        <member name="M:Shared.CollectionHelper.AppendAndReplace``1(``0[]@,``0[])">
+            <summary>Appends objects on array and overwrites the original.</summary>
+        </member>
+        <member name="M:Shared.CollectionHelper.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@)">
+            <summary>
+            Get dictionary by key and create new value with standard constructor, if it did not exist.
+            </summary>
+            <returns>true if new value was created</returns>
+        </member>
+        <member name="M:Shared.CollectionHelper.GetList">
+            <summary>
+            Gets a static list object. Do not save reference.
+            Call <b>Flush&lt;T&gt;()</b> to receive output.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionHelper.Flush``1">
+            <summary>
+            Use when finished with <b>GetList()</b>
+            </summary>
+        </member>
+        <member name="T:Shared.ConsoleHelper">
+            <summary>
+            Functions for use in console applications.<br/>
+            - manipulate console output<br/>
+            - manage processes<br/>
+            - manage drives<br/>
+            </summary>
+        </member>
+        <member name="M:Shared.ConsoleHelper.RunCommand(System.String,System.String,System.String@,System.Action{System.String})">
+            <summary>
+            Runs command or program. Blocks execution until finished.
+            </summary>
+            <param name="command">Command or program path.</param>
+            <param name="args">Process arguments to use.</param>
+            <param name="output">Console text output.</param>
+            <param name="onData">Data receive action.</param>
+            <returns>Process exit code</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.RunCommandAsync(System.String,System.String,System.Action{System.String},System.Boolean)">
+            <summary>
+            Runs command or program.
+            </summary>
+            <param name="command">Command or program path.</param>
+            <param name="args">Process arguments to use.</param>
+            <param name="onData">Data receive action. Prints to console, if empty.</param>
+            <param name="startNow">Whenever to start the process immediately.</param>
+            <returns>Process thread</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.RunAdmin(System.String)">
+            <summary>
+            Run the current assembly as admin. Force exists application.
+            </summary>
+        </member>
+        <member name="M:Shared.ConsoleHelper.GetCursorPosition">
+            <summary>
+            Get current cursor position from console window.
+            In .Net 5 > use Console.GetCursorPosition
+            </summary>
+            <returns>Cursor position</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.GetConsoleInfo">
+            <summary>
+            Retrieves information about the current screen buffer window
+            </summary>
+        </member>
+        <member name="M:Shared.ConsoleHelper.IndexOfInConsole(System.String)">
+            <summary>
+            Find text in console window
+            </summary>
+            <returns>List of found coordinates</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.IndexOfInConsole(System.String[])">
+            <summary>
+            Find texts in console window
+            </summary>
+            <param name="text"></param>
+            <returns>List of found coordinates</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.GetChar(Shared.ConsoleHelper.COORD,System.IntPtr)">
+            <summary>
+            Retrieve character from console window
+            </summary>
+        </member>
+        <member name="M:Shared.ConsoleHelper.GetChar(System.Int32,System.Int32,System.Char@)">
+            <summary>
+            Retrieve character from console window
+            </summary>
+            <returns>true if successful</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.GetText(System.Int32,System.Int32,System.Int32,System.IntPtr)">
+            <summary>
+            Retrieve text from console window.<br/>
+            No length will return until end of line.<br/>
+            Length below zero will return until cursor position.
+            </summary>
+        </member>
+        <member name="M:Shared.ConsoleHelper.ReadConsoleOutputCharacterA(System.IntPtr,System.Byte@,System.Int32,Shared.ConsoleHelper.COORD,System.Int32@)">
+            <param name="hStdout">result of 'GetStdHandle(-11)'</param>
+            <param name="ch">A̲N̲S̲I̲ character result</param>
+            <param name="c_in">set to '1'</param>
+            <param name="coord_XY"> screen location to read, X:loword, Y:hiword</param>
+            <param name="c_out">(unwanted, discard)</param>
+            <returns>false if error</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.ReadConsoleOutputCharacterW(System.IntPtr,System.Char@,System.Int32,Shared.ConsoleHelper.COORD,System.Int32@)">
+            <param name="hStdout">result of 'GetStdHandle(-11)'</param>
+            <param name="ch">U̲n̲i̲c̲o̲d̲e̲ character result</param>
+            <param name="c_in">set to 'sizeof(char)'</param>
+            <param name="coord_XY">screen location to read, X:loword, Y:hiword</param>
+            <param name="c_out">sizeof(char) or 1 if second part of a wide character</param>
+            <returns>false if error</returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.WriteConsoleOutputCharacterW(System.IntPtr,System.Char,System.Int32,Shared.ConsoleHelper.COORD,System.Int32@)">
+            <summary>
+            
+            </summary>
+            <param name="hStdout">result of 'GetStdHandle(-11)'</param>
+            <param name="ch">U̲n̲i̲c̲o̲d̲e̲ character to write</param>
+            <param name="c_in">set to 'sizeof(char)'</param>
+            <param name="coord_XY">screen location to write, X:loword, Y:hiword</param>
+            <param name="c_out">returns sizeof(char) if successful</param>
+            <returns></returns>
+        </member>
+        <member name="M:Shared.ConsoleHelper.SetVolumeMountPointW(System.String,System.String)">
+            <param name="lpszVolumeMountPoint">Y:\MountX</param>
+            <param name="lpszVolumeName">\\?\Volume{00000000-0000-0000-0000-000000000000}\</param>
+        </member>
+        <member name="T:Shared.PathTool">
+            <summary>
+            Tool to handle path operations.
+            </summary>
+        </member>
+        <member name="P:Shared.PathHelper.Username">
+            <summary>%username%</summary>
+        </member>
+        <member name="P:Shared.PathHelper.UserProfile">
+            <summary>C:\Users\%username%</summary>
+        </member>
+        <member name="P:Shared.PathHelper.DesktopDirectory">
+            <summary>C:\Users\%username%\Desktop</summary>
+        </member>
+        <member name="P:Shared.PathHelper.ProgramFiles">
+            <summary>C:\Program Files</summary>
+        </member>
+        <member name="P:Shared.PathHelper.ProgramFilesX86">
+            <summary>C:\Program Files (x86)</summary>
+        </member>
+        <member name="P:Shared.PathHelper.MyDocuments">
+            <summary>C:\Users\%username%\OneDrive - Bruker Physik GmbH\Documents</summary>
+        </member>
+        <member name="P:Shared.PathHelper.MyPictures">
+            <summary>C:\Users\%username%\Pictures</summary>
+        </member>
+        <member name="P:Shared.PathHelper.MyMusic">
+            <summary>C:\Users\%username%\Music</summary>
+        </member>
+        <member name="P:Shared.PathHelper.MyVideos">
+            <summary>C:\Users\%username%\Videos</summary>
+        </member>
+        <member name="P:Shared.PathHelper.ApplicationData">
+            <summary>C:\Users\%username%\AppData\Roaming</summary>
+        </member>
+        <member name="P:Shared.PathHelper.LocalApplicationData">
+            <summary>C:\Users\%username%\AppData\Local</summary>
+        </member>
+        <member name="P:Shared.PathHelper.CommonApplicationData">
+            <summary>C:\ProgramData</summary>
+        </member>
+        <member name="P:Shared.PathHelper.System">
+            <summary>C:\WINDOWS\system32</summary>
+        </member>
+        <member name="P:Shared.PathHelper.SystemX86">
+            <summary>C:\WINDOWS\SysWOW64</summary>
+        </member>
+        <member name="P:Shared.PathHelper.Startup">
+            <summary>C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</summary>
+        </member>
+        <member name="P:Shared.PathHelper.Desktop">
+            <summary>C:\Users\%username%\Desktop<br/>Prefer DesktopDirectory instead.</summary>
+        </member>
+        <member name="M:Shared.StringsHelper.JoinArgs(System.String[])">
+            <summary>
+            Joins an array of arguments into a single string, which can be used for commands.
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Shared.StringsHelper.FilterPath(System.String)">
+            <summary>
+            Converts string into valid absolute path.<br/>
+            Returns null, if invalid path (e.g. illegal characters).
+            </summary>
+        </member>
+        <member name="M:Shared.StringsHelper.ExpandWindowsVolume(System.String)">
+            <summary>
+            Returns to windows style volume expanded string "C:\".
+            Otherwise returns input string.
+            </summary>
+        </member>
+        <member name="M:Shared.StringsHelper.PathExists(System.String)">
+            <summary>
+            Checks for files or directories.
+            </summary>
+        </member>
+        <member name="M:Shared.StringsHelper.GetUniqueFilename(System.String)">
+            <summary>
+            Returns file path that does not exist. Appends (1) or increases existing numberation, if file already exists.
+            </summary>
+        </member>
+        <member name="M:Shared.StringsHelper.ToLiteral(System.String)">
+            <summary>
+            Escapes Unicode and ASCII non printable characters
+            </summary>
+            <param name="input">The string to convert</param>
+            <returns>An escaped string literal</returns>
+        </member>
+        <member name="M:Shared.StringsHelper.Join``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.String},System.String)">
+             <summary>Joins an enumeration with a value converter and a delimiter to a string</summary>
+             <typeparam name="T">The inner type of the enumeration</typeparam>
+             <param name="enumeration">The enumeration</param>
+             <param name="converter">An optional value converter (from T to string)</param>
+             <param name="delimiter">An optional delimiter</param>
+             <returns>The values joined into a string</returns>
+            
+        </member>
+        <member name="M:Shared.StringsHelper.TrySubstring(System.String,System.Char,System.Int32,System.Boolean)">
+            <summary>Returns substring. Always excludes char 'c'. Returns null, if index is out of range or char not found.</summary>
+            <param name="str">source string</param>
+            <param name="c">char to search for</param>
+            <param name="start">start index; negative number search last index instead</param>
+            <param name="tail">get tail instead of head</param>
+        </member>
+        <member name="T:Shared.StringsHelper.RegexEvaluator">
+            <summary>
+            Evaluator for Regex.Replace extension.
+            </summary>
+        </member>
+        <member name="M:Shared.StringsHelper.Replace(System.Text.RegularExpressions.Regex,System.String,Shared.StringsHelper.RegexEvaluator)">
+            <summary>
+            Regex.Replace, but with additional index and count values.
+            </summary>
+        </member>
+        <member name="T:Shared.SerializationTool">
+            <summary>
+            Tool to handle (de-)serialization.
+            </summary>
+        </member>
+        <member name="T:Shared.Logger">
+            <summary>
+            Methods to print to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintDebug(System.String,System.String)">
+            <summary>
+            Only prints in DEBUG.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.Print(System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintWarning(System.String,System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintError(System.String,System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintException(System.Exception)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+    </members>
+</doc>

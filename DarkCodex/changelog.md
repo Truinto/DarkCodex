@@ -2,8 +2,9 @@
 - ~~added save metadata to keep track of enabled patches~~ not yet
 
 ## [1.5.24]
-- added demon rage to possible limitless rage prerequisites
-- localized string cleanup
+- added demon rage to limitless rage prerequisites
+- localized string cleanup #225
+- fixed spell weapons crashing during load, causing all equipment visuals to not load #224
 
 ## [1.5.23]
 - fixed Limitless Alchemist prerequisites #220

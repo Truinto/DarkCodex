@@ -6,5 +6,5 @@ using System.Reflection;
 [assembly: AssemblyProduct("UnityMod")]
 [assembly: AssemblyCopyright("Copyright Truinto 2023")]
 
-[assembly: AssemblyVersion("1.0.0.121")]
-[assembly: AssemblyFileVersion("1.0.0.121")]
+[assembly: AssemblyVersion("1.0.0.122")]
+[assembly: AssemblyFileVersion("1.0.0.122")]
