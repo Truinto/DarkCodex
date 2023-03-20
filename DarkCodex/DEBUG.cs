@@ -239,7 +239,7 @@ namespace DarkCodex
 #endif
                 foreach (var enchantment in BpCache.Get<BlueprintItemEnchantment>())
                 {
-                    if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "") // todo: check if string conversion is worth it
+                    if (enchantment?.m_EnchantName == null || enchantment.m_EnchantName.m_Key != "" && enchantment.m_EnchantName != "")
                         continue;
 
                     string name = enchantment.name;

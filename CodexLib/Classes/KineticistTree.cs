@@ -15,8 +15,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#pragma warning disable CS1591 // ignore missing XML comment
+
 namespace CodexLib
 {
+    /// <summary>
+    /// Reference tree of all the kineticist blueprints. Includes base game and mods.
+    /// </summary>
     public class KineticistTree
     {
         private static KineticistTree instance;
@@ -621,8 +626,9 @@ namespace CodexLib
             {
                 Selection = null,
                 Progession = null,
-                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("34F4DDBC9F3542D598A0CC9E0AE019BB"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("799FD079B82A40E0A2C29061FD0C2182"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("34f4ddbc9f3542d598a0cc9e0ae019bb"),
+                BaseAbility = null,
+                BoostActivatable = Helper.ToRef<BlueprintActivatableAbilityReference>("799fd079b82a40e0a2c29061fd0c2182"),
                 Parent1 = Telekinetic,
                 Parent2 = null,
                 Blade = null,
@@ -637,8 +643,9 @@ namespace CodexLib
             {
                 Selection = null,
                 Progession = null,
-                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("4E2D370657B24DD78239A64B1949010D"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0167EBDED6F145B681EE94ADF02DD052"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("4e2d370657b24dd78239a64b1949010d"),
+                BaseAbility = null,
+                BoostActivatable = Helper.ToRef<BlueprintActivatableAbilityReference>("0167ebded6f145b681ee94adf02dd052"),
                 Parent1 = Telekinetic,
                 Parent2 = null,
                 Blade = null,
@@ -654,7 +661,8 @@ namespace CodexLib
                 Selection = null,
                 Progession = null,
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("60f9f403494546bba5866f456e799b2d"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("a9cf8aa916e4420d8c5eacbfd794a1b7"),
+                BaseAbility = null,
+                BoostActivatable = Helper.ToRef<BlueprintActivatableAbilityReference>("a9cf8aa916e4420d8c5eacbfd794a1b7"),
                 Parent1 = Gravity,
                 Parent2 = null,
                 Blade = null,
@@ -669,8 +677,9 @@ namespace CodexLib
             {
                 Selection = null,
                 Progession = null,
-                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("A8D83675D00544469F1FEA2CD371F4E1"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("2F2FD6C377F54912AEE78917B9E1D3CD"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("a8d83675d00544469f1fea2cd371f4e1"),
+                BaseAbility = null,
+                BoostActivatable = Helper.ToRef<BlueprintActivatableAbilityReference>("2f2fd6c377f54912aee78917b9e1d3cd"),
                 Parent1 = Gravity,
                 Parent2 = null,
                 Blade = null,
@@ -686,7 +695,8 @@ namespace CodexLib
                 Selection = null,
                 Progession = null,
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("b0b71503bb864c78adc0a3cbdfa6fc51"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("2e62673f2e63442197b1f71e5a886205"),
+                BaseAbility = null,
+                BoostActivatable = Helper.ToRef<BlueprintActivatableAbilityReference>("2e62673f2e63442197b1f71e5a886205"),
                 Parent1 = Negative,
                 Parent2 = null,
                 Blade = null,
@@ -702,7 +712,8 @@ namespace CodexLib
                 Selection = null,
                 Progession = null,
                 BlastFeature = Helper.ToRef<BlueprintFeatureReference>("dcacf5d46c814dbfbb8cf82c0b25c518"),
-                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("0f1c8705825b494ba25525a7f05c0fb6"),
+                BaseAbility = null,
+                BoostActivatable = Helper.ToRef<BlueprintActivatableAbilityReference>("0f1c8705825b494ba25525a7f05c0fb6"),
                 Parent1 = Positive,
                 Parent2 = null,
                 Blade = null,
@@ -898,6 +909,7 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("44804ca6ba7d495439cc9d5ad6d6cfcf"),
                     Helper.ToRef<BlueprintAbilityReference>("c0704daaf6e4c5840a94e7db6d7dbe0e"),
                     Helper.ToRef<BlueprintAbilityReference>("0be97d0e752060f468bbf62ce032b9f5"),
+                    Helper.ToRef<BlueprintAbilityReference>("0e3b058a1c0042bb86d5c39264f387ce"),
                 },
             };
             Detonation = new()
@@ -1260,6 +1272,7 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("96360bedde8648a8a6762e2de41b60a5"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("321e49800199496e829f6876d34fce47"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("fc07e1226c0e46f98ec1d49e6a68086d"),
             };
             ForceHook = new()
             {
@@ -1291,31 +1304,37 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("e9cf588e2ef64fb68d0ec8c566e8b294"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("611d7a60d13943249bc706dc965cdce0"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("bf2b31a8c97a4ea5b3048ccc01d9def3"),
             };
             Enervating = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("8662ccb8dd484a2f8139d46621c641fd"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("94fc7da86b1e4049974f46580dbecb9f"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("8fb731ddd0a1426582b7916509defd35"),
             };
             Pulling = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("3ae954ad56a2497b92fada3dc493b4e1"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("28db04531698400a98da7fb965a519e7"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("36ddb2e7184343a49992e65a27a89412"),
             };
             Unnerving = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("e53160d091914d50bfc1d8d4fa482e30"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("d5c72f8725f74109abb4c0ca516da805"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("f40c87a27401428e9133f757d157f6f2"),
             };
             VoidVampire = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("922fd10e3e994d7793821da1583cdfea"),
-                Buff = Helper.ToRef<BlueprintBuffReference>("2b306434ee2948a782263f57b7c2ddb5"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("d6c523157463453aa40a8b8bbfd40447"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("d9e3b600a10e4edc97fb3a1702831b4a"),
             };
             Weighing = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("987dc633dbae49b0adc11cd9c5672553"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("98147fa8bb4049ab9e7a6c8b55eb47bf"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("0bde03bda7ba49c1a72e960857a64b9c"),
             };
             Singularity = new()
             {
@@ -1332,16 +1351,19 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("1cd0cd60997d4288be1fc85f753e53de"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("dcf5ebb5dbd34f5dbea8c3699ce0054b"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("6b7f98a52f54418490988d0fc0d67cf5"),
             };
             Toxic = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("fdc63fd61b794e40ba3c5446ba8ea1c2"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("d337687cefcb4c7e80898b0008ce4e63"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("bcb32c5793974426a6da4fbdd8d780f1"),
             };
             ToxicGreater = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("56567887f604473797dc8223c68999da"),
-                Buff = Helper.ToRef<BlueprintBuffReference>("56567887f604473797dc8223c68999da"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("848ab4144cb14b4499167bcbfd372796"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("189ce662afdb441baa45716d909ce9ed"),
             };
             Vampiric = new()
             {
@@ -1538,6 +1560,17 @@ namespace CodexLib
             }
         }
 
+        /// <summary>
+        /// Get filtered collection of all elements.
+        /// </summary>
+        /// <param name="basic">Whenever to include basic elements (granted at level 1).</param>
+        /// <param name="composite">Whenever to include composite elements (granted at level 7 or 15).</param>
+        /// <param name="boost">This aren't elements. Recommend false.</param>
+        /// <param name="onlyPhysical">Remove energy based elements.</param>
+        /// <param name="onlyEnergy">Remove physical based elements.</param>
+        /// <param name="archetype">Whenever to include blood archetype.</param>
+        /// <param name="modded">Whenever to include modded elements. This can return blueprints not yet loaded!</param>
+        /// <returns></returns>
         public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool boost = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)
         {
             bool mod1 = modded && EnabledElementsExpanded;
@@ -1655,7 +1688,9 @@ namespace CodexLib
             return null;
         }
 
-        /// <summary>Returns composite of two elements or no elements, if no composite matches.</summary>
+        /// <summary>
+        /// Returns composite of two elements or no elements, if no composite matches.
+        /// </summary>
         public IEnumerable<Element> GetComposites(Element element, Element element2 = null)
         {
             foreach (var e in GetAll(false, true))
@@ -2062,6 +2097,8 @@ namespace CodexLib
 
         public class Boost : KineticistTree.Element
         {
+            public BlueprintActivatableAbilityReference BoostActivatable;
+
             public bool ModifiesSimple;
             public bool ModifiesComposite;
             public bool ModifiesEnergy;
@@ -2095,6 +2132,10 @@ namespace CodexLib
             public BlueprintAbilityReference Burn;
         }
 
+        /// <summary>
+        /// This should be called WildTalent instead of Infusion.<br/>
+        /// It includes all substance, form, and utility wild talents.
+        /// </summary>
         public class Infusion
         {
             public BlueprintFeatureReference Feature;
@@ -2172,7 +2213,7 @@ namespace CodexLib
                     #region Element
                     else if (value is Element element)
                     {
-                        if (!GetAll(true, true, archetype: true).Contains(element))
+                        if (!GetAll(basic: true, composite: true, boost: true, archetype: true).Contains(element))
                             Helper.Print($"field missing in GetAll '{fi.Name}'");
 
                         check(fi, value);
@@ -2236,7 +2277,7 @@ namespace CodexLib
                             }
                             else if (infusion.Activator == null || !infusion.Activator.Equals(addfacts.First()))
                             {
-                                Helper.Print($"wrong activator: {fi.Name} -> {infusion.Activator?.GetBlueprint()?.AssetGuid} : {addfacts.First()} : {addfacts.First().GetBlueprint()?.GetType()}");
+                                Helper.Print($"wrong activator: {fi.Name} : {infusion.Activator?.GetBlueprint()?.AssetGuid} -> {addfacts.First()} : {addfacts.First().GetBlueprint()?.GetType()}");
                             }
                         }
                     }
@@ -2273,7 +2314,7 @@ namespace CodexLib
                         if (!typeof(BlueprintReferenceBase).IsAssignableFrom(fi2.FieldType))
                             continue;
 
-                        bool canBeNull = fi2.HasAttribute<CanBeNullAttribute>();
+                        bool canBeNull = fi2.HasAttribute<CanBeNullAttribute>() || fi2.Name.StartsWith("Boost_");
 
                         if (fi2.GetValue(field) is not BlueprintReferenceBase reference)
                         {
@@ -2290,7 +2331,7 @@ namespace CodexLib
                         }
 
                         var refType = reference.GetType().BaseType?.GenericTypeArguments.FirstOrDefault();
-                        if (refType != null && refType != bp.GetType())
+                        if (refType != null && !refType.IsAssignableFrom(bp.GetType()))
                         {
                             Helper.Print($"reference check '{fi.Name}.{fi2.Name}':{reference.Guid} type mismatch ref={refType} bp={bp.GetType()}");
                         }

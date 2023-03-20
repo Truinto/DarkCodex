@@ -291,8 +291,28 @@
             Experiment for storing flags. Abandoned in favor of CountableFlagArray.
             </summary>
         </member>
+        <member name="T:CodexLib.KineticistTree">
+            <summary>
+            Reference tree of all the kineticist blueprints. Includes base game and mods.
+            </summary>
+        </member>
+        <member name="M:CodexLib.KineticistTree.GetAll(System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Get filtered collection of all elements.
+            </summary>
+            <param name="basic">Whenever to include basic elements (granted at level 1).</param>
+            <param name="composite">Whenever to include composite elements (granted at level 7 or 15).</param>
+            <param name="boost">This aren't elements. Recommend false.</param>
+            <param name="onlyPhysical">Remove energy based elements.</param>
+            <param name="onlyEnergy">Remove physical based elements.</param>
+            <param name="archetype">Whenever to include blood archetype.</param>
+            <param name="modded">Whenever to include modded elements. This can return blueprints not yet loaded!</param>
+            <returns />
+        </member>
         <member name="M:CodexLib.KineticistTree.GetComposites(CodexLib.KineticistTree.Element,CodexLib.KineticistTree.Element)">
-            <summary>Returns composite of two elements or no elements, if no composite matches.</summary>
+            <summary>
+            Returns composite of two elements or no elements, if no composite matches.
+            </summary>
         </member>
         <member name="M:CodexLib.KineticistTree.GetBlasts(System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
             <summary>Only returns non null values.</summary>
@@ -314,6 +334,12 @@
         </member>
         <member name="F:CodexLib.KineticistTree.Focus.Element2">
             <summary>can be null (earth, fire)</summary>
+        </member>
+        <member name="T:CodexLib.KineticistTree.Infusion">
+            <summary>
+            This should be called WildTalent instead of Infusion.<br />
+            It includes all substance, form, and utility wild talents.
+            </summary>
         </member>
         <member name="F:CodexLib.KineticistTree.Infusion.Buff">
             <summary>can be null (only exists on substance infusions)</summary>

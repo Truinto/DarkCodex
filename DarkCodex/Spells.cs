@@ -496,7 +496,7 @@ namespace DarkCodex
         public static void CreateDebugSpells()
         {
             Helper.CreateBlueprintAbility(
-                "DebugSummonEnemyWeak",
+                "DebugSummonEnemy",
                 "Summon Dummy",
                 icon: Helper.StealIcon("970c6db48ff0c6f43afc9dbb48780d03"),
                 actionType: UnitCommand.CommandType.Free,
@@ -509,7 +509,7 @@ namespace DarkCodex
                         unit: "e881dabcd5323ae4bb5f90da2b763edf", //CR0_ArueshalaeNightmare
                         duration: Helper.DurationOneMinute,
                         linkToCaster: false))
-                );
+                ).TargetPoint();
         }
 
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]
