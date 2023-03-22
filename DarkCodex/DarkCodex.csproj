@@ -109,9 +109,13 @@
 		<ItemGroup>
 			<_CopyItems Include="$(TargetDir)\*" />
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
+			
+			<_ModFiles Include="$(ModFolder)\$(TargetName)\blueprints*.txt" />
+			<_ModFiles Include="$(ModFolder)\$(TargetName)\enGB.json" />
 		</ItemGroup>
 
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
+		<Copy Condition="'$(Configuration)'=='Release'" SourceFiles="@(_ModFiles)" DestinationFolder="$(SolutionDir)\DarkCodex\Settings\" />
 		<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>

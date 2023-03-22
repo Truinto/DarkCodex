@@ -1,5 +1,4 @@
-﻿using CodexLib;
-using Kingmaker.Blueprints;
+﻿using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.ElementsSystem;
@@ -475,14 +474,13 @@ namespace DarkCodex
                             SavingThrowType.Fortitude,
                             Helper.CreateContextActionDealDamage(DamageEnergyType.NegativeEnergy, Helper.CreateContextDiceValue(DiceType.D6, 1, 0)),
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionDealDamage(StatType.Strength, Helper.CreateContextDiceValue(DiceType.Zero, 0, 1))))
-                        )
-                    )
-                );
+                        )),
+                    Helper.CreateSpellComponent(SpellSchool.Necromancy),
+                    Helper.CreateSpellDescriptorComponent(SpellDescriptor.Cold)
+                    );
 
             effect.MakeStickySpell(out var cast, Helper.ContextCasterLevel);
-
-            Main.Patch(typeof(Patch_TouchPersist)); // TODO: move to patches
-
+            cast.AddComponents(Helper.CreateCraftInfoComponent());
             cast.Add(1,
                 "98c05aeff6e3d384f8aec6d584973642", //BloodragerSpellList
                 "4d72e1e7bd6bc4f4caaea7aa43a14639", //MagusSpellList
@@ -495,10 +493,26 @@ namespace DarkCodex
         // for debug only
         public static void CreateDebugSpells()
         {
-            Helper.CreateBlueprintAbility(
-                "DebugSummonEnemy",
-                "Summon Dummy",
-                icon: Helper.StealIcon("970c6db48ff0c6f43afc9dbb48780d03"),
+            var recruit = Helper.CreateBlueprintAbility(
+                "DebugSummonEnemyRecruit",
+                "Summon Recruit",
+                icon: Helper.StealIcon("4e0e9aba6447d514f88eff1464cc4763"),
+                actionType: UnitCommand.CommandType.Free,
+                duration: Resource.Strings.OneMinute
+                ).SetComponents(
+                Helper.CreateContextSetAbilityParams(casterLevel: 20),
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateContextActionSpawnMonster(
+                        unit: "622499edbd2cdeb4fa7128c61e3326ca", //CR1_Crusader_Human_Recruit_Melee_Male
+                        duration: Helper.DurationOneMinute,
+                        linkToCaster: false))
+                ).TargetPoint();
+
+            var undead = Helper.CreateBlueprintAbility(
+                "DebugSummonEnemyUndead",
+                "Summon Undead",
+                icon: Helper.StealIcon("4c1556984f24e5c4282c6fcda832b7b2"),
                 actionType: UnitCommand.CommandType.Free,
                 duration: Resource.Strings.OneMinute
                 ).SetComponents(
@@ -510,6 +524,33 @@ namespace DarkCodex
                         duration: Helper.DurationOneMinute,
                         linkToCaster: false))
                 ).TargetPoint();
+
+            var herald = Helper.CreateBlueprintAbility(
+                "DebugSummonEnemyHerald",
+                "Summon Herald",
+                icon: Helper.StealIcon("75a10d5a635986641bfbcceceec87217"),
+                actionType: UnitCommand.CommandType.Free,
+                duration: Resource.Strings.OneMinute
+                ).SetComponents(
+                Helper.CreateContextSetAbilityParams(casterLevel: 20),
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    Helper.CreateContextActionSpawnMonster(
+                        unit: "ba4d057e32bd2984f969bc781da523ba", //AlushinyrraHerald
+                        duration: Helper.DurationOneMinute,
+                        linkToCaster: false))
+                ).TargetPoint();
+
+            Helper.CreateBlueprintAbility(
+                "DebugSummonEnemy",
+                "Summon Dummy",
+                icon: Helper.StealIcon("970c6db48ff0c6f43afc9dbb48780d03"),
+                actionType: UnitCommand.CommandType.Free,
+                duration: Resource.Strings.OneMinute
+                ).SetComponents(
+                Helper.CreateContextSetAbilityParams(casterLevel: 20)
+                ).TargetPoint(
+                ).AddToAbilityVariants(recruit, undead, herald);
         }
 
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]

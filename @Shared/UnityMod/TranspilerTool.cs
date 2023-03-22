@@ -19,6 +19,17 @@ namespace Shared
     /// </summary>
     public class TranspilerTool : IList<CodeInstruction>
     {
+        #region Constants
+
+        /// <summary></summary>
+        public const BindingFlags BindingAll = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+        /// <summary></summary>
+        public const BindingFlags BindingInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+        /// <summary></summary>
+        public const BindingFlags BindingStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+
+        #endregion
+
         #region Fields
 
         /// <summary>Index of the currently selected line. 'Index' usually refers to this variable.</summary>
@@ -447,7 +458,8 @@ namespace Shared
 
         /// <summary>
         /// Injects call. Increments index (still pointing to the same code). <br/>
-        /// Delegate may return void. Otherwise the first parameter is taken from the stack and replaced with the return value.
+        /// Delegate may return void. Otherwise the <b>first parameter is taken from the stack and replaced with the return value</b>.<br/>
+        /// <b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b>
         /// </summary>
         /// <param name="func"><b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b></param>
         /// <remarks>
@@ -463,7 +475,8 @@ namespace Shared
 
         /// <summary>
         /// Injects call. Increments index (pointing to the new code). <br/>
-        /// Delegate may return void. Otherwise the first parameter is taken from the stack and replaced with the return value.
+        /// Delegate may return void. Otherwise the <b>first parameter is taken from the stack and replaced with the return value</b>.<br/>
+        /// <b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b>
         /// </summary>
         /// <param name="func"><b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b></param>
         /// <remarks>
@@ -479,7 +492,8 @@ namespace Shared
 
         /// <summary>
         /// Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result. <br/>
-        /// This function will inject necessary load OpCodes.
+        /// This function will inject necessary load OpCodes.<br/>
+        /// <b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b>
         /// </summary>
         /// <param name="func"><b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b></param>
         /// <param name="before">If true will inject delegate before current line (still pointing to the same code). Otherwise after (pointing to the new code).</param>
@@ -555,7 +569,8 @@ namespace Shared
 
         /// <summary>
         /// <b>Instance methods need their instance as the first parameter!</b><br/>
-        /// Replaces the current IL line with call. The delegate must return the replacement return type and must have the same parameters with identical names and order.
+        /// Replaces the current IL line with call. The delegate must return the replacement return type and <b>must have the same parameters with identical names and order</b>.<br/>
+        /// <b>object Function(object object_instance, object parameter0, object parameter1..., [object __instance], [object arg0], [object arg1...])</b>
         /// </summary>
         /// <param name="func"><b>object Function(object object_instance, object parameter0, object parameter1..., [object __instance], [object arg0], [object arg1...])</b></param>
         /// <remarks>
@@ -1289,9 +1304,37 @@ namespace Shared
             return false;
         }
 
-        private static void EnumerateCallers(MethodInfo info, bool includedPatches, params string[] excludeIds)
+        /// <summary>
+        /// Untested. Returns all methods calling a particular method.
+        /// </summary>
+        public static List<MethodInfo> GetCallers(MethodInfo info, string[] includeAssemblies = null, string[] excludeAssemblies = null)
         {
-            // TODO: get all methods that call the original method
+            //var patches = Harmony.GetPatchInfo(info);
+            var callers = new List<MethodInfo>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                string name = assembly.FullName;
+                if (includeAssemblies != null && !includeAssemblies.Any(name.StartsWith))
+                    continue;
+                if (excludeAssemblies != null && excludeAssemblies.Any(name.StartsWith))
+                    continue;
+
+                foreach (var @class in assembly.GetTypes())
+                {
+                    foreach (var method in @class.GetMethods(BindingAll))
+                    {
+                        foreach (var line in PatchProcessor.ReadMethodBody(method))
+                        {
+                            if (info.Equals(line.Value))
+                            {
+                                callers.Add(method);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return callers;
         }
 
         #endregion

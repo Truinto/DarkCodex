@@ -82,6 +82,7 @@ using Kingmaker.Controllers.Dialog;
 using Kingmaker.Designers.EventConditionActionSystem.Conditions;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Recommendations;
+using Kingmaker.Blueprints.TurnBasedModifiers;
 
 namespace CodexLib
 {
@@ -91,7 +92,7 @@ namespace CodexLib
     /// <remarks>
     /// BlueprintComponent has a field OwnerBlueprint. When components are shared between blueprints, these may cause weird bugs.
     /// </remarks>
-    public static class Helper
+    public static partial class Helper
     {
         #region Other
 
@@ -1753,7 +1754,8 @@ namespace CodexLib
         public static readonly ContextValue ContextStatBonus = CreateContextValue(AbilityRankType.StatBonus);
         public static readonly ContextValue ContextSpeedBonus = CreateContextValue(AbilityRankType.SpeedBonus);
 
-        public static readonly ContextValue ContextCasterLevel = CreateContextValue(AbilityParameterType.Level);
+        public static readonly ContextValue ContextCasterLevel = CreateContextValue((AbilityParameterType)3);
+        public static readonly ContextValue ContextSpellLevel = CreateContextValue(AbilityParameterType.Level);
         public static readonly ContextValue ContextCasterStatBonus = CreateContextValue(AbilityParameterType.CasterStatBonus);
 
         public static readonly ContextValue SharedDamage = CreateContextValue(AbilitySharedValue.Damage);
@@ -2262,7 +2264,7 @@ namespace CodexLib
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
 
-            string name = effect.name.EndsWith("_Effect") ? effect.name.Replace("_Effect", "_Cast") : effect.name + "_Cast";
+            string name = effect.name.Contains("_Effect") ? effect.name.Replace("_Effect", "_Cast") : effect.name + "_Cast";
 
             cast = effect.Clone(name, guid2: guid_cast)
                     .RemoveComponents<AbilityDeliverProjectile>()
@@ -3440,6 +3442,11 @@ namespace CodexLib
             result.DurationValue = Helper.CreateContextDurationValue(bonus: duration, rate: rate);
 
             return result;
+        }
+
+        public static AbilityIsFullRoundInTurnBased CreateAbilityIsFullRoundInTurnBased()
+        {
+            return new AbilityIsFullRoundInTurnBased() { FullRoundIfTurnBased = true };
         }
 
         public static SpellComponent CreateSpellComponent(SpellSchool school)

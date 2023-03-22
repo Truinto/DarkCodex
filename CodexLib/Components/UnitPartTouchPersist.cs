@@ -1,5 +1,4 @@
-﻿using Kingmaker.Controllers;
-using Kingmaker.UnitLogic.Commands;
+﻿using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Parts;
 using System;
 using System.Collections.Generic;
@@ -9,78 +8,55 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Replacement for <see cref="UnitPartTouch"/>. Also remembers the number of uses per cast.
+    /// </summary>
     public class UnitPartTouchPersist : UnitPartTouch
     {
+        /// <summary>Number of uses before effect wears off.</summary>
         public int Count;
     }
 
     /// <summary>
-    /// Multi touch attacks. E.g. Chill Touch.
+    /// Logic to handle touch attacks with multiple charges. E.g. Chill Touch.
     /// </summary>
     public class AbilityEffectStickyTouchPersist : AbilityEffectStickyTouch
     {
+        /// <summary>Number of uses before effect wears off.</summary>
         public ContextValue Count;
 
-        /// <summary>
-        /// Multi touch attacks. E.g. Chill Touch.
-        /// </summary>
+        /// <inheritdoc cref="AbilityEffectStickyTouchPersist"/>
         /// <param name="blueprintAbility">type: <b>BlueprintAbility</b></param>
-        /// <param name="count">Count of uses before effect wears off.</param>
+        /// <param name="count">Number of uses before effect wears off.</param>
         public AbilityEffectStickyTouchPersist(AnyRef blueprintAbility, ContextValue count)
         {
             this.m_TouchDeliveryAbility = blueprintAbility;
             this.Count = count;
         }
 
+        /// <summary>
+        /// Implementation of AbilityApplyEffect.Apply.
+        /// </summary>
         public override void Apply(AbilityExecutionContext context, TargetWrapper target)
         {
-            if (context.MaybeCaster == null)
+            var caster = context.MaybeCaster;
+            if (caster == null)
                 return;
 
-            var part = context.MaybeCaster.Ensure<UnitPartTouchPersist>();
-            part.Init(this.TouchDeliveryAbility, context.Ability, context.SourceAbilityContext);
+            var part = caster.Ensure<UnitPartTouch, UnitPartTouchPersist>();
             part.Count = this.Count.Calculate(context);
+            part.Init(this.TouchDeliveryAbility, context.Ability, context.SourceAbilityContext);
 
-            if (context.MaybeCaster == target.Unit)
+            if (caster == target.Unit)
             {
                 Rulebook.Trigger(new RuleCastSpell(part.Ability.Data, target));
                 return;
             }
 
+            caster.Brain.AutoUseAbility = part.Ability.Data;
             var unitCommand = (part.AutoCastCommand = UnitUseAbility.CreateCastCommand(part.Ability.Data, target));
             unitCommand.IgnoreCooldown(part.IgnoreCooldownBeforeTime);
-            context.MaybeCaster.Commands.AddToQueueFirst(unitCommand);
-        }
-    }
-
-    [HarmonyPatch]
-    public class Patch_TouchPersist // TODO
-    {
-        [HarmonyPatch(typeof(TouchSpellsController), nameof(TouchSpellsController.OnAbilityEffectApplied))]
-        public static bool Prefix1(AbilityExecutionContext context, TouchSpellsController __instance)
-        {
-            // reduce count by 1; remove at 0
-            var part = context.MaybeCaster?.Get<UnitPartTouchPersist>();
-            if (part != null)
-            {
-                if (--part.Count > 0)
-                    return false;
-                part.RemoveSelf();
-            }
-
-            return true;
-        }
-
-        [HarmonyPatch(typeof(AbilityCastRateUtils), nameof(AbilityCastRateUtils.GetChargesCount), typeof(AbilityData))]
-        public static void Postfix2(AbilityData ability, ref int __result)
-        {
-            // display correct count
-            if(ability.StickyTouch != null)
-            {
-                var part = ability.Caster.Unit.Get<UnitPartTouchPersist>();
-                if (part != null)
-                    __result = part.Count;
-            }
+            caster.Commands.AddToQueueFirst(unitCommand);
         }
     }
 }

@@ -663,17 +663,31 @@
         <member name="T:CodexLib.UnitPartModifierBonus">
             <summary>Unfinished; use IncreaseModifierBonus instead.</summary>
         </member>
-        <member name="T:CodexLib.AbilityEffectStickyTouchPersist">
+        <member name="T:CodexLib.UnitPartTouchPersist">
             <summary>
-            Multi touch attacks. E.g. Chill Touch.
+            Replacement for <see cref="T:Kingmaker.UnitLogic.Parts.UnitPartTouch" />. Also remembers the number of uses per cast.
             </summary>
         </member>
-        <member name="M:CodexLib.AbilityEffectStickyTouchPersist.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue)">
+        <member name="F:CodexLib.UnitPartTouchPersist.Count">
+            <summary>Number of uses before effect wears off.</summary>
+        </member>
+        <member name="T:CodexLib.AbilityEffectStickyTouchPersist">
             <summary>
-            Multi touch attacks. E.g. Chill Touch.
+            Logic to handle touch attacks with multiple charges. E.g. Chill Touch.
             </summary>
+        </member>
+        <member name="F:CodexLib.AbilityEffectStickyTouchPersist.Count">
+            <summary>Number of uses before effect wears off.</summary>
+        </member>
+        <member name="M:CodexLib.AbilityEffectStickyTouchPersist.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue)">
+            <inheritdoc cref="T:CodexLib.AbilityEffectStickyTouchPersist" />
             <param name="blueprintAbility">type: <b>BlueprintAbility</b></param>
-            <param name="count">Count of uses before effect wears off.</param>
+            <param name="count">Number of uses before effect wears off.</param>
+        </member>
+        <member name="M:CodexLib.AbilityEffectStickyTouchPersist.Apply(Kingmaker.UnitLogic.Abilities.AbilityExecutionContext,Kingmaker.Utility.TargetWrapper)">
+            <summary>
+            Implementation of AbilityApplyEffect.Apply.
+            </summary>
         </member>
         <member name="T:CodexLib.VariantSelectionApplyEffect">
             <summary>
@@ -1134,6 +1148,13 @@
             Can handle multiple different types and will recursively resolve collections.
             </summary>
         </member>
+        <member name="M:CodexLib.Helper.Ensure``2(Kingmaker.EntitySystem.EntityDataBase)">
+            <summary>
+            Works like <see cref="M:Kingmaker.EntitySystem.EntityDataBase.Ensure``1" />, but for inherited UnitParts.<br />
+            Removes <typeparamref name="TPartBase" /> and adds <typeparamref name="TPart" /> as necessary.<br />
+            If you need to transfer data, use IUpgrade interface.
+            </summary>
+        </member>
         <member name="T:CodexLib.IActionBarConvert">
             <summary>
             Allow custom action bar convertions (unfoldable variants).
@@ -1169,6 +1190,14 @@
             400 = change rank value<br />
             300 = change shared value
             </summary>
+        </member>
+        <member name="T:CodexLib.IUpgrade`1">
+            <summary>
+            Simple interface to Upgrade UnitParts.
+            </summary>
+        </member>
+        <member name="M:CodexLib.IUpgrade`1.Upgrade(`0)">
+            <summary />
         </member>
         <member name="T:CodexLib.MasterPatch">
             <summary>
@@ -1210,6 +1239,15 @@
             Override of ContextValue by ContextStatValue.<br />
             This patch makes ContextValue.Calculate quasi virtual.
             </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_ContextValueParams">
+            <summary>
+            Allow for more <see cref="T:Kingmaker.UnitLogic.Mechanics.AbilityParameterType" /> ContextValues.<br />
+            3=CasterLevel, 4=RankBonus, 5=DC, 6=Concentraction
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_ContextValueParams.Postfix(Kingmaker.UnitLogic.Abilities.AbilityExecutionContext,Kingmaker.UnitLogic.Mechanics.ContextValue,System.Int32@)">
+            <summary />
         </member>
         <member name="T:CodexLib.Patches.Patch_DebugReport">
             <summary>
@@ -1268,6 +1306,12 @@
         <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.LevelUpActionPostLoad(Kingmaker.UnitLogic.Class.LevelUp.Actions.SelectFeature)">
             <summary>
             Fix for 'empty' Items collection.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_TouchPersist">
+            <summary>
+            Patches to handle touch attacks with multiple charges.<br />
+            See also: AbilityEffectStickyTouchPersist, UnitPartTouchPersist
             </summary>
         </member>
         <member name="T:CodexLib.Patches.Patch_WeaponCategory">
@@ -1578,6 +1622,15 @@
             Tool to automate transpiler modifications.
             </summary>
         </member>
+        <member name="F:Shared.TranspilerTool.BindingAll">
+            <summary />
+        </member>
+        <member name="F:Shared.TranspilerTool.BindingInstance">
+            <summary />
+        </member>
+        <member name="F:Shared.TranspilerTool.BindingStatic">
+            <summary />
+        </member>
         <member name="F:Shared.TranspilerTool.Index">
             <summary>Index of the currently selected line. 'Index' usually refers to this variable.</summary>
         </member>
@@ -1759,8 +1812,7 @@
         <member name="M:Shared.TranspilerTool.InsertBefore(System.Delegate)">
             <summary>
             Injects call. Increments index (still pointing to the same code). <br />
-            Delegate may return void. Otherwise the first parameter is taken from the stack and replaced with the return value.
-            </summary>
+            Delegate may return void. Otherwise the <b>first parameter is taken from the stack and replaced with the return value</b>.<br /><b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b></summary>
             <param name="func">
                 <b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b>
             </param>
@@ -1774,8 +1826,7 @@
         <member name="M:Shared.TranspilerTool.InsertAfter(System.Delegate)">
             <summary>
             Injects call. Increments index (pointing to the new code). <br />
-            Delegate may return void. Otherwise the first parameter is taken from the stack and replaced with the return value.
-            </summary>
+            Delegate may return void. Otherwise the <b>first parameter is taken from the stack and replaced with the return value</b>.<br /><b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b></summary>
             <param name="func">
                 <b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b>
             </param>
@@ -1789,8 +1840,7 @@
         <member name="M:Shared.TranspilerTool.InsertReturn(System.Delegate,System.Boolean)">
             <summary>
             Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result. <br />
-            This function will inject necessary load OpCodes.
-            </summary>
+            This function will inject necessary load OpCodes.<br /><b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b></summary>
             <param name="func">
                 <b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b>
             </param>
@@ -1806,8 +1856,7 @@
             <summary>
                 <b>Instance methods need their instance as the first parameter!</b>
                 <br />
-            Replaces the current IL line with call. The delegate must return the replacement return type and must have the same parameters with identical names and order.
-            </summary>
+            Replaces the current IL line with call. The delegate must return the replacement return type and <b>must have the same parameters with identical names and order</b>.<br /><b>object Function(object object_instance, object parameter0, object parameter1..., [object __instance], [object arg0], [object arg1...])</b></summary>
             <param name="func">
                 <b>object Function(object object_instance, object parameter0, object parameter1..., [object __instance], [object arg0], [object arg1...])</b>
             </param>
@@ -2007,6 +2056,11 @@
             <summary>
             Throws if type cannot be assigned to parameter. Handles by-ref resolution.<br />
             Returns true, if operation must use dereference.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetCallers(System.Reflection.MethodInfo,System.String[],System.String[])">
+            <summary>
+            Untested. Returns all methods calling a particular method.
             </summary>
         </member>
         <member name="T:Shared.LabelInfo">

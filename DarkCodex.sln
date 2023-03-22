@@ -15,10 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodexLib", "CodexLib\CodexL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnityMod", "@Shared\UnityMod\UnityMod.csproj", "{2627C06B-6197-41FD-B9BD-D0083D9DDFFE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LocalizationApp", "LocalizationApp\LocalizationApp.csproj", "{90209116-BD54-4EA2-B775-AB0338CF4E6A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetstandardProject", "@Shared\NetstandardProject\NetstandardProject.csproj", "{519F375D-6164-4132-ABD9-12E830608B0D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +33,6 @@ Global
 		{2627C06B-6197-41FD-B9BD-D0083D9DDFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2627C06B-6197-41FD-B9BD-D0083D9DDFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2627C06B-6197-41FD-B9BD-D0083D9DDFFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{90209116-BD54-4EA2-B775-AB0338CF4E6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{90209116-BD54-4EA2-B775-AB0338CF4E6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{90209116-BD54-4EA2-B775-AB0338CF4E6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{90209116-BD54-4EA2-B775-AB0338CF4E6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{519F375D-6164-4132-ABD9-12E830608B0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{519F375D-6164-4132-ABD9-12E830608B0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{519F375D-6164-4132-ABD9-12E830608B0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{519F375D-6164-4132-ABD9-12E830608B0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

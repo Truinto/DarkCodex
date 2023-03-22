@@ -79,7 +79,7 @@ namespace DarkCodex
             var knight = Helper.Get<BlueprintArchetype>("7d61d9b2250260a45b18c5634524a8fb");
 
             var applicable = Tree.GetAll(true, true, archetype: true).Select(s => s.Blade.Burn).ToArray();
-            Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
+            //Main.PrintDebug(applicable.Select(s => s.NameSafe()).Join());
             var icon = Helper.StealIcon("0e5ec4d781678234f83118df41fd27c3");
 
             var ability = Helper.CreateBlueprintActivatableAbility(
@@ -269,12 +269,12 @@ namespace DarkCodex
                 ).SetComponents(
                 can_gather,
                 hasMoveAction,
-                Helper.CreateAbilityEffectRunAction(0, lose_halfmove, apply_debuff, three2three, two2three, one2three, zero2two),
-                new RestrictionCanGatherPowerAbility());
+                Helper.CreateAbilityEffectRunAction(0, regain_halfmove, apply_debuff, three2three, two2three, one2three, zero2two),
+                new RestrictionCanGatherPowerAbility(),
+                Helper.CreateAbilityIsFullRoundInTurnBased());
             mobile_gathering_long_ab.CanTargetSelf = true;
             mobile_gathering_long_ab.Animation = CastAnimationStyle.Self;
             mobile_gathering_long_ab.HasFastAnimation = true;
-            mobile_gathering_long_ab.m_IsFullRoundAction = true;
 
             var mobile_gathering_feat = Helper.CreateBlueprintFeature(
                 "MobileGatheringFeat",

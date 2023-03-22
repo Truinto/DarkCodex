@@ -27,6 +27,7 @@ namespace CodexLib
             typeof(Patch_AOEAttackRolls),
             typeof(Patch_ConditionExemption),
             typeof(Patch_ContextStatValue),
+            typeof(Patch_ContextValueParams),
             typeof(Patch_DebugReport),
             typeof(Patch_FixAbilityTargets),
             typeof(Patch_FlameBlade),
@@ -40,6 +41,7 @@ namespace CodexLib
             typeof(Patch_RuleSpendCharge),
             typeof(Patch_SpellSelectionParametrized),
             typeof(Patch_SuppressError),
+            typeof(Patch_TouchPersist),
             typeof(Patch_WeaponCategory),
         };
 

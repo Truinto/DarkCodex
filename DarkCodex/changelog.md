@@ -1,5 +1,10 @@
 # Changelog
-- ~~added save metadata to keep track of enabled patches~~ not yet
+
+## [1.5.25]
+- limitless activatables ignore OnlyInCombat condition #230
+- added Chill Touch spell
+- added save metadata to keep track of enabled patches
+- updated chinese translation by nixgnot #225
 
 ## [1.5.24]
 - added demon rage to limitless rage prerequisites

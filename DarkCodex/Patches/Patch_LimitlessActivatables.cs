@@ -40,6 +40,18 @@ namespace DarkCodex
             return data.Code;
         }
 
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.IsAvailableByRestrictions), MethodType.Getter)]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler4(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        {
+            var data = new TranspilerTool(instructions, generator, original);
+
+            data.Seek(typeof(BlueprintActivatableAbility), nameof(BlueprintActivatableAbility.OnlyInCombat));
+            data.InsertAfter(Patch3);
+
+            return data.Code;
+        }
+
         public static void Patch1(ActivatableAbility ability, bool forceRemovedBuff)
         {
             if (!IsFree(ability))
@@ -48,7 +60,6 @@ namespace DarkCodex
 
         public static bool Patch3(bool __stack, ActivatableAbility __instance)
         {
-            //Main.PrintDebug("ActivatableAbility.TryStart");
             return __stack && !IsFree(__instance);
         }
 

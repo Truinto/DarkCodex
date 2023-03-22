@@ -265,7 +265,6 @@ namespace Shared
         {
             if (restart)
             {
-                restart = false;
                 UIUtility.ShowMessageBox("Warning! Patch selection changed. Restart game before saving. If you cannot load your save, re-enable patches.", MessageModalBase.ModalType.Message, a => { }, null, 0, null, null, null);
             }
         }
@@ -418,7 +417,7 @@ namespace Shared
             modEntry.OnHideGUI = OnHideGUI;
 
             MasterPatch.Run(typeof(CodexLib.BpCache)); // this must run very early
-            //Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
+            Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
 
             //harmony.PatchAll(typeof(Main).Assembly);
             //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
@@ -457,12 +456,10 @@ namespace Shared
             PatchSafe(typeof(DEBUG.ArmyLeader1));
             PatchSafe(typeof(DEBUG.SpellReach));
             PatchSafe(typeof(Patch_Prebuilds));
-            //PatchSafe(typeof(Patch_SaveExtension));
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixBladeWhirlwind);
             LoadSafe(Spellcasters.CreateChannelForm);
-            LoadSafe(Spells.CreateChillTouch);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -515,6 +512,7 @@ namespace Shared
             LoadSafe(Spells.CreateFlameBlade);
             LoadSafe(Spells.CreateDivineTrident);
             LoadSafe(Spells.CreateProduceFlame);
+            LoadSafe(Spells.CreateChillTouch);
             LoadSafe(Spells.PatchVarious);
 
             // General
