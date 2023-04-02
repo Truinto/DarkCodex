@@ -111,27 +111,27 @@
 			<_CopyItems Include="$(TargetDir)\*" />
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
 
-			<_Zip Include="$(ModFolder)\builds\testdata.json" />
-			<_Zip Include="$(ModFolder)\icons\*.png" />
-			<_Zip Include="$(ModFolder)\info.json" />
-			<_Zip Include="$(ModFolder)\blueprints.txt" />
-			<_Zip Include="$(ModFolder)\blueprints_dynamic.txt" />
-			<_Zip Include="$(ModFolder)\changelog.md" />
-			<_Zip Include="$(ModFolder)\CodexLib.dll" />
-			<_Zip Include="$(ModFolder)\DarkCodex.dll" />
-			<_Zip Include="$(ModFolder)\enGB.json" />
-			<_Zip Include="$(ModFolder)\enchantenGB.json" />
-			<_Zip Include="$(ModFolder)\zhCN.json" />
-			<_Zip Include="$(ModFolder)\enchantzhCN.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\builds\testdata.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\icons\*.png" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\info.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\blueprints.txt" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\blueprints_dynamic.txt" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\changelog.md" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\CodexLib.dll" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\DarkCodex.dll" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\enGB.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\enchantenGB.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\zhCN.json" />
+			<_Zip Include="$(ModFolder)\$(TargetName)\enchantzhCN.json" />
 			
-			<_Download Include="$(ModFolder)\zhCN.json" Url="DarkCodex汉化/zhCN.json" />
-			<_Download Include="$(ModFolder)\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
+			<_Download Include="Settings\zhCN.json" Url="DarkCodex汉化/zhCN.json" />
+			<_Download Include="Settings\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
 		</ItemGroup>
 		
 		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" />
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
 		<!--<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />-->
-		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\DarkCodex.zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
+		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\$(TargetName)\DarkCodex.zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>
 
