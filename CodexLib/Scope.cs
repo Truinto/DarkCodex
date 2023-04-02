@@ -20,7 +20,7 @@ namespace CodexLib
         public bool allowGuidGeneration;
 
         [Obsolete]
-        public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger)
+        private Scope(string modPath, UnityModManager.ModEntry.ModLogger logger)
         {
             this.modPath = modPath;
             this.logger = logger;
@@ -28,7 +28,7 @@ namespace CodexLib
         }
 
         [Obsolete]
-        public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger, Harmony harmony)
+        private Scope(string modPath, UnityModManager.ModEntry.ModLogger logger, Harmony harmony)
         {
             this.modPath = modPath;
             this.logger = logger;

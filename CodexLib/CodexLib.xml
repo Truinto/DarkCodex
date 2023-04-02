@@ -549,9 +549,7 @@
             </summary>
         </member>
         <member name="M:CodexLib.OverrideResourceLogic.#ctor(Kingmaker.UnitLogic.Abilities.Components.Base.IAbilityResourceLogic,CodexLib.AnyRef[])">
-            <summary>
-            Replace ResourceLogic of specific abilities.
-            </summary>
+            <inheritdoc cref="T:CodexLib.OverrideResourceLogic" />
             <param name="resourceLogic">Resource logic to take precedence.</param>
             <param name="spells">type: <b>BlueprintAbility</b></param>
         </member>
@@ -561,9 +559,7 @@
             </summary>
         </member>
         <member name="M:CodexLib.AbilityResourceLogicCooldown.#ctor(CodexLib.AnyRef,System.Int32,System.Boolean)">
-            <summary>
-            Resource-free use of ability, if not on cooldown.
-            </summary>
+            <inheritdoc cref="T:CodexLib.AbilityResourceLogicCooldown" />
             <param name="resource">type: <b>BlueprintAbilityResource</b></param>
             <param name="cooldown">Cooldown in rounds.</param>
             <param name="isSpend">If false, all uses are free without cooldown.</param>
@@ -961,6 +957,20 @@
             Use MakeContextActionSavingThrow instead, if you want to inline ContextActionConditionalSaved.
             </summary>
         </member>
+        <member name="M:CodexLib.Helper.MakeStickySpell(Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility,Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility@,Kingmaker.UnitLogic.Mechanics.ContextValue)">
+            <summary>
+            Duplicate a blueprint. Creating a corresponding 'cast' variant with the StickyTouch component.<br />
+            Use this if you want to create a new touch spell. You need to define the 'effect' variant yourself.<br />
+            Cast needs: AbilityEffectStickyTouch, SpellListComponent, CraftInfoComponent<br />
+            Effect needs: AbilityDeliverTouch, AbilityEffectRunAction
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.MakeStickySpell(Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility,Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility@,Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility@)">
+            <summary>
+            Duplicate a blueprint twice. Creating a 'cast' and 'effect' variant with the StickyTouch component.<br />
+            Use this if you want to copy an existing spell as a touch spell.
+            </summary>
+        </member>
         <member name="M:CodexLib.Helper.MakeRunActionApplyBuff(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextDurationValue,System.Boolean,System.Boolean)">
             <summary>
             Creates an action list and adds a single apply buff action.
@@ -1165,6 +1175,11 @@
             If attached to a component, will cause convertables to not drag.
             </summary>
         </member>
+        <member name="T:CodexLib.IActionBarSelectionUpdate">
+            <summary>
+            Triggers when player clicks on a MechanicActionBarSlotVariantSelection variant.
+            </summary>
+        </member>
         <member name="T:CodexLib.IAfterRule">
             <summary>
             Use the IAfterRule interface to place your component after all other.
@@ -1323,6 +1338,11 @@
         <member name="T:CodexLib.Patch_ResourceOverride">
             <summary>
             Fix for overriding 'AbilityData.OverridenResourceLogic', when the logic is also IAbilityRestriction.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patch_SuppressError.FixNullExceptionDeserializeComponents">
+            <summary>
+            This happens specifically because of VariantSelectionApplyEffect when it overrides AbilityData.OverridenResourceLogic for unkown reasons.
             </summary>
         </member>
         <member name="T:CodexLib.RuleCombatManeuverWithWeapon">
@@ -1524,40 +1544,35 @@
             Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T2" />.
             </summary>
         </member>
-        <member name="T:Shared.Logger">
+        <member name="T:Shared.LocalizedStringCached">
             <summary>
-            Methods to print to standard output.
+            Flexible LocalizedString whose logic depends on <see cref="F:Shared.LocalizedStringCached.Resolver" />.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintDebug(System.String,System.String)">
+        <member name="F:Shared.LocalizedStringCached.Default">
+            <summary>Original string value.</summary>
+        </member>
+        <member name="F:Shared.LocalizedStringCached.Resolver">
+            <summary>Function to resolve key to localized string.</summary>
+        </member>
+        <member name="M:Shared.LocalizedStringCached.#ctor(System.String)">
+            <inheritdoc cref="T:Shared.LocalizedStringCached" />
+        </member>
+        <member name="M:Shared.LocalizedStringCached.Clear">
             <summary>
-            Only prints in DEBUG.
+            Clear cache. Next access will pull from Resolver again.
             </summary>
         </member>
-        <member name="M:Shared.Logger.Print(System.String)">
+        <member name="M:Shared.LocalizedStringCached.ToString">
             <summary>
-            Prints to standard output.
+            Pulls string from Resolver and caches result.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintWarning(System.String,System.String)">
-            <summary>
-            Prints to standard output.
-            </summary>
+        <member name="M:Shared.LocalizedStringCached.op_Implicit(Shared.LocalizedStringCached)~System.String">
+            <inheritdoc cref="M:Shared.LocalizedStringCached.ToString" />
         </member>
-        <member name="M:Shared.Logger.PrintError(System.String,System.String)">
-            <summary>
-            Prints to standard output.
-            </summary>
-        </member>
-        <member name="M:Shared.Logger.PrintException(System.Exception)">
-            <summary>
-            Prints to standard output.
-            </summary>
-        </member>
-        <member name="T:Shared.SerializationTool">
-            <summary>
-            Tool to handle (de-)serialization.
-            </summary>
+        <member name="M:Shared.LocalizedStringCached.op_Implicit(System.String)~Shared.LocalizedStringCached">
+            <inheritdoc cref="T:Shared.LocalizedStringCached" />
         </member>
         <member name="T:Shared.BaseSettings`1">
             <summary>
@@ -2142,6 +2157,41 @@
         </member>
         <member name="M:Shared.LocalInfo.op_Implicit(Shared.LocalInfo)~System.Int32">
             <summary />
+        </member>
+        <member name="T:Shared.SerializationTool">
+            <summary>
+            Tool to handle (de-)serialization.
+            </summary>
+        </member>
+        <member name="T:Shared.Logger">
+            <summary>
+            Methods to print to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintDebug(System.String,System.String)">
+            <summary>
+            Only prints in DEBUG.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.Print(System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintWarning(System.String,System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintError(System.String,System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintException(System.Exception)">
+            <summary>
+            Prints to standard output.
+            </summary>
         </member>
     </members>
 </doc>

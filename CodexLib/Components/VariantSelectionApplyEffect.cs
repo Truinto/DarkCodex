@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kingmaker.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,23 +13,31 @@ namespace CodexLib
     /// - ContextRankConfig, ContextCalculateSharedValue, ContextAbilityParamsCalculator<br/>
     /// - AbilityApplyEffect
     /// </summary>
-    public class VariantSelectionApplyEffect : AbilityApplyEffect, IAbilityRestriction, IMechanicRecalculate
+    public class VariantSelectionApplyEffect : AbilityApplyEffect, IAbilityRestriction, IMechanicRecalculate, IActionBarSelectionUpdate
     {
         public int Priority => 0;
 
         public string GetAbilityRestrictionUIText()
         {
-            return LocalizedTexts.Instance.Reasons.NoResources;
+            return LocalizedTexts.Instance.Reasons.AbilityDisabled;
         }
 
         public bool IsAbilityRestrictionPassed(AbilityData ability)
         {
-            if (ability.Caster.GetFact(ability.Blueprint)?.GetDataExt<IActionBarConvert, VariantSelectionData>()?.Selected is not BlueprintScriptableObject bp)
+            if (ability.Caster.GetFact(ability.Blueprint)?.GetDataExt<IActionBarConvert, VariantSelectionData>()?.Selected is not BlueprintScriptableObject sourceAbility)
                 return false;
-            var resource = bp.GetComponent<AbilityResourceLogic>();
-            if (resource == null)
+
+            if (ability.OverridenResourceLogic?.RequiredResource != null)
                 return true;
-            return resource.IsAbilityRestrictionPassed(ability);
+
+            ability.OverridenResourceLogic = sourceAbility.GetComponent<AbilityResourceLogic>();
+            return true;
+        }
+
+        public void Update(AbilityData ability, IUIDataProvider blueprint)
+        {
+            ability.OverridenResourceLogic = (blueprint as BlueprintScriptableObject)?.GetComponent<AbilityResourceLogic>();
+            Helper.PrintDebug($"VariantSelectionApplyEffect Update");
         }
 
         public void PreCalculate(MechanicsContext context)
@@ -70,17 +79,23 @@ namespace CodexLib
         public override void Apply(AbilityExecutionContext context, TargetWrapper target)
         {
             if (context.SourceAbility == null
-                || context.MaybeCaster == null)
+                || context.MaybeCaster is not UnitEntityData caster)
                 return;
 
-            if (context.MaybeCaster.GetFact(context.SourceAbility)?.GetDataExt<IActionBarConvert, VariantSelectionData>()?.Selected is not BlueprintAbility sourceAbility)
+            if (caster.GetFact(context.SourceAbility)?.GetDataExt<IActionBarConvert, VariantSelectionData>()?.Selected is not BlueprintAbility sourceAbility)
                 return;
-
-            // reduce resource
-            sourceAbility.GetComponent<AbilityResourceLogic>()?.Spend(context.Ability);
 
             // run AbilityEffectRunAction
-            sourceAbility.GetComponent<AbilityApplyEffect>()?.Apply(context, target);
+            var applyEffect = sourceAbility.GetComponent<AbilityApplyEffect>();
+            applyEffect?.Apply(context, target);
+        }
+    }
+
+    public class VariantSelectionResourceLogic : AbilityResourceLogic
+    {
+        public override bool IsAbilityRestrictionPassed(AbilityData ability)
+        {
+            return base.IsAbilityRestrictionPassed(ability);
         }
     }
 }

@@ -351,7 +351,7 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref paladin.Get().m_Archetypes, archetype.ToRef());
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Bladed Brush", "combat feat: use glaive with Weapon Finesse and Precise Strike", false)]
+        [PatchInfo(Severity.Create, "Bladed Brush", "combat feat: use glaive with Weapon Finesse and Precise Strike", false)]
         public static void CreateBladedBrush()
         {
             var feat = Helper.CreateBlueprintFeature(

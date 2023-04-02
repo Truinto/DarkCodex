@@ -15,7 +15,7 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix1(ItemEntityWeapon weapon, ref bool __result)
         {
-            var owner = weapon.Owner;
+            var owner = weapon?.Owner;
             if (owner == null)
                 return;
 

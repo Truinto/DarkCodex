@@ -30,6 +30,7 @@ using Shared;
 using CodexLib;
 using Kingmaker.Utility;
 using Kingmaker.Enums;
+using System.Security.Policy;
 
 namespace DarkCodex
 {
@@ -485,5 +486,26 @@ namespace DarkCodex
             public const string Weapon_Fire = "91e5a56dd421a2941984a36a2af164b6";
             public const string Weapon_Shock = "1d1465ffa2699644ba8dfac48cb33195";
         }
+
+        private static string[] array;
+        public static string[] LocalizedStrings
+        {
+            get => array ??= new[]
+            {
+                //None
+                "", 
+                //MenuDisclaimer
+                Helper.CreateString("Disclaimer: Remember that playing with mods often makes them mandatory for your save game!"),
+                //MenuLegend
+                Helper.CreateString("Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above.\n[*] Option is enabled/disabled immediately, without restart."),
+            };
+        }
+    }
+
+    public enum Localized
+    {
+        None,
+        MenuDisclaimer,
+        MenuLegend,
     }
 }

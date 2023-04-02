@@ -80,6 +80,8 @@ namespace DarkCodex
                 foreach (string patch in Main.appliedPatches)
                     saveData.Remove(patch);
 
+                // TODO: check patch even exists, check patch is critical
+
                 if (saveData.Count > 0)
                 {
                     Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable patches' to enable: " + saveData.Join(), yesLabel: "Enable patches", noLabel: "Ignore this time",

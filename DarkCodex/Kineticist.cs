@@ -924,7 +924,7 @@ namespace DarkCodex
             Helper.AddInfusion(greater);
         }
 
-        [PatchInfo(Severity.Fix | Severity.WIP, "Fix Blood Kineticist", "seeks to fix bugs in Blood Kineticist", false)]
+        [PatchInfo(Severity.Fix, "Fix Blood Kineticist", "seeks to fix bugs in Blood Kineticist", false)]
         public static void FixBloodKineticist()
         {
             var blood = Tree.Composite_Blood;
@@ -978,6 +978,9 @@ namespace DarkCodex
                     damageInfo[i] = info;
                 }
             }
+
+            // fix kinetic blade doesn't grant blood blade
+            Tree.KineticBlade.Feature.Get().AddComponents(Helper.CreateAddFeatureIfHasFact(Tree.Composite_Blood.BaseAbility, Tree.Composite_Blood.Blade.Feature));
         }
 
         [PatchInfo(Severity.Create, "Elemental Scion (3PP)", "new Kineticist archetype", false)]

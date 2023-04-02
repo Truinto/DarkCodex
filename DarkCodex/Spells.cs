@@ -393,7 +393,8 @@ namespace DarkCodex
             weapon.m_VisualParameters = new()
             {
                 m_Projectiles = new BlueprintProjectileReference[] { (AnyRef)Resource.Projectile.ScorchingRay00 },
-                m_WeaponAnimationStyle = WeaponAnimationStyle.ThrownStraight
+                m_WeaponAnimationStyle = WeaponAnimationStyle.ThrownStraight,
+                m_WeaponModel = Helper.GetPrefabLink("8dcb2efc5b9c4da44af5e2e7d59b4433")
             };
 
             buff.Flags(
@@ -438,7 +439,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Create, "Chill Touch", "spell: Chill Touch", false)]
-        public static void CreateChillTouch()
+        public static void CreateChillTouch() // TODO: fix magus spellstrike with chill touch 
         {
             /*
             Chill Touch
@@ -500,11 +501,11 @@ namespace DarkCodex
                 actionType: UnitCommand.CommandType.Free,
                 duration: Resource.Strings.OneMinute
                 ).SetComponents(
-                Helper.CreateContextSetAbilityParams(casterLevel: 20),
+                Helper.CreateContextSetAbilityParams(casterLevel: 1),
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
                     Helper.CreateContextActionSpawnMonster(
-                        unit: "622499edbd2cdeb4fa7128c61e3326ca", //CR1_Crusader_Human_Recruit_Melee_Male
+                        unit: "931425ba7152a7149a8b012cb637cbb4", //CR0.5_Cultist_Ranged
                         duration: Helper.DurationOneMinute,
                         linkToCaster: false))
                 ).TargetPoint();
@@ -516,7 +517,7 @@ namespace DarkCodex
                 actionType: UnitCommand.CommandType.Free,
                 duration: Resource.Strings.OneMinute
                 ).SetComponents(
-                Helper.CreateContextSetAbilityParams(casterLevel: 20),
+                Helper.CreateContextSetAbilityParams(casterLevel: 1),
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
                     Helper.CreateContextActionSpawnMonster(
@@ -532,7 +533,7 @@ namespace DarkCodex
                 actionType: UnitCommand.CommandType.Free,
                 duration: Resource.Strings.OneMinute
                 ).SetComponents(
-                Helper.CreateContextSetAbilityParams(casterLevel: 20),
+                Helper.CreateContextSetAbilityParams(casterLevel: 1),
                 Helper.CreateAbilityEffectRunAction(
                     SavingThrowType.Unknown,
                     Helper.CreateContextActionSpawnMonster(
@@ -541,6 +542,20 @@ namespace DarkCodex
                         linkToCaster: false))
                 ).TargetPoint();
 
+            var stun = Helper.CreateBlueprintAbility(
+                "DebugSummonEnemyStunning",
+                "Stun an enemy",
+                icon: Helper.StealIcon("09d39b38bb7c6014394b6daced9bacd3"),
+                actionType: UnitCommand.CommandType.Free,
+                duration: Resource.Strings.Permanent
+                ).TargetAny(
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(0, 
+                    Helper.CreateContextActionApplyBuff("09d39b38bb7c6014394b6daced9bacd3"))
+                );
+
+            var falseLife = Helper.Get<BlueprintAbility>("dc6af3b4fd149f841912d8a3ce0983de");
+
             Helper.CreateBlueprintAbility(
                 "DebugSummonEnemy",
                 "Summon Dummy",
@@ -548,9 +563,9 @@ namespace DarkCodex
                 actionType: UnitCommand.CommandType.Free,
                 duration: Resource.Strings.OneMinute
                 ).SetComponents(
-                Helper.CreateContextSetAbilityParams(casterLevel: 20)
+                Helper.CreateContextSetAbilityParams(casterLevel: 1)
                 ).TargetPoint(
-                ).AddToAbilityVariants(recruit, undead, herald);
+                ).AddToAbilityVariants(recruit, undead, herald, stun, falseLife);
         }
 
         [PatchInfo(Severity.Fix, "Various Tweaks", "life bubble is AOE again", false)]

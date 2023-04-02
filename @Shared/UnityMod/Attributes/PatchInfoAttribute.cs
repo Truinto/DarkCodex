@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-#pragma warning disable CS1591
-
 namespace Shared
 {
     public class PatchInfoAttribute : Attribute, IComparable<PatchInfoAttribute>, IEquatable<PatchInfoAttribute>
@@ -23,8 +21,8 @@ namespace Shared
         }
 
         public Severity PatchType;
-        public string DisplayName;
-        public string Description;
+        public LocalizedStringCached DisplayName;
+        public LocalizedStringCached Description;
         public bool Homebrew;
         public Type Requirement;
         public int Priority;    // 400 = normal, 300 = late, 500 = early, 200 = after other mods; currently only informative

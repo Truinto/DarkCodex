@@ -1,6 +1,8 @@
-﻿using Kingmaker.UI;
+﻿using Kingmaker.EntitySystem.Persistence.JsonUtility;
+using Kingmaker.UI;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,17 +75,6 @@ namespace CodexLib
             {
                 writer.WriteValue(num.Value);
             }
-
-            //if (value is not VariantSelectionWrapper wrapper 
-            //    || wrapper.Selected is not KineticistTree.Element element 
-            //    || element.BlastFeature?.Get()?.name is not string name)
-            //{
-            //    writer.WriteNull();
-            //    return;
-            //}
-
-            //writer.WriteValue(name);
-            //Helper.PrintDebug("JsonConverter write KineticistTree.Element " + element);
         }
     }
 }

@@ -254,7 +254,7 @@ namespace DarkCodex
             Helper.AddFeats(feat);
         }
 
-        [PatchInfo(Severity.Create | Severity.Hidden, "Channel Form", "basic feat: collection of abilities to shape channel energy into new forms", true)]
+        [PatchInfo(Severity.Create, "Channel Form", "basic feat: collection of abilities to shape channel energy into new forms", true)]
         public static void CreateChannelForm()
         {
             /*
@@ -280,15 +280,15 @@ namespace DarkCodex
                 range: AbilityRange.Long
                 ).TargetEnemy(
                 ).SetComponents(
+                new ActivatableVariants(channels),
+                new VariantSelectionApplyEffect(),
                 Helper.CreateAbilityDeliverProjectile(
                     projectile: Resource.Projectile.RayOfExhaustion00,
                     type: AbilityProjectileType.Simple,
                     length: 0.Feet(),
                     width: 5.Feet(),
-                    weapon: "f6ef95b1f7bb52b408a5b345a330ffe8")//, //RayItem
-                //new ActivatableVariants(channels),
-                //new VariantSelectionApplyEffect()
-                ); // TODO: this shows up as a 50ft line?
+                    weapon: "f6ef95b1f7bb52b408a5b345a330ffe8") //RayItem
+                );
 
             var burst = Helper.CreateBlueprintAbility(
                 "ChannelFormBurst",
@@ -296,9 +296,12 @@ namespace DarkCodex
                 "Alter your channel energy area into a 10 feet radius burst.",
                 icon: channels.First().Get<BlueprintAbility>().Icon,
                 range: AbilityRange.Close
+                ).TargetPoint(
                 ).SetComponents(
+                new ActivatableVariants(channels),
+                new VariantSelectionApplyEffect(),
                 Helper.CreateAbilityDeliverProjectile(
-                    projectile: Resource.Projectile.Fireball00,
+                    projectile: Resource.Projectile.AlchemistHolyBomb00,
                     type: AbilityProjectileType.Simple,
                     length: 0.Feet(),
                     width: 5.Feet()),
@@ -309,11 +312,14 @@ namespace DarkCodex
                 "ChannelFormLine",
                 "Channel Line",
                 "Alter your channel energy area into a 60 feet line.",
-                icon: null,
+                icon: Helper.StealIcon("2aad85320d0751340a0786de073ee3d5"),
                 range: AbilityRange.Projectile
+                ).TargetPoint(
                 ).SetComponents(
+                new ActivatableVariants(channels),
+                new VariantSelectionApplyEffect(),
                 Helper.CreateAbilityDeliverProjectile(
-                    projectile: Resource.Projectile.FireLine00,
+                    projectile: Resource.Projectile.Kinetic_BlueFlameLine00,
                     type: AbilityProjectileType.Line,
                     length: 60.Feet(),
                     width: 5.Feet())
@@ -323,11 +329,14 @@ namespace DarkCodex
                 "ChannelFormCone",
                 "Channel Cone",
                 "Alter your channel energy area into a 30 feet cone.",
-                icon: null,
+                icon: Helper.StealIcon("fde466d2c24705641bcd97d04a323566"),
                 range: AbilityRange.Projectile
+                ).TargetPoint(
                 ).SetComponents(
+                new ActivatableVariants(channels),
+                new VariantSelectionApplyEffect(),
                 Helper.CreateAbilityDeliverProjectile(
-                    projectile: Resource.Projectile.FireCone30Feet00,
+                    projectile: Resource.Projectile.ChannelNegativeEnergyCone30Feet00,
                     type: AbilityProjectileType.Cone,
                     length: 30.Feet(),
                     width: 5.Feet())
@@ -336,7 +345,7 @@ namespace DarkCodex
             var feat = Helper.CreateBlueprintFeature(
                 "ChannelFormFeat",
                 "Channel Form",
-                "As a free action you may alter your channel energy area into new forms."
+                "As a free action you may alter your channel energy area to one of the following options:\n- single target ray\n- 10-foot burst centered anywhere within 30 feet\n- 60-foot line\n- 30-foot cone"
                 ).SetComponents(
                 Helper.CreatePureRecommendation(),
                 Helper.CreateAddFacts(ray, burst, line, cone),

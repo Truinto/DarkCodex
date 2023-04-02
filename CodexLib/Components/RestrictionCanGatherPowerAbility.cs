@@ -22,38 +22,32 @@ namespace CodexLib
         {
             return LocalizedTexts.Instance.Reasons.SpecificWeaponRequired.ToString(() =>
             {
-                GameLogContext.Text = LocalizedTexts.Instance.WeaponCategories.GetText(Kingmaker.Enums.WeaponCategory.KineticBlast);
+                GameLogContext.Text = LocalizedTexts.Instance.WeaponCategories.GetText(WeaponCategory.KineticBlast);
             });
         }
 
         public bool IsCasterRestrictionPassed(UnitEntityData caster)
         {
             UnitPartKineticist unitPartKineticist = caster.Get<UnitPartKineticist>();
-            if (!unitPartKineticist)
+            if (!unitPartKineticist)            
                 return false;
-
-            UnitBody body = caster.Body;
-
+            
+            UnitBody body = caster.Body;            
             ItemEntity maybeItem = body.PrimaryHand.MaybeItem;
-            bool flag = maybeItem is ItemEntityWeapon itemEntityWeapon && itemEntityWeapon.Blueprint.Category == WeaponCategory.KineticBlast;
+            ItemEntityWeapon obj = maybeItem as ItemEntityWeapon;
+            bool flag = obj != null && obj.Blueprint.Category == WeaponCategory.KineticBlast;
             ItemEntity maybeItem2 = body.SecondaryHand.MaybeItem;
-            ItemEntityShield maybeShield = body.SecondaryHand.MaybeShield;
-            ArmorProficiencyGroup? armorProficiencyGroup = (maybeShield != null) ? new ArmorProficiencyGroup?(maybeShield.Blueprint.Type.ProficiencyGroup) : default(ArmorProficiencyGroup?);
-            if (maybeItem != null && !(maybeItem as ItemEntityWeapon).IsMonkUnarmedStrike && !flag)
-                return false;
+            ArmorProficiencyGroup? armorProficiencyGroup = body.SecondaryHand.MaybeShield?.Blueprint.Type.ProficiencyGroup;
 
+            if (maybeItem != null && !(maybeItem as ItemEntityWeapon).IsMonkUnarmedStrike && !flag)            
+                return false;
+            
             if (maybeItem2 != null)
             {
-                if (armorProficiencyGroup != null)
-                {
-                    ArmorProficiencyGroup? armorProficiencyGroup2 = armorProficiencyGroup;
-                    ArmorProficiencyGroup armorProficiencyGroup3 = ArmorProficiencyGroup.TowerShield;
-                    if (!(armorProficiencyGroup2.GetValueOrDefault() == armorProficiencyGroup3 & armorProficiencyGroup2 != null))
-                        return unitPartKineticist.CanGatherPowerWithShield;
-                }
+                if (armorProficiencyGroup.HasValue && armorProficiencyGroup != ArmorProficiencyGroup.TowerShield)                
+                    return unitPartKineticist.CanGatherPowerWithShield;                
                 return false;
             }
-
             return true;
         }
     }

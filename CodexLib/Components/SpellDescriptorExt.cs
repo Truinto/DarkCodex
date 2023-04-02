@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CodexLib
 {
     [Obsolete("discarded")]
-    public class SpellDescriptorExt : SpellDescriptorComponent
+    internal class SpellDescriptorExt : SpellDescriptorComponent
     {
         public BitArray DescriptorExt;
 

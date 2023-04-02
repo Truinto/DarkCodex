@@ -1703,7 +1703,7 @@ namespace CodexLib
         }
 
         [Obsolete("Use GetTalents(form: true, substance: true) instead")]
-        public IEnumerable<BlueprintFeature> GetInfusionTalents()
+        private IEnumerable<BlueprintFeature> GetInfusionTalents()
         {
             foreach (var talent in SelectionInfusion.Get().m_AllFeatures)
             {
@@ -1714,7 +1714,7 @@ namespace CodexLib
         }
 
         [Obsolete("Use GetTalents(utility: true) instead")]
-        public IEnumerable<BlueprintFeature> GetWildTalents()
+        private IEnumerable<BlueprintFeature> GetWildTalents()
         {
             foreach (var talent in SelectionWildTalent.Get().m_AllFeatures)
             {
@@ -1862,7 +1862,7 @@ namespace CodexLib
         /// <summary>Only returns non null values.</summary>
         public IEnumerable<BlueprintAbility> GetBlasts(bool bases = false, bool variants = false, bool bladeburn = false, bool bladedamage = false)
         {
-            foreach (var element in GetAll(true, true, archetype: true))
+            foreach (var element in GetAll(basic: true, composite: true, archetype: true))
             {
                 var b = element.BaseAbility.Get();
                 if (b == null)
@@ -2314,7 +2314,7 @@ namespace CodexLib
                         if (!typeof(BlueprintReferenceBase).IsAssignableFrom(fi2.FieldType))
                             continue;
 
-                        bool canBeNull = fi2.HasAttribute<CanBeNullAttribute>() || fi2.Name.StartsWith("Boost_");
+                        bool canBeNull = fi2.HasAttribute<CanBeNullAttribute>() || fi.Name.StartsWith("Boost_");
 
                         if (fi2.GetValue(field) is not BlueprintReferenceBase reference)
                         {

@@ -21,5 +21,17 @@ namespace CodexLib
         {
             __instance.Facts.m_Facts.RemoveAll(f => f.Blueprint == null);
         }
+
+        /// <summary>
+        /// This happens specifically because of VariantSelectionApplyEffect when it overrides AbilityData.OverridenResourceLogic for unkown reasons.
+        /// </summary>
+        [HarmonyPatch(typeof(BlueprintComponent), nameof(BlueprintComponent.OnDeserialized))]
+        [HarmonyPrefix]
+        public static bool FixNullExceptionDeserializeComponents()
+        {
+            if (Kingmaker.Blueprints.JsonSystem.Json.BlueprintBeingRead == null)
+                return false;
+            return true;
+        }
     }
 }

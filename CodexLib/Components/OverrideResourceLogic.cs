@@ -14,9 +14,7 @@ namespace CodexLib
         public IAbilityResourceLogic ResourceLogic;
         public BlueprintAbilityReference[] Spells;
 
-        /// <summary>
-        /// Replace ResourceLogic of specific abilities.
-        /// </summary>
+        /// <inheritdoc cref="OverrideResourceLogic"/>
         /// <param name="resourceLogic">Resource logic to take precedence.</param>
         /// <param name="spells">type: <b>BlueprintAbility</b></param>
         public OverrideResourceLogic(IAbilityResourceLogic resourceLogic, params AnyRef[] spells)
@@ -49,9 +47,7 @@ namespace CodexLib
     {
         public int Cooldown;
 
-        /// <summary>
-        /// Resource-free use of ability, if not on cooldown.
-        /// </summary>
+        /// <inheritdoc cref="AbilityResourceLogicCooldown"/>
         /// <param name="resource">type: <b>BlueprintAbilityResource</b></param>
         /// <param name="cooldown">Cooldown in rounds.</param>
         /// <param name="isSpend">If false, all uses are free without cooldown.</param>

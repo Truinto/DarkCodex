@@ -113,7 +113,8 @@ namespace DarkCodex
         [PatchInfo(Severity.Create | Severity.WIP, "Butchering Axe", "new weapon type Butchering Axe", false)]
         public static void CreateButcheringAxe()
         {
-            //Helper.EnumCreateWeaponCategory(Const.ButcheringAxe, "Butchering Axe"); // TODO: fix new weapon category
+            // TODO: fix new weapon category
+            //Helper.EnumCreateWeaponCategory(Const.ButcheringAxe, "Butchering Axe"); 
 
             //AccessTools.Field(typeof(WeaponCategoryExtension), nameof(WeaponCategoryExtension.Data)).SetValue(null,
             //    Helper.Append(WeaponCategoryExtension.Data, new WeaponCategoryExtension.DataItem(

@@ -184,40 +184,35 @@
             Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T2"/>.
             </summary>
         </member>
-        <member name="T:Shared.Logger">
+        <member name="T:Shared.LocalizedStringCached">
             <summary>
-            Methods to print to standard output.
+            Flexible LocalizedString whose logic depends on <see cref="F:Shared.LocalizedStringCached.Resolver"/>.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintDebug(System.String,System.String)">
+        <member name="F:Shared.LocalizedStringCached.Default">
+            <summary>Original string value.</summary>
+        </member>
+        <member name="F:Shared.LocalizedStringCached.Resolver">
+            <summary>Function to resolve key to localized string.</summary>
+        </member>
+        <member name="M:Shared.LocalizedStringCached.#ctor(System.String)">
+            <inheritdoc cref="T:Shared.LocalizedStringCached"/>
+        </member>
+        <member name="M:Shared.LocalizedStringCached.Clear">
             <summary>
-            Only prints in DEBUG.
+            Clear cache. Next access will pull from Resolver again.
             </summary>
         </member>
-        <member name="M:Shared.Logger.Print(System.String)">
+        <member name="M:Shared.LocalizedStringCached.ToString">
             <summary>
-            Prints to standard output.
+            Pulls string from Resolver and caches result.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintWarning(System.String,System.String)">
-            <summary>
-            Prints to standard output.
-            </summary>
+        <member name="M:Shared.LocalizedStringCached.op_Implicit(Shared.LocalizedStringCached)~System.String">
+            <inheritdoc cref="M:Shared.LocalizedStringCached.ToString"/>
         </member>
-        <member name="M:Shared.Logger.PrintError(System.String,System.String)">
-            <summary>
-            Prints to standard output.
-            </summary>
-        </member>
-        <member name="M:Shared.Logger.PrintException(System.Exception)">
-            <summary>
-            Prints to standard output.
-            </summary>
-        </member>
-        <member name="T:Shared.SerializationTool">
-            <summary>
-            Tool to handle (de-)serialization.
-            </summary>
+        <member name="M:Shared.LocalizedStringCached.op_Implicit(System.String)~Shared.LocalizedStringCached">
+            <inheritdoc cref="T:Shared.LocalizedStringCached"/>
         </member>
         <member name="T:Shared.BaseSettings`1">
             <summary>
@@ -805,6 +800,41 @@
         </member>
         <member name="M:Shared.LocalInfo.op_Implicit(Shared.LocalInfo)~System.Int32">
             <summary></summary>
+        </member>
+        <member name="T:Shared.SerializationTool">
+            <summary>
+            Tool to handle (de-)serialization.
+            </summary>
+        </member>
+        <member name="T:Shared.Logger">
+            <summary>
+            Methods to print to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintDebug(System.String,System.String)">
+            <summary>
+            Only prints in DEBUG.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.Print(System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintWarning(System.String,System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintError(System.String,System.String)">
+            <summary>
+            Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Logger.PrintException(System.Exception)">
+            <summary>
+            Prints to standard output.
+            </summary>
         </member>
     </members>
 </doc>

@@ -34,19 +34,31 @@ namespace CodexLib
         /// </summary>
         public override void OnMainClick()
         {
-            base.OnMainClick();
+            Helper.PrintDebug($"ActionBarSlotVMChild OnMainClick1");
 
             if (this.MechanicActionBarSlot is MechanicActionBarSlotVariantSelection selection)
             {
-                bool isOn = selection.IsActive();
+                var old = selection.SelectionData.Selected;
 
+                base.OnMainClick();
+
+                bool isOn = selection.IsActive();
                 if (isOn)
                     this.Parent.ForeIcon.Value = selection.GetIcon();
                 else
                     this.Parent.ForeIcon.Value = null;
 
-                if (this.Parent.MechanicActionBarSlot is MechanicActionBarSlotActivableAbility act)
-                    act.ActivatableAbility.IsOn = isOn;
+                object parent = this.Parent.MechanicActionBarSlot.GetContentData();
+                if (parent is ActivatableAbility act)
+                    act.IsOn = isOn;
+                if (old != selection.SelectionData.Selected && parent is AbilityData ability)
+                    ability.Blueprint.CallComponents<IActionBarSelectionUpdate>(a => a.Update(ability, selection.Blueprint));
+
+                Helper.PrintDebug($"ActionBarSlotVMChild OnMainClick2 old={old} new={selection.SelectionData.Selected} {parent is AbilityData}");
+            }
+            else
+            {
+                base.OnMainClick();
             }
 
         }

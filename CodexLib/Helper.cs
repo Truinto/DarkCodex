@@ -868,11 +868,7 @@ namespace CodexLib
 
         #region GUID
 
-        [Obsolete]
-        public static bool Allow_Guid_Generation = false;
         private static string _overwriteGuid;
-        //private static List<string> _guidloaded = new();
-        //private static Dictionary<string, string> _guids = new();
 
         private static Dictionary<string, Dictionary<string, string>> _mappedGuids = new();
 
@@ -2260,6 +2256,12 @@ namespace CodexLib
             return b;
         }
 
+        /// <summary>
+        /// Duplicate a blueprint. Creating a corresponding 'cast' variant with the StickyTouch component.<br/>
+        /// Use this if you want to create a new touch spell. You need to define the 'effect' variant yourself.<br/>
+        /// Cast needs: AbilityEffectStickyTouch, SpellListComponent, CraftInfoComponent<br/>
+        /// Effect needs: AbilityDeliverTouch, AbilityEffectRunAction
+        /// </summary>
         public static BlueprintAbility MakeStickySpell(this BlueprintAbility effect, out BlueprintAbility cast, ContextValue count = null)
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
@@ -2278,9 +2280,16 @@ namespace CodexLib
             cast.Range = AbilityRange.Touch;
             cast.Animation = CastAnimationStyle.Self;
 
+            if (effect.GetComponent<AbilityDeliverTouch>() == null)
+                effect.AddComponents(CreateAbilityDeliverTouch());
+
             return effect;
         }
 
+        /// <summary>
+        /// Duplicate a blueprint twice. Creating a 'cast' and 'effect' variant with the StickyTouch component.<br/>
+        /// Use this if you want to copy an existing spell as a touch spell.
+        /// </summary>
         public static void MakeStickySpell(BlueprintAbility spell, out BlueprintAbility cast, out BlueprintAbility effect)
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
@@ -2290,7 +2299,9 @@ namespace CodexLib
                     .RemoveComponents<AbilityDeliverProjectile>()
                     .RemoveComponents<AbilityEffectRunAction>();
             effect = spell.Clone(spell.name + "_Effect", guid2: guid_effect)
-                    .RemoveComponents<AbilityDeliverProjectile>();
+                    .RemoveComponents<AbilityDeliverProjectile>()
+                    .RemoveComponents<SpellListComponent>()
+                    .RemoveComponents<CraftInfoComponent>();
 
             cast.AddComponents(CreateAbilityEffectStickyTouch(effect.ToRef()));
             cast.Range = AbilityRange.Touch;
@@ -3497,13 +3508,12 @@ namespace CodexLib
             result.m_Length = length;
             result.m_LineWidth = width;
             result.m_Weapon = weapon;
-            result.Type = AbilityProjectileType.Line;
             result.NeedAttackRoll = weapon != null;
             return result;
         }
 
         [Obsolete]
-        public static AbilityDeliverProjectile CreateAbilityDeliverProjectile(BlueprintProjectileReference projectile, AbilityProjectileType type = AbilityProjectileType.Simple, BlueprintItemWeaponReference weapon = null, Feet length = default, Feet width = default)
+        private static AbilityDeliverProjectile CreateAbilityDeliverProjectile(BlueprintProjectileReference projectile, AbilityProjectileType type = AbilityProjectileType.Simple, BlueprintItemWeaponReference weapon = null, Feet length = default, Feet width = default)
         {
             var result = new AbilityDeliverProjectile();
             result.m_Projectiles = projectile.ObjToArray();
@@ -3592,7 +3602,7 @@ namespace CodexLib
         }
 
         [Obsolete]
-        public static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(GameAction[] actions, Condition[] conditions = null, Operation operation = Operation.And)
+        private static AbilityExecuteActionOnCast CreateAbilityExecuteActionOnCast(GameAction[] actions, Condition[] conditions = null, Operation operation = Operation.And)
         {
             var result = new AbilityExecuteActionOnCast();
             result.Actions = CreateActionList(actions);
@@ -4228,7 +4238,7 @@ namespace CodexLib
         }
 
         [Obsolete]
-        public static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
+        private static BlueprintActivatableAbility CreateBlueprintActivatableAbility(string name, string displayName, string description, out BlueprintBuff buff, Sprite icon = null, CommandType commandType = CommandType.Free, AbilityActivationType activationType = AbilityActivationType.Immediately, ActivatableAbilityGroup group = ActivatableAbilityGroup.None, bool deactivateImmediately = true, bool onByDefault = false, bool onlyInCombat = false, bool deactivateEndOfCombat = false, bool deactivateAfterRound = false, bool deactivateWhenStunned = false, bool deactivateWhenDead = false, bool deactivateOnRest = false, bool useWithSpell = false, int groupWeight = 1)
         {
             return CreateBlueprintActivatableAbility(name, out buff, displayName, description, icon, commandType, activationType, group, deactivateImmediately, onByDefault, onlyInCombat, deactivateEndOfCombat, deactivateAfterRound, deactivateWhenStunned, deactivateWhenDead, deactivateOnRest, useWithSpell, groupWeight);
         }

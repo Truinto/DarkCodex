@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<Version>1.5.26</Version>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -11,7 +12,6 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<DebugType>embedded</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
@@ -21,7 +21,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 		<PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-		<PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.2.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Common References -->
@@ -96,12 +96,13 @@
 	<!-- Update build version -->
 	<Target Name="Versioning" BeforeTargets="BeforeBuild">
 		<ItemGroup>
-			<VersioningInput Include="changelog.md" />
-			<VersioningOutput Include="Properties\AssemblyInfo.cs" />
-			<VersioningOutput Include="info.json" />
-			<VersioningOutput Include="Settings\Repository.json" />
+			<!--<_VersioningIn Include="$(MSBuildThisFileFullPath)" />-->
+			<_VersioningIn Include="changelog.md" />
+			<_VersioningOut Include="$(MSBuildThisFileFullPath)" />
+			<_VersioningOut Include="info.json" />
+			<_VersioningOut Include="Settings\Repository.json" Max="2" />
 		</ItemGroup>
-		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningOutput)" RegexInput="\[(?'version'[\d\.]{5,})\]" RegexOutput="(?&lt;!Manager)((?:Version|v).*?)(?'version'[\d\.\*]{5,})" MaxMatch="3" TouchFiles="false" />
+		<VersioningTask InputFiles="@(_VersioningIn)" UpdateFiles="@(_VersioningOut)" MaxMatch="1" TouchFiles="false" />
 	</Target>
 
 	<!-- Copy to mod folder -->
@@ -109,14 +110,28 @@
 		<ItemGroup>
 			<_CopyItems Include="$(TargetDir)\*" />
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
-			
-			<_ModFiles Include="$(ModFolder)\$(TargetName)\blueprints*.txt" />
-			<_ModFiles Include="$(ModFolder)\$(TargetName)\enGB.json" />
-		</ItemGroup>
 
+			<_Zip Include="$(ModFolder)\builds\testdata.json" />
+			<_Zip Include="$(ModFolder)\icons\*.png" />
+			<_Zip Include="$(ModFolder)\info.json" />
+			<_Zip Include="$(ModFolder)\blueprints.txt" />
+			<_Zip Include="$(ModFolder)\blueprints_dynamic.txt" />
+			<_Zip Include="$(ModFolder)\changelog.md" />
+			<_Zip Include="$(ModFolder)\CodexLib.dll" />
+			<_Zip Include="$(ModFolder)\DarkCodex.dll" />
+			<_Zip Include="$(ModFolder)\enGB.json" />
+			<_Zip Include="$(ModFolder)\enchantenGB.json" />
+			<_Zip Include="$(ModFolder)\zhCN.json" />
+			<_Zip Include="$(ModFolder)\enchantzhCN.json" />
+			
+			<_Download Include="$(ModFolder)\zhCN.json" Url="DarkCodex汉化/zhCN.json" />
+			<_Download Include="$(ModFolder)\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
+		</ItemGroup>
+		
+		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" />
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
-		<Copy Condition="'$(Configuration)'=='Release'" SourceFiles="@(_ModFiles)" DestinationFolder="$(SolutionDir)\DarkCodex\Settings\" />
-		<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />
+		<!--<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />-->
+		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\DarkCodex.zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>
 

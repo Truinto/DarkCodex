@@ -30,7 +30,7 @@ namespace CodexLib
         public override bool IsBad() => this.Blueprint == null;
         public override bool IsDisabled(int resourceCount) => false;
         public override bool CanUseIfTurnBasedInternal() => true;
-        public override object GetContentData() => null;
+        public override object GetContentData() => this.Blueprint;
         public override Color GetDecorationColor() => Color.white;
         public override Sprite GetDecorationSprite() => null;
         public override string GetTitle() => Blueprint.Name;

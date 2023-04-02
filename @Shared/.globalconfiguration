@@ -20,6 +20,9 @@ dotnet_diagnostic.IDE0060.severity = suggestion
 # IDE0062: Lokale Funktion als "static" festlegen
 dotnet_diagnostic.IDE0062.severity = none
 
+# CA1069: Enumerationswerte dürfen nicht dupliziert werden
+dotnet_diagnostic.CA1069.severity = none
+
 # CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 dotnet_diagnostic.CS1591.severity = suggestion
 

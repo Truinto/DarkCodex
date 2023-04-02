@@ -99,9 +99,8 @@ namespace Shared
                 StyleLine.normal.background = new Texture2D(1, 1);
             }
 
-            GUILayout.Label("Disclaimer: Remember that playing with mods often makes them mandatory for your save game!");
-            GUILayout.Label("Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above."
-                + "\n[*] Option is enabled/disabled immediately, without restart.");
+            GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuDisclaimer]);
+            GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuLegend]);
 
             if (Patch_AllowAchievements.Patched)
                 Checkbox(ref state.allowAchievements, "[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files");
@@ -149,8 +148,6 @@ namespace Shared
                 restart = true;
                 patchInfos.Update();
             });
-
-            //patchInfos.Update(); // TODO: check if update can be skipped here; check if settings are applied correctly; put favorite settings on top
 
             string category = null;
             bool folded = false;
@@ -205,7 +202,7 @@ namespace Shared
                     GUILayout.Label(Resource.Cache.IconBookBlack, GUILayout.ExpandWidth(false));
                 GUILayout.Space(5);
 #endif
-                GUILayout.Label(info.DisplayName.Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
+                GUILayout.Label(info.DisplayName.ToString().Grey(info.IsHidden).Red(info.IsDangerous), GUILayout.Width(300));
                 GUILayout.Label(info.Description, GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
             }
@@ -237,7 +234,7 @@ namespace Shared
 
                 foreach (var info in patchInfos)
                     if (!info.IsEvent && !info.IsHidden)
-                        sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
+                        sw.WriteLine($"|{info.Class}.{info.Method}|{info.Description.ToString().Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
             }
             if (GUILayout.Button("Debug: Generate CodexLib bin files (will lag)", GUILayout.ExpandWidth(false)))
                 BpCache.ExportResources(Path.Combine(Helper.PathMods, "Blueprints.bin"));
@@ -416,8 +413,9 @@ namespace Shared
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnHideGUI = OnHideGUI;
 
+            LocalizedStringCached.Resolver = f => Helper.CreateString(f.Default);
             MasterPatch.Run(typeof(CodexLib.BpCache)); // this must run very early
-            Helper.Patch(typeof(Patch_SaveExtension)); // TODO: save extension
+            Helper.Patch(typeof(Patch_SaveExtension));
 
             //harmony.PatchAll(typeof(Main).Assembly);
             //harmony.Patch(HarmonyLib.AccessTools.Method(typeof(EnumUtils), nameof(EnumUtils.GetMaxValue), null, new Type[] { typeof(ActivatableAbilityGroup) }),
@@ -447,7 +445,7 @@ namespace Shared
 
             // for Debug
 #if DEBUG
-            PatchSafe(typeof(DEBUG.WatchCalculateParams));
+            //PatchSafe(typeof(DEBUG.WatchCalculateParams));
             PatchSafe(typeof(DEBUG.WatchSelectiveMetamagic));
             //PatchSafe(typeof(DEBUG.WatchWeaponEnchantment));
             //PatchSafe(typeof(DEBUG.WatchSharedValue));
@@ -459,7 +457,6 @@ namespace Shared
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixBladeWhirlwind);
-            LoadSafe(Spellcasters.CreateChannelForm);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -536,6 +533,7 @@ namespace Shared
             LoadSafe(Spellcasters.CreatePurifyingChannel);
             LoadSafe(Spellcasters.CreateBestowHope);
             LoadSafe(Spellcasters.CreateEnergyChannel);
+            LoadSafe(Spellcasters.CreateChannelForm);
 
             // MartialArt
             LoadSafe(MartialArt.CreatePaladinVirtuousBravo);
@@ -1202,7 +1200,7 @@ namespace Shared
 
                         foreach (var info in patchInfos)
                             if (!info.IsEvent && !info.IsHidden)
-                                res.Add($"|{info.Class}.{info.Method}|{info.Description.Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
+                                res.Add($"|{info.Class}.{info.Method}|{info.Description.ToString().Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
 
                         res.Add("");
 

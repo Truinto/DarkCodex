@@ -24,7 +24,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="BuildTaskVersionControl" Version="1.0.4" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.2.0" ExcludeAssets="runtime" />
 		<PackageReference Include="System.Management" Version="7.0.0" />
 	</ItemGroup>
 
@@ -35,17 +35,11 @@
 		<Compile Include="..\General\CollectionHelper.cs" Link="CollectionHelper.cs" />
 		<Compile Include="..\General\ConsoleHelper.cs" Link="ConsoleHelper.cs" />
 		<Compile Include="..\General\GeneralHelper.cs" Link="GeneralHelper.cs" />
+		<Compile Include="..\General\Logger.cs" Link="Logger.cs" />
 		<Compile Include="..\General\PathHelper.cs" Link="PathHelper.cs" />
+		<Compile Include="..\General\SerializationTool.cs" Link="SerializationTool.cs" />
 		<Compile Include="..\General\StringsHelper.cs" Link="StringsHelper.cs" />
-
-		<Compile Include="..\UnityMod\SerializationTool.cs" Link="SerializationTool.cs" />
-		<Compile Include="..\UnityMod\Logger.cs" Link="Logger.cs" />
 	</ItemGroup>
-
-	<!--<ItemGroup>
-		<Compile Update="Settings.Designer.cs" DesignTimeSharedInput="True" AutoGen="True" DependentUpon="Settings.settings" />
-		<None Update="Settings.settings" Generator="SettingsSingleFileGenerator" LastGenOutput="Settings.Designer.cs" />
-	</ItemGroup>-->
 
 	<!-- Update build version -->
 	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
@@ -63,7 +57,7 @@
 			<_CopyItems Include="$(TargetDir)$(TargetName).xml" />
 		</ItemGroup>
 
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="..\" />
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="..\" UseHardlinksIfPossible="true" />
 	</Target>
 
 </Project>

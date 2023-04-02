@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.26]
+- fixed Chill Touch not using touch weapon
+- fixed Produce Flame causing a crash because weapon model was empty (uses torch model now)
+- Channel Form, basic feat: collection of abilities to shape channel energy into new forms #181
+
 ## [1.5.25]
 - limitless activatables ignore OnlyInCombat condition #230
 - added Chill Touch spell

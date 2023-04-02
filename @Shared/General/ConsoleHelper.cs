@@ -99,6 +99,7 @@ namespace Shared
 
                 //var client = new WebClient();
                 //client.DownloadFile(url, filePath);
+                //client.UploadFile(url, null, filePath);
 
                 using var sw = new FileStream(filePath, FileMode.CreateNew);
                 using var client2 = new HttpClient();
