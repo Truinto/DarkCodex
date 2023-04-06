@@ -1,6 +1,7 @@
 # Changelog
 
 ## [1.5.27]
+- fixes for update
 - fixed Feral Combat Training with Mythic Improved Unarmed Strike
 - honor toybox gather power cheat
 - rephrased patch metadata popup

@@ -3,31 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Kingmaker.Blueprints.Items.Weapons;
 using Shared;
 
 namespace DarkCodex
 {
-    [HarmonyPatch]
+    [HarmonyPatch(typeof(TwoWeaponFightingAttackPenalty), nameof(TwoWeaponFightingAttackPenalty.OnEventAboutToTrigger), typeof(RuleCalculateAttackBonusWithoutTarget))]
     public class Patch_ProdigiousTWF
     {
-        [HarmonyPatch(typeof(TwoWeaponFightingAttackPenalty), nameof(TwoWeaponFightingAttackPenalty.OnEventAboutToTrigger), typeof(RuleCalculateAttackBonusWithoutTarget))]
+        [HarmonyPatch]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
 
-            // find last access to a local boolean variable
-            data.Last().Rewind(f => f.IsStloc(7));
-
             // set variable to true, if weapon should be considered light
+            data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsLight));
             data.InsertAfter(Patch);
 
             return data.Code;
         }
 
-        public static void Patch(TwoWeaponFightingAttackPenalty __instance, [LocalParameter(type: typeof(bool), index: 7)] ref bool flag)
+        public static bool Patch(bool __stack, TwoWeaponFightingAttackPenalty __instance)
         {
-            flag = flag || __instance.Owner.HasFlag(MechanicFeature.ProdigiousTWF);
+            return __stack || __instance.Owner.HasFlag(MechanicFeature.ProdigiousTWF);
         }
     }
 }
