@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib.Patches
 {
+    /// <summary>
+    /// Logic for FeatureForPrerequisite. Pretense unit has a feature during feature selection.
+    /// </summary>
     [HarmonyPatch(typeof(Prerequisite), nameof(Prerequisite.Check))]
     public class Patch_Prerequisite
     {

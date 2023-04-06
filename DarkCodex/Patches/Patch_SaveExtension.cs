@@ -27,11 +27,8 @@ namespace DarkCodex
         {
             try
             {
-                Main.Print($"DEBUG OnSave 1");
-
                 if (!Settings.State.saveMetadata || Main.appliedPatches == null || Main.appliedPatches.Count == 0)
                     return;
-                Main.Print($"DEBUG OnSave 2 {Main.appliedPatches.Join()}");
 
                 string json = Helper.Serialize(Main.appliedPatches, indent: false, type: false);
                 if (json == null || json == "")
@@ -81,10 +78,15 @@ namespace DarkCodex
                     saveData.Remove(patch);
 
                 // TODO: check patch even exists, check patch is critical
+                for (int i = saveData.Count - 1; i >= 0; i--)
+                {
+                    if (!Main.skippedPatches.Contains(saveData[i]))
+                        saveData.Remove(saveData[i]);
+                }
 
                 if (saveData.Count > 0)
                 {
-                    Helper.ShowMessageBox("Critical patch missing! Either turn off 'Save Metadata' or press 'Enable patches' to enable: " + saveData.Join(), yesLabel: "Enable patches", noLabel: "Ignore this time",
+                    Helper.ShowMessageBox("[DarkCodex] Patches not found since last time. Do you want to re-enable them or ignore it? (You can turn this off in the menu 'Save Metadata'.) \n" + saveData.Join(), yesLabel: "Enable patches", noLabel: "Ignore this time",
                         onYes: () =>
                         {
                             foreach (var info in saveData)

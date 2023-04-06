@@ -86,6 +86,7 @@ namespace DarkCodex
             return weaponType;
         }
 
+
         [HarmonyPatch(typeof(AbilityCasterMainWeaponCheck), nameof(AbilityCasterMainWeaponCheck.IsCasterRestrictionPassed))]
         [HarmonyPostfix]
         public static void Postfix2(UnitEntityData caster, AbilityCasterMainWeaponCheck __instance, ref bool __result) // stunning fist & co
@@ -97,33 +98,6 @@ namespace DarkCodex
         }
 
 
-        //[HarmonyPatch(typeof(MonkNoArmorAndMonkWeaponFeatureUnlock), nameof(MonkNoArmorAndMonkWeaponFeatureUnlock.CheckEligibility))]
-        //[HarmonyPrefix]
-        //public static bool Prefix3(MonkNoArmorAndMonkWeaponFeatureUnlock __instance) // flurry of blows
-        //{
-        //    if (!__instance.Owner.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-        //        return true;
-        //    if (__instance.IsZenArcher)
-        //        return true;
-        //    var body = __instance.Owner.Body;
-        //    if (__instance.IsSohei)
-        //    {
-        //        if (!body.SecondaryHand.HasShield
-        //        && (!body.Armor.HasArmor || body.Armor.Armor.Blueprint.ProficiencyGroup == ArmorProficiencyGroup.Light)
-        //        && (body.PrimaryHand.Weapon.Blueprint.IsMonk || body.PrimaryHand.Weapon.Blueprint.IsNatural) || (bool)__instance.Owner.Get<UnitPartWeaponTraining>()?.IsSuitableWeapon(body.PrimaryHand.MaybeWeapon))
-        //            __instance.AddFact();
-        //        else
-        //            __instance.RemoveFact();
-        //        return false;
-        //    }
-        //    if (!body.SecondaryHand.HasShield
-        //    && (!body.Armor.HasArmor || !body.Armor.Armor.Blueprint.IsArmor)
-        //    && (body.PrimaryHand.Weapon.Blueprint.IsMonk || body.PrimaryHand.Weapon.Blueprint.IsNatural))
-        //        __instance.AddFact();
-        //    else
-        //        __instance.RemoveFact();
-        //    return false;
-        //}
         [HarmonyPatch(typeof(MonkNoArmorAndMonkWeaponFeatureUnlock), nameof(MonkNoArmorAndMonkWeaponFeatureUnlock.CheckEligibility))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // flurry of blows
@@ -225,6 +199,17 @@ namespace DarkCodex
                 && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                 return Resource.Cache.WeaponTypeUnarmed.Get();
             return weaponType;
+        }
+
+
+        [HarmonyPatch(typeof(MythicUnarmedStrike), nameof(MythicUnarmedStrike.OnEventAboutToTrigger), typeof(RuleCalculateWeaponStats))]
+        [HarmonyPostfix]
+        public static void Postfix9(RuleCalculateWeaponStats evt, MythicUnarmedStrike __instance) // Mythic Improved Unarmed Strike
+        {
+            if (!evt.Weapon.Blueprint.IsUnarmed
+                && evt.Weapon.Blueprint.IsNatural
+                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))            
+                evt.AddDamageModifier(evt.Initiator.Progression.MythicLevel / 2, __instance.Fact);
         }
     }
 

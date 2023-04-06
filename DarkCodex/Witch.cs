@@ -89,7 +89,7 @@ namespace DarkCodex
                 ).SetUIData(act);
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP, "Split Hex", "basic feat: Split Hex, Split Major Hex", false)]
+        [PatchInfo(Severity.Create, "Split Hex", "basic feat: Split Hex, Split Major Hex", false)]
         public static void CreateSplitHex()
         {
             var major = Helper.ToRef<BlueprintFeatureReference>("8ac781b33e380c84aa578f1b006dd6c5"); //WitchMajorHex
@@ -118,12 +118,12 @@ namespace DarkCodex
 
             Helper.AddFeats(splitHex, splitMajorHex);
 
-            Main.RunLast("Split Hex", () =>
+            Main.RunLast("Rank Hexes", () =>
             {
                 foreach (var feat in BpCache.Get<BlueprintFeature>())
                 {
                     var preq = feat.GetComponents<PrerequisiteFeature>();
-                    int rank = preq.Any(a => a.m_Feature.Equals(major)) ? 1 : preq.Any(a => a.m_Feature.Equals(grand)) ? 2 : 0;
+                    int rank = preq.Any(a => a.m_Feature.Equals(grand)) ? 2 : preq.Any(a => a.m_Feature.Equals(major)) ? 1 : 0;
                     if (rank == 0)
                         continue;
 
@@ -135,7 +135,7 @@ namespace DarkCodex
 
                     foreach (var fact in addfacts.m_Facts)
                     {
-                        if (fact.Get() is BlueprintAbility ab)
+                        if (fact.Get() is BlueprintAbility ab && ab.GetComponent<FeatureRank>() == null)
                         {
                             ab.AddComponents(new FeatureRank(rank));
                             Main.PrintDebug($"adding rank {rank} to {ab.name}");

@@ -12,6 +12,6 @@ namespace CodexLib
     public interface IUpgrade<T>
     {
         /// <summary></summary>
-        public void Upgrade(T t);
+        public void Upgrade(T upgradeFrom);
     }
 }

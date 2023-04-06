@@ -25,37 +25,22 @@ namespace DarkCodex
             // touch spells
             Helper.MakeStickySpell(Helper.Get<BlueprintAbility>("3105d6e9febdc3f41a08d2b7dda1fe74"), out var baleful, out _);
 
-            // touch hexes
-            var hexes_harmful = BpCache.Get<BlueprintAbility>().Where(w => w.EffectOnEnemy == AbilityEffectOnUnit.Harmful && (w.name.StartsWith("WitchHex") || w.name.StartsWith("ShamanHex"))).ToArray();
-            var accursed_strike_variants = new List<BlueprintAbility>();
-            foreach (var hex in hexes_harmful)
-            {
-                Helper.MakeStickySpell(hex, out var hex_accursed, out var hex_effect);
-
-                hex_effect.ActionType = CommandType.Standard;
-                hex_accursed.ActionType = CommandType.Standard;
-                hex_accursed.AddComponents(Helper.CreateAbilityShowIfCasterHasFact(hex.Parent ? hex.Parent.ToRef2() : hex.ToRef2()));
-
-                accursed_strike_variants.Add(hex_accursed);
-            }
-
             var accursed_strike_ab = Helper.CreateBlueprintAbility(
                 "AccursedStrikeAbility",
                 "Accursed Strike",
                 "Any prepared spell or hex with the curse descriptor can be delivered using the spellstrike ability, even if the spells are not touch attack spells.",
-                icon: accursed_strike_variants[0].m_Icon,
+                icon: Helper.StealIcon("d25c72a92dd8d38449a6a371ef36413e"),
                 type: AbilityType.Supernatural,
                 actionType: CommandType.Standard,
                 range: AbilityRange.Touch
-                ).TargetEnemy(
-                ).AddToAbilityVariants(accursed_strike_variants.ToArray());
+                ).TargetEnemy();
 
             // feature
             var feat = Helper.CreateBlueprintFeature(
                 "AccursedStrikeFeature",
                 "Accursed Strike",
                 "Any prepared spell or hex with the curse descriptor can be delivered using the spellstrike ability, even if the spells are not touch attack spells.",
-                accursed_strike_variants[0].m_Icon,
+                accursed_strike_ab.m_Icon,
                 FeatureGroup.WitchHex
                 ).SetComponents(
                 Helper.CreatePrerequisiteArchetypeLevel(hexcrafter, 1, characterClass: Helper.ToRef<BlueprintCharacterClassReference>("45a4607686d96a1498891b3286121780")),
@@ -63,10 +48,27 @@ namespace DarkCodex
                 Helper.CreateAddKnownSpell(baleful.ToRef(), 5, archetype: hexcrafter)
                 );
 
-            Resource.Cache.AccursedStrike.AddRange(accursed_strike_variants);
-#if DEBUG
-            Helper.AddHex(feat, false); // TODO: bugfix accursed strike
-#endif
+            Helper.AddHex(feat, false);
+
+            Main.RunLast("Accursed Strike", () =>
+            {
+                // touch hexes
+                var hexes_harmful = BpCache.Get<BlueprintAbility>().Where(w => !w.HasVariants && w.EffectOnEnemy == AbilityEffectOnUnit.Harmful && (w.name.StartsWith("WitchHex") || w.name.StartsWith("ShamanHex"))).ToArray();
+                var accursed_strike_variants = new List<BlueprintAbility>();
+                foreach (var hex in hexes_harmful)
+                {
+                    //Helper.MakeStickySpell(hex, out var hex_accursed, out var hex_effect);
+                    //hex_effect.ActionType = CommandType.Standard;
+                    hex.MakeStickySpell(out var hex_accursed, addTouchAttack: false);
+
+                    hex_accursed.ActionType = CommandType.Standard;
+                    hex_accursed.AddComponents(Helper.CreateAbilityShowIfCasterHasFact(hex.Parent ? hex.Parent.ToRef2() : hex.ToRef2()));
+
+                    accursed_strike_variants.Add(hex_accursed);
+                }
+                accursed_strike_ab.AddToAbilityVariants(accursed_strike_variants);
+                Resource.Cache.AccursedStrike.AddRange(accursed_strike_variants);
+            });
         }
 
         [PatchInfo(Severity.Fix, "Fix Hexcrafter", "allows hex selection with any arcana, add missing spell recall at level 11", false)]

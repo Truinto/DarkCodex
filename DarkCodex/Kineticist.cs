@@ -1281,7 +1281,7 @@ namespace DarkCodex
                 );
 
             // add to monk ac progression
-            var ac = Helper.Get<BlueprintBuff>("f132c4c4279e4646a05de26635941bfe").GetComponents<ContextRankConfig>().First(f => f.m_BaseValueType == ContextRankBaseValueType.SummClassLevelWithArchetype);
+            var ac = Helper.Get<BlueprintBuff>("d7ff7a9f1fe84e679f98b36e4bacd63c").GetComponents<ContextRankConfig>().First(f => f.m_BaseValueType == ContextRankBaseValueType.SummClassLevelWithArchetype);
             ac.m_AdditionalArchetypes = Helper.Append(ac.m_AdditionalArchetypes, Tree.ElementalAscetic);
 
             Main.RunLast("Elemental Flurry", () =>

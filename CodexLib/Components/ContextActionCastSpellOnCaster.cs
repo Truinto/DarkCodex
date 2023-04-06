@@ -17,18 +17,10 @@ namespace CodexLib
 {
     public class ContextActionCastSpellOnCaster : ContextAction
 	{
-		public BlueprintAbility Spell
-		{
-			get
-			{
-				BlueprintAbilityReference spell = this.m_Spell;
-				if (spell == null)
-				{
-					return null;
-				}
-				return spell.Get();
-			}
-		}
+		public bool SkipCheck;
+		public BlueprintAbilityReference m_Spell;
+
+		public BlueprintAbility Spell => this.m_Spell?.Get();
 
 		public override string GetCaption()
 		{
@@ -54,10 +46,5 @@ namespace CodexLib
 			Rulebook.Trigger(new RuleCastSpell(abilityData, caster));
 			//Helper.PrintDebug("ContextActionCastSpellOnCaster casted spell");
 		}
-
-		public bool SkipCheck;
-
-		[SerializeField]
-		public BlueprintAbilityReference m_Spell;
 	}
 }

@@ -462,7 +462,13 @@
             Adds another feature when gaining a feature. Can be a BlueprintFeatureSelection, in which case a new tab is generated.
             </summary>
         </member>
+        <member name="T:CodexLib.AddTemporaryWeapon">
+            <summary>
+            Based on <see cref="T:Kingmaker.UnitLogic.Class.Kineticist.AddKineticistBlade" />. Doesn't impose restrictions on attacks of opportunity. Force equips weapons with proficiency. Add parameters to <see cref="T:Kingmaker.Craft.CraftedItemPart" />.
+            </summary>
+        </member>
         <member name="M:CodexLib.AddTemporaryWeapon.#ctor(CodexLib.AnyRef)">
+            <inheritdoc cref="T:CodexLib.AddTemporaryWeapon" />
             <param name="weapon">type: <b>BlueprintItemWeapon</b></param>
         </member>
         <member name="T:CodexLib.AddUndeadCompanion">
@@ -644,6 +650,9 @@
         </member>
         <member name="M:CodexLib.RemoveFeatureOnApplyToPet.#ctor(CodexLib.AnyRef)">
             <param name="feature">type: <b>BlueprintUnitFact</b></param>
+        </member>
+        <member name="F:CodexLib.RestrictionCanGatherPowerAbility.Cheat">
+            <summary>If true, restriction is always passed.</summary>
         </member>
         <member name="T:CodexLib.SpellPerfection">
             <summary>
@@ -957,7 +966,7 @@
             Use MakeContextActionSavingThrow instead, if you want to inline ContextActionConditionalSaved.
             </summary>
         </member>
-        <member name="M:CodexLib.Helper.MakeStickySpell(Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility,Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility@,Kingmaker.UnitLogic.Mechanics.ContextValue)">
+        <member name="M:CodexLib.Helper.MakeStickySpell(Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility,Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility@,Kingmaker.UnitLogic.Mechanics.ContextValue,System.Boolean)">
             <summary>
             Duplicate a blueprint. Creating a corresponding 'cast' variant with the StickyTouch component.<br />
             Use this if you want to create a new touch spell. You need to define the 'effect' variant yourself.<br />
@@ -1280,6 +1289,11 @@
         <member name="T:CodexLib.Patches.Patch_GetTargetProjectileFix">
             <summary>
             Fixes AbilityDeliverTeleportTrample not returning worldPosition.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_Prerequisite">
+            <summary>
+            Logic for FeatureForPrerequisite. Pretense unit has a feature during feature selection.
             </summary>
         </member>
         <member name="T:CodexLib.Patches.Patch_RulebookEventBusPriority">

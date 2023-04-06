@@ -37,5 +37,13 @@ namespace CodexLib.Patches
                     __result = part.Count;
             }
         }
+
+        [HarmonyPatch(typeof(MagusController), nameof(MagusController.OnEventDidTrigger), typeof(RuleAttackWithWeapon))]
+        [HarmonyPrefix]
+        public static bool Prefix3()
+        {
+            // this same code is already called by TouchSpellsController
+            return false;
+        }
     }
 }

@@ -11,10 +11,14 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Based on <see cref="AddKineticistBlade"/>. Doesn't impose restrictions on attacks of opportunity. Force equips weapons with proficiency. Add parameters to <see cref="CraftedItemPart"/>.
+    /// </summary>
     public class AddTemporaryWeapon : UnitBuffComponentDelegate<AddKineticistBladeData>, IAreaActivationHandler
     {
         public BlueprintItemWeaponReference Weapon;
 
+        /// <inheritdoc cref="AddTemporaryWeapon"/>
         /// <param name="weapon">type: <b>BlueprintItemWeapon</b></param>
         public AddTemporaryWeapon(AnyRef weapon)
         {

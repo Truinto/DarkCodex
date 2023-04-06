@@ -18,6 +18,9 @@ namespace CodexLib
     [AllowedOn(typeof(BlueprintAbility), false)]
     public class RestrictionCanGatherPowerAbility : BlueprintComponent, IAbilityCasterRestriction
     {
+        /// <summary>If true, restriction is always passed.</summary>
+        public static bool Cheat;
+
         public string GetAbilityCasterRestrictionUIText()
         {
             return LocalizedTexts.Instance.Reasons.SpecificWeaponRequired.ToString(() =>
@@ -28,6 +31,9 @@ namespace CodexLib
 
         public bool IsCasterRestrictionPassed(UnitEntityData caster)
         {
+            if (Cheat)
+                return true;
+
             UnitPartKineticist unitPartKineticist = caster.Get<UnitPartKineticist>();
             if (!unitPartKineticist)            
                 return false;

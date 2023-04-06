@@ -129,7 +129,7 @@
   "4722adba69eae809197e9beccf544b17bc340c17": "Channel Cone",
   "59f5704a95edc8c460e10f6f89a5eb2eb46de043": "Alter your channel energy area into a 30 feet cone.",
   "3af3b5e538c09c9690c0aff718ef78ed3ab9b916": "Channel Form",
-  "67d996f3ffbe37cc93f36cb9869c8e13c1f33b73": "As a free action you may alter your channel energy area to one of the following options:\n- 10-foot burst centered anywhere within 30 feet\n- 60-foot line\n- 30-foot cone",
+  "c8d95c3fa20a26db66a3305f2a8d57c2706c9bff": "As a free action you may alter your channel energy area to one of the following options:\n- single target ray\n- 10-foot burst centered anywhere within 30 feet\n- 60-foot line\n- 30-foot cone",
   "910e52926b6f8e6e87e6245a13eabe3ca2a7d145": "Virtuous Bravo",
   "92d50f05f730e18249a938811c894d2315577ad3": "Although no less a beacon of hope and justice than other paladins, virtuous bravos rely on their wit and grace rather than might and strong armor.",
   "77285009d1096702c17b59638be90a2eeef9845a": "Virtuous Bravo Proficiencies",
@@ -533,5 +533,7 @@
   "1a4a649477fb65c37cd963197e9010462c0dd850": "allows respec to be finished at any point",
   "7498ad86b3c0c03eb43aae99232728a8319f51fb": "Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost.\nPatched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.",
   "56b77515d2add149adf5b178eb32576d2425b598": "let's you pick class levels after level 20 with any class; this won't add new features except basic feats and won't allow character levels beyond 20 (which can be done with champion mythic path or Toybox)",
-  "3e7840eb134e01055edcfaa8dd43b7a052e08a3c": "allows zippy to work on spell-like abilities"
+  "3e7840eb134e01055edcfaa8dd43b7a052e08a3c": "allows zippy to work on spell-like abilities",
+  "6730e22becce0d054375f1cfbb9236fbad0403d3": "Disclaimer: Remember that playing with mods often makes them mandatory for your save game!",
+  "cf29ed797e97568dd5c26f6da1654e2d569af20a": "Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above.\n[*] Option is enabled/disabled immediately, without restart."
 }

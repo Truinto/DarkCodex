@@ -53,8 +53,8 @@ namespace CodexLib
                 return;
             }
 
-            caster.Brain.AutoUseAbility = part.Ability.Data;
-            var unitCommand = (part.AutoCastCommand = UnitUseAbility.CreateCastCommand(part.Ability.Data, target));
+            //caster.Brain.AutoUseAbility = part.Ability.Data;
+            var unitCommand = part.AutoCastCommand = UnitUseAbility.CreateCastCommand(part.Ability.Data, target);
             unitCommand.IgnoreCooldown(part.IgnoreCooldownBeforeTime);
             caster.Commands.AddToQueueFirst(unitCommand);
         }

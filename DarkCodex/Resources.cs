@@ -487,10 +487,10 @@ namespace DarkCodex
             public const string Weapon_Shock = "1d1465ffa2699644ba8dfac48cb33195";
         }
 
-        private static string[] array;
+        private static string[] _localizedStrings;
         public static string[] LocalizedStrings
         {
-            get => array ??= new[]
+            get => _localizedStrings ??= new[]
             {
                 //None
                 "", 

@@ -77,7 +77,7 @@ Content
 |Kineticist.PatchGatherPower|Kineticist Gather Power can be used manually|:book:|:heavy_check_mark:|
 |Kineticist.PatchVarious|bowling works with sandstorm blast, apply PsychokineticistStat setting, fixed Negative Energy Mastery|:house:|:heavy_check_mark:|
 |Kineticist.FixBlastsAreSpellLike|makes blasts register as spell like, instead of supernatural|:book:|:heavy_check_mark:|
-|Kineticist.FixBloodKineticist|seeks to fix bugs in Blood Kineticist|:book:|:construction:|
+|Kineticist.FixBloodKineticist|seeks to fix bugs in Blood Kineticist|:book:|:heavy_check_mark:|
 |Kineticist.FixWallInfusion|fix Wall Infusion not dealing damage while standing inside|:book:|:heavy_check_mark:|
 |Magus.CreateAccursedStrike|hexcrafter arcana: Accursed Strike|:book:|:x:|
 |Magus.FixHexcrafterProgression|allows hex selection with any arcana, add missing spell recall at level 11|:book:|:heavy_check_mark:|
@@ -136,7 +136,7 @@ Content
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
-|Spells.CreateChillTouch|spell: Chill Touch|:book:|:heavy_check_mark:|
+|Spells.CreateChillTouch|spell: Chill Touch|:book:|:x:|
 |Spells.CreateDivineTrident|spell: Divine Trident|:book:|:heavy_check_mark:|
 |Spells.CreateFlameBlade|spell: Flame Blade, feat: Flame Blade Dervish Combat|:book:|:heavy_check_mark:|
 |Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
@@ -148,7 +148,7 @@ Content
 |Witch.CreateCackleActivatable|Cackle/Chant can be toggled to use move action passively|:house:|:heavy_check_mark:|
 |Witch.CreateExtraHex|basic feat: Extra Hex|:book:|:heavy_check_mark:|
 |Witch.CreateIceTomb|Hex: Ice Tomb|:book:|:heavy_check_mark:|
-|Witch.CreateSplitHex|basic feat: Split Hex, Split Major Hex|:book:|:construction:|
+|Witch.CreateSplitHex|basic feat: Split Hex, Split Major Hex|:book:|:heavy_check_mark:|
 |Witch.FixBoundlessHealing|boundless healing applies to healing hex|:book:|:heavy_check_mark:|
 |Witch.FixFortuneHex|Fortune hex will only trigger once per type of roll and per round|:book:|:heavy_check_mark:|
 |Patch.Patch_AbilityRange|bonus spell range equal to 5 feet per 2 caster levels|:house:|:heavy_check_mark:|

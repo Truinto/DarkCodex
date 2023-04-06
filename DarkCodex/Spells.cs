@@ -394,7 +394,7 @@ namespace DarkCodex
             {
                 m_Projectiles = new BlueprintProjectileReference[] { (AnyRef)Resource.Projectile.ScorchingRay00 },
                 m_WeaponAnimationStyle = WeaponAnimationStyle.ThrownStraight,
-                m_WeaponModel = Helper.GetPrefabLink("8dcb2efc5b9c4da44af5e2e7d59b4433")
+                m_WeaponModel = Helper.GetPrefabLink("8dcb2efc5b9c4da44af5e2e7d59b4433") // todo: Produce Flame, look for better fx
             };
 
             buff.Flags(
@@ -438,8 +438,8 @@ namespace DarkCodex
             ab.Add(2, "d8f30625d1b1f9d41a24446cbf7ac52e"); //FireDomainSpellList
         }
 
-        [PatchInfo(Severity.Create, "Chill Touch", "spell: Chill Touch", false)]
-        public static void CreateChillTouch() // TODO: fix magus spellstrike with chill touch 
+        [PatchInfo(Severity.Create | Severity.Faulty, "Chill Touch", "spell: Chill Touch", false)]
+        public static void CreateChillTouch()
         {
             /*
             Chill Touch
@@ -452,6 +452,24 @@ namespace DarkCodex
             A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.
             An undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.
             */
+
+            // TODO: fix magus spellstrike with chill touch 
+            // - touch attack is stopped midway, then cast again
+            // - 'persist' touch can be overwritten with different spell, causing weird attack patterns
+            /* 
+             * UnitUseAbility.CreateCastCommand -> could be used to convert base ability cast into stickytouch cast
+             * Patch_FixSpellStrike
+             * Patch_FixEldritchArcherSpellstrike
+             * Patch_TouchPersist
+             * UnitPartTouchPersist
+             * 
+             * TouchSpellsController! look for IsHit!
+             * MagusController! look for IsHit!
+             * AbilityEffectStickyTouch
+             * TurnController
+             * UnitCommand.IsSpellstrikeAttack
+             * UnitPartTouch.IsCastedInThisRound
+             */
 
             var effect = Helper.CreateBlueprintAbility(
                 "ChillTouch_Effect",
@@ -550,6 +568,7 @@ namespace DarkCodex
                 duration: Resource.Strings.Permanent
                 ).TargetAny(
                 ).SetComponents(
+                Helper.CreateContextSetAbilityParams(casterLevel: 20),
                 Helper.CreateAbilityEffectRunAction(0, 
                     Helper.CreateContextActionApplyBuff("09d39b38bb7c6014394b6daced9bacd3"))
                 );

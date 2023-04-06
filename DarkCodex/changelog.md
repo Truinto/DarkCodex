@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.27]
+- fixed Feral Combat Training with Mythic Improved Unarmed Strike
+- honor toybox gather power cheat
+- rephrased patch metadata popup
+
 ## [1.5.26]
 - fixed Chill Touch not using touch weapon
 - fixed Produce Flame causing a crash because weapon model was empty (uses torch model now)

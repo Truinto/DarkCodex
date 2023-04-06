@@ -64,6 +64,7 @@ namespace Shared
         public static string ModPath;
         internal static PatchInfoCollection patchInfos;
         internal static readonly List<string> appliedPatches = new();
+        internal static readonly List<string> skippedPatches = new();
         private static UnityModManager.ModEntry.ModLogger logger;
         public static bool applyNullFinalizer;
 
@@ -99,6 +100,8 @@ namespace Shared
                 StyleLine.normal.background = new Texture2D(1, 1);
             }
 
+            //GUILayout.Label($"toggleKineticistGatherPower {Resource.TestField()}");
+
             GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuDisclaimer]);
             GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuLegend]);
 
@@ -107,7 +110,7 @@ namespace Shared
             else
                 GUILayout.Label("Allow achievements - managed by other mod");
 
-            Checkbox(ref Settings.State.saveMetadata, "Save Metadata (warns when loading incompatible saves) WIP");
+            Checkbox(ref Settings.State.saveMetadata, "Save Metadata (warns when loading incompatible saves)");
 
             Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
             Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
@@ -406,7 +409,7 @@ namespace Shared
 
         #region Load
 
-        static partial void OnLoad(UnityModManager.ModEntry modEntry)
+        private static void OnLoad(UnityModManager.ModEntry modEntry)
         {
             modEntry.OnToggle = OnToggle;
             modEntry.OnGUI = OnGUI;
@@ -422,7 +425,7 @@ namespace Shared
             //    postfix: new HarmonyMethod(typeof(Patch_ActivatableAbilityGroup).GetMethod("Postfix")));
         }
 
-        static partial void OnMainMenu()
+        private static void OnMainMenu()
         {
             if (Settings.State.showBootupWarning)
             {
@@ -432,7 +435,34 @@ namespace Shared
             }
         }
 
-        static partial void OnBlueprintsLoaded()
+        private static object instanceSettings;
+        private static FieldInfo toggleKineticistGatherPower;
+        private static void OnToggleModMenu(bool open)
+        {
+            if (!open)
+            {
+                try
+                {
+                    if (instanceSettings == null)
+                    {
+                        instanceSettings = false;
+                        var type = Type.GetType("ToyBox.Main, ToyBox");
+                        if (type != null)
+                        {
+                            instanceSettings = type.GetField("settings", Helper.BindingAll).GetValue(null);
+                            var typeSettings = instanceSettings.GetType();
+                            toggleKineticistGatherPower = typeSettings.GetField("toggleKineticistGatherPower", Helper.BindingAll);
+                        }
+                    }
+
+                    if (toggleKineticistGatherPower != null)
+                        RestrictionCanGatherPowerAbility.Cheat = (bool)toggleKineticistGatherPower.GetValue(instanceSettings);
+                }
+                catch (Exception e) { PrintDebug(e.ToString()); }
+            }
+        }
+
+        private static void OnBlueprintsLoaded()
         {
 #if DEBUG
             using var scope = new Scope(modPath: Main.ModPath, logger: Main.logger, harmony: Main.harmony, allowGuidGeneration: true);
@@ -457,6 +487,7 @@ namespace Shared
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixBladeWhirlwind);
+            PatchSafe(typeof(Patch_FixSpellStrike));
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -648,7 +679,7 @@ namespace Shared
             SubscribeSafe(typeof(Event_AreaEffects));
         }
 
-        static partial void OnBlueprintsLoadedLast()
+        private static void OnBlueprintsLoadedLast()
         {
 #if DEBUG
             using var scope = new Scope(Main.ModPath, Main.logger, harmony, true);
@@ -668,20 +699,12 @@ namespace Shared
 #if DEBUG
             PrintDebug("Running in debug.");
             ExportContent();
+            _ = Resource.LocalizedStrings;
             Helper.ExportStrings();
             Helper.ExportStrings("enchant");
             KineticistTree.Instance.Validate();
 #endif
         }
-
-        #endregion
-
-        #region Partial Methods
-
-        static partial void OnLoad(UnityModManager.ModEntry modEntry);
-        static partial void OnBlueprintsLoaded();
-        static partial void OnBlueprintsLoadedLast();
-        static partial void OnMainMenu();
 
         #endregion
 
@@ -855,8 +878,17 @@ namespace Shared
                 try
                 {
                     OnMainMenu();
+                    OnToggleModMenu(false);
                 }
                 catch (Exception ex) { logger?.LogException(ex); }
+            }
+
+            [HarmonyPatch(typeof(UnityModManager.UI), nameof(UnityModManager.UI.ToggleWindow), typeof(bool))]
+            [HarmonyPostfix]
+            private static void Postfix5(bool open, bool ___mOpened)
+            {
+                if (open != ___mOpened)
+                    OnToggleModMenu(open);
             }
         }
 
@@ -1138,6 +1170,8 @@ namespace Shared
 
             if (!skip && !appliedPatches.Contains(name))
                 appliedPatches.Add(name);
+            if (skip && !skippedPatches.Contains(name))
+                skippedPatches.Add(name);
 
             return skip;
         }
@@ -1181,8 +1215,7 @@ namespace Shared
                 string path = Path.Combine(Main.ModPath, "readme.link");
                 if (!File.Exists(path))
                     return;
-                path = File.ReadAllText(Path.Combine(Main.ModPath, "readme.link"));
-                path = path.Trim();
+                path = File.ReadAllText(path).Trim();
                 if (!File.Exists(path))
                     return;
 

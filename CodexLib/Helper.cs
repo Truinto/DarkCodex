@@ -1012,7 +1012,7 @@ namespace CodexLib
                         return data;
                     }
                 }
-                catch (Exception e) { Print($"Could not read lanaguage file for {LocalizationManager.CurrentPack.Locale}: {e.Message}"); }
+                catch (Exception e) { Print($"Could not read lanaguage file for {suffix}{LocalizationManager.CurrentPack.Locale}: {e.Message}"); }
                 return new();
             }
         }
@@ -1248,7 +1248,7 @@ namespace CodexLib
         {
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
             {
-                if (original == null && obj.Components[i] is TOrig || ReferenceEquals(original, obj.Components[i]))
+                if ((original == null && obj.Components[i] is TOrig) || ReferenceEquals(original, obj.Components[i]))
                 {
                     if (original != null)
                         original.OwnerBlueprint = null;
@@ -2262,7 +2262,7 @@ namespace CodexLib
         /// Cast needs: AbilityEffectStickyTouch, SpellListComponent, CraftInfoComponent<br/>
         /// Effect needs: AbilityDeliverTouch, AbilityEffectRunAction
         /// </summary>
-        public static BlueprintAbility MakeStickySpell(this BlueprintAbility effect, out BlueprintAbility cast, ContextValue count = null)
+        public static BlueprintAbility MakeStickySpell(this BlueprintAbility effect, out BlueprintAbility cast, ContextValue count = null, bool addTouchAttack = true)
         {
             const string guid_cast = "5fc3a01f26584d84b9c2bef04ec6cd8b";
 
@@ -2280,7 +2280,7 @@ namespace CodexLib
             cast.Range = AbilityRange.Touch;
             cast.Animation = CastAnimationStyle.Self;
 
-            if (effect.GetComponent<AbilityDeliverTouch>() == null)
+            if (addTouchAttack && effect.GetComponent<AbilityDeliverTouch>() == null)
                 effect.AddComponents(CreateAbilityDeliverTouch());
 
             return effect;
