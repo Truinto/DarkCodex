@@ -803,6 +803,17 @@
             Overwrite existing LocalizedString with new value.
             </summary>
         </member>
+        <member name="T:CodexLib.Helper.VoidDelegate">
+            <summary>Empty delegate handler.</summary>
+        </member>
+        <member name="E:CodexLib.Helper.OnLocaleChange">
+            <summary />
+        </member>
+        <member name="M:CodexLib.Helper.ClearStringMaps">
+            <summary>
+            Clears all string maps. Call this after locale was changed.
+            </summary>
+        </member>
         <member name="M:CodexLib.Helper.ExportStrings(System.String)">
             <summary>
             Print all generated LocalizedString with a specific suffix to '{suffix}enGB.json' in the current mod directory.

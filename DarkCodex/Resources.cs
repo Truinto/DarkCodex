@@ -487,18 +487,59 @@ namespace DarkCodex
             public const string Weapon_Shock = "1d1465ffa2699644ba8dfac48cb33195";
         }
 
-        private static string[] _localizedStrings;
+        internal static string[] _localizedStrings;
         public static string[] LocalizedStrings
         {
-            get => _localizedStrings ??= new[]
+            get
             {
-                //None
-                "", 
-                //MenuDisclaimer
-                Helper.CreateString("Disclaimer: Remember that playing with mods often makes them mandatory for your save game!"),
-                //MenuLegend
-                Helper.CreateString("Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above.\n[*] Option is enabled/disabled immediately, without restart."),
-            };
+                if (_localizedStrings != null)
+                    return _localizedStrings;
+
+                using var scope = new Scope(Main.ModPath, Main.logger, Main.harmony, Main.AllowGuidGeneration);
+                return _localizedStrings = new[]
+                {
+                    //None
+                    "", 
+                    //MenuDisclaimer
+                    Helper.CreateString("Disclaimer: Remember that playing with mods often makes them mandatory for your save game!"),
+                    //MenuLegend
+                    Helper.CreateString("Legend: [F] This adds a feat. You still need to pick feats/talents for these effects. If you already picked these features, then they stay in effect regardless of the option above.\n[*] Option is enabled/disabled immediately, without restart."),
+                    //MenuAllowAchievements
+                    Helper.CreateString("[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files"),
+                    //MenuManagedAchievements
+                    Helper.CreateString("Allow achievements - managed by other mod"),
+                    //MenuSaveMetadata
+                    Helper.CreateString("Save Metadata (warns when loading incompatible saves)"),
+                    //MenuPsychokineticist
+                    Helper.CreateString("Psychokineticist Main Stat"),
+                    //MenuLimitlessFeats
+                    Helper.CreateString("Limitless feats always set cost to 0, instead of reducing by 1"),
+                    //MenuAdvancedPatch
+                    Helper.CreateString("Advanced: Patch Control"),
+                    //MenuPatchExplanation
+                    Helper.CreateString("Options in red font may not be disabled during a playthrough. Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame. Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section.\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>"),
+                    //MenuDisableHomebrew
+                    Helper.CreateString("Disable all homebrew"),
+                    //MenuNewFeaturesDefault
+                    Helper.CreateString("New features default on"),
+                    //MenuDebug
+                    Helper.CreateString("Debug"),
+                    //MenuSave
+                    Helper.CreateString("Save settings!"),
+                    //MessagePatchChanged
+                    Helper.CreateString("Patch settings were changed recently. You must restart game now!"),
+                    //MessageIgnoreThisTime
+                    Helper.CreateString("Ignore this time"),
+                    //MessageIUnderstand
+                    Helper.CreateString("I understand"),
+                    //MessageReenablePatch
+                    Helper.CreateString("[DarkCodex] Patches not found since last time. Do you want to re-enable them or ignore it? (You can turn this off in the menu 'Save Metadata'.) \n"),
+                    //MessageEnablePatch
+                    Helper.CreateString("Enable patches"),
+                    //MessagePatchesEnabled
+                    Helper.CreateString("Patches enabled, you must restart game now!"),
+                };
+            }
         }
     }
 
@@ -507,5 +548,22 @@ namespace DarkCodex
         None,
         MenuDisclaimer,
         MenuLegend,
+        MenuAllowAchievements,
+        MenuManagedAchievements,
+        MenuSaveMetadata,
+        MenuPsychokineticist,
+        MenuLimitlessFeats,
+        MenuAdvancedPatch,
+        MenuPatchExplanation,
+        MenuDisableHomebrew,
+        MenuNewFeaturesDefault,
+        MenuDebug,
+        MenuSave,
+        MessagePatchChanged,
+        MessageIgnoreThisTime,
+        MessageIUnderstand,
+        MessageReenablePatch,
+        MessageEnablePatch,
+        MessagePatchesEnabled,
     }
 }

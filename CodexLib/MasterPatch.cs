@@ -33,6 +33,7 @@ namespace CodexLib
             typeof(Patch_FlameBlade),
             typeof(Patch_GetTargetProjectileFix),
             typeof(Patch_LevelUp),
+            typeof(Patch_LocalizationChanged),
             typeof(Patch_MaterialComponent),
             typeof(Patch_MechanicsContextRecalculate),
             typeof(Patch_Prerequisite),

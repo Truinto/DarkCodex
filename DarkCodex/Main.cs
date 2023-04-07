@@ -59,13 +59,19 @@ namespace Shared
     //#if DEBUG [EnableReloading] #endif
     public static partial class Main
     {
+#if DEBUG
+        public const bool AllowGuidGeneration = true;
+#else
+        public const bool AllowGuidGeneration = false;
+#endif
+
         public static Harmony harmony;
         public static bool Enabled;
         public static string ModPath;
         internal static PatchInfoCollection patchInfos;
         internal static readonly List<string> appliedPatches = new();
         internal static readonly List<string> skippedPatches = new();
-        private static UnityModManager.ModEntry.ModLogger logger;
+        internal static UnityModManager.ModEntry.ModLogger logger;
         public static bool applyNullFinalizer;
 
         public static bool IsInGame => Game.Instance.Player?.Party?.Any() ?? false; // RootUIContext.Instance?.IsInGame ?? false; //
@@ -91,6 +97,7 @@ namespace Shared
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
+            using var scope = new Scope(Main.ModPath, Main.logger, Main.harmony, Main.AllowGuidGeneration);
             Settings state = Settings.State;
 
             if (StyleBox == null)
@@ -106,14 +113,14 @@ namespace Shared
             GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuLegend]);
 
             if (Patch_AllowAchievements.Patched)
-                Checkbox(ref state.allowAchievements, "[*] Allow achievements - enables achievements while mods are active and also set corresponding flag to future save files");
+                Checkbox(ref state.allowAchievements, Resource.LocalizedStrings[(int)Localized.MenuAllowAchievements]);
             else
-                GUILayout.Label("Allow achievements - managed by other mod");
+                GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuManagedAchievements]);
 
-            Checkbox(ref Settings.State.saveMetadata, "Save Metadata (warns when loading incompatible saves)");
+            Checkbox(ref Settings.State.saveMetadata, Resource.LocalizedStrings[(int)Localized.MenuSaveMetadata]);
 
-            Checkbox(ref state.PsychokineticistStat, "Psychokineticist Main Stat");
-            Checkbox(ref state.reallyFreeCost, "Limitless feats always set cost to 0, instead of reducing by 1");
+            Checkbox(ref state.PsychokineticistStat, Resource.LocalizedStrings[(int)Localized.MenuPsychokineticist]);
+            Checkbox(ref state.reallyFreeCost, Resource.LocalizedStrings[(int)Localized.MenuLimitlessFeats]);
 
             //NumberField(nameof(Settings.magicItemBaseCost), "Cost of magic items (default: 1000)");
             //NumberFieldFast(ref _debug1, "Target Frame Rate");
@@ -138,14 +145,12 @@ namespace Shared
 #endif
 
             GUILayout.Space(10);
-            GUILayout.Label("Advanced: Patch Control");
-            GUILayout.Label("Options in red font may not be disabled during a playthrough. Options marked with <color=red><b>✖</b></color> will not be loaded. You can use this to disable certain patches you don't like or that cause you issues ingame."
-                    + " Options marked with <color=yellow><b>!</b></color> are missing patches to work properly. Check the \"Patch\" section."
-                    + "\n<color=yellow>Warning: All option require a restart. Disabling options may cause your current saves to be stuck at loading, until re-enabled.</color>");
-            if (GUILayout.Button("Disable all homebrew", GUILayout.ExpandWidth(false)))
+            GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuAdvancedPatch]);
+            GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuPatchExplanation]);
+            if (GUILayout.Button(Resource.LocalizedStrings[(int)Localized.MenuDisableHomebrew], GUILayout.ExpandWidth(false)))
                 patchInfos.Where(w => w.Homebrew).ForEach(attr => patchInfos.SetEnable(false, attr));
             GUILayout.Space(10);
-            Checkbox(state.NewFeatureDefaultOn, "New features default on", b =>
+            Checkbox(state.NewFeatureDefaultOn, Resource.LocalizedStrings[(int)Localized.MenuNewFeaturesDefault], b =>
             {
                 state.NewFeatureDefaultOn = b;
                 restart = true;
@@ -211,7 +216,7 @@ namespace Shared
             }
 
             GUILayout.Space(10);
-            GUILayout.Label("Debug");
+            GUILayout.Label(Resource.LocalizedStrings[(int)Localized.MenuDebug]);
 
             if (GUILayout.Button("Debug: Export Player Data", GUILayout.ExpandWidth(false)))
                 ExportPlayerData();
@@ -251,7 +256,7 @@ namespace Shared
 
             GUILayout.Label("");
 
-            if (GUILayout.Button("Save settings!"))
+            if (GUILayout.Button(Resource.LocalizedStrings[(int)Localized.MenuSave]))
                 OnSaveGUI(modEntry);
 
             //if (GUI.tooltip != null && GUI.tooltip != "")
@@ -416,7 +421,18 @@ namespace Shared
             modEntry.OnSaveGUI = OnSaveGUI;
             modEntry.OnHideGUI = OnHideGUI;
 
+            // localization logic
             LocalizedStringCached.Resolver = f => Helper.CreateString(f.Default);
+            Helper.OnLocaleChange += () => 
+            {
+                Resource._localizedStrings = null;
+                foreach (var patch in patchInfos)
+                {
+                    patch.DisplayName.Clear();
+                    patch.Description.Clear();
+                }
+            };
+
             MasterPatch.Run(typeof(CodexLib.BpCache)); // this must run very early
             Helper.Patch(typeof(Patch_SaveExtension));
 
@@ -464,11 +480,7 @@ namespace Shared
 
         private static void OnBlueprintsLoaded()
         {
-#if DEBUG
-            using var scope = new Scope(modPath: Main.ModPath, logger: Main.logger, harmony: Main.harmony, allowGuidGeneration: true);
-#else
-            using var scope = new Scope(Main.ModPath, Main.logger, harmony, false);
-#endif
+            using var scope = new Scope(Main.ModPath, Main.logger, harmony, AllowGuidGeneration);
             MasterPatch.Run();
             Print("Loading Dark Codex");
             patchInfos = new(Settings.State);
@@ -681,11 +693,7 @@ namespace Shared
 
         private static void OnBlueprintsLoadedLast()
         {
-#if DEBUG
-            using var scope = new Scope(Main.ModPath, Main.logger, harmony, true);
-#else
-            using var scope = new Scope(Main.ModPath, Main.logger, harmony, false);
-#endif
+            using var scope = new Scope(Main.ModPath, Main.logger, harmony, AllowGuidGeneration);
 
             LoadSafe(Kineticist.CreateExpandedElement);
 
@@ -1232,8 +1240,13 @@ namespace Shared
                         res.Add("|--------|-------------|----|--------|");
 
                         foreach (var info in patchInfos)
+                        {
                             if (!info.IsEvent && !info.IsHidden)
+                            {
+                                info.DisplayName.ToString(); // don't remove, this is to force localize this string
                                 res.Add($"|{info.Class}.{info.Method}|{info.Description.ToString().Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
+                            }
+                        }
 
                         res.Add("");
 

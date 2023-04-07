@@ -39,7 +39,7 @@ namespace Shared
         {
             if (Resolver == null)
                 return Default;
-            return cache ??= Resolver(this);
+            return cache ??= Resolver(this) ?? Default;
         }
 
         /// <inheritdoc cref="ToString"/>

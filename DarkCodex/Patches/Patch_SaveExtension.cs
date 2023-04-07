@@ -55,7 +55,7 @@ namespace DarkCodex
 
                 if (Main.restart)
                 {
-                    Helper.ShowMessageBox("Patch settings were changed recently. You must restart game now!", yesLabel: "Ignore this time", noLabel: "I understand",
+                    Helper.ShowMessageBox(Resource.LocalizedStrings[(int)Localized.MessagePatchChanged], yesLabel: Resource.LocalizedStrings[(int)Localized.MessageIgnoreThisTime], noLabel: Resource.LocalizedStrings[(int)Localized.MessageIUnderstand],
                         onYes: () =>
                         {
                             Main.restart = false;
@@ -77,7 +77,6 @@ namespace DarkCodex
                 foreach (string patch in Main.appliedPatches)
                     saveData.Remove(patch);
 
-                // TODO: check patch even exists, check patch is critical
                 for (int i = saveData.Count - 1; i >= 0; i--)
                 {
                     if (!Main.skippedPatches.Contains(saveData[i]))
@@ -86,13 +85,13 @@ namespace DarkCodex
 
                 if (saveData.Count > 0)
                 {
-                    Helper.ShowMessageBox("[DarkCodex] Patches not found since last time. Do you want to re-enable them or ignore it? (You can turn this off in the menu 'Save Metadata'.) \n" + saveData.Join(), yesLabel: "Enable patches", noLabel: "Ignore this time",
+                    Helper.ShowMessageBox(Resource.LocalizedStrings[(int)Localized.MessageReenablePatch] + saveData.Join(), yesLabel: Resource.LocalizedStrings[(int)Localized.MessageEnablePatch], noLabel: Resource.LocalizedStrings[(int)Localized.MessageIgnoreThisTime],
                         onYes: () =>
                         {
                             foreach (var info in saveData)
                                 Main.patchInfos.SetEnable(true, info, force: true);
                             Main.OnSaveGUI(null);
-                            Helper.ShowMessageBox("Patches enabled, you must restart game now!");
+                            Helper.ShowMessageBox(Resource.LocalizedStrings[(int)Localized.MessagePatchesEnabled]);
                             //SystemUtil.ApplicationQuit();
                             //SystemUtil.ApplicationRestart();
                         });

@@ -1003,6 +1003,8 @@ namespace CodexLib
                 try
                 {
                     string path = Path.Combine(Scope.ModPath, $"{suffix}{LocalizationManager.CurrentPack.Locale}.json");
+                    Print($"Trying to load lanaguage file {path} {File.Exists(path)} {!Scope.AllowGuidGeneration}");
+
                     if (File.Exists(path) && !Scope.AllowGuidGeneration)
                     {
                         var data = Deserialize<Dictionary<string, string>>(path: path);
@@ -1060,6 +1062,22 @@ namespace CodexLib
                 CreateString(newString, localizedString?.Shared?.String?.m_Key, null);
             else
                 PrintDebug("Warning: CreateString failed since m_Key is empty");
+        }
+
+        /// <summary>Empty delegate handler.</summary>
+        public delegate void VoidDelegate();
+
+        /// <summary></summary>
+        public static event VoidDelegate OnLocaleChange;
+
+        /// <summary>
+        /// Clears all string maps. Call this after locale was changed.
+        /// </summary>
+        public static void ClearStringMaps()
+        {
+            if (!Scope.AllowGuidGeneration)
+                _mappedStrings.Clear();
+            OnLocaleChange?.Invoke();
         }
 
         [System.Diagnostics.Conditional("DEBUG")]

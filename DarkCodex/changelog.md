@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.28]
+- added localization to menu
+
 ## [1.5.27]
 - fixes for update
 - fixed Feral Combat Training with Mythic Improved Unarmed Strike
