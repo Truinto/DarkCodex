@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kingmaker.Designers.EventConditionActionSystem.Actions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,9 +16,9 @@ namespace CodexLib
         /// </summary>
         public static TPart Ensure<TPartBase, TPart>(this EntityDataBase unit) where TPartBase : EntityPart where TPart : TPartBase, new()
         {
-            var cache = EntityPartsCacheAccessor<TPart>.Get(unit.Parts.m_Cache);
-            if (cache.Part != null)
-                return (TPart)cache.Part;
+            var cache = EntityPartsCacheAccessor<TPartBase>.Get(unit.Parts.m_Cache);
+            if (cache.Part is TPart ctpart)
+                return ctpart;
 
             var parts = unit.Parts.m_Parts;
             for (int i = 0; i < parts.Count; i++)
@@ -27,18 +28,41 @@ namespace CodexLib
 
                 if (tbase is TPart tpart)
                 {
-                    EntityPartsCacheAccessor<TPart>.Set(unit.Parts.m_Cache, tpart);
+                    EntityPartsCacheAccessor<TPartBase>.Set(unit.Parts.m_Cache, tpart);
                     return tpart;
                 }
 
-                unit.Parts.Remove(tbase);
-                tpart = unit.Parts.Add<TPart>();
+                tbase.RemoveSelf();
+                tpart = add();
                 if (tpart is IUpgrade<TPartBase> upgrade)
                     upgrade.Upgrade(tbase);
                 return tpart;
             }
 
-            return unit.Parts.Add<TPart>();
+            return add();
+
+            TPart add()
+            {
+                var val = new TPart();
+                parts.Add(val);
+                //unit.Parts.AddToCache(val); // this seems unecessary
+                EntityPartsCacheAccessor<TPartBase>.Set(unit.Parts.m_Cache, val);
+                val.AttachToEntity(unit);
+                try
+                {
+                    unit.Parts.Delegate?.OnPartAdded(val);
+                }
+                catch (Exception e) { PrintException(e); }
+                return val;
+            }
+        }
+
+        /// <summary>
+        /// Works like <see cref="EntityDataBase.Get{TPart}"/>, but for inherited UnitParts.
+        /// </summary>
+        public static TPart Get<TPartBase, TPart>(this EntityDataBase unit) where TPartBase : EntityPart where TPart : TPartBase, new()
+        {
+            return unit.Get<TPartBase>() as TPart;
         }
     }
 }

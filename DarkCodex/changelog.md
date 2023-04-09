@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.29]
+- added even more localization
+- fixed Chill Touch and touch attacks #239 #243
+
 ## [1.5.28]
 - added localization to menu
 

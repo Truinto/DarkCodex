@@ -252,11 +252,11 @@ namespace DarkCodex
             // fix destrutive dispel scaling
             Helper.Get<BlueprintUnitProperty>("13e4f1dd08954723b173335a54b48746") //DestructiveDispelProperty
                 .SetComponents(
-                new PropertyAttributeMax { MentalStat = true },
-                new SimplePropertyGetter { Property = UnitProperty.Level, Settings = new() { m_Progression = PropertySettings.Progression.Div2 } });
+                new PropertyAttributeMax() { MentalStat = true },
+                new SimplePropertyGetter() { Property = UnitProperty.Level, Settings = new() { m_Progression = PropertySettings.Progression.Div2 } });
 
             // body forms become immune to horrid wilting
-            var resistWilt = new AddSpellImmunity { Type = SpellImmunityType.Specific, m_Exceptions = Helper.ToRef<BlueprintAbilityReference>("08323922485f7e246acb3d2276515526").ObjToArray() }; //HorridWilting
+            var resistWilt = new AddSpellImmunity() { Type = SpellImmunityType.Specific, m_Exceptions = Helper.ToRef<BlueprintAbilityReference>("08323922485f7e246acb3d2276515526").ObjToArray() }; //HorridWilting
             Helper.Get<BlueprintBuff>("b574e1583768798468335d8cdb77e94c").AddComponents(resistWilt); //FieryBodyBuff
             Helper.Get<BlueprintBuff>("a6da7d6a5c9377047a7bd2680912860f").AddComponents(resistWilt); //IceBodyBuff
             Helper.Get<BlueprintBuff>("2eabea6a1f9a58246a822f207e8ca79e").AddComponents(resistWilt); //IronBodyBuff
@@ -528,10 +528,10 @@ namespace DarkCodex
                 "You can take advantage of a distracted foe.\nBenefit(s): When you attempt a combat maneuver check against a foe you are flanking, you can forgo the +2 bonus on your attack roll for flanking to instead have the combat maneuver not provoke an attack of opportunity. If you have a feat or ability that allows you to attempt the combat maneuver without provoking an attack of opportunity, you can instead increase the bonus on your attack roll for flanking to +4 for the combat maneuver check.\nSpecial: This feat counts as having Dex 13, Int 13, Combat Expertise, and Improved Unarmed Strike for the purposes of meeting the prerequisites of the various improved combat maneuver feats, as well as feats that require those improved combat maneuver feats as prerequisites.",
                 group: FeatureGroup.CombatFeat
                 ).SetComponents(
-                new FeatureForPrerequisite { FakeFact = Helper.ToRef<BlueprintUnitFactReference>("4c44724ffa8844f4d9bedb5bb27d144a") }, //CombatExpertiseFeature
-                new FeatureForPrerequisite { FakeFact = Helper.ToRef<BlueprintUnitFactReference>("7812ad3672a4b9a4fb894ea402095167") }, //ImprovedUnarmedStrike
-                new ReplaceStatForPrerequisites { OldStat = StatType.Dexterity, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
-                new ReplaceStatForPrerequisites { OldStat = StatType.Intelligence, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
+                new FeatureForPrerequisite() { FakeFact = Helper.ToRef<BlueprintUnitFactReference>("4c44724ffa8844f4d9bedb5bb27d144a") }, //CombatExpertiseFeature
+                new FeatureForPrerequisite() { FakeFact = Helper.ToRef<BlueprintUnitFactReference>("7812ad3672a4b9a4fb894ea402095167") }, //ImprovedUnarmedStrike
+                new ReplaceStatForPrerequisites() { OldStat = StatType.Dexterity, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
+                new ReplaceStatForPrerequisites() { OldStat = StatType.Intelligence, SpecificNumber = 13, Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.SpecificNumber },
                 new DirtyFightingBonus(),
                 Helper.CreateAddFacts(DirtyFightingBonus.List.Select(s => s.Key.ToRef<BlueprintUnitFactReference>()))
                 );
@@ -592,7 +592,7 @@ namespace DarkCodex
                     poison.displayName,
                     $"This creature got poisoned with {poison.displayName}."
                     ).SetComponents(
-                    new BuffPoisonStatDamage { Descriptor = ModifierDescriptor.UntypedStackable, Stat = poison.statType, Value = poison.damage, Ticks = poison.ticks, SuccesfullSaves = poison.successfullSaves, SaveType = SavingThrowType.Fortitude },
+                    new BuffPoisonStatDamage() { Descriptor = ModifierDescriptor.UntypedStackable, Stat = poison.statType, Value = poison.damage, Ticks = poison.ticks, SuccesfullSaves = poison.successfullSaves, SaveType = SavingThrowType.Fortitude },
                     Helper.CreateContextSetAbilityParams(dc: poison.dc, add10toDC: false)
                     );
                 buff.Stacking = StackingType.Poison;
@@ -657,7 +657,7 @@ namespace DarkCodex
                 "You are unequaled at the casting of one particular spell.\nBenefit: Pick one spell which you have the ability to cast. Whenever you cast that spell you may apply any one metamagic feat you have to that spell without affecting its level or casting time, as long as the total modified level of the spell does not use a spell slot above 9th level. In addition, if you have other feats which allow you to apply a set numerical bonus to any aspect of this spell (such as Spell Focus, Spell Penetration, Weapon Focus [ray], and so on), double the bonus granted by that feat when applied to this spell.",
                 onlyKnownSpells: true
                 ).SetComponents(
-                new MetamagicReduceCostParametrized { ReduceByMostExpensive = true },
+                new MetamagicReduceCostParametrized() { ReduceByMostExpensive = true },
                 new SpellPerfection(),
                 Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15)
                 );

@@ -46,16 +46,16 @@ namespace CodexLib
 
         public static UINumber[] Numbers = new UINumber[]
         {
-            new UINumber { Value = 0, Name = "0", Description = "", Icon = GetSprite(0) },
-            new UINumber { Value = 1, Name = "1", Description = "", Icon = GetSprite(1) },
-            new UINumber { Value = 2, Name = "2", Description = "", Icon = GetSprite(2) },
-            new UINumber { Value = 3, Name = "3", Description = "", Icon = GetSprite(3) },
-            new UINumber { Value = 4, Name = "4", Description = "", Icon = GetSprite(4) },
-            new UINumber { Value = 5, Name = "5", Description = "", Icon = GetSprite(5) },
-            new UINumber { Value = 6, Name = "6", Description = "", Icon = GetSprite(6) },
-            new UINumber { Value = 7, Name = "7", Description = "", Icon = GetSprite(7) },
-            new UINumber { Value = 8, Name = "8", Description = "", Icon = GetSprite(8) },
-            new UINumber { Value = 9, Name = "9", Description = "", Icon = GetSprite(9) },
+            new UINumber() { Value = 0, Name = "0", Description = "", Icon = GetSprite(0) },
+            new UINumber() { Value = 1, Name = "1", Description = "", Icon = GetSprite(1) },
+            new UINumber() { Value = 2, Name = "2", Description = "", Icon = GetSprite(2) },
+            new UINumber() { Value = 3, Name = "3", Description = "", Icon = GetSprite(3) },
+            new UINumber() { Value = 4, Name = "4", Description = "", Icon = GetSprite(4) },
+            new UINumber() { Value = 5, Name = "5", Description = "", Icon = GetSprite(5) },
+            new UINumber() { Value = 6, Name = "6", Description = "", Icon = GetSprite(6) },
+            new UINumber() { Value = 7, Name = "7", Description = "", Icon = GetSprite(7) },
+            new UINumber() { Value = 8, Name = "8", Description = "", Icon = GetSprite(8) },
+            new UINumber() { Value = 9, Name = "9", Description = "", Icon = GetSprite(9) },
         };
     }
 }

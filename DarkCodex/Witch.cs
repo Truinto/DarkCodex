@@ -154,7 +154,7 @@ namespace DarkCodex
             var chant = Helper.Get<BlueprintAbility>("6cd07c80aabf2b248a11921090de9c17");
             var sfx = new PrefabLink() { AssetId = "79665f3d500fdf44083feccf4cbfc00a" };
 
-            var consume_move = new ActivatableAbilityUnitCommand { Type = CommandType.Move };
+            var consume_move = new ActivatableAbilityUnitCommand() { Type = CommandType.Move };
 
             var runCackle = cackle.GetComponent<AbilityEffectRunAction>().Actions;
             var cackle_addarea = Helper.CreateBlueprintAbilityAreaEffect(

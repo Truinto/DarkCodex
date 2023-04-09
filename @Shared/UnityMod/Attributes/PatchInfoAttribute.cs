@@ -21,6 +21,7 @@ namespace Shared
         }
 
         public Severity PatchType;
+        public LocalizedStringCached DisplayClass;
         public LocalizedStringCached DisplayName;
         public LocalizedStringCached Description;
         public bool Homebrew;
@@ -103,6 +104,7 @@ namespace Shared
         public void Add(PatchInfoAttribute attr, MemberInfo info)
         {
             attr.Class = info.DeclaringType?.Name ?? "Patch";
+            attr.DisplayClass = attr.Class;
             attr.Method = info.Name;
             attr.Hash = (attr.Class + "." + attr.Method).GetHashCode();
 

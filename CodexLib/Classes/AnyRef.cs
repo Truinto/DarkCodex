@@ -173,11 +173,11 @@ namespace CodexLib
             if (obj is AnyRef any)
                 return any;
             if (obj is string str)
-                return new AnyRef { deserializedGuid = BlueprintGuid.Parse(str) };
+                return new AnyRef() { deserializedGuid = BlueprintGuid.Parse(str) };
             if (obj is BlueprintReferenceBase bp)
-                return new AnyRef { deserializedGuid = bp.deserializedGuid, Cached = bp.Cached };
+                return new AnyRef() { deserializedGuid = bp.deserializedGuid, Cached = bp.Cached };
             if (obj is SimpleBlueprint sb)
-                return new AnyRef { deserializedGuid = sb.AssetGuid, Cached = sb };
+                return new AnyRef() { deserializedGuid = sb.AssetGuid, Cached = sb };
             Helper.PrintError($"AnyRef could not resolve type '{obj?.GetType()}'");
             return null;
         }

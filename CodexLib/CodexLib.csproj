@@ -1,6 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<Version>1.4.1.113</Version>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -19,7 +20,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 		<PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-		<PackageReference Include="BuildTaskVersionControl" Version="1.2.0" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
 		<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18.2" ExcludeAssets="runtime" />
 	</ItemGroup>
 
@@ -95,12 +96,14 @@
 		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(GameManaged)\" />
 	</Target>
 
-	<!-- Increase build version -->
+	<!-- Update build version -->
 	<Target Name="Versioning" BeforeTargets="BeforeBuild">
 		<ItemGroup>
-			<VersioningInput Include="Properties\AssemblyInfo.cs" />
+			<_VersioningIn Include="$(MSBuildThisFileFullPath)" />
+			<_VersioningIn Include="changelog.md" />
+			<_VersioningOut Include="$(MSBuildThisFileFullPath)" />
 		</ItemGroup>
-		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningInput)" AutoIncrease="true" MaxMatch="3" TouchFiles="false" />
+		<VersioningTask InputFiles="@(_VersioningIn)" UpdateFiles="@(_VersioningOut)" MaxMatch="1" TouchFiles="false" AutoIncrease="true" />
 	</Target>
 
 	<!-- ILMerge and copy to solution folder -->

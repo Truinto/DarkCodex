@@ -437,7 +437,7 @@ namespace CodexLib
                     Damage = Helper.ToRef<BlueprintAbilityReference>("4e2d7b4eebc348b2bdf4968053c76af9"),
                     Burn = Helper.ToRef<BlueprintAbilityReference>("0b8bc0ee998a41508052ca7ff31c14f8")
                 },
-                DamageType = new DamageTypeDescription { Type = DamageType.Force }.ObjToArray()
+                DamageType = new DamageTypeDescription() { Type = DamageType.Force }.ObjToArray()
             };
 
             Gravity = new()
@@ -2163,7 +2163,7 @@ namespace CodexLib
                 result[0] = new DamageTypeDescription
                 {
                     Type = DamageType.Physical,
-                    Physical = new DamageTypeDescription.PhysicalData { Form = p1.Value }
+                    Physical = new DamageTypeDescription.PhysicalData() { Form = p1.Value }
                 };
 
             if (e1 != null)

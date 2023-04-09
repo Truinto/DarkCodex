@@ -39,7 +39,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature(SneakAttack),
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
                     Helper.CreateActionList(Helper.CreateConditional(
-                        condition: new ContextConditionCasterHasFact { m_Fact = flensing.ToRef2() },
+                        condition: new ContextConditionCasterHasFact() { m_Fact = flensing.ToRef2() },
                         ifTrue: new ContextActionIncreaseBleed(true),
                         ifFalse: new ContextActionIncreaseBleed(false))),
                     OnlySneakAttack: true),

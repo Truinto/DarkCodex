@@ -188,7 +188,7 @@ namespace Shared
                     }
 
                     GUILayout.Space(3);
-                    GUILayout.Label(info.Class);
+                    GUILayout.Label(info.DisplayClass);
 
                     GUILayout.EndHorizontal();
                 }
@@ -423,7 +423,7 @@ namespace Shared
 
             // localization logic
             LocalizedStringCached.Resolver = f => Helper.CreateString(f.Default);
-            Helper.OnLocaleChange += () => 
+            Helper.OnLocaleChange += () =>
             {
                 Resource._localizedStrings = null;
                 foreach (var patch in patchInfos)
@@ -499,7 +499,6 @@ namespace Shared
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixBladeWhirlwind);
-            PatchSafe(typeof(Patch_FixSpellStrike));
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -1241,9 +1240,15 @@ namespace Shared
 
                         foreach (var info in patchInfos)
                         {
+                            if (!info.IsHidden) // don't remove, this is to force localize this string
+                            {
+                                info.DisplayClass.ToString();
+                                info.DisplayName.ToString();
+                                info.Description.ToString();
+                            }
+
                             if (!info.IsEvent && !info.IsHidden)
                             {
-                                info.DisplayName.ToString(); // don't remove, this is to force localize this string
                                 res.Add($"|{info.Class}.{info.Method}|{info.Description.ToString().Replace('\n', ' ')}|{info.HomebrewStr}|{info.StatusStr}|");
                             }
                         }

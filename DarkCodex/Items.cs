@@ -200,8 +200,8 @@ namespace DarkCodex
                 prefix: "Impactful",
                 enchantValue: 2
                 ).SetComponents(
-                new ModifyWeaponSize { SizeCategoryChange = 1 },
-                new ScalingCMBonus { Type = CombatManeuver.BullRush }
+                new ModifyWeaponSize() { SizeCategoryChange = 1 },
+                new ScalingCMBonus() { Type = CombatManeuver.BullRush }
                 ).ToRef();
 
             var butcherType = Resource.Cache.WeaponTypeButchering;

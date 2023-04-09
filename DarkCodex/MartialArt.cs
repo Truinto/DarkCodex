@@ -40,7 +40,7 @@ namespace DarkCodex
                 "A virtuous bravo gains Weapon Finesse as a bonus feat. She can use her Charisma score in place of her Intelligence score to meet prerequisites of combat feats."
                 ).SetComponents(
                 Helper.CreateAddFeatureOnApply("90e54424d682d104ab36436bd527af09"), //WeaponFinesse
-                new ReplaceStatForPrerequisites { Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.NewStat, OldStat = StatType.Intelligence, NewStat = StatType.Charisma }
+                new ReplaceStatForPrerequisites() { Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.NewStat, OldStat = StatType.Intelligence, NewStat = StatType.Charisma }
                 );
 
             var f3_nimble = Helper.CreateBlueprintFeature(
@@ -65,7 +65,7 @@ namespace DarkCodex
                 "Precise Strike",
                 "At 3rd level, while she has at least 1 panache point, a swashbuckler gains the ability to strike precisely with a light or one-handed piercing melee weapon (though not natural weapon attacks), adding her swashbuckler level to the damage dealt. To use this deed, a swashbuckler cannot attack with a weapon in her other hand or use a shield other than a buckler. She can even use this ability with thrown light or one-handed piercing melee weapons, so long as the target is within 30 feet of her. Any creature that is immune to sneak attacks is immune to the additional damage granted by precise strike, and any item or ability that protects a creature from critical hits also protects a creature from the additional damage of a precise strike. This additional damage is precision damage, and isn’t multiplied on a critical hit."
                 ).SetComponents(
-                new DuelistPreciseStrike { m_Duelist = paladin }
+                new DuelistPreciseStrike() { m_Duelist = paladin }
                 );
 
             var panache2 = Helper.CreateBlueprintFeature(
@@ -105,7 +105,7 @@ namespace DarkCodex
                 commandType: UnitCommand.CommandType.Swift
                 ).SetComponents(
                 new DeactivateImmediatelyIfNoAttacksThisRound(),
-                new ActivatableAbilityUnitCommand { Type = UnitCommand.CommandType.Swift }
+                new ActivatableAbilityUnitCommand() { Type = UnitCommand.CommandType.Swift }
                 );
             buff.SetComponents(
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
@@ -125,7 +125,7 @@ namespace DarkCodex
                 Helper.CreateAddAbilityResources(resourcePanache),
                 Helper.CreateAddFacts(panache1, panache2, panache3, panache4, panache5),
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
-                    Helper.CreateActionList(new ContextRestoreResource { m_Resource = resourcePanache }),
+                    Helper.CreateActionList(new ContextRestoreResource() { m_Resource = resourcePanache }),
                     ActionsOnInitiator: true,
                     DuelistWeapon: true));
 
@@ -360,7 +360,7 @@ namespace DarkCodex
                 "You can use the Weapon Finesse feat to apply your Dexterity modifier instead of your Strength modifier to attack rolls with a glaive sized for you, even though it isn’t a light weapon. When wielding a glaive, you can treat it as a one-handed piercing or slashing melee weapon and as if you were not making attacks with your off-hand for all feats and class abilities that require such a weapon (such as a duelist’s or swashbuckler’s precise strike)."
                 ).SetComponents(
                 new AddDuelistWeapon(WeaponCategory.Glaive),
-                new AttackStatReplacement { ReplacementStat = StatType.Dexterity, CheckWeaponTypes = true, m_WeaponTypes = Helper.ToRef<BlueprintWeaponTypeReference>("7a14a1b224cd173449cb7ffc77d5f65c").ObjToArray() }, //Glaive
+                new AttackStatReplacement() { ReplacementStat = StatType.Dexterity, CheckWeaponTypes = true, m_WeaponTypes = Helper.ToRef<BlueprintWeaponTypeReference>("7a14a1b224cd173449cb7ffc77d5f65c").ObjToArray() }, //Glaive
                 Helper.CreatePrerequisiteParametrizedFeature("1e1f627d26ad36f43bbd26cc2bf8ac7e", WeaponCategory.Glaive), //WeaponFocus
                 Helper.CreatePrerequisiteFeature("b382afa31e4287644b77a8b30ed4aa0b") //Deity ShelynFeature
                 );
@@ -380,7 +380,7 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreatePrerequisiteStatValue(StatType.Strength, 13),
                 Helper.CreateAddMechanicsFeature(MechanicFeature.ProdigiousTWF),
-                new ReplaceStatForPrerequisites { Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.NewStat, OldStat = StatType.Dexterity, NewStat = StatType.Strength }
+                new ReplaceStatForPrerequisites() { Policy = ReplaceStatForPrerequisites.StatReplacementPolicy.NewStat, OldStat = StatType.Dexterity, NewStat = StatType.Strength }
                 );
 
             Main.Patch(typeof(Patch_ProdigiousTWF));

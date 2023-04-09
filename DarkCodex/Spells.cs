@@ -55,7 +55,7 @@ namespace DarkCodex
                 Helper.CreateAbilityEffectRunAction(
                     condition: new Condition[] {
                         Helper.CreateContextConditionIsEnemy(),
-                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
+                        new ContextConditionAttackRoll() { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
                     },
                     ifTrue: new GameAction[] {
                         new ContextActionDealWeaponDamage()
@@ -88,7 +88,7 @@ namespace DarkCodex
                 Helper.CreateAbilityEffectRunAction(
                     condition: new Condition[] {
                         Helper.CreateContextConditionIsEnemy(),
-                        new ContextConditionAttackRoll { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
+                        new ContextConditionAttackRoll() { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
                     },
                     ifTrue: new GameAction[] {
                         new ContextActionDealWeaponDamage()
@@ -438,7 +438,7 @@ namespace DarkCodex
             ab.Add(2, "d8f30625d1b1f9d41a24446cbf7ac52e"); //FireDomainSpellList
         }
 
-        [PatchInfo(Severity.Create | Severity.Faulty, "Chill Touch", "spell: Chill Touch", false)]
+        [PatchInfo(Severity.Create, "Chill Touch", "spell: Chill Touch", false)]
         public static void CreateChillTouch()
         {
             /*
@@ -452,24 +452,6 @@ namespace DarkCodex
             A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.
             An undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.
             */
-
-            // TODO: fix magus spellstrike with chill touch 
-            // - touch attack is stopped midway, then cast again
-            // - 'persist' touch can be overwritten with different spell, causing weird attack patterns
-            /* 
-             * UnitUseAbility.CreateCastCommand -> could be used to convert base ability cast into stickytouch cast
-             * Patch_FixSpellStrike
-             * Patch_FixEldritchArcherSpellstrike
-             * Patch_TouchPersist
-             * UnitPartTouchPersist
-             * 
-             * TouchSpellsController! look for IsHit!
-             * MagusController! look for IsHit!
-             * AbilityEffectStickyTouch
-             * TurnController
-             * UnitCommand.IsSpellstrikeAttack
-             * UnitPartTouch.IsCastedInThisRound
-             */
 
             var effect = Helper.CreateBlueprintAbility(
                 "ChillTouch_Effect",
@@ -594,7 +576,7 @@ namespace DarkCodex
             var bubble = Helper.Get<BlueprintAbility>("265582bc494c4b12b5860b508a2f89a2"); //LifeBubble
             bubble.Range = AbilityRange.Personal;
             if (bubble.GetComponent<AbilityTargetsAround>() == null)
-                bubble.AddComponents(new AbilityTargetsAround { m_Radius = 20.Feet(), m_TargetType = TargetType.Ally, m_Condition = new() });
+                bubble.AddComponents(new AbilityTargetsAround() { m_Radius = 20.Feet(), m_TargetType = TargetType.Ally, m_Condition = new() });
         }
     }
 }

@@ -808,7 +808,7 @@ namespace DarkCodex
                 ).SetComponents(
                 addKnownSpells,
                 Helper.CreateAutoMetamagic(Metamagic.Reach, addKnownSpells.Spells.ToList(), AutoMetamagic.AllowedType.SpellOnly),
-                new AddUnlimitedSpell { m_Abilities = addKnownSpells.Spells.StickyResolve() }
+                new AddUnlimitedSpell() { m_Abilities = addKnownSpells.Spells.StickyResolve() }
                 );
 
             Helper.AddMythicTalent(feat2);

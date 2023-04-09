@@ -24,7 +24,7 @@ namespace CodexLib
             if (val.Length < 3)
                 return new LocalizedString();
 
-            return new LocalizedString { m_Key = val[1] };
+            return new LocalizedString() { m_Key = val[1] };
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

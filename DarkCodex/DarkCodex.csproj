@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.5.28</Version>
+		<Version>1.5.29</Version>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -21,7 +21,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 		<PackageReference Include="AssemblyPublicizer" Version="1.0.2" ExcludeAssets="runtime" />
-		<PackageReference Include="BuildTaskVersionControl" Version="1.2.0" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<!-- Common References -->
@@ -96,7 +96,7 @@
 	<!-- Update build version -->
 	<Target Name="Versioning" BeforeTargets="BeforeBuild">
 		<ItemGroup>
-			<!--<_VersioningIn Include="$(MSBuildThisFileFullPath)" />-->
+			<_VersioningIn Include="$(MSBuildThisFileFullPath)" />
 			<_VersioningIn Include="changelog.md" />
 			<_VersioningOut Include="$(MSBuildThisFileFullPath)" />
 			<_VersioningOut Include="info.json" />
@@ -128,9 +128,8 @@
 			<_Download Include="Settings\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
 		</ItemGroup>
 		
-		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" />
+		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" Interval="0.12:00" />
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
-		<!--<Exec Condition="'$(Configuration)'=='Release'" WorkingDirectory="$(ModFolder)\" Command="&quot;$(Zip7)&quot; u &quot;-x!*.zip&quot; &quot;$(TargetName)\$(TargetName).zip&quot; @&quot;$(TargetName)\filelist.txt&quot; &gt;NUL" />-->
 		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\$(TargetName)\DarkCodex.zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>

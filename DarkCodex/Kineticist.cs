@@ -312,7 +312,7 @@ namespace DarkCodex
                 {
                     list.Add(Helper.CreateConditional(
                         new Condition[] {
-                            new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = 7 },
+                            new ContextConditionCharacterClass() { CheckCaster = true, m_Class = t.Class, MinLevel = 7 },
                             Helper.CreateContextConditionHasFact(element.BlastFeature, true),
                             Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature),
                             Helper.CreateContextConditionHasFact(element.Parent2.BlastFeature)
@@ -326,7 +326,7 @@ namespace DarkCodex
             {
                 list.Add(Helper.CreateConditional(
                     new Condition[] {
-                        new ContextConditionCharacterClass { CheckCaster = true, m_Class = t.Class, MinLevel = boost.IsGreaterVersion ? 15 : 7},
+                        new ContextConditionCharacterClass() { CheckCaster = true, m_Class = t.Class, MinLevel = boost.IsGreaterVersion ? 15 : 7},
                         Helper.CreateContextConditionHasFact(boost.BlastFeature, true),
                         Helper.CreateContextConditionHasFact(boost.Parent1.BlastFeature),
                         Helper.CreateConditionOr(t.GetAll(basic: boost.ModifiesSimple, composite: boost.ModifiesComposite, onlyPhysical: boost.IsOnlyPhysical, onlyEnergy: boost.IsOnlyEnergy)
@@ -637,7 +637,7 @@ namespace DarkCodex
             soulability.HasFastAnimation = true;
             var targets = soulability.GetComponent<AbilityTargetsAround>();
             targets.m_Condition.Conditions = Array.Empty<Condition>();
-            soulability.AddComponents(new AbilityRequirementOnlyCombat { Not = true });
+            soulability.AddComponents(new AbilityRequirementOnlyCombat() { Not = true });
         }
 
         [PatchInfo(Severity.Extend, "Various Tweaks", "bowling works with sandstorm blast, apply PsychokineticistStat setting, fixed Negative Energy Mastery", true)]
@@ -835,7 +835,7 @@ namespace DarkCodex
             Resource.Cache.FeatureMindShield.SetReference(feature);
 
             var property = Helper.CreateBlueprintUnitProperty("PsychokineticistMindPropertyGetter")
-                .SetComponents(new PropertyMindShield { Feature = feature });
+                .SetComponents(new PropertyMindShield() { Feature = feature });
 
             var rank = buff.GetComponent<ContextRankConfig>();
             rank.m_StepLevel = 1;
@@ -1222,7 +1222,7 @@ namespace DarkCodex
                 "Elemental Flurry",
                 "At 1st level, an elemental ascetic gains Improved Unarmed Strike as a bonus feat. He gains the kinetic fist form infusion and it costs 0 points of burn instead of 1 point of burn. When using the kinetic fist form infusion with a full attack, he can make a flurry of blows as the monk class feature. He must use only his fists to make this flurry, no matter what other abilities he possesses.\nLike a monk, he can use this ability only when unarmored, not using a shield, and unencumbered. He can’t use his kinetic blast without a form infusion, nor can he ever use his kinetic blast with the chain, extended range, extreme range, foe throw, flurry of blasts, many throw, or snake form infusions, or with any other form infusion that requires a ranged attack roll or ranged touch attack roll."
                 ).SetComponents(
-                new AddKineticistBurnModifier { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = Tree.DefaultAbility.Variants.ToArray() }
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = -1, m_AppliableTo = Tree.DefaultAbility.Variants.ToArray() }
                 );
 
             var wisdom_feat = burnFeature.Clone(

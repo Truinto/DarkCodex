@@ -970,7 +970,7 @@ namespace CodexLib
 
         public static LocalizedString GetString(string key)
         {
-            return new LocalizedString { Key = key };
+            return new LocalizedString() { Key = key };
         }
 
         public static bool IsEmptyKey(this LocalizedString locString)
@@ -1030,7 +1030,7 @@ namespace CodexLib
         public static LocalizedString CreateString(this string value, string key = null, string suffix = null)
         {
             if (value == null || value == "")
-                return new LocalizedString { Key = "" };
+                return new LocalizedString() { Key = "" };
 
             if (key == null)
             {
@@ -1048,7 +1048,7 @@ namespace CodexLib
                 LocalizationManager.CurrentPack.PutString(key, value);
             }
 
-            return new LocalizedString { Key = key };
+            return new LocalizedString() { Key = key };
         }
 
         /// <summary>
@@ -3192,13 +3192,13 @@ namespace CodexLib
         {
             var result = new AddConditionExceptions();
             result.Condition = condition;
-            result.Exception = new UnitConditionExceptionsFromBuff { Exceptions = buffs };
+            result.Exception = new UnitConditionExceptionsFromBuff() { Exceptions = buffs };
             return result;
         }
 
         public static SpellDescriptorComponent CreateSpellDescriptorComponent(SpellDescriptor descriptor)
         {
-            return new SpellDescriptorComponent { Descriptor = descriptor };
+            return new SpellDescriptorComponent() { Descriptor = descriptor };
         }
 
         public static SpellImmunityToSpellDescriptor CreateSpellImmunityToSpellDescriptor(SpellDescriptor descriptor, BlueprintUnitFactReference ignoreFact = null)
@@ -3644,7 +3644,7 @@ namespace CodexLib
             result.m_Radius = radius;
             result.m_SpreadSpeed = spread ?? 25.Feet();
             result.m_IncludeDead = includedDead;
-            result.m_Condition = new ConditionsChecker { Conditions = conditions };
+            result.m_Condition = new ConditionsChecker() { Conditions = conditions };
 
             return result;
         }
@@ -4785,12 +4785,12 @@ namespace CodexLib
 
         public static T ToRef<T>(this string guid) where T : BlueprintReferenceBase, new()
         {
-            return new T { deserializedGuid = BlueprintGuid.Parse(guid) };
+            return new T() { deserializedGuid = BlueprintGuid.Parse(guid) };
         }
 
         public static T ToRef<T>(this BlueprintReferenceBase reference) where T : BlueprintReferenceBase, new()
         {
-            return new T { deserializedGuid = reference.deserializedGuid };
+            return new T() { deserializedGuid = reference.deserializedGuid };
         }
 
         public static T ToRef<T>(this object obj) where T : BlueprintReferenceBase, new()
@@ -4798,11 +4798,11 @@ namespace CodexLib
             if (obj is T t)
                 return t;
             if (obj is string str)
-                return new T { deserializedGuid = BlueprintGuid.Parse(str) };
+                return new T() { deserializedGuid = BlueprintGuid.Parse(str) };
             if (obj is BlueprintReferenceBase bp)
-                return new T { deserializedGuid = bp.deserializedGuid, Cached = bp.Cached };
+                return new T() { deserializedGuid = bp.deserializedGuid, Cached = bp.Cached };
             if (obj is SimpleBlueprint sb)
-                return new T { deserializedGuid = sb.AssetGuid, Cached = sb };
+                return new T() { deserializedGuid = sb.AssetGuid, Cached = sb };
             Helper.PrintError($"ToRef could not resolve type '{obj?.GetType()}'");
             return null;
         }
@@ -5057,14 +5057,14 @@ namespace CodexLib
 
         public static SpriteLink GetSprite(string guid)
         {
-            return new SpriteLink { AssetId = guid };
+            return new SpriteLink() { AssetId = guid };
         }
 
         public static Sprite LoadSprite(string guid)
         {
             try
             {
-                return new SpriteLink { AssetId = guid }.Load();
+                return new SpriteLink() { AssetId = guid }.Load();
             }
             catch (Exception e)
             {

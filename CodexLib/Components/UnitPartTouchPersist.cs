@@ -45,18 +45,8 @@ namespace CodexLib
 
             var part = caster.Ensure<UnitPartTouch, UnitPartTouchPersist>();
             part.Count = this.Count.Calculate(context);
-            part.Init(this.TouchDeliveryAbility, context.Ability, context.SourceAbilityContext);
 
-            if (caster == target.Unit)
-            {
-                Rulebook.Trigger(new RuleCastSpell(part.Ability.Data, target));
-                return;
-            }
-
-            //caster.Brain.AutoUseAbility = part.Ability.Data;
-            var unitCommand = part.AutoCastCommand = UnitUseAbility.CreateCastCommand(part.Ability.Data, target);
-            unitCommand.IgnoreCooldown(part.IgnoreCooldownBeforeTime);
-            caster.Commands.AddToQueueFirst(unitCommand);
+            base.Apply(context, target);
         }
     }
 }

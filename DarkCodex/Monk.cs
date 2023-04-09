@@ -127,7 +127,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteFeature("7812ad3672a4b9a4fb894ea402095167"), //ImprovedUnarmedStrike
                 preqStyles,
                 Helper.CreatePrerequisiteFullStatValue(StatType.BaseAttackBonus, 5),
-                new IncreaseActivatableAbilityGroupSize { Group = ActivatableAbilityGroup.CombatStyle }
+                new IncreaseActivatableAbilityGroupSize() { Group = ActivatableAbilityGroup.CombatStyle }
                 );
 
             Helper.AddCombatFeat(feat);

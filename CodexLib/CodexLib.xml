@@ -1185,6 +1185,11 @@
             If you need to transfer data, use IUpgrade interface.
             </summary>
         </member>
+        <member name="M:CodexLib.Helper.Get``2(Kingmaker.EntitySystem.EntityDataBase)">
+            <summary>
+            Works like <see cref="M:Kingmaker.EntitySystem.EntityDataBase.Get``1" />, but for inherited UnitParts.
+            </summary>
+        </member>
         <member name="T:CodexLib.IActionBarConvert">
             <summary>
             Allow custom action bar convertions (unfoldable variants).

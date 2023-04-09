@@ -109,18 +109,18 @@ namespace DarkCodex
 
             var action = Helper.CreateConditional(
                 new Condition[] {
-                    new ContextConditionCasterHasFact { m_Fact = feat },
+                    new ContextConditionCasterHasFact() { m_Fact = feat },
                     new ContextConditionIsEnemy(),
                     Helper.CreateContextConditionSharedValueHigher(AbilitySharedValue.DurationSecond, 0, Equality.LowerOrEqual)
                 },
                 ifTrue: new GameAction[] {
                     Helper.CreateContextActionChangeSharedValue(AbilitySharedValue.DurationSecond, add: 1),
-                    new ContextActionSavingThrow {
+                    new ContextActionSavingThrow() {
                         Type = SavingThrowType.Will,
                         Actions = Helper.CreateActionList(
                             Helper.CreateContextActionDealDamage(DamageEnergyType.Fire, Helper.CreateContextDiceValue(DiceType.Zero, 0, Helper.CreateContextValue(AbilitySharedValue.Heal)), false, true),
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionApplyBuff("df6d1025da07524429afbae248845ecc", Helper.CreateContextDurationValue(bonus: 1))), //DazzledBuff
-                            new ContextActionSpawnFx { PrefabLink = Helper.GetPrefabLink("61602c5b0ac793d489c008e9cb58f631") })
+                            new ContextActionSpawnFx() { PrefabLink = Helper.GetPrefabLink("61602c5b0ac793d489c008e9cb58f631") })
                     },
                 });
 
@@ -164,7 +164,7 @@ namespace DarkCodex
 
             var action = Helper.CreateConditional(
                 new Condition[] {
-                    new ContextConditionCasterHasFact { m_Fact = feat },
+                    new ContextConditionCasterHasFact() { m_Fact = feat },
                     new ContextConditionIsAlly()
                 },
                 ifTrue: new GameAction[] {
