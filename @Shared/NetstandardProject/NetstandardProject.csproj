@@ -1,6 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<Version>1.0.0.53</Version>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -14,6 +15,7 @@
 		<RootNamespace>Shared</RootNamespace>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
 	<!-- Library Path -->
@@ -24,7 +26,7 @@
 	<!-- Nuget Packages -->
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="BuildTaskVersionControl" Version="1.2.0" ExcludeAssets="runtime" />
+		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
 		<PackageReference Include="System.Management" Version="7.0.0" />
 	</ItemGroup>
 
@@ -42,12 +44,12 @@
 	</ItemGroup>
 
 	<!-- Update build version -->
-	<Target Name="Versioning" BeforeTargets="PreBuildEvent">
+	<Target Name="Versioning" BeforeTargets="BeforeBuild">
 		<ItemGroup>
-			<VersioningInput Include="Properties\AssemblyInfo.cs" />
-			<VersioningOutput Include="Properties\AssemblyInfo.cs" />
+			<_VersioningIn Include="$(MSBuildThisFileFullPath)" />
+			<_VersioningOut Include="$(MSBuildThisFileFullPath)" />
 		</ItemGroup>
-		<VersioningTask InputFile="@(VersioningInput)" UpdateFiles="@(VersioningOutput)" AutoIncrease="true" MaxMatch="3" TouchFiles="false" />
+		<VersioningTask InputFiles="@(_VersioningIn)" UpdateFiles="@(_VersioningOut)" MaxMatch="1" TouchFiles="false" AutoIncrease="true" />
 	</Target>
 
 	<!-- Copy to solution folder -->

@@ -136,9 +136,10 @@ Content
 |Spellcasters.FixBloodlineArcane|Arcane Apotheosis ignores metamagic casting time penalty|:book:|:heavy_check_mark:|
 |Spellcasters.PatchArcanistBrownFur|allows Share Transmutation to affect any spell|:house:|:heavy_check_mark:|
 |Spells.CreateBladedDash|spell: Bladed Dash|:book:|:heavy_check_mark:|
-|Spells.CreateChillTouch|spell: Chill Touch|:book:|:x:|
+|Spells.CreateChillTouch|spell: Chill Touch|:book:|:heavy_check_mark:|
 |Spells.CreateDivineTrident|spell: Divine Trident|:book:|:heavy_check_mark:|
 |Spells.CreateFlameBlade|spell: Flame Blade, feat: Flame Blade Dervish Combat|:book:|:heavy_check_mark:|
+|Spells.CreateFrostbite|spell: Frostbite|:book:|:heavy_check_mark:|
 |Spells.CreateHealingFlames|spell: Healing Flames|:book:|:heavy_check_mark:|
 |Spells.CreateProduceFlame|spell: Produce Flame|:book:|:heavy_check_mark:|
 |Spells.PatchVarious|life bubble is AOE again|:book:|:heavy_check_mark:|

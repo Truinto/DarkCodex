@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.5.30]
+- added new spell: Frostbite #235
+- fixed Mad Magic getting lost after reloading a save #244
+- added druid spells to hunter list #248
+- removed limit to metamagic backgrounds #249
+
 ## [1.5.29]
 - added even more localization
 - fixed Chill Touch and touch attacks #239 #243

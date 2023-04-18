@@ -39,6 +39,7 @@ namespace CodexLib
         public const ModifierDescriptor Intelligence = (ModifierDescriptor)5380;
         public const ModifierDescriptor Charisma = (ModifierDescriptor)5381;
 
+        // TabletopTweaks
         public const Metamagic Intensified = (Metamagic)(1 << 12);
         public const Metamagic Dazing = (Metamagic)(1 << 13);
         public const Metamagic Rime = (Metamagic)(1 << 16);
@@ -51,6 +52,7 @@ namespace CodexLib
         public const Metamagic ElementalCold = (Metamagic)(1 << 23);
         public const Metamagic ElementalElectricity = (Metamagic)(1 << 24);
         public const Metamagic ElementalFire = (Metamagic)(1 << 25);
+        public const Metamagic Twin = (Metamagic)(1 << 26);
 
         public const WeaponCategory ButcheringAxe = (WeaponCategory)5480;
 

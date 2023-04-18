@@ -1,6 +1,7 @@
 ﻿using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
@@ -199,7 +200,7 @@ namespace DarkCodex
                 "FlameBladeEnchantment",
                 "Flame Blade"
                 ).SetComponents(
-                new FlameBladeLogic(feat, 10)
+                new SummonWeaponLogic(feat, 10)
                 );
             enchantment.WeaponFxPrefab = Helper.GetPrefabLink(Resource.Sfx.Weapon_Fire);
             enchantment.m_HiddenInUI = true;
@@ -255,6 +256,7 @@ namespace DarkCodex
 
             ab.Add(2,
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
                 "c0c40e42f07ff104fa85492da464ac69"  //ShamanSpelllist
                 );
 
@@ -282,7 +284,7 @@ namespace DarkCodex
                 "DivineTridentEnchantment",
                 "Divine Trident"
                 ).SetComponents(
-                new FlameBladeLogic(feat, 10)
+                new SummonWeaponLogic(feat, 10)
                 );
             enchantment.WeaponFxPrefab = Helper.GetPrefabLink(Resource.Sfx.Weapon_Shock);
             enchantment.m_HiddenInUI = true;
@@ -338,6 +340,7 @@ namespace DarkCodex
 
             ab.Add(2,
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
                 "8443ce803d2d31347897a3d85cc32f53", //ClericSpellList
                 "98c05aeff6e3d384f8aec6d584973642", //BloodragerSpellList
                 "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
@@ -355,18 +358,6 @@ namespace DarkCodex
         {
             Sprite icon = Helper.StealIcon("cdb106d53c65bbc4086183d54c3b97c7");
 
-            /*
-            Produce Flame
-            School evocation [fire]; Level druid 1, shaman 1; Domain fire 2
-            Casting Time 1 standard action
-            Range personal
-            Duration 1 min./level (D)
-            Saving Throw none; Spell Resistance yes
-
-            Flames as bright as a torch appear in your open hand. The flames harm neither you nor your equipment.
-            In addition to providing illumination, the flames can be hurled or used to touch enemies. You can strike an opponent with a melee touch attack, dealing fire damage equal to 1d6 + 1 point per caster level (maximum +5). Alternatively, you can hurl the flames up to 120 feet as a thrown weapon. When doing so, you attack with a ranged touch attack (with no range penalty) and deal the same damage as with the melee attack. No sooner do you hurl the flames than a new set appears in your hand. Each attack you make reduces the remaining duration by 1 minute. If an attack reduces the remaining duration to 0 minutes or less, the spell ends after the attack resolves.
-            */
-
             var buff = Helper.CreateBlueprintBuff("ProduceFlameBuff");
 
             var enchantment = Helper.CreateBlueprintWeaponEnchantment(
@@ -378,7 +369,7 @@ namespace DarkCodex
                         Helper.CreateContextActionReduceBuffDuration(buff, 10)),
                     OnlyHit: false
                     ),
-                new FlameBladeLogic(null, step: 1, max: 5)
+                new SummonWeaponLogic(null, step: 1, max: 5)
                 );
             enchantment.m_HiddenInUI = true;
 
@@ -433,6 +424,7 @@ namespace DarkCodex
 
             ab.Add(1,
                 "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
                 "c0c40e42f07ff104fa85492da464ac69" //ShamanSpelllist
                 );
             ab.Add(2, "d8f30625d1b1f9d41a24446cbf7ac52e"); //FireDomainSpellList
@@ -441,18 +433,6 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Chill Touch", "spell: Chill Touch", false)]
         public static void CreateChillTouch()
         {
-            /*
-            Chill Touch
-            School necromancy; Level bloodrager 1, magus 1, shaman 1, sorcerer/wizard 1, witch 1; Mystery reaper 1
-            Casting Time 1 standard action
-            Range touch
-            Targets creature or creatures touched (up to one/level)
-            Saving Throw Fortitude partial or Will negates; see text; Spell Resistance yes
-
-            A touch from your hand, which glows with blue energy, disrupts the life force of living creatures. Each touch channels negative energy that deals 1d6 points of damage. The touched creature also takes 1 point of Strength damage unless it makes a successful Fortitude saving throw. You can use this melee touch attack up to one time per level.
-            An undead creature you touch takes no damage of either sort, but it must make a successful Will saving throw or flee as if panicked for 1d4 rounds + 1 round per caster level.
-            */
-
             var effect = Helper.CreateBlueprintAbility(
                 "ChillTouch_Effect",
                 "Chill Touch",
@@ -461,6 +441,7 @@ namespace DarkCodex
                 type: AbilityType.Spell,
                 actionType: UnitCommand.CommandType.Standard,
                 range: AbilityRange.Touch,
+                duration: Resource.Strings.Instantaneous,
                 savingThrow: Resource.Strings.FortitudePartial
                 ).TargetEnemy(
                 ).SetComponents(
@@ -476,9 +457,8 @@ namespace DarkCodex
                             Helper.CreateContextActionDealDamage(DamageEnergyType.NegativeEnergy, Helper.CreateContextDiceValue(DiceType.D6, 1, 0)),
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionDealDamage(StatType.Strength, Helper.CreateContextDiceValue(DiceType.Zero, 0, 1))))
                         )),
-                    Helper.CreateSpellComponent(SpellSchool.Necromancy),
-                    Helper.CreateSpellDescriptorComponent(SpellDescriptor.Cold)
-                    );
+                Helper.CreateSpellComponent(SpellSchool.Necromancy)
+                );
 
             effect.MakeStickySpell(out var cast, Helper.ContextCasterLevel);
             cast.AddComponents(Helper.CreateCraftInfoComponent());
@@ -491,7 +471,47 @@ namespace DarkCodex
                 );
         }
 
-        // for debug only
+        [PatchInfo(Severity.Create, "Frostbite", "spell: Frostbite", false)]
+        public static void CreateFrostbite()
+        {
+            var effect = Helper.CreateBlueprintAbility(
+                "Frostbite_Effect",
+                "Frostbite",
+                "Your melee touch attack deals 1d6 points of nonlethal cold damage + 1 point per level, and the target is fatigued. The fatigued condition ends when the target recovers from the nonlethal damage. This spell cannot make a creature exhausted even if it is already fatigued. You can use this melee touch attack up to one time per level.",
+                icon: Helper.CreateSprite("FrostBite.png"),
+                type: AbilityType.Spell,
+                actionType: UnitCommand.CommandType.Standard,
+                range: AbilityRange.Touch,
+                savingThrow: Resource.Strings.FortitudePartial,
+                duration: Resource.Strings.Instantaneous
+                ).TargetEnemy(
+                ).SetComponents(
+                Helper.CreateAbilityEffectRunAction(
+                    SavingThrowType.Unknown,
+                    //Helper.CreateContextActionApplyBuff("e6f2fc5d73d88064583cb828801212f4", Helper.DurationOneHour, fromSpell: true, dispellable: true), //Fatigued
+                    Helper.CreateContextActionDealDamage(DamageEnergyType.Cold, Helper.CreateContextDiceValue(DiceType.D6, 1, Helper.ContextCasterLevel))
+                    ),
+                new AbilityEffectApplied<RuleDealDamage>(
+                    (evt, context) => evt.HasDealtDamage(DamageTypeMix.Cold),
+                    Helper.CreateContextActionApplyBuff("e6f2fc5d73d88064583cb828801212f4", Helper.DurationOneHour, fromSpell: true, dispellable: true) //Fatigued
+                    ),
+                Helper.CreateSpellComponent(SpellSchool.Transmutation),
+                Helper.CreateSpellDescriptorComponent(SpellDescriptor.Cold)
+                );
+
+            effect.MakeStickySpell(out var cast, Helper.ContextCasterLevel);
+            cast.AddComponents(Helper.CreateCraftInfoComponent());
+            cast.Add(1,
+                "98c05aeff6e3d384f8aec6d584973642", //BloodragerSpellList
+                "4d72e1e7bd6bc4f4caaea7aa43a14639", //MagusSpellList
+                "c0c40e42f07ff104fa85492da464ac69", //ShamanSpelllist
+                "bad8638d40639d04fa2f80a1cac67d6b", //DruidSpellList
+                "d090b791bfe381740b98ed4ff909b1cf", //HunterSpelllist
+                "e17df9977b879b64e8a8cbb4b3569f19"  //WitchSpellList
+                );
+        }
+
+        [PatchInfo(Severity.Create | Severity.Hidden, "Debug Spells", "for debug only", false)]
         public static void CreateDebugSpells()
         {
             var recruit = Helper.CreateBlueprintAbility(
@@ -542,6 +562,15 @@ namespace DarkCodex
                         linkToCaster: false))
                 ).TargetPoint();
 
+            var extra = Helper.CreateBlueprintBuff(
+                "DebugBuffExtraHealth"
+                ).Flags(
+                hidden: true
+                ).SetComponents(
+                new TemporaryHitPointsRandom() { Descriptor = ModifierDescriptor.UntypedStackable, Bonus = 200 },
+                Helper.CreateAddStatBonus(4, StatType.AC, ModifierDescriptor.NaturalArmor)
+                );
+
             var stun = Helper.CreateBlueprintAbility(
                 "DebugSummonEnemyStunning",
                 "Stun an enemy",
@@ -551,8 +580,10 @@ namespace DarkCodex
                 ).TargetAny(
                 ).SetComponents(
                 Helper.CreateContextSetAbilityParams(casterLevel: 20),
-                Helper.CreateAbilityEffectRunAction(0, 
-                    Helper.CreateContextActionApplyBuff("09d39b38bb7c6014394b6daced9bacd3"))
+                Helper.CreateAbilityEffectRunAction(0,
+                    Helper.CreateContextActionApplyBuff("09d39b38bb7c6014394b6daced9bacd3"),
+                    Helper.CreateContextActionApplyBuff((AnyRef)extra)
+                    )
                 );
 
             var falseLife = Helper.Get<BlueprintAbility>("dc6af3b4fd149f841912d8a3ce0983de");

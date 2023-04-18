@@ -368,20 +368,6 @@
         <member name="M:CodexLib.MechanicActionBarSlotSpellGroup.UpdateAutoUse">
             <returns>true if AutoUse is managed by this group</returns>
         </member>
-        <member name="T:CodexLib.MetamagicExt">
-            <summary>
-            WIP; suspect to change
-            </summary>
-            
-            RuleCollectMetamagic, AddMetamagicFeat
-            RuleApplyMetamagic
-            MetamagicData
-            MetamagicBuilder 
-            SpellBookMetamagicMixer?
-            UIUtilityTexts .GetMetamagicList .GetMetamagicName
-            Game.Instance.BlueprintRoot.LocalizedTexts.MetamagicNames
-            
-        </member>
         <member name="T:CodexLib.SpellSlotLevel">
             <summary>
             Container to compare Spell Slots. Equal when itself, converted from itself, or same level of the same spontaneous spellbook.
@@ -396,6 +382,26 @@
             <summary>
             Ability logic to teleport caster to point and return targets inbetween plus reach
             </summary>
+        </member>
+        <member name="T:CodexLib.AbilityEffectApplied`1">
+            <summary>
+            Runs actions, if owner <see cref="T:Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbility" /> triggered <typeparamref name="TRule" />.
+            </summary>
+        </member>
+        <member name="F:CodexLib.AbilityEffectApplied`1.Condition">
+            <summary>When true, Actions are executed.</summary>
+        </member>
+        <member name="F:CodexLib.AbilityEffectApplied`1.Actions">
+            <summary>Actions to perform, when Condition returns true.</summary>
+        </member>
+        <member name="M:CodexLib.AbilityEffectApplied`1.#ctor(System.Func{`0,Kingmaker.UnitLogic.Abilities.AbilityExecutionContext,System.Boolean},Kingmaker.ElementsSystem.GameAction[])">
+            <inheritdoc cref="T:CodexLib.AbilityEffectApplied`1" />
+        </member>
+        <member name="M:CodexLib.AbilityEffectApplied`1.OnEventAboutToTrigger(Kingmaker.RuleSystem.RulebookTargetEvent)">
+            <summary />
+        </member>
+        <member name="M:CodexLib.AbilityEffectApplied`1.OnEventDidTrigger(Kingmaker.RuleSystem.RulebookTargetEvent)">
+            <summary />
         </member>
         <member name="T:CodexLib.AbilityRequirementHasBuffTimed">
             <summary>
@@ -510,18 +516,6 @@
             <param name="buff">type: <b>BlueprintBuff</b></param>
             <param name="element">Damage type</param>
         </member>
-        <member name="T:CodexLib.FlameBladeLogic">
-            <summary>
-            Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
-            </summary>
-        </member>
-        <member name="M:CodexLib.FlameBladeLogic.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue,System.Int32,System.Int32)">
-            <inheritdoc cref="T:CodexLib.FlameBladeLogic" />
-            <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
-            <param name="drReduction">Amount of DR ignored, if creature has flameBladeDervish.</param>
-            <param name="step">Bonus damage per caster level.</param>
-            <param name="max">Maximal bonus damage.</param>
-        </member>
         <member name="T:CodexLib.IncreaseResourceAmountPlus">
             <summary>
             Grants extra charges for each Fact a creature has.
@@ -548,6 +542,30 @@
             <param name="bonus">Maneuver bonus amount.</param>
             <param name="type">Type of combat maneuver.</param>
             <param name="descriptor">ModifierDescriptor of maneuver bonus.</param>
+        </member>
+        <member name="T:CodexLib.MetamagicReduceCostParametrized">
+            <summary>
+            Reduces metamagic cost. Can reduce cost by fixed amount or make the most expensive metamagic free. Can be filtered by metamagic.<br />
+            Filters by spell, if attached to a <see cref="T:Kingmaker.Blueprints.Classes.Selection.BlueprintParametrizedFeature" />.
+            </summary>
+        </member>
+        <member name="F:CodexLib.MetamagicReduceCostParametrized.Reduction">
+            <summary>Amount to reduce cost by.</summary>
+        </member>
+        <member name="F:CodexLib.MetamagicReduceCostParametrized.ReduceByMostExpensive">
+            <summary>Reduce cost by most expensive. Overrides Reduction.</summary>
+        </member>
+        <member name="F:CodexLib.MetamagicReduceCostParametrized.Metamagic">
+            <summary>Check spell has this specific metamagic.</summary>
+        </member>
+        <member name="M:CodexLib.MetamagicReduceCostParametrized.#ctor(System.Int32,System.Boolean,Kingmaker.UnitLogic.Abilities.Metamagic)">
+            <inheritdoc cref="T:CodexLib.MetamagicReduceCostParametrized" />
+        </member>
+        <member name="M:CodexLib.MetamagicReduceCostParametrized.OnEventAboutToTrigger(Kingmaker.RuleSystem.Rules.RuleApplyMetamagic)">
+            <summary />
+        </member>
+        <member name="M:CodexLib.MetamagicReduceCostParametrized.OnEventDidTrigger(Kingmaker.RuleSystem.Rules.RuleApplyMetamagic)">
+            <summary />
         </member>
         <member name="T:CodexLib.OverrideResourceLogic">
             <summary>
@@ -662,6 +680,18 @@
             Uses solution 3.
             </summary>
         </member>
+        <member name="T:CodexLib.SummonWeaponLogic">
+            <summary>
+            Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
+            </summary>
+        </member>
+        <member name="M:CodexLib.SummonWeaponLogic.#ctor(CodexLib.AnyRef,Kingmaker.UnitLogic.Mechanics.ContextValue,System.Int32,System.Int32)">
+            <inheritdoc cref="T:CodexLib.SummonWeaponLogic" />
+            <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
+            <param name="drReduction">Amount of DR ignored, if creature has flameBladeDervish.</param>
+            <param name="step">Bonus damage per caster level.</param>
+            <param name="max">Maximal bonus damage.</param>
+        </member>
         <member name="T:CodexLib.UnitConditionExceptionsFromBuff">
             <summary>Don't apply condition, if its source is in Exceptions.</summary>
         </member>
@@ -724,6 +754,11 @@
             <remarks>
             BlueprintComponent has a field OwnerBlueprint. When components are shared between blueprints, these may cause weird bugs.
             </remarks>
+        </member>
+        <member name="M:CodexLib.Helper.HasInterface(System.Type,System.Type)">
+            <summary>
+            Returns true if <i><paramref name="type" /></i> is <i><paramref name="interface" /></i> or implements <i><paramref name="interface" /></i>.
+            </summary>
         </member>
         <member name="M:CodexLib.Helper.GetFullName(System.Type)">
             <summary>
@@ -1116,6 +1151,17 @@
             <param name="toCaster" />
             <param name="asChild" />
         </member>
+        <member name="M:CodexLib.Helper.CreateContextActionApplyBuff(CodexLib.AnyRef,System.Single,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Apply buff to target or caster.
+            </summary>
+            <param name="buff">type: <b>BlueprintBuff</b></param>
+            <param name="durationInSeconds" />
+            <param name="fromSpell" />
+            <param name="dispellable" />
+            <param name="toCaster" />
+            <param name="asChild" />
+        </member>
         <member name="M:CodexLib.Helper.CreatePrerequisiteFeature(CodexLib.AnyRef,System.Boolean)">
             <summary>
             Prerequisite Feature
@@ -1178,6 +1224,11 @@
             Can handle multiple different types and will recursively resolve collections.
             </summary>
         </member>
+        <member name="M:CodexLib.Helper.AddBuffStacking(Kingmaker.EntitySystem.Entities.UnitEntityData,Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff,Kingmaker.UnitLogic.Mechanics.MechanicsContext,System.Nullable{System.TimeSpan})">
+            <summary>
+            Applies buff to unit or increases its duration, if unit is already under the effect of that buff.
+            </summary>
+        </member>
         <member name="M:CodexLib.Helper.Ensure``2(Kingmaker.EntitySystem.EntityDataBase)">
             <summary>
             Works like <see cref="M:Kingmaker.EntitySystem.EntityDataBase.Ensure``1" />, but for inherited UnitParts.<br />
@@ -1188,6 +1239,12 @@
         <member name="M:CodexLib.Helper.Get``2(Kingmaker.EntitySystem.EntityDataBase)">
             <summary>
             Works like <see cref="M:Kingmaker.EntitySystem.EntityDataBase.Get``1" />, but for inherited UnitParts.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.HasDealtDamage(Kingmaker.RuleSystem.Rules.Damage.RuleDealDamage,CodexLib.DamageTypeMix,System.Boolean)">
+            <summary>
+            Returns true if <i><paramref name="rule" /></i> dealt at least one point of damage of every type in <i><paramref name="damageType" /></i>.<br />
+            If <i><paramref name="any" /></i> is true, any damage type is sufficient, instead of all.
             </summary>
         </member>
         <member name="T:CodexLib.IActionBarConvert">
@@ -1307,6 +1364,23 @@
             Fixes AbilityDeliverTeleportTrample not returning worldPosition.
             </summary>
         </member>
+        <member name="T:CodexLib.Patches.Patch_MetamagicExt">
+            <summary>
+            Patch to extend metamagic.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_MetamagicExt.Transpiler1(System.Collections.Generic.IEnumerable{HarmonyLib.CodeInstruction},System.Reflection.Emit.ILGenerator,System.Reflection.MethodBase)">
+            <summary>
+            Forces Metamagic list to iterate through all bits, instead of just the defined Enums.<br />
+            This will fix all metamagic names for all mods, as long as <see cref="M:Kingmaker.UI.Common.UIUtilityTexts.GetMetamagicName(Kingmaker.UnitLogic.Abilities.Metamagic)" /> returns their text.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_MetamagicExt.Transpiler1Alt(System.Collections.Generic.IEnumerable{HarmonyLib.CodeInstruction})">
+            <summary>
+            Forces Metamagic list to iterate through all bits, instead of just the defined Enums.<br />
+            This will fix all metamagic names for all mods, as long as <see cref="M:Kingmaker.UI.Common.UIUtilityTexts.GetMetamagicName(Kingmaker.UnitLogic.Abilities.Metamagic)" /> returns their text.
+            </summary>
+        </member>
         <member name="T:CodexLib.Patches.Patch_Prerequisite">
             <summary>
             Logic for FeatureForPrerequisite. Pretense unit has a feature during feature selection.
@@ -1351,6 +1425,19 @@
         <member name="M:CodexLib.Patches.Patch_SpellSelectionParametrized.LevelUpActionPostLoad(Kingmaker.UnitLogic.Class.LevelUp.Actions.SelectFeature)">
             <summary>
             Fix for 'empty' Items collection.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patches.Patch_SummonWeapon">
+            <inheritdoc cref="T:CodexLib.SummonWeaponLogic" />
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SummonWeapon.ForceTouchAttack(Kingmaker.Blueprints.Items.Weapons.BlueprintItemWeapon,Kingmaker.RuleSystem.AttackType@)">
+            <summary>
+            Force touch attack, regardless of original weapon type.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Patches.Patch_SummonWeapon.SpawnSfx(Kingmaker.Items.ItemEntityWeapon)">
+            <summary>
+            Ensure visual effect are spawned.
             </summary>
         </member>
         <member name="T:CodexLib.Patches.Patch_TouchPersist">

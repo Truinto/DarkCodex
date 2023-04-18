@@ -11,19 +11,19 @@ namespace CodexLib
     /// <summary>
     /// Logic for Flame Blade, Divine Trident, Produce Flame, and any other spell that grants a magical touch weapon.
     /// </summary>
-    public class FlameBladeLogic : WeaponEnchantmentLogic, IInitiatorRulebookHandler<RuleCalculateWeaponStats>, IInitiatorRulebookHandler<RuleCalculateDamage>, IInitiatorRulebookHandler<RuleAttackRoll>
+    public class SummonWeaponLogic : WeaponEnchantmentLogic, IInitiatorRulebookHandler<RuleCalculateWeaponStats>, IInitiatorRulebookHandler<RuleCalculateDamage>, IInitiatorRulebookHandler<RuleAttackRoll>
     {
         public BlueprintUnitFactReference FlameBladeDervish;
         public ContextValue DRReduction;
         public int Step;
         public int Max;
 
-        /// <inheritdoc cref="FlameBladeLogic"/>
+        /// <inheritdoc cref="SummonWeaponLogic"/>
         /// <param name="flameBladeDervish">type: <b>BlueprintUnitFact</b></param>
         /// <param name="drReduction">Amount of DR ignored, if creature has flameBladeDervish.</param>
         /// <param name="step">Bonus damage per caster level.</param>
         /// <param name="max">Maximal bonus damage.</param>
-        public FlameBladeLogic(AnyRef flameBladeDervish, ContextValue drReduction = null, int step = 2, int max = 20)
+        public SummonWeaponLogic(AnyRef flameBladeDervish, ContextValue drReduction = null, int step = 2, int max = 20)
         {
             this.FlameBladeDervish = flameBladeDervish;
             this.DRReduction = drReduction;

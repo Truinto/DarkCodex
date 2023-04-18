@@ -145,9 +145,12 @@ namespace CodexLib
             }
         }
 
+        /// <summary>
+        /// Returns true if <i><paramref name="type"/></i> is <i><paramref name="interface"/></i> or implements <i><paramref name="interface"/></i>.
+        /// </summary>
         public static bool HasInterface(this Type type, Type @interface)
         {
-            return type != @interface && @interface.IsAssignableFrom(type);
+            return type == @interface || type.GetInterfaces().Contains(@interface);
         }
 
         /// <summary>
@@ -2016,6 +2019,7 @@ namespace CodexLib
         private static BlueprintFeatureSelection _combatfeats1;
         private static BlueprintFeatureSelection _combatfeats2;
         private static BlueprintFeatureSelection _combatfeats3;
+        private static BlueprintFeatureSelection _wizardfeats;
         public static void AddFeats(params BlueprintFeature[] feats)
         {
             _basicfeats1 ??= Get<BlueprintFeatureSelection>("247a4068296e8be42890143f451b4b45"); //BasicFeatSelection
@@ -2029,16 +2033,23 @@ namespace CodexLib
         }
         public static void AddCombatFeat(BlueprintFeature feats)
         {
-            _combatfeats1 ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("41c8486641f7d6d4283ca9dae4147a9f");
+            _combatfeats1 ??= Get<BlueprintFeatureSelection>("41c8486641f7d6d4283ca9dae4147a9f");
             AppendAndReplace(ref _combatfeats1.m_AllFeatures, feats.ToRef());
 
-            _combatfeats2 ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("c5158a6622d0b694a99efb1d0025d2c1");
+            _combatfeats2 ??= Get<BlueprintFeatureSelection>("c5158a6622d0b694a99efb1d0025d2c1");
             AppendAndReplace(ref _combatfeats2.m_AllFeatures, feats.ToRef());
 
-            _combatfeats3 ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
+            _combatfeats3 ??= Get<BlueprintFeatureSelection>("e10c4f18a6c8b4342afe6954bde0587b");
             AppendAndReplace(ref _combatfeats3.m_AllFeatures, feats.ToRef());
 
             AddFeats(feats);
+        }
+        public static void AddWizardFeat(BlueprintFeature feat)
+        {
+            _wizardfeats ??= Get<BlueprintFeatureSelection>("8c3102c2ff3b69444b139a98521a4899");
+            AppendAndReplace(ref _wizardfeats.m_AllFeatures, feat.ToRef());
+
+            AddFeats(feat);
         }
 
         private static BlueprintFeatureSelection _mythicfeats;
@@ -2046,8 +2057,8 @@ namespace CodexLib
         private static BlueprintFeatureSelection _mythicextratalents;
         public static void AddMythicTalent(BlueprintFeature feat)
         {
-            _mythictalents ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
-            _mythicextratalents ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
+            _mythictalents ??= Get<BlueprintFeatureSelection>("ba0e5a900b775be4a99702f1ed08914d");
+            _mythicextratalents ??= Get<BlueprintFeatureSelection>("8a6a511c55e67d04db328cc49aaad2b8");
 
             AppendAndReplace(ref _mythictalents.m_AllFeatures, feat.ToRef());
             _mythicextratalents.m_AllFeatures = _mythictalents.m_AllFeatures;
@@ -2055,7 +2066,7 @@ namespace CodexLib
 
         public static void AddMythicFeat(BlueprintFeature feat)
         {
-            _mythicfeats ??= ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81");
+            _mythicfeats ??= Get<BlueprintFeatureSelection>("9ee0f6745f555484299b0a1563b99d81");
 
             AppendAndReplace(ref _mythicfeats.m_AllFeatures, feat.ToRef());
         }
@@ -3834,11 +3845,13 @@ namespace CodexLib
             return result;
         }
 
+        [Obsolete]
         public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool fromSpell = false, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
             return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: fromSpell, toCaster: toCaster, asChild: asChild, dispellable: dispellable, permanent: permanent);
         }
 
+        [Obsolete]
         public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
             var result = new ContextActionApplyBuff();
@@ -3874,7 +3887,31 @@ namespace CodexLib
             return result;
         }
 
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, float durationInSeconds, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
+        /// <summary>
+        /// Apply buff to target or caster.
+        /// </summary>
+        /// <param name="buff">type: <b>BlueprintBuff</b></param>
+        /// <param name="durationInSeconds"></param>
+        /// <param name="fromSpell"></param>
+        /// <param name="dispellable"></param>
+        /// <param name="toCaster"></param>
+        /// <param name="asChild"></param>
+        public static ContextActionApplyBuff CreateContextActionApplyBuff(AnyRef buff, float durationInSeconds, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false)
+        {
+            var result = new ContextActionApplyBuff();
+            result.m_Buff = buff;
+            result.UseDurationSeconds = true;
+            result.DurationSeconds = durationInSeconds;
+            result.IsFromSpell = fromSpell;
+            result.IsNotDispelable = !dispellable;
+            result.ToCaster = toCaster;
+            result.AsChild = asChild;
+            result.Permanent = false;
+            return result;
+        }
+
+        [Obsolete]
+        private static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, float durationInSeconds, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
             var result = new ContextActionApplyBuff();
             result.m_Buff = buff.ToRef();
@@ -4015,6 +4052,11 @@ namespace CodexLib
             return result;
         }
 
+        public static FeatureTagsComponent CreateFeatureTagsComponent(FeatureTag featureTag)
+        {
+            return new FeatureTagsComponent() { FeatureTags = featureTag };
+        }
+
         public static PureRecommendation CreatePureRecommendation(RecommendationPriority priority = RecommendationPriority.Good)
         {
             return new PureRecommendation()
@@ -4148,7 +4190,7 @@ namespace CodexLib
             result.LocalizedSavingThrow = savingThrow ?? _empty;
             result.AvailableMetamagic = Metamagic.Empower | Metamagic.Maximize | Metamagic.Quicken | Metamagic.Extend | Metamagic.Heighten | Metamagic.Reach
                                       | Metamagic.CompletelyNormal | Metamagic.Persistent | Metamagic.Selective | Metamagic.Bolstered;
-            result.SpellResistance = type == AbilityType.Spell;
+            result.SpellResistance = type == AbilityType.Spell || type == AbilityType.SpellLike;
             result.IgnoreSpellResistanceForAlly = result.SpellResistance;
             AddAsset(result, guid);
             return result;

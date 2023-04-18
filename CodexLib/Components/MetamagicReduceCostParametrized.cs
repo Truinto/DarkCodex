@@ -14,15 +14,40 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Reduces metamagic cost. Can reduce cost by fixed amount or make the most expensive metamagic free. Can be filtered by metamagic.<br/>
+    /// Filters by spell, if attached to a <see cref="BlueprintParametrizedFeature"/>.
+    /// </summary>
     public class MetamagicReduceCostParametrized : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleApplyMetamagic>
     {
-        public int Reduction = 1;
-        public Metamagic Metamagic;
+        /// <summary>Amount to reduce cost by.</summary>
+        public int Reduction;
+        /// <summary>Reduce cost by most expensive. Overrides Reduction.</summary>
         public bool ReduceByMostExpensive;
+        /// <summary>Check spell has this specific metamagic.</summary>
+        public Metamagic Metamagic;
 
+        [Obsolete]
+        private MetamagicReduceCostParametrized()
+        {
+            Reduction = 1;
+        }
+
+        /// <inheritdoc cref="MetamagicReduceCostParametrized"/>
+        public MetamagicReduceCostParametrized(int reduction = 1, bool reduceByMostExpensive = false, Metamagic metamagic = 0)
+        {
+            this.Reduction = reduction;
+            this.ReduceByMostExpensive = reduceByMostExpensive;
+            this.Metamagic = metamagic;
+        }
+
+        /// <summary></summary>
         public void OnEventAboutToTrigger(RuleApplyMetamagic evt)
         {
-            if (this.Param.Blueprint is BlueprintAbility bp && bp != evt.Spell && bp != evt.Spell.Parent)
+            if (this.Param?.Blueprint is BlueprintAbility bp && bp != evt.Spell && bp != evt.Spell.Parent)
+                return;
+
+            if (Metamagic != 0 && !evt.AppliedMetamagics.Contains(Metamagic))
                 return;
 
             if (ReduceByMostExpensive)
@@ -34,12 +59,10 @@ namespace CodexLib
                 return;
             }
 
-            if (Metamagic != 0 && !evt.AppliedMetamagics.Contains(Metamagic))
-                return;
-
             evt.ReduceCost(Reduction);
         }
 
+        /// <summary></summary>
         public void OnEventDidTrigger(RuleApplyMetamagic evt)
         {
             // modified SpellLevelCost cannot reduce the spells cost; unless mythic metamagic

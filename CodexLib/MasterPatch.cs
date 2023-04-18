@@ -19,6 +19,7 @@ namespace CodexLib
     {
         public static List<Type> PatchList = new()
         {
+            //typeof(Event_AbilityEffectApplied),
             typeof(BpCache),
             typeof(Patch_AbilityAtWill),
             typeof(Patch_AbilityIsFullRound),
@@ -30,12 +31,13 @@ namespace CodexLib
             typeof(Patch_ContextValueParams),
             typeof(Patch_DebugReport),
             typeof(Patch_FixAbilityTargets),
-            typeof(Patch_FlameBlade),
+            typeof(Patch_SummonWeapon),
             typeof(Patch_GetTargetProjectileFix),
             typeof(Patch_LevelUp),
             typeof(Patch_LocalizationChanged),
             typeof(Patch_MaterialComponent),
             typeof(Patch_MechanicsContextRecalculate),
+            typeof(Patch_MetamagicExt),
             typeof(Patch_Prerequisite),
             typeof(Patch_ResourceOverride),
             typeof(Patch_RulebookEventBusPriority),
@@ -53,7 +55,7 @@ namespace CodexLib
         {
             if (PatchList == null || PatchList.Count == 0)
                 return;
-            
+
             var harmony = Scope.Stack.First().harmony;
             foreach (var patch in PatchList)
                 PatchSafe(harmony, patch);
@@ -85,7 +87,11 @@ namespace CodexLib
             try
             {
                 Scope.Stack.First().logger.Log("Patching " + patch.Name);
-                harmony.CreateClassProcessor(patch).Patch();
+
+                if (patch.HasInterface(typeof(IGlobalSubscriber)))
+                    EventBus.Subscribe(Activator.CreateInstance(patch));
+                else
+                    harmony.CreateClassProcessor(patch).Patch();
             }
             catch (Exception e)
             {

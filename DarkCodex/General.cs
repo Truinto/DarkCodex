@@ -365,7 +365,7 @@ namespace DarkCodex
                 "One of your parents was a gifted spellcaster who not only used metamagic often, but also developed many magical items and perhaps even a new spell or two — and you have inherited a fragment of this greatness.\nBenefit: Pick one spell when you choose this trait. When you apply metamagic feats to this spell that add at least 1 level to the spell, treat its actual level as 1 lower for determining the spell's final adjusted level. Additionally your caster level gains a +2 trait bonus as long as this bonus doesn’t raise your caster level above your current Hit Dice.",
                 icon: null,
                 group: FeatureGroup.Trait,
-                maxlevel: 4
+                maxlevel: 10
                 ).SetComponents(
                 new MetamagicReduceCostParametrized(),
                 new AddCasterLevelLimit() { Bonus = 2 }
@@ -377,9 +377,9 @@ namespace DarkCodex
                 "You have mastered a particular spell. Whenever you apply metamagic feats to it, you can reduce its final adjusted level by up to 2, but not below the spell's original cost.",
                 icon: null,
                 group: FeatureGroup.Trait,
-                maxlevel: 4
+                maxlevel: 10
                 ).SetComponents(
-                new MetamagicReduceCostParametrized() { Reduction = 2 }
+                new MetamagicReduceCostParametrized(2)
                 );
 
             var faithTrait1 = Helper.CreateBlueprintFeature(
@@ -657,7 +657,7 @@ namespace DarkCodex
                 "You are unequaled at the casting of one particular spell.\nBenefit: Pick one spell which you have the ability to cast. Whenever you cast that spell you may apply any one metamagic feat you have to that spell without affecting its level or casting time, as long as the total modified level of the spell does not use a spell slot above 9th level. In addition, if you have other feats which allow you to apply a set numerical bonus to any aspect of this spell (such as Spell Focus, Spell Penetration, Weapon Focus [ray], and so on), double the bonus granted by that feat when applied to this spell.",
                 onlyKnownSpells: true
                 ).SetComponents(
-                new MetamagicReduceCostParametrized() { ReduceByMostExpensive = true },
+                new MetamagicReduceCostParametrized(reduceByMostExpensive: true),
                 new SpellPerfection(),
                 Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15)
                 );

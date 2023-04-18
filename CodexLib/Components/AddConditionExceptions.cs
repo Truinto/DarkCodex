@@ -12,7 +12,7 @@ namespace CodexLib
 {
     [AllowedOn(typeof(BlueprintUnitFact), false)]
     [AllowMultipleComponents]
-    public class AddConditionExceptions : UnitFactComponentDelegate
+    public class AddConditionExceptions : UnitFactComponentDelegate, IUnitCombatHandler
     {
         public UnitCondition Condition;
         public UnitConditionExceptions Exception;
@@ -30,7 +30,17 @@ namespace CodexLib
         {
             int index = (int)Condition;
             var exceptions = this.Owner.State.m_ConditionsExceptions;
-            exceptions[index]?.Remove(Exception);
+            exceptions?[index]?.Remove(Exception);
+        }
+
+        public void HandleUnitJoinCombat(UnitEntityData unit)
+        {
+            OnTurnOff();
+            OnTurnOn();
+        }
+
+        public void HandleUnitLeaveCombat(UnitEntityData unit)
+        {
         }
     }
 }

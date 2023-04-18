@@ -246,6 +246,8 @@ namespace Shared
             }
             if (GUILayout.Button("Debug: Generate CodexLib bin files (will lag)", GUILayout.ExpandWidth(false)))
                 BpCache.ExportResources(Path.Combine(Helper.PathMods, "Blueprints.bin"));
+            if (GUILayout.Button("Debug: MC Cheat Ability", GUILayout.ExpandWidth(false)))
+                DebugCheatAbility();
             Checkbox(ref state.polymorphKeepInventory, "Debug: Enable polymorph equipment (restart to disable)");
             Checkbox(ref state.polymorphKeepModel, "Debug: Disable polymorph transformation [*]");
             Checkbox(ref state.verbose, "Debug: Verbose");
@@ -499,6 +501,7 @@ namespace Shared
             LoadSafe(General.CreatePoison);
             LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixBladeWhirlwind);
+            LoadSafe(Spellcasters.CreateDazingMetamagic);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
             PatchSafe(typeof(DEBUG.Enchantments));
@@ -552,6 +555,7 @@ namespace Shared
             LoadSafe(Spells.CreateDivineTrident);
             LoadSafe(Spells.CreateProduceFlame);
             LoadSafe(Spells.CreateChillTouch);
+            LoadSafe(Spells.CreateFrostbite);
             LoadSafe(Spells.PatchVarious);
 
             // General
@@ -701,6 +705,9 @@ namespace Shared
             LoadSafe(Unlock.UnlockAnimalCompanion);
             LoadSafe(Unlock.UnlockKineticist);
 
+            // fix for CodexLib's metamagic patch while running TTT
+            harmony.Unpatch(AccessTools.Method(typeof(UIUtilityTexts), nameof(UIUtilityTexts.GetMetamagicList)), HarmonyPatchType.Postfix, "*");
+
             patchInfos.Sort(); // sort info list for GUI
             patchInfos.Update();
 #if DEBUG
@@ -758,6 +765,13 @@ namespace Shared
             return true;
         }
 
+        /// <summary>
+        /// <b>You must set your project's reference of CodexLib as 'local copy false' (private="false").</b><br/>
+        /// Doing so causes the app domain to not load CodexLib with your mod. Instead call <see cref="EnsureCodexLib(string)"/> in your load entry (before calls to CodexLib show up in your code).<br/>
+        /// This makes sure only the newest assembly version is loaded. This is shared between all mods.<br/>
+        /// Failure to comply will break all mods using CodexLib upon update.
+        /// </summary>
+        /// <param name="modPath">Path of your mod. This is <b>modEntry.Path</b>.</param>
         private static void EnsureCodexLib(string modPath)
         {
             if (AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.StartsWith("CodexLib, ")))
@@ -1314,6 +1328,16 @@ namespace Shared
             {
                 PrintException(e);
             }
+        }
+
+        private static void DebugCheatAbility()
+        {
+            try
+            {
+                foreach (string bp in new[] { "4d5067521f7a4072b90bc66069bbed7d", "7853143d87baea1429bb409b023edb6b" })
+                    Game.Instance.Player.MainCharacter.Value.AddFact(Helper.Get<BlueprintUnitFact>(bp));
+            }
+            catch (Exception) { }
         }
     }
 }

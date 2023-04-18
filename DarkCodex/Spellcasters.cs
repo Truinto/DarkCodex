@@ -3,6 +3,7 @@ using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Designers.Mechanics.Recommendations;
 using Kingmaker.ElementsSystem;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.ActivatableAbilities;
@@ -266,7 +267,7 @@ namespace DarkCodex
             - 30-foot cone
             */
 
-            AnyRef[] channels = BpCache.Get<BlueprintAbility>().Where(w => w.SpellDescriptor.HasAnyFlag(
+            AnyRef[] channels = BpCache.Get<BlueprintAbility>().Where(w => w.Type != AbilityType.Spell && w.Type != AbilityType.SpellLike && w.SpellDescriptor.HasAnyFlag(
                 SpellDescriptor.ChannelNegativeHarm
                 | SpellDescriptor.ChannelNegativeHeal
                 | SpellDescriptor.ChannelPositiveHarm
@@ -353,6 +354,58 @@ namespace DarkCodex
                 );
 
             Helper.AddFeats(feat);
+        }
+
+        [PatchInfo(Severity.Create | Severity.Hidden | Severity.WIP, "Dazing Spell (Metamagic)", "spell damage also daze the target", false)]
+        public static void CreateDazingMetamagic()
+        {
+            /*
+            Dazing Spell (Metamagic)
+            You can daze creatures with the power of your spells.
+            Benefit: You can modify a spell to daze a creature damaged by the spell. When a creature takes damage from this spell, they become dazed for a number of rounds equal to the original level of the spell. If the spell allows a saving throw, a successful save negates the daze effect. If the spell does not allow a save, the target can make a Will save to negate the daze effect. If the spell effect also causes the creature to become dazed, the duration of this metamagic effect is added to the duration of the spell.
+            Level Increase: +3 (a dazing spell uses up a spell slot three levels higher than the spell’s actual level.
+            Spells that do not inflict damage do not benefit from this feat. 
+            */
+
+            var feat = Helper.CreateBlueprintFeature(
+                "DazingSpellFeat",
+                "Dazing Spell (Metamagic)",
+                "You can daze creatures with the power of your spells.\nBenefit: You can modify a spell to daze a creature damaged by the spell. When a creature takes damage from this spell, they become dazed for a number of rounds equal to the original level of the spell. If the spell allows a saving throw, a successful save negates the daze effect. If the spell does not allow a save, the target can make a Will save to negate the daze effect.\nLevel Increase: +3 (a dazing spell uses up a spell slot three levels higher than the spell’s actual level.)\nSpells that do not inflict damage do not benefit from this feat.",
+                group: FeatureGroup.WizardFeat
+                ).SetComponents(
+                new AddMetamagicFeat() { Metamagic = Const.Dazing },
+                Helper.CreatePrerequisiteStatValue(StatType.Intelligence, 3),
+                Helper.CreateFeatureTagsComponent(FeatureTag.Magic | FeatureTag.Metamagic)
+                );
+
+            // must add name
+            var names = Game.Instance.BlueprintRoot.LocalizedTexts.MetamagicNames;
+            if (names.Entries.Any(a => a.Value == Const.Dazing))
+                Helper.AppendAndReplace(ref names.Entries, new Kingmaker.Blueprints.Root.Strings.MetamagicString.MyEntry() { Value = Const.Dazing, Text = Helper.CreateString("Dazing") });
+
+            var favorite = Helper.CreateBlueprintFeature(
+                "FavoriteMetamagicDazing",
+                "Favorite Metamagic — Dazing"
+                ).SetUIData(
+                description: Helper.GetString("db1fbb2d-e684-43a1-a9d3-8a79a5b23761")
+                ).SetComponents(
+                //Helper.CreateAddMechanicsFeature(AddMechanicsFeature.MechanicsFeatureType.FavoriteMetamagicBolstered),
+                new MetamagicReduceCostParametrized(metamagic: Const.Dazing),
+                Helper.CreatePrerequisiteFeature(feat)
+                );
+
+            Helper.AddWizardFeat(feat);
+            Helper.Get<BlueprintFeatureSelection>("503fb196aa222b24cb6cfdc9a284e838") //FavoriteMetamagicSelection
+                .Add(favorite);
+
+            EventBus.Subscribe(new Event_DazingSpell());
+
+            Main.RunLast("DazingSpellFeat", () =>
+            {
+                foreach (var spell in BpCache.Get<BlueprintAbility>())
+                    if (spell.Type == AbilityType.Spell)
+                        spell.AvailableMetamagic |= Const.Dazing;
+            });
         }
     }
 }

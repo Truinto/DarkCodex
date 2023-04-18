@@ -27,50 +27,45 @@ namespace Shared
 
         public static bool ReadArgs(this string[] args, params string[] identifier)
         {
-            if (args.Length < 1 || identifier.Length < 1)
+            if (args == null || identifier == null)
                 return false;
 
-            bool result = false;
-            bool read = false;
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i].Length < 1 || ArgsIdentifier.Contains(args[i][0]))
-                    read = false;
-
                 if (identifier.Contains(args[i]))
-                    read = result = true;
+                    return true;
             }
-            return result;
+            return false;
         }
 
         public static bool ReadArgs(this string[] args, ref string value, params string[] identifier)
         {
-            if (args.Length < 1 || identifier.Length < 1)
+            if (args == null || identifier == null)
                 return false;
 
             bool read = false;
-            bool result = false;
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].Length < 1 || ArgsIdentifier.Contains(args[i][0]))
                     read = false;
 
                 if (read)
+                {
                     value = args[i];
+                    return true;
+                }
 
                 if (identifier.Contains(args[i]))
-                    read = result = true;
+                    read = true;
             }
-            return result;
+            return false;
         }
 
         public static bool ReadArgs(this string[] args, ref List<string> value, params string[] identifier)
         {
             value ??= new();
-            if (args.Length < 1)
-                throw new ArgumentException("empty argument", nameof(args));
-            if (identifier.Length < 1)
-                throw new ArgumentException("empty argument", nameof(identifier));
+            if (args == null || identifier == null)
+                return false;
 
             bool read = false;
             bool result = false;
@@ -80,7 +75,10 @@ namespace Shared
                     read = false;
 
                 if (read)
+                {
                     value.Add(args[i]);
+                    continue;
+                }
 
                 if (identifier.Contains(args[i]))
                     read = result = true;

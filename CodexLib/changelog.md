@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.4.2]
+- renamed FlameBladeLogic to SummonWeaponLogic
+
 ## [1.4.1]
 - removed unnecessary generics from CountableFlagArray and PartExtensions
 
