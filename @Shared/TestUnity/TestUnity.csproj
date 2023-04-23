@@ -28,13 +28,15 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Private="True" Include="0Harmony" HintPath="$(Lib)\0Harmony.dll" />
+		<Reference Private="True" Include="0Harmony" HintPath="$(Lib)\UnityModManager\0Harmony.dll" />
 		<Reference Private="True" Include="Newtonsoft.Json" HintPath="$(Lib)\Newtonsoft.Json.dll" />
-		<Reference Private="True" Include="UnityModManager" HintPath="$(Lib)\UnityModManager.dll" />
+		<Reference Private="True" Include="UnityModManager" HintPath="$(Lib)\UnityModManager\UnityModManager.dll" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\UnityMod\UnityMod.csproj" />
+
+		<GlobalAnalyzerConfigFiles Include="..\.globalconfiguration" Link=".globalconfiguration" />
 	</ItemGroup>
 
 </Project>

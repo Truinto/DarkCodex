@@ -54,7 +54,7 @@ namespace CodexLib
                 evt.OverrideDamageBonusStatMultiplier(1f);
             }
 
-            //evt.DoNotScaleDamage = true;
+            evt.DoNotScaleDamage = true;
         }
 
         public void OnEventDidTrigger(RuleCalculateWeaponStats evt)

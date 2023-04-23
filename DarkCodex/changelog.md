@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.31]
+- compatibility patch
+- fixed bug that would prevented limitless abilities to turn off #254
+- added DontScale flag to summoned weapons #252
+
 ## [1.5.30]
 - added new spell: Frostbite #235
 - fixed Mad Magic getting lost after reloading a save #244

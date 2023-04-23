@@ -13,20 +13,20 @@
             var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(IAbilityRestriction), nameof(IAbilityRestriction.IsAbilityRestrictionPassed));
-            data.ReplaceCall(Patch);
+            data.ReplaceCall(patch);
 
             return data.Code;
-        }
 
-        public static bool Patch(IAbilityRestriction instance, AbilityData ability)
-        {
-            if (instance is IAbilityResourceLogic
-                && ability.OverridenResourceLogic is IAbilityRestriction replace)
+            static bool patch(IAbilityRestriction instance, AbilityData ability)
             {
-                return replace.IsAbilityRestrictionPassed(ability);
-            }
+                if (instance is IAbilityResourceLogic
+                    && ability.OverridenResourceLogic is IAbilityRestriction replace)
+                {
+                    return replace.IsAbilityRestrictionPassed(ability);
+                }
 
-            return instance.IsAbilityRestrictionPassed(ability);
+                return instance.IsAbilityRestrictionPassed(ability);
+            }
         }
     }
 }

@@ -14,54 +14,75 @@ namespace DarkCodex
     {
         [HarmonyPatch(typeof(UnitActivatableAbilitiesController), nameof(UnitActivatableAbilitiesController.StopOutOfCombat))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> KeepGoingOutOfCombat(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
 
-            data.Seek(typeof(ActivatableAbility), nameof(ActivatableAbility.Stop));
-            data.ReplaceCall(Patch1);
+            data.Seek(typeof(BlueprintActivatableAbility), nameof(BlueprintActivatableAbility.DeactivateIfCombatEnded));
+            data.InsertAfter(patch);
 
             return data.Code;
+
+            static bool patch(bool __stack, ActivatableAbility ability)
+            {
+                return __stack && !IsFree(ability);
+            }
         }
+
 
         [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.OnNewRound))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler1(instructions, generator, original);
+        public static IEnumerable<CodeInstruction> KeepGoingOnNewRound(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        {
+            var data = new TranspilerTool(instructions, generator, original);
+
+            data.Seek(typeof(BlueprintActivatableAbility), nameof(BlueprintActivatableAbility.DeactivateIfCombatEnded));
+            data.InsertAfter(patch);
+
+            return data.Code;
+
+            static bool patch(bool __stack, ActivatableAbility __instance)
+            {
+                return __stack && !IsFree(__instance);
+            }
+        }
+
 
         [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.TryStart))]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> AlwaysStartable(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(BlueprintActivatableAbility), nameof(BlueprintActivatableAbility.ActivateOnCombatStarts));
-            data.InsertAfter(Patch3);
+            data.InsertAfter(patch);
 
             return data.Code;
+            
+            static bool patch(bool __stack, ActivatableAbility __instance)
+            {
+                return __stack && !IsFree(__instance);
+            }
         }
+
 
         [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.IsAvailableByRestrictions), MethodType.Getter)]
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler4(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        public static IEnumerable<CodeInstruction> AlwaysAvailable(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
 
             data.Seek(typeof(BlueprintActivatableAbility), nameof(BlueprintActivatableAbility.OnlyInCombat));
-            data.InsertAfter(Patch3);
+            data.InsertAfter(patch);
 
             return data.Code;
+            
+            static bool patch(bool __stack, ActivatableAbility __instance)
+            {
+                return __stack && !IsFree(__instance);
+            }
         }
 
-        public static void Patch1(ActivatableAbility ability, bool forceRemovedBuff)
-        {
-            if (!IsFree(ability))
-                ability.Stop(forceRemovedBuff);
-        }
-
-        public static bool Patch3(bool __stack, ActivatableAbility __instance)
-        {
-            return __stack && !IsFree(__instance);
-        }
 
         public static bool IsFree(ActivatableAbility ability)
         {

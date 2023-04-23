@@ -3962,7 +3962,7 @@ namespace CodexLib
         public static PrerequisiteFeaturesFromList CreatePrerequisiteFeaturesFromList(IEnumerable<AnyRef> blueprintFeature = null, int amount = 1, bool any = false)
         {
             var result = new PrerequisiteFeaturesFromList();
-            result.m_Features = blueprintFeature?.ToRef<BlueprintFeatureReference>();
+            result.m_Features = blueprintFeature?.ToRef<BlueprintFeatureReference>() ?? Array.Empty<BlueprintFeatureReference>();
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
             result.Amount = blueprintFeature == null ? 0 : amount;
             return result;
@@ -4244,6 +4244,8 @@ namespace CodexLib
             result.RequireProficiency = requireKnown; // use this to require the spell to be known?
             result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unknown?
             // if both true, check unknown and prerequisites are met
+
+            result.BlueprintParameterVariants = Array.Empty<AnyBlueprintReference>();
 
             AddAsset(result, guid);
             return result;
@@ -5069,6 +5071,9 @@ namespace CodexLib
         {
             try
             {
+                if (!File.Exists(path))
+                    path = Path.Combine(Scope.ModPath, "icons", path);
+
                 var bytes = File.ReadAllBytes(path);
                 var texture = new Texture2D(width, height);
                 texture.LoadImage(bytes);
@@ -5085,6 +5090,9 @@ namespace CodexLib
         {
             try
             {
+                if (!File.Exists(path))
+                    path = Path.Combine(Scope.ModPath, "icons", path);
+
                 var bytes = File.ReadAllBytes(path);
                 var texture = new Texture2D(width, height);
                 texture.LoadImage(bytes);

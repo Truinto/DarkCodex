@@ -530,21 +530,54 @@ namespace TestUnity
         [TestMethod]
         public void TestInsertReturnConditionalTrue()
         {
-            harmony.Patch(AccessTools.Method(typeof(TestTarget), nameof(TestTarget.PatchReturn)), transpiler: new(((Delegate)InsertReturnConditionalTrue).Method));
+            harmony.Patch(AccessTools.Method(typeof(TestTarget), nameof(TestTarget.PatchReturn)), transpiler: new(((Delegate)transpiler).Method));
             var result = TestTarget.PatchReturn();
             Assert.AreEqual(8, result);
             harmony.UnpatchAll();
+
+            static IEnumerable<CodeInstruction> transpiler(IEnumerable<CodeInstruction> instr, ILGenerator generator, MethodBase original)
+            {
+                var tools = new TranspilerTool(instr, generator, original);
+                tools.InsertReturn(patch, true);
+                return tools;
+            }
+
+            static bool patch(ref long __result)
+            {
+                __result = 2;
+                return true;
+            }
         }
-        public static IEnumerable<CodeInstruction> InsertReturnConditionalTrue(IEnumerable<CodeInstruction> instr, ILGenerator generator, MethodBase original)
+
+
+
+        [TestMethod]
+        public void TestInsertJump()
         {
-            var tools = new TranspilerTool(instr, generator, original);
-            tools.InsertReturn(PatchInsertReturnConditionalTrue, true);
-            return tools;
-        }
-        public static bool PatchInsertReturnConditionalTrue(ref long __result)
-        {
-            __result = 2;
-            return true;
+            harmony.Patch(AccessTools.Method(typeof(TestTarget), nameof(TestTarget.PatchCondition)), transpiler: new(((Delegate)transpiler).Method));
+            int local0 = 10;
+            new TestTarget().PatchCondition(8, ref local0);
+            Assert.AreEqual(10, local0);
+            new TestTarget().PatchCondition(3, ref local0);
+            Assert.AreEqual(6, local0);
+            harmony.UnpatchAll();
+
+            static IEnumerable<CodeInstruction> transpiler(IEnumerable<CodeInstruction> instr, ILGenerator generator, MethodBase original)
+            {
+                var tools = new TranspilerTool(instr, generator, original);
+                var label = tools.GetLabel(tools.Code.Last());
+                tools.Seek(OpCodes.Ldarg_2);
+                tools.InsertJump(patch, label, true);
+                return tools;
+            }
+
+            static bool patch(int number)
+            {
+                if (number == 8)
+                    return true;
+                else
+                    return false;
+            }
         }
 
 

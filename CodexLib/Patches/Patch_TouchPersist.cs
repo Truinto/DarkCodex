@@ -75,7 +75,7 @@ namespace CodexLib.Patches
 
             return data;
 
-            bool patch(bool __stack, [LocalParameter(indexByType: 0)] UnitPartTouch partTouch)
+            static bool patch(bool __stack, [LocalParameter(indexByType: 0)] UnitPartTouch partTouch)
             {
                 return partTouch is UnitPartTouchPersist && CombatController.IsInTurnBasedCombat();
             }

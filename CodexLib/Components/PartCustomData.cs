@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 namespace CodexLib
 {
     /// <summary>
-    /// EntityPart to store any kind of enum value.
+    /// EntityPart to store any kind of enum value.<br/>
+    /// Used by <see cref="AddMechanicFeatureCustom"/>.
     /// </summary>
     public class PartCustomData : EntityPart
     {
@@ -28,7 +29,8 @@ namespace CodexLib
     }
 
     /// <summary>
-    /// Extension methods to work with <see cref="PartCustomData"/>.
+    /// Extension methods to work with <see cref="PartCustomData"/>.<br/>
+    /// Used by <see cref="AddMechanicFeatureCustom"/>.
     /// </summary>
     public static class PartExtensions
     {

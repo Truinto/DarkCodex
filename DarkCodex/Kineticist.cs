@@ -717,7 +717,7 @@ namespace DarkCodex
                 icon: icon
                 );
             buff1.SetComponents(
-                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Metakinesis, Value = 1 },
+                new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Metakinesis, Value = 1, m_AppliableTo = Array.Empty<BlueprintAbilityReference>() },
                 Helper.CreateAutoMetamagic(Metamagic.Selective, null, AutoMetamagic.AllowedType.KineticistBlast)
                 ).Flags(hidden: true, stayOnDeath: true);
 

@@ -37,7 +37,8 @@ namespace CodexLib
             typeof(Patch_LocalizationChanged),
             typeof(Patch_MaterialComponent),
             typeof(Patch_MechanicsContextRecalculate),
-            typeof(Patch_MetamagicExt),
+            // TODO! fix metamagic ext; currently displayes everything twice
+            //typeof(Patch_MetamagicExt),
             typeof(Patch_Prerequisite),
             typeof(Patch_ResourceOverride),
             typeof(Patch_RulebookEventBusPriority),

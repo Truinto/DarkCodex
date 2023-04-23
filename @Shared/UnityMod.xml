@@ -494,11 +494,28 @@
         </member>
         <member name="M:Shared.TranspilerTool.InsertReturn(System.Delegate,System.Boolean)">
             <summary>
-            Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result. <br/>
+            Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result.<br/>
             This function will inject necessary load OpCodes.<br/>
             <b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b>
             </summary>
             <param name="func"><b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b></param>
+            <param name="before">If true will inject delegate before current line (still pointing to the same code). Otherwise after (pointing to the new code).</param>
+            <remarks>
+            The delegate may define any of the original parameters, locals, and __instance (if non-static).<br/>
+            These optional parameters are matched by name, with <see cref="T:Shared.LocalParameterAttribute"/>, or with <see cref="T:Shared.OriginalParameterAttribute"/>.<br/>
+            If <see cref="T:Shared.LocalParameterAttribute"/> doesn't match any existing locals, then a new one is generated. Non matching parameters will throw.<br/>
+            If the optional parameter's source is ref (or out), then the delegate must also use ref. Otherwise ref is optional.
+            </remarks>
+        </member>
+        <member name="M:Shared.TranspilerTool.InsertJump(System.Delegate,Shared.LabelInfo,System.Boolean)">
+            <summary>
+            Injects jump to given label.<br/>
+            This function will inject necessary load OpCodes.<br/>
+            Use <see cref="M:Shared.TranspilerTool.GetLabel(HarmonyLib.CodeInstruction,System.String,System.Boolean)"/> to jump to a specific CodeInstruction.<br/>
+            <b>bool Function([object __instance], [object arg0], [object arg1...])</b>
+            </summary>
+            <param name="func"><b>bool Function([object __instance], [object arg0], [object arg1...])</b></param>
+            <param name="label">Label to jump to, if func returns true.</param>
             <param name="before">If true will inject delegate before current line (still pointing to the same code). Otherwise after (pointing to the new code).</param>
             <remarks>
             The delegate may define any of the original parameters, locals, and __instance (if non-static).<br/>
@@ -593,12 +610,17 @@
         </member>
         <member name="M:Shared.TranspilerTool.GetLabel(HarmonyLib.CodeInstruction,System.String,System.Boolean)">
             <summary>
-            Get a label to a specific CodeInstruction.
+            Get a label to a specific CodeInstruction. Name must be attached to this CodeInstruction or be null.
             </summary>
         </member>
         <member name="M:Shared.TranspilerTool.GetLabel(System.String,System.Boolean)">
             <summary>
             Get label with a specific name or create a new label, if name is null or non-existent.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetLabel(System.Int32)">
+            <summary>
+            Get label by label index (not line index).
             </summary>
         </member>
         <member name="M:Shared.TranspilerTool.NameLabel(System.Int32,System.String)">
@@ -614,6 +636,11 @@
         <member name="M:Shared.TranspilerTool.GetLocal(System.String,System.Type,System.Boolean)">
             <summary>
             Get local with a specific name or create a new local, if name is null or non-existent and type is given.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetLocal(System.Int32,System.Type)">
+            <summary>
+            Get local by index.
             </summary>
         </member>
         <member name="M:Shared.TranspilerTool.NameLocal(System.Int32,System.String)">
@@ -723,7 +750,8 @@
         </member>
         <member name="T:Shared.LabelInfo">
             <summary>
-            Struct to hold Label and string.
+            Struct to hold Label and string.<br/>
+            Use <see cref="M:Shared.TranspilerTool.GetLabel(System.String,System.Boolean)"/> to get or create new labels.
             </summary>
         </member>
         <member name="F:Shared.LabelInfo.Label">

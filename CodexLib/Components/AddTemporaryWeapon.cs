@@ -16,6 +16,7 @@ namespace CodexLib
     /// </summary>
     public class AddTemporaryWeapon : UnitBuffComponentDelegate<AddKineticistBladeData>, IAreaActivationHandler
     {
+        /// <summary>Weapon to spawn.</summary>
         public BlueprintItemWeaponReference Weapon;
 
         /// <inheritdoc cref="AddTemporaryWeapon"/>

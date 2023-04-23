@@ -19,14 +19,14 @@ namespace DarkCodex
 
             // set variable to true, if weapon should be considered light
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsLight));
-            data.InsertAfter(Patch);
+            data.InsertAfter(patch);
 
             return data.Code;
-        }
 
-        public static bool Patch(bool __stack, TwoWeaponFightingAttackPenalty __instance)
-        {
-            return __stack || __instance.Owner.HasFlag(MechanicFeature.ProdigiousTWF);
+            static bool patch(bool __stack, TwoWeaponFightingAttackPenalty __instance)
+            {
+                return __stack || __instance.Owner.HasFlag(MechanicFeature.ProdigiousTWF);
+            }
         }
     }
 }

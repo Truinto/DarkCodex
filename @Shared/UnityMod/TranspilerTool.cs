@@ -445,6 +445,8 @@ namespace Shared
         /// </summary>
         public void InsertBefore(OpCode opcode, object operand = null)
         {
+            if (operand is LabelInfo label)
+                operand = (Label)label;
             Code.Insert(Index++, new CodeInstruction(opcode, operand));
         }
 
@@ -453,6 +455,8 @@ namespace Shared
         /// </summary>
         public void InsertAfter(OpCode opcode, object operand = null)
         {
+            if (operand is LabelInfo label)
+                operand = (Label)label;
             Code.Insert(++Index, new CodeInstruction(opcode, operand));
         }
 
@@ -491,7 +495,7 @@ namespace Shared
         }
 
         /// <summary>
-        /// Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result. <br/>
+        /// Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result.<br/>
         /// This function will inject necessary load OpCodes.<br/>
         /// <b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b>
         /// </summary>
@@ -565,6 +569,50 @@ namespace Shared
 
             if (hasCondition)
                 (before ? Current : Next).labels.Add(label1);
+        }
+
+        /// <summary>
+        /// Injects jump to given label.<br/>
+        /// This function will inject necessary load OpCodes.<br/>
+        /// Use <see cref="GetLabel(CodeInstruction, string, bool)"/> to jump to a specific CodeInstruction.<br/>
+        /// <b>bool Function([object __instance], [object arg0], [object arg1...])</b>
+        /// </summary>
+        /// <param name="func"><b>bool Function([object __instance], [object arg0], [object arg1...])</b></param>
+        /// <param name="label">Label to jump to, if func returns true.</param>
+        /// <param name="before">If true will inject delegate before current line (still pointing to the same code). Otherwise after (pointing to the new code).</param>
+        /// <remarks>
+        /// The delegate may define any of the original parameters, locals, and __instance (if non-static).<br/>
+        /// These optional parameters are matched by name, with <see cref="LocalParameterAttribute"/>, or with <see cref="OriginalParameterAttribute"/>.<br/>
+        /// If <see cref="LocalParameterAttribute"/> doesn't match any existing locals, then a new one is generated. Non matching parameters will throw.<br/>
+        /// If the optional parameter's source is ref (or out), then the delegate must also use ref. Otherwise ref is optional.
+        /// </remarks>
+        public void InsertJump(Delegate func, LabelInfo label, bool before = false)
+        {
+            var mi = func.GetMethodInfo();
+            var parametersFunc = mi.GetParameters();
+
+            if (!mi.IsStatic)
+                throw new ArgumentException("Delegate must be static");
+            if (mi.ReturnType != typeof(bool))
+                throw new ArgumentException("Delegate must return bool");
+            if (label.IsEmpty)
+                throw new ArgumentException("LabelInfo must not be empty");
+
+            for (int i = 0; i < parametersFunc.Length; i++)
+            {
+                var parameterFunc = parametersFunc[i];
+
+                if (InsertPushOriginal(before, parameterFunc))
+                    continue;
+
+                if (InsertPushLocal(before, parameterFunc))
+                    continue;
+
+                throw new ArgumentException($"Delegate unknown parameter name '{parameterFunc.Name}'!");
+            }
+
+            Code.Insert(before ? Index++ : ++Index, new CodeInstruction(OpCodes.Call, mi));
+            Code.Insert(before ? Index++ : ++Index, new CodeInstruction(OpCodes.Brtrue, (Label)label));
         }
 
         /// <summary>
@@ -913,7 +961,7 @@ namespace Shared
 
                 Logger.PrintDebug($"Transpiler NextJumpNever @{Index} {line.opcode}");
 
-                line.operand = GetLabel(Next);
+                line.operand = (Label)GetLabel(Next);
 
                 //if (line.opcode.StackBehaviourPush != StackBehaviour.Push0)
                 //    throw new Exception($"Cond_Branch should not push onto stack {line.opcode}");
@@ -947,14 +995,35 @@ namespace Shared
         #region Labels
 
         /// <summary>
-        /// Get a label to a specific CodeInstruction.
+        /// Get a label to a specific CodeInstruction. Name must be attached to this CodeInstruction or be null.
         /// </summary>
-        public Label GetLabel(CodeInstruction line, string name = null, bool canMake = true)
+        public LabelInfo GetLabel(CodeInstruction line, string name = null, bool canMake = true)
         {
-            if (line.labels.Count == 0)
-                line.labels.Add(GetLabel(name, canMake));
+            LabelInfo label;
+            if (name != null)
+            {
+                label = LabelsExtended.Find(f => f.Name == name);
+                if (!label.IsEmpty)
+                {
+                    if (!line.labels.Contains(label))
+                        throw new Exception($"Label not attached to correct CodeInstruction: {name}");
+                    return label;
+                }
+            }
 
-            return line.labels.First();
+            if (line.labels.Count == 0)
+            {
+                if (!canMake)
+                    throw new Exception($"CodeInstruction has no label and canMake is false");
+                line.labels.Add(label = GetLabel(name, true));
+                return label;
+            }
+
+            label = LabelsExtended.Find(f => f.Equals(line.labels.First()));
+            if (label.IsEmpty)
+                throw new Exception($"Missing label in LabelsExtended: {label}");
+
+            return label;
         }
 
         /// <summary>
@@ -970,6 +1039,15 @@ namespace Shared
                     throw new Exception($"Label with the same index/name already exists! {info}");
                 LabelsExtended.Add(info);
             }
+            return info;
+        }
+
+        /// <summary>
+        /// Get label by label index (not line index).
+        /// </summary>
+        public LabelInfo GetLabel(int number)
+        {
+            var info = LabelsExtended.Find(f => f.Index == number);
             return info;
         }
 
@@ -1024,6 +1102,19 @@ namespace Shared
         }
 
         /// <summary>
+        /// Get local by index.
+        /// </summary>
+        public LocalInfo GetLocal(int index, Type type = null)
+        {
+            var info = LocalsExtended.Find(f => f.Index == index);
+
+            if (type != null && !info.IsEmpty && !info.Type.IsTypeCompatible(type))
+                throw new InvalidCastException("local type incompatible");
+
+            return info;
+        }
+
+        /// <summary>
         /// Set name of local by index.
         /// </summary>
         public void NameLocal(int localIndex, string name)
@@ -1033,7 +1124,7 @@ namespace Shared
 
             int index = LocalsExtended.FindIndex(f => f.Index == localIndex);
             if (index < 0)
-                return;
+                throw new Exception($"Local with index {localIndex} doesn't exists! {name}");
             LocalsExtended[index] = new(LocalsExtended[index].Local, name);
         }
 
@@ -1047,7 +1138,7 @@ namespace Shared
 
             int index = LocalsExtended.FindIndex(f => f.Local.LocalIndex == local.LocalIndex);
             if (index < 0)
-                return;
+                throw new Exception($"Local with index {local.LocalIndex} doesn't exists! {name}");
             LocalsExtended[index] = new(local, name);
         }
 
@@ -1091,6 +1182,8 @@ namespace Shared
         /// <summary></summary>
         public void Insert(int index, CodeInstruction item)
         {
+            if (item.operand is LabelInfo label)
+                item.operand = (Label)label;
             Code.Insert(index, item);
         }
 
@@ -1103,6 +1196,8 @@ namespace Shared
         /// <summary></summary>
         public void Add(CodeInstruction item)
         {
+            if (item.operand is LabelInfo label)
+                item.operand = (Label)label;
             Code.Add(item);
         }
 
@@ -1343,7 +1438,8 @@ namespace Shared
     #region Structs
 
     /// <summary>
-    /// Struct to hold Label and string.
+    /// Struct to hold Label and string.<br/>
+    /// Use <see cref="TranspilerTool.GetLabel(string, bool)"/> to get or create new labels.
     /// </summary>
     public readonly struct LabelInfo
     {
@@ -1358,14 +1454,14 @@ namespace Shared
         public bool IsEmpty => Name == null;
 
         /// <summary></summary>
-        public LabelInfo(Label label, string name = null)
+        internal LabelInfo(Label label, string name = null)
         {
             this.Label = label;
             this.Name = name ?? "L_" + label.GetHashCode();
         }
 
         /// <summary></summary>
-        public LabelInfo(int label, string name)
+        internal LabelInfo(int label, string name)
         {
             if (label < 0)
                 throw new IndexOutOfRangeException();
@@ -1384,8 +1480,6 @@ namespace Shared
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (IsEmpty)
-                return false;
             if (obj is LabelInfo info)
                 return this.Index == info.Index || this.Name == info.Name;
             if (obj is int integer)
@@ -1428,7 +1522,7 @@ namespace Shared
         public bool IsEmpty => Name == null;
 
         /// <summary></summary>
-        public LocalInfo(LocalVariableInfo local, string name)
+        internal LocalInfo(LocalVariableInfo local, string name)
         {
             this.Local = local ?? throw new ArgumentNullException();
             this.Name = name ?? throw new ArgumentNullException();
@@ -1445,8 +1539,6 @@ namespace Shared
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (IsEmpty)
-                return false;
             if (obj is LocalInfo info)
                 return this.Index == info.Index || this.Name == info.Name;
             if (obj is int integer)
