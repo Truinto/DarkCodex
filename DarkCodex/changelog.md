@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.32]
+- fixed bug that all physical kinetic blasts applied spell resistance #246
+
 ## [1.5.31]
 - compatibility patch
 - fixed bug that would prevented limitless abilities to turn off #254

@@ -2352,7 +2352,7 @@ namespace CodexLib
         {
             var result = new AbilityEffectRunAction();
             result.Actions = CreateActionList(
-                CreateContextActionApplyBuff(buff, duration, dispellable: dispellable, toCaster: toCaster, asChild: toCaster, permanent: duration == null)
+                CreateContextActionApplyBuff(buff, duration, dispellable: dispellable, toCaster: toCaster, asChild: toCaster)
                 );
             return result;
         }
@@ -3846,13 +3846,13 @@ namespace CodexLib
         }
 
         [Obsolete]
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool fromSpell = false, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
+        private static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, int duration = 0, DurationRate rate = DurationRate.Rounds, bool fromSpell = false, bool dispellable = false, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
             return CreateContextActionApplyBuff(buff, CreateContextDurationValue(bonus: duration, rate: rate), fromSpell: fromSpell, toCaster: toCaster, asChild: asChild, dispellable: dispellable, permanent: permanent);
         }
 
         [Obsolete]
-        public static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
+        private static ContextActionApplyBuff CreateContextActionApplyBuff(this BlueprintBuff buff, ContextDurationValue duration, bool fromSpell = false, bool dispellable = true, bool toCaster = false, bool asChild = false, bool permanent = false)
         {
             var result = new ContextActionApplyBuff();
             result.m_Buff = buff.ToRef();

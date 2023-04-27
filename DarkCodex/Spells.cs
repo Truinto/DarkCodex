@@ -568,7 +568,8 @@ namespace DarkCodex
                 hidden: true
                 ).SetComponents(
                 new TemporaryHitPointsRandom() { Descriptor = ModifierDescriptor.UntypedStackable, Bonus = 200 },
-                Helper.CreateAddStatBonus(4, StatType.AC, ModifierDescriptor.NaturalArmor)
+                Helper.CreateAddStatBonus(4, StatType.AC, ModifierDescriptor.NaturalArmor),
+                new AddSpellResistance() { Value = 1 }
                 );
 
             var stun = Helper.CreateBlueprintAbility(

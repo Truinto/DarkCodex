@@ -156,6 +156,7 @@ namespace DarkCodex
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
+            ability.SpellResistance = false;
             ability.AvailableMetamagic = Metamagic.Quicken;
             var abref = ability.ToRef();
 
@@ -468,6 +469,7 @@ namespace DarkCodex
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
+            earth_impale_ab.SpellResistance = false;
             actions.InjectCondition(new ContextConditionAttackRoll(weapon));
 
             // metal ability
@@ -492,6 +494,7 @@ namespace DarkCodex
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
+            metal_impale_ab.SpellResistance = false;
             actions.InjectCondition(new ContextConditionAttackRoll(weapon));
 
             // ice ability
@@ -517,6 +520,7 @@ namespace DarkCodex
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Earth),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Earth)
                 ).TargetPoint(CastAnimationStyle.Kineticist);
+            ice_impale_ab.SpellResistance = false;
             actions.InjectCondition(new ContextConditionAttackRoll(weapon));
 
             // add to feats and append variants
@@ -602,6 +606,7 @@ namespace DarkCodex
                 Step_sfx(AbilitySpawnFxTime.OnPrecastStart, Resource.Sfx.PreStart_Electric),
                 Step_sfx(AbilitySpawnFxTime.OnStart, Resource.Sfx.Start_Electric)
                 ).TargetEnemy(CastAnimationStyle.Kineticist);
+            thunderstorm_chain_ab.SpellResistance = false;
             Helper.AppendAndReplace(ref actions.Actions, new ContextActionChangeRankValue(AbilityRankChangeType.Add, AbilityRankType.DamageDice, -1));
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, chain_feat.ToRef());
@@ -870,7 +875,7 @@ namespace DarkCodex
                 );
             var save = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude,
                     succeed: null,
-                    failed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1));
+                    failed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), Helper.DurationOneRound));
             buff.SetComponents(
                 Step4_dc(true),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },
@@ -888,8 +893,8 @@ namespace DarkCodex
                 icon: Helper.StealIcon("46660d0da7797124aa221818778edc9d")
                 );
             var save_greater = Helper.MakeContextActionSavingThrow(SavingThrowType.Fortitude,
-                    succeed: Helper.CreateContextActionApplyBuff(Helper.Get<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323"), 1),
-                    failed: Helper.CreateContextActionApplyBuff(poison, permanent: true));
+                    succeed: Helper.CreateContextActionApplyBuff("4e42460798665fd4cb9173ffa7ada323", Helper.DurationOneRound),
+                    failed: Helper.CreateContextActionApplyBuff(poison, duration: null));
             buff_greater.SetComponents(
                 Step4_dc(true),
                 new RecalculateOnStatChange() { UseKineticistMainStat = true },

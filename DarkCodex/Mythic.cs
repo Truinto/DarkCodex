@@ -601,7 +601,7 @@ namespace DarkCodex
                 .ReplaceComponent(default(AbilityEffectRunAction),
                     Helper.CreateAbilityEffectRunAction(SavingThrowType.Will,
                         Helper.CreateConditional(new ContextConditionMoreHitDice(),
-                            ifTrue: Helper.CreateContextActionApplyBuff(ddbuff, permanent: true))))
+                            ifTrue: Helper.CreateContextActionApplyBuff(ddbuff, duration: null))))
                 .AddComponents(
                     new ContextCalculateAbilityParams()
                     {
