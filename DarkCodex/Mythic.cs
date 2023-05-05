@@ -67,6 +67,16 @@ namespace DarkCodex
                 SetResourceDecreasing(evangelist_resource.AssetGuid, limitless);
             }
 
+            // mod Homebrew Archetypes: Herald
+            if (Helper.Get("c66bf3b976be86b4f872289d3437ce40") is BlueprintAbilityResource herald_resource
+                && Helper.Get("58358a826daee6b44a46b657a1fd428f") is BlueprintFeature herald_wrath_prereq
+                && Helper.Get("92c7500a2c79b784090025e3d816ab29") is BlueprintFeature herald_mercy_prereq)
+            {
+                limitless.AddComponents(Helper.CreatePrerequisiteFeature(herald_wrath_prereq, true));
+                limitless.AddComponents(Helper.CreatePrerequisiteFeature(herald_mercy_prereq, true));
+                SetResourceDecreasing(herald_resource.AssetGuid, limitless);
+            }
+
             // mod Homebrew Archetypes: Dervish of the Dawn
             if ( Helper.Get("a077d4fe75dd0b846a1507f64bff71f8") is BlueprintFeature dervish_prereq)
             {
