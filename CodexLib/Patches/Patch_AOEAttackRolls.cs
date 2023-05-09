@@ -19,8 +19,11 @@ namespace CodexLib.Patches
             var original2 = AccessTools.PropertySetter(typeof(RuleAttackRoll), nameof(RuleAttackRoll.CriticalConfirmationD20));
             var data = new TranspilerTool(instructions, generator, original);
 
-            data.ReplaceAllCalls(original1, SetD20);
-            data.ReplaceAllCalls(original2, SetD20Crit);
+            if (data.ReplaceAllCalls(original1, SetD20) == 0)
+                throw new Exception("Unable to patch " + original1);
+
+            if (data.ReplaceAllCalls(original2, SetD20Crit) == 0)
+                throw new Exception("Unable to patch " + original2);
 
             return data;
         }

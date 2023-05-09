@@ -120,8 +120,9 @@ namespace Shared
         /// <param name="args">Process arguments to use.</param>
         /// <param name="output">Console text output.</param>
         /// <param name="onData">Data receive action.</param>
+        /// <param name="priority">Process prioirty.</param>
         /// <returns>Process exit code</returns>
-        public static int RunCommand(string command, string args, out string output, Action<string> onData = null)
+        public static int RunCommand(string command, string args, out string output, Action<string> onData = null, ProcessPriorityClass priority = ProcessPriorityClass.BelowNormal)
         {
             var sb = new StringBuilder();
             if (onData == null)
@@ -129,7 +130,7 @@ namespace Shared
             else
                 onData += s => sb.AppendLine(s);
 
-            using var p = RunCommandAsync(command, args, onData, true);
+            using var p = RunCommandAsync(command: command, args: args, onData: onData, startNow: true, priority: priority);
             p.WaitForExit();
 
             output = sb.ToString();
@@ -143,8 +144,9 @@ namespace Shared
         /// <param name="args">Process arguments to use.</param>
         /// <param name="onData">Data receive action. Prints to console, if empty.</param>
         /// <param name="startNow">Whenever to start the process immediately.</param>
+        /// <param name="priority">Process prioirty, only if startNow is true.</param>
         /// <returns>Process thread</returns>
-        public static Process RunCommandAsync(string command, string args = "", Action<string> onData = null, bool startNow = true)
+        public static Process RunCommandAsync(string command, string args = "", Action<string> onData = null, bool startNow = true, ProcessPriorityClass priority = ProcessPriorityClass.BelowNormal)
         {
             onData ??= Console.WriteLine;
 
@@ -167,6 +169,7 @@ namespace Shared
                 p.Start();
                 p.BeginOutputReadLine();
                 p.BeginErrorReadLine();
+                p.PriorityClass = priority;
             }
             //p.WaitForExit();
             return p;

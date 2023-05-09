@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.33]
+- fixed issue during RuleCalculateAbilityParams, if spell is null #259
+- merge pull request #257
+
 ## [1.5.32]
 - fixed bug that all physical kinetic blasts applied spell resistance #246
 

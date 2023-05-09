@@ -103,7 +103,7 @@ namespace DarkCodex
         public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // flurry of blows
         {
             var data = new TranspilerTool(instructions, generator, original);
-            data.ReplaceAllCalls(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsMonk), Patch3);
+            data.ReplaceAllCalls(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsMonk), Patch3); // TODO: use InsertAfter instead
             return data.Code;
         }
         public static bool Patch3(BlueprintItemWeapon weapon, MonkNoArmorAndMonkWeaponFeatureUnlock __instance)

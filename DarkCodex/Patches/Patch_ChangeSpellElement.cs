@@ -75,6 +75,9 @@ namespace DarkCodex
         [HarmonyPrefix]
         public static bool Prefix3(RuleCalculateAbilityParams evt, IncreaseSpellDescriptorCasterLevel __instance)
         {
+            if (evt.Spell == null)
+                return true;
+
             if (!evt.Spell.SpellDescriptor.HasAnyFlag(AnyElement))
                 return true;
 

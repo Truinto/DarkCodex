@@ -28,6 +28,6 @@ namespace DarkCodex
             return hasShield || __instance.Owner.Descriptor.HasFact(RapidShot);
         }
 
-        public static BlueprintBuff RapidShot = Helper.ToRef<BlueprintBuffReference>("0f310c1e709e15e4fa693db15a4baeb4"); //RapidShotBuff
+        public static BlueprintBuffReference RapidShot = Helper.ToRef<BlueprintBuffReference>("0f310c1e709e15e4fa693db15a4baeb4"); //RapidShotBuff
     }
 }
