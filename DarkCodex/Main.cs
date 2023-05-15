@@ -499,7 +499,6 @@ namespace Shared
             PatchSafe(typeof(DEBUG.SpellReach));
             PatchSafe(typeof(Patch_Prebuilds));
             LoadSafe(General.CreatePoison);
-            LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixBladeWhirlwind);
             LoadSafe(Spellcasters.CreateDazingMetamagic);
 #endif
@@ -633,7 +632,7 @@ namespace Shared
 
             // Kineticist
             LoadSafe(Kineticist.CreateElementalScion);
-            //LoadSafe(Kineticist.CreateElementalAscetic);
+            LoadSafe(Kineticist.CreateElementalAscetic);
             LoadSafe(Kineticist.FixWallInfusion);
             LoadSafe(Kineticist.CreateKineticistBackground);
             LoadSafe(Kineticist.CreateMobileGatheringFeat);
@@ -705,12 +704,13 @@ namespace Shared
             LoadSafe(Unlock.UnlockAnimalCompanion);
             LoadSafe(Unlock.UnlockKineticist);
 
-            // fix for CodexLib's metamagic patch while running TTT
-            harmony.Unpatch(AccessTools.Method(typeof(UIUtilityTexts), nameof(UIUtilityTexts.GetMetamagicList)), HarmonyPatchType.Postfix, "*");
 
             patchInfos.Sort(); // sort info list for GUI
             patchInfos.Update();
 #if DEBUG
+            // fix for CodexLib's metamagic patch while running TTT
+            harmony.Unpatch(AccessTools.Method(typeof(UIUtilityTexts), nameof(UIUtilityTexts.GetMetamagicList)), HarmonyPatchType.Postfix, "*");
+
             PrintDebug("Running in debug.");
             ExportContent();
             _ = Resource.LocalizedStrings;

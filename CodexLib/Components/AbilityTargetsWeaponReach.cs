@@ -1,5 +1,7 @@
 ﻿using Kingmaker.Designers;
 using Kingmaker.ElementsSystem;
+using Kingmaker.UI.AbilityTarget;
+using Kingmaker.UI.Selection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,98 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    [HarmonyPatch]
+    public static class Patch_FixAbilityTargetsWeaponReach
+    {
+        public static readonly Feet Marker = (-123).Feet();
+
+        //[HarmonyPatch(typeof(BlueprintAbility), nameof(BlueprintAbility.AppendAoE))]
+        //[HarmonyPatch(typeof(AbilityTargetsAround), nameof(AbilityTargetsAround.AoERadius), MethodType.Getter)]
+        //[HarmonyPostfix]
+        //public static void Postfix1b(AbilityTargetsAround __instance, ref Feet __result)
+        //{
+        //    var context = ContextData<MechanicsContext.Data>.Current?.Context;
+        //    _ = context.MaybeCaster;
+        //}
+
+        [HarmonyPatch(typeof(AbilityTargetsAround), nameof(AbilityTargetsAround.WouldTargetUnit))]
+        [HarmonyPrefix]
+        public static bool Prefix1(AbilityData ability, Vector3 targetPos, UnitEntityData unit, AbilityTargetsAround __instance, ref bool __result)
+        {
+            if (__instance.m_SpreadSpeed != Marker)
+                return true;
+
+            __result = unit.IsUnitInRange(targetPos, GetRealRadius(__instance.m_Radius, ability.Caster).Meters);
+            return false;
+        }
+
+        [HarmonyPatch(typeof(AbilityTargetsAround), nameof(AbilityTargetsAround.Select))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        {
+            var data = new TranspilerTool(instructions, generator, original);
+
+            data.InsertAfterAll(typeof(AbilityTargetsAround), nameof(AbilityTargetsAround.m_Radius), patch);
+
+            return data;
+
+            Feet patch(Feet __stack, AbilityExecutionContext context, AbilityTargetsAround __instance)
+            {
+                if (__instance.m_SpreadSpeed != Marker)
+                    return __stack;
+
+                return GetRealRadius(__instance.m_Radius, context.MaybeCaster);
+            }
+        }
+
+        [HarmonyPatch(typeof(AbilityAoERange), nameof(AbilityAoERange.GetRadius))]
+        [HarmonyPrefix]
+        public static bool Prefix3(AbilityAoERange __instance, ref float __result)
+        {
+            var targetsAround = __instance.Ability?.Blueprint?.GetComponent<AbilityTargetsAround>();
+            if (targetsAround != null || targetsAround.m_SpreadSpeed != Marker)
+                return true;
+
+            __result = GetRealRadius(targetsAround.m_Radius, __instance.Ability.Caster).Meters * 2f;
+            return false;
+        }
+
+        [HarmonyPatch(typeof(CharacterUIDecal), nameof(CharacterUIDecal.HandleCurrentAbilityShow))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler4(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
+        {
+            var data = new TranspilerTool(instructions, generator, original);
+
+            data.InsertAfterAll(typeof(BlueprintAbility), nameof(BlueprintAbility.AoERadius), patch);
+
+            return data;
+
+            Feet patch(Feet __stack, AbilityData ability, CharacterUIDecal __instance)
+            {
+                var targetsAround = ability.Blueprint.GetComponent<AbilityTargetsAround>();
+                if (targetsAround != null || targetsAround.m_SpreadSpeed != Marker)
+                    return __stack;
+
+                return GetRealRadius(targetsAround.m_Radius, ability.Caster);
+            }
+        }
+
+        [HarmonyPatch(typeof(CharacterUIDecal), nameof(CharacterUIDecal.HandleAbilityTargetHover))]
+        [HarmonyTranspiler]
+        public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler4(instructions, generator, original);
+
+
+        public static Feet GetRealRadius(Feet basevalue, UnitEntityData caster = null, UnitEntityData target = null)
+        {
+            var weapon = caster?.GetFirstWeapon();
+            if (weapon == null)
+                return basevalue;
+
+            float corpulence = caster.View.Corpulence + (target?.View.Corpulence ?? 0.5f);
+            return weapon.AttackRange + corpulence.Feet();
+        }
+    }
+
     public class AbilityTargetsWeaponReach : AbilitySelectTarget, IAbilityAoERadiusProvider
     {
         public Feet BaseRange;
@@ -41,7 +135,7 @@ namespace CodexLib
         public override Feet GetSpreadSpeed() => SpreadSpeed;
 
         public override IEnumerable<TargetWrapper> Select(AbilityExecutionContext context, TargetWrapper anchor)
-        { 
+        {
             if (context.MaybeCaster == null)
             {
                 Helper.PrintDebug("Caster is missing");

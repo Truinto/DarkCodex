@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.4.2.8</Version>
+		<Version>1.4.2.9</Version>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -63,7 +63,7 @@
 		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
 
-		<Reference Include="UnityMod" HintPath="$(SolutionDir)\@Shared\UnityMod.dll" />
+		<ProjectReference Include="$(SolutionDir)\@Shared\UnityMod\UnityMod.csproj" />
 	</ItemGroup>
 
 	<!-- Other Files -->
@@ -85,6 +85,14 @@
 		<None Remove="CodexLib.xml" />
 		<None Remove="update_codexlib.bat" />
 	</ItemGroup>
+
+	<!-- Use project reference for coding, but the merged CodexLib for building -->
+	<Target Name="DynamicReference" BeforeTargets="BuildOnlySettings">
+		<ItemGroup>
+			<ProjectReference Remove="$(SolutionDir)\@Shared\UnityMod\UnityMod.csproj" />
+			<Reference Include="UnityMod" HintPath="$(SolutionDir)\@Shared\UnityMod.dll" Private="false" />
+		</ItemGroup>
+	</Target>
 
 	<!-- Publicize -->
 	<Target Name="Publicize" BeforeTargets="BeforeBuild" AfterTargets="">

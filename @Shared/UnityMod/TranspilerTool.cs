@@ -495,6 +495,45 @@ namespace Shared
         }
 
         /// <summary>
+        /// Same as <see cref="InsertAfter(Delegate)"/>, but iterates all lines of code.
+        /// </summary>
+        /// <param name="type">Declaring type of the target member.</param>
+        /// <param name="name">Name of the target member.</param>
+        /// <param name="func">Delegate to run after target.</param>
+        /// <param name="parameters">Optional parameter definition, if target method is overloaded.</param>
+        /// <param name="generics">Optional generics definition, if target method has generics.</param>
+        public int InsertAfterAll(Type type, string name, Delegate func, Type[] parameters = null, Type[] generics = null)
+        {
+            var original = _memberCache.Get(type, name, parameters, generics);
+            return InsertAfterAll(original, func);
+        }
+
+        /// <summary>
+        /// Same as <see cref="InsertAfter(Delegate)"/>, but iterates all lines of code.
+        /// </summary>
+        /// <param name="original">Target member.</param>
+        /// <param name="func">Delegate to run after target.</param>
+        public int InsertAfterAll(MemberInfo original, Delegate func)
+        {
+            int counter = 0;
+            int index = Index;
+
+            First();
+            while (!IsLast)
+            {
+                if (Calls(original))
+                {
+                    InsertAfter(func);
+                    counter++;
+                }
+                Index++;
+            }
+
+            Index = index;
+            return counter;
+        }
+
+        /// <summary>
         /// Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result.<br/>
         /// This function will inject necessary load OpCodes.<br/>
         /// <b>[bool] Function(T out __result, [object __instance], [object arg0], [object arg1...])</b>

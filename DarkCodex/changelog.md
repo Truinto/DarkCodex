@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.34]
+- added Elemental Ascetic (needs testing) #130
+- fixed fix for quicken command type #258
+- fixed a compatibility issue with BubbleBuff #261
+
 ## [1.5.33]
 - fixed issue during RuleCalculateAbilityParams, if spell is null #259
 - merge pull request #257

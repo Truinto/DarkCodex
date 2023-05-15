@@ -1992,6 +1992,23 @@
             If the optional parameter's source is ref (or out), then the delegate must also use ref. Otherwise ref is optional.
             </remarks>
         </member>
+        <member name="M:Shared.TranspilerTool.InsertAfterAll(System.Type,System.String,System.Delegate,System.Type[],System.Type[])">
+            <summary>
+            Same as <see cref="M:Shared.TranspilerTool.InsertAfter(System.Delegate)" />, but iterates all lines of code.
+            </summary>
+            <param name="type">Declaring type of the target member.</param>
+            <param name="name">Name of the target member.</param>
+            <param name="func">Delegate to run after target.</param>
+            <param name="parameters">Optional parameter definition, if target method is overloaded.</param>
+            <param name="generics">Optional generics definition, if target method has generics.</param>
+        </member>
+        <member name="M:Shared.TranspilerTool.InsertAfterAll(System.Reflection.MemberInfo,System.Delegate)">
+            <summary>
+            Same as <see cref="M:Shared.TranspilerTool.InsertAfter(System.Delegate)" />, but iterates all lines of code.
+            </summary>
+            <param name="original">Target member.</param>
+            <param name="func">Delegate to run after target.</param>
+        </member>
         <member name="M:Shared.TranspilerTool.InsertReturn(System.Delegate,System.Boolean)">
             <summary>
             Injects return value. Returns original method, if returning false or void. If the original has a return value, then it must be supplied with __result.<br />

@@ -1187,7 +1187,7 @@ namespace DarkCodex
             }
         }
 
-        [PatchInfo(Severity.Create | Severity.WIP | Severity.Hidden, "Elemental Ascetic", "new Kineticist archetype", false)]
+        [PatchInfo(Severity.Create, "Elemental Ascetic", "new Kineticist archetype", false)]
         public static void CreateElementalAscetic()
         {
             var burnFeature = Helper.Get<BlueprintFeature>("57e3577a0eb53294e9d7cc649d5239a3");
@@ -1319,7 +1319,10 @@ namespace DarkCodex
         public static void FixBladeWhirlwind()
         {
             var whirlwind = Tree.BladeWhirlwind.Activator.GetBlueprint() as BlueprintAbility;
-            whirlwind.ReplaceComponent(default(AbilityTargetsAround), new AbilityTargetsWeaponReach(10.Feet()));
+            whirlwind.GetComponent<AbilityTargetsAround>().m_SpreadSpeed = Patch_FixAbilityTargetsWeaponReach.Marker;
+            //whirlwind.ReplaceComponent(default(AbilityTargetsAround), new AbilityTargetsWeaponReach(10.Feet()));
+
+            Main.Patch(typeof(Patch_FixAbilityTargetsWeaponReach));
         }
 
         #region Helper

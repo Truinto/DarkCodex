@@ -3837,6 +3837,7 @@ namespace CodexLib
             result.m_Buff = buff.ToRef();
             result.UseDurationSeconds = true;
             result.DurationSeconds = duration;
+            result.DurationValue = Helper.DurationZero;
             result.IsFromSpell = fromSpell;
             result.IsNotDispelable = !dispellable;
             result.ToCaster = toCaster;
@@ -3902,6 +3903,7 @@ namespace CodexLib
             result.m_Buff = buff;
             result.UseDurationSeconds = true;
             result.DurationSeconds = durationInSeconds;
+            result.DurationValue = Helper.DurationZero;
             result.IsFromSpell = fromSpell;
             result.IsNotDispelable = !dispellable;
             result.ToCaster = toCaster;
@@ -3917,6 +3919,7 @@ namespace CodexLib
             result.m_Buff = buff.ToRef();
             result.UseDurationSeconds = true;
             result.DurationSeconds = durationInSeconds;
+            result.DurationValue = Helper.DurationZero;
             result.IsFromSpell = fromSpell;
             result.IsNotDispelable = !dispellable;
             result.ToCaster = toCaster;
