@@ -59,6 +59,8 @@ namespace CodexLib
         /// <summary>List of delayed actions to execute after blueprint is generated.</summary>
         public List<Action<BlueprintScriptableObject>> Actions;
 
+        private BlueprintReferenceBase cache;
+
         /// <inheritdoc cref="AnyRef"/>
         public AnyRef()
         {
@@ -138,7 +140,13 @@ namespace CodexLib
         /// </summary>
         public T ToRef<T>() where T : BlueprintReferenceBase, new()
         {
-            return new T() { deserializedGuid = this.deserializedGuid };
+            if (cache is not T t)
+                cache = t = new T() { deserializedGuid = this.deserializedGuid };
+
+            if (t.deserializedGuid == BlueprintGuid.Empty)
+                Helper.PrintError("AnyRef.ToRef was used without any GUID");
+
+            return t;
         }
 
         /// <inheritdoc cref="Equals(object)"/>

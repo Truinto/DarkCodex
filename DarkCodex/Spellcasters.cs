@@ -33,12 +33,11 @@ namespace DarkCodex
             var bloodline = Helper.Get<BlueprintProgression>("4d491cf9631f7e9429444f4aed629791"); //BloodlineArcaneProgression
             var sage = Helper.Get<BlueprintProgression>("7d990675841a7354c957689a6707c6c2"); //SageBloodlineProgression
             var seeker = Helper.Get<BlueprintProgression>("562c5e4031d268244a39e01cc4b834bb"); //SeekerBloodlineArcaneProgression
-            var seekerFeat = Helper.Get<BlueprintFeature>("e407e1a130324fa8866dcbfd21ba1fa7"); //SeekerBloodlineArcaneCombatCastingAdeptFeatureAddLevel9
             var adeptFeat = Helper.Get<BlueprintFeature>("82a966061553ea442b0ce0cdb4e1d49c"); //BloodlineArcaneCombatCastingAdeptFeatureLevel1
             var apotheosis = Helper.Get<BlueprintFeature>("2086d8c0d40e35b40b86d47e47fb17e4"); //BloodlineArcaneArcaneApotheosisFeature
 
             apotheosis.AddComponents(
-                Helper.CreateRemoveFeatureOnApply(adeptFeat),
+                //Helper.CreateRemoveFeatureOnApply(adeptFeat),
                 new AddMechanicFeatureCustom(MechanicFeature.SpontaneousMetamagicNoFullRound)
                 );
             apotheosis.m_Description.CreateString(apotheosis.m_Description + "\nYou can add any metamagic feats that you know to your spells without increasing their casting time, although you must still expend higher-level spell slots.");
@@ -68,10 +67,15 @@ namespace DarkCodex
             buff.SetComponents(new MetamagicAdeptFix(resource.ToReference<BlueprintAbilityResourceReference>()));
             adeptFeat.SetComponents(Helper.CreateAddFacts(adept), Helper.CreateAddAbilityResources(resource));
             adeptFeat.m_Description.CreateString(descAdept);
-            seekerFeat.m_Description.CreateString(descAdept);
 
+            // remove the staged level depending bonus and replace it with the Metamagic Adept ability
+            Helper.Get<BlueprintFeature>("7aa83ee3526a946419561d8d1aa09e75") //BloodlineArcaneCombatCastingAdeptFeatureAddLevel1
+                .SetComponents(Helper.CreateAddFacts(adeptFeat));
             bloodline.RemoveFeature("3d7b19c8a1d03464aafeb306342be000"); //BloodlineArcaneCombatCastingAdeptFeatureAddLevel2
-            sage.RemoveFeature("3d7b19c8a1d03464aafeb306342be000");
+            sage.RemoveFeature("3d7b19c8a1d03464aafeb306342be000"); //BloodlineArcaneCombatCastingAdeptFeatureAddLevel2
+
+            Helper.Get<BlueprintFeature>("e407e1a130324fa8866dcbfd21ba1fa7") //SeekerBloodlineArcaneCombatCastingAdeptFeatureAddLevel9
+                .SetComponents(Helper.CreateAddFacts(adeptFeat));
             seeker.RemoveFeature("9cb584629d604325a1141c72ad751e17"); //SeekerBloodlineArcaneCombatCastingAdeptFeatureAddLevel15
         }
 

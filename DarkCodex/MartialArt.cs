@@ -387,5 +387,31 @@ namespace DarkCodex
 
             Helper.AddCombatFeat(feat);
         }
+
+        [PatchInfo(Severity.Create, "Two-Weapon Rend", "combat feat: deal extra damage, when attacking with offhand", false)]
+        public static void CreateTwoWeaponRend()
+        {
+            /*
+            Two-Weapon Rend (Combat)
+            Prerequisites: Dex 17, Double Slice, Improved Two-Weapon Fighting, Two-Weapon Fighting, base attack bonus +11.
+            Striking with both of your weapons simultaneously, you can use them to deliver devastating wounds.
+            Benefit: If you hit an opponent with both your primary hand and your off-hand weapon, you deal an additional 1d10 points of damage plus 1-1/2 times your Strength modifier. You can only deal this additional damage once each round.
+             */
+
+            var feat = Helper.CreateBlueprintFeature(
+                "CombatTwoWeaponRend",
+                "Two-Weapon Rend",
+                "Striking with both of your weapons simultaneously, you can use them to deliver devastating wounds.\nBenefit: If you hit an opponent with both your primary hand and your off-hand weapon, you deal an additional 1d10 points of damage plus 1-1/2 times your Strength modifier. You can only deal this additional damage once each round.",
+                group: FeatureGroup.CombatFeat
+                ).SetComponents(
+                Helper.CreatePrerequisiteStatValue(StatType.Dexterity, 17),
+                Helper.CreatePrerequisiteFullStatValue(StatType.BaseAttackBonus, 11),
+                Helper.CreatePrerequisiteFeature("8a6a1920019c45d40b4561f05dcb3240"), //DoubleSlice
+                Helper.CreatePrerequisiteFeature("9af88f3ed8a017b45a6837eab7437629"), //TwoWeaponFightingImproved
+                new RendFeature() { RendDamage = Helper.D10x1, RendType = Helper.CreateDamageTypeDescription(PhysicalDamageForm.Slashing) }
+                );
+
+            Helper.AddCombatFeat(feat);
+        }
     }
 }

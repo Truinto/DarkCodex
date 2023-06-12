@@ -58,6 +58,7 @@ Content
 |Kineticist.CreateAutoMetakinesis|activatable to automatically empower and maximize blasts, if you have unused burn|:book:|:heavy_check_mark:|
 |Kineticist.CreateBladeRushInfusion|infusion: Blade Rush, expands Kinetic Knight|:book:|:heavy_check_mark:|
 |Kineticist.CreateChainInfusion|infusion: Chain|:book:|:heavy_check_mark:|
+|Kineticist.CreateElementalAscetic|new Kineticist archetype|:book:|:heavy_check_mark:|
 |Kineticist.CreateElementalScion|new Kineticist archetype|:book:|:heavy_check_mark:|
 |Kineticist.CreateExpandedElement|basic feat: select extra elements|:house:|:heavy_check_mark:|
 |Kineticist.CreateExtraWildTalentFeat|basic feat: Extra Wild Talent; required by other kineticist features!|:book:|:heavy_check_mark:|
@@ -85,6 +86,7 @@ Content
 |MartialArt.CreateBladedBrush|combat feat: use glaive with Weapon Finesse and Precise Strike|:book:|:heavy_check_mark:|
 |MartialArt.CreatePaladinVirtuousBravo|archetype|:book:|:construction:|
 |MartialArt.CreateProdigiousTwoWeaponFighting|combat feat: use STR for TWF and always treat offhand as light|:book:|:heavy_check_mark:|
+|MartialArt.CreateTwoWeaponRend|combat feat: deal extra damage, when attacking with offhand|:book:|:heavy_check_mark:|
 |Monk.CreateFeralCombatTraining|basic feat: Feral Combat Training|:house:|:heavy_check_mark:|
 |Monk.PatchSoheiRapidShot|disallow rapid shot for Sohei|:house:|:heavy_check_mark:|
 |Mythic.CreateDemonLord|adds features of Demon Lords to the mythic Demon progression: teleport at will, ...|:house:|:construction:|

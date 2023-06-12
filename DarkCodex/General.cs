@@ -162,7 +162,7 @@ namespace DarkCodex
                 requireKnown: true
                 ).SetComponents(
                 new PreferredSpell(),
-                Helper.CreatePrerequisiteFullStatValue(StatType.SkillKnowledgeArcana, 5),
+                Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 5),
                 Helper.CreatePrerequisiteFeature(heighten)
                 );
             feat.Groups = new FeatureGroup[] { FeatureGroup.Feat, FeatureGroup.WizardFeat };

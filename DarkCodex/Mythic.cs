@@ -119,7 +119,7 @@ namespace DarkCodex
         [PatchInfo(Severity.Create, "Limitless Witch Hexes", "mythic ability: Hexes ignore their cooldown", true)]
         public static void CreateLimitlessWitchHexes()
         {
-            var limitless = Helper.CreateBlueprintFeature(
+            AnyRef limitless = Helper.CreateBlueprintFeature(
                 "LimitlessWitchHexes",
                 "Limitless Witch Hexes",
                 "Your curse knows no bounds.\nBenefit: You can use your hexes with no time restriction.",
@@ -139,14 +139,14 @@ namespace DarkCodex
                 var checknew = new AbilityTargetHasFactExcept();
                 checknew.m_CheckedFacts = check.m_CheckedFacts;
                 checknew.Inverted = check.Inverted;
-                checknew.PassIfFact = limitless.ToRef2();
+                checknew.PassIfFact = limitless;
 
                 ability.ReplaceComponent(check, checknew);
             }
 
             // resource based
-            Helper.Get<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless.ToRef2(); // WitchHexAuraOfPurityActivatableAbility
-            Helper.Get<BlueprintAbility>("cedc4959ab311d548881844eecddf57a").GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless.ToRef2()); // WitchHexLifeGiverAbility
+            Helper.Get<BlueprintActivatableAbility>("298edc3bc21e61044bba25f4e767cb8b").GetComponent<ActivatableAbilityResourceLogic>().m_FreeBlueprint = limitless; // WitchHexAuraOfPurityActivatableAbility
+            Helper.Get<BlueprintAbility>("cedc4959ab311d548881844eecddf57a").GetComponent<AbilityResourceLogic>().ResourceCostDecreasingFacts.Add(limitless); // WitchHexLifeGiverAbility
 
             Helper.AddMythicTalent(limitless);
         }

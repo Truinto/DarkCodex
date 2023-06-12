@@ -165,7 +165,7 @@ namespace DarkCodex
                 size: 30.Feet(),
                 sfx: sfx,
                 unitEnter: null,
-                unitRound: runCackle
+                unitRound: null //runCackle
                 ).CreateAddAreaEffect();
             var cackle_passiv = Helper.CreateBlueprintActivatableAbility(
                 "WitchHexCacklePassive",
@@ -180,7 +180,10 @@ namespace DarkCodex
                 deactivateImmediately: false
                 ).SetComponents(
                 consume_move);
-            cackle_buff.SetComponents(cackle_addarea);
+            cackle_buff.SetComponents(
+                cackle_addarea,
+                new BuffRunEachRound(runCackle, radius: default, affectAlly: true, affectEnemy: true)
+                );
 
             var runChant = chant.GetComponent<AbilityEffectRunAction>().Actions;
             var chant_addarea = Helper.CreateBlueprintAbilityAreaEffect(
@@ -191,7 +194,7 @@ namespace DarkCodex
                 size: 30.Feet(),
                 sfx: sfx,
                 unitEnter: null,
-                unitRound: runChant
+                unitRound: null //runChant
                 ).CreateAddAreaEffect();
             var chant_passiv = Helper.CreateBlueprintActivatableAbility(
                 "ShamanHexChantPassive",
@@ -206,7 +209,10 @@ namespace DarkCodex
                 deactivateImmediately: false
                 ).SetComponents(
                 consume_move);
-            chant_buff.SetComponents(chant_addarea);
+            chant_buff.SetComponents(
+                chant_addarea,
+                new BuffRunEachRound(runChant, radius: default, affectAlly: true, affectEnemy: true)
+                );
 
             Helper.AppendAndReplace(ref cackle_feat.GetComponent<AddFacts>().m_Facts, cackle_passiv.ToRef());
             Helper.AppendAndReplace(ref chant_feat.GetComponent<AddFacts>().m_Facts, chant_passiv.ToRef());

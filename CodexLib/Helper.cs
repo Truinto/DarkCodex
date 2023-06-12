@@ -1761,6 +1761,12 @@ namespace CodexLib
 
         #endregion
 
+        #region Dice Forumlas
+
+        public static readonly DiceFormula D10x1 = new DiceFormula() { m_Dice = DiceType.D10, m_Rolls = 1 };
+
+        #endregion
+
         #region Context Values
 
         public static readonly ContextValue ContextDefault = CreateContextValue(AbilityRankType.Default);
@@ -3183,14 +3189,6 @@ namespace CodexLib
             return result;
         }
 
-        public static PrerequisiteFullStatValue CreatePrerequisiteFullStatValue(StatType stat, int value = 0)
-        {
-            var result = new PrerequisiteFullStatValue();
-            result.Stat = stat;
-            result.Value = value;
-            return result;
-        }
-
         public static AddCondition CreateAddCondition(UnitCondition condition)
         {
             return new AddCondition
@@ -3977,6 +3975,15 @@ namespace CodexLib
             result.Stat = statType;
             result.Value = value;
             result.Group = any ? Prerequisite.GroupType.Any : Prerequisite.GroupType.All;
+            return result;
+        }
+
+        // for BAB, sneak?
+        public static PrerequisiteFullStatValue CreatePrerequisiteFullStatValue(StatType stat, int value = 0)
+        {
+            var result = new PrerequisiteFullStatValue();
+            result.Stat = stat;
+            result.Value = value;
             return result;
         }
 

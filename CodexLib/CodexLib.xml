@@ -507,6 +507,34 @@
         <member name="F:CodexLib.BleedBuff.BuffBleed">
             <summary>type: <b>BlueprintBuff</b></summary>
         </member>
+        <member name="T:CodexLib.BuffRunEachRound">
+            <summary>
+            Buff component to run actions each round.
+            </summary>
+        </member>
+        <member name="F:CodexLib.BuffRunEachRound.Actions">
+            <summary>Action to execute each round.</summary>
+        </member>
+        <member name="F:CodexLib.BuffRunEachRound.Radius">
+            <summary>If greater than 0, the radius to look for targets.</summary>
+        </member>
+        <member name="F:CodexLib.BuffRunEachRound.AffectAlly">
+            <summary>Whenever to affect allies.</summary>
+        </member>
+        <member name="F:CodexLib.BuffRunEachRound.AffectEnemy">
+            <summary>Whenever to affect enemies.</summary>
+        </member>
+        <member name="F:CodexLib.BuffRunEachRound.AffectOnlyOwner">
+            <summary>If true, then actions are only run on owner.</summary>
+        </member>
+        <member name="M:CodexLib.BuffRunEachRound.#ctor(Kingmaker.ElementsSystem.ActionList,Kingmaker.Utility.Feet,System.Boolean,System.Boolean,System.Boolean)">
+            <inheritdoc cref="T:CodexLib.BuffRunEachRound" />
+        </member>
+        <member name="M:CodexLib.BuffRunEachRound.OnNewRound">
+            <summary>
+            Interface implementation to execute on each round.
+            </summary>
+        </member>
         <member name="M:CodexLib.ContextActionUndoAction.#ctor(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType,System.Single,System.Boolean)">
             <summary>
             Restore action time. Cooldown is usually 6 seconds, except for CommandType.Move where 3 seconds is one move action and 6 seconds are 2 move actions.

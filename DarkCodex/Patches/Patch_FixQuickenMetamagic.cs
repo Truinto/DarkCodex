@@ -18,7 +18,7 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix(AbilityData __instance, ref UnitCommand.CommandType __result)
         {
-            if (__instance.HasMetamagic(Metamagic.Quicken) && __instance.Caster.Unit.CombatState.HasCooldownForCommand(__result))
+            if (__instance.HasMetamagic(Metamagic.Quicken) && __instance.Caster.Unit.CombatState.HasCooldownForCommand(UnitCommand.CommandType.Swift))
             {
                 __result = __instance.Blueprint.ActionType;
             }

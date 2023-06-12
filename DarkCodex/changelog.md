@@ -1,8 +1,13 @@
 # Changelog
 
+## [1.5.35]
+- fixed FixBloodlineArcane removing Metamagic Adept at level 9 #262
+- changed how cackle is applied which perhaps fixes inconsistencies #264
+- fixed fix for quicken command type #258
+- added combat feat Two-Weapon Rend #265
+
 ## [1.5.34]
 - added Elemental Ascetic (needs testing) #130
-- fixed fix for quicken command type #258
 - fixed a compatibility issue with BubbleBuff #261
 
 ## [1.5.33]

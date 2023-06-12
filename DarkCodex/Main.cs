@@ -499,7 +499,7 @@ namespace Shared
             PatchSafe(typeof(DEBUG.SpellReach));
             PatchSafe(typeof(Patch_Prebuilds));
             LoadSafe(General.CreatePoison);
-            LoadSafe(Kineticist.FixBladeWhirlwind);
+            //LoadSafe(Kineticist.FixBladeWhirlwind);
             LoadSafe(Spellcasters.CreateDazingMetamagic);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
@@ -584,6 +584,7 @@ namespace Shared
             LoadSafe(MartialArt.CreatePaladinVirtuousBravo);
             LoadSafe(MartialArt.CreateProdigiousTwoWeaponFighting);
             LoadSafe(MartialArt.CreateBladedBrush);
+            LoadSafe(MartialArt.CreateTwoWeaponRend);
 
             // Items
             LoadSafe(Items.PatchArrows);
