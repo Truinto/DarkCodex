@@ -16,5 +16,6 @@ namespace CodexLib
         ProdigiousTWF,
         NotAChance,
         MobilityAtFullSpeed,
+        KineticBladeAttackOfOpportunity,
     }
 }

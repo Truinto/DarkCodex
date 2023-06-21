@@ -760,9 +760,21 @@
             Returns true, if operation must use dereference.
             </summary>
         </member>
+        <member name="M:Shared.TranspilerTool.HasMethodCall(System.Reflection.MethodInfo,System.Reflection.MethodInfo)">
+            <summary>
+            Untested. Checks if a particular method has calls to another method.<br/>
+            Does not resolve wrapped method calls (e.g. lambda expressions).
+            </summary>
+        </member>
         <member name="M:Shared.TranspilerTool.GetCallers(System.Reflection.MethodInfo,System.String[],System.String[])">
             <summary>
-            Untested. Returns all methods calling a particular method.
+            Untested. Returns all methods in all assemblies calling a particular method.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetCallersR(System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Boolean)">
+            <summary>
+            Untested. Returns <i><paramref name="parentMethod"/></i> and embedded methods which call <i><paramref name="lookingforMethod"/></i>.
+            Does resolve some wrapped method calls (e.g. lambda expressions).
             </summary>
         </member>
         <member name="T:Shared.LabelInfo">

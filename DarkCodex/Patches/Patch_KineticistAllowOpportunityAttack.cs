@@ -24,60 +24,34 @@ namespace DarkCodex
         private static BlueprintGuid blade_p = BlueprintGuid.Parse("b05a206f6c1133a469b2f7e30dc970ef"); //KineticBlastPhysicalBlade
         private static BlueprintGuid blade_e = BlueprintGuid.Parse("a15b2fb1d5dc4f247882a7148d50afb0"); //KineticBlastEnergyBlade
 
+        public static void Example()
+        {
+            var CreateAddMechanicsFeature = AccessTools.Method("CodexLib.Helper, CodexLib:CreateAddMechanicsFeature", new[] { Type.GetType("CodexLib.MechanicFeature, CodexLib") });
+            var comp = CreateAddMechanicsFeature?.Invoke(null, new object[] { 8 });
+
+            Main.Print($"Patch_KineticistAllowOpportunityAttack.Example {comp != null}");
+        }
+
+        /// <summary>
+        /// Remove condition DisableAttacksOfOpportunity from kinetic blades.
+        /// </summary>
         [HarmonyPatch(typeof(AddKineticistBlade), nameof(AddKineticistBlade.OnActivate))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
-            data.ReplaceAllCalls(typeof(UnitState), nameof(UnitState.AddCondition), Patch1);
+            data.ReplaceAllCalls(typeof(UnitState), nameof(UnitState.AddCondition), patch);
             return data;
-        }
 
-        public static void Patch1(UnitState __instance, UnitCondition condition, Buff source, UnitConditionExceptions exceptions)
-        {
-        }
-
-        //[HarmonyPatch(typeof(UnitHelper), nameof(UnitHelper.IsThreatHand))]
-        //[HarmonyPrefix]
-        public static bool Prefix2(UnitEntityData unit, WeaponSlot hand, ref bool __result)
-        {
-            if (!hand.HasWeapon)
-                __result = false;
-
-            else if (!hand.Weapon.Blueprint.IsMelee && !unit.State.Features.SnapShot)
-                __result = false;
-
-            else if (hand.Weapon.Blueprint.IsUnarmed && !unit.Descriptor.State.Features.ImprovedUnarmedStrike)
-                __result = false;
-
-            else if ((hand.Weapon.Blueprint.Type.AssetGuid == blade_p || hand.Weapon.Blueprint.Type.AssetGuid == blade_e)
-                     && unit.Buffs.GetBuff(Resource.Cache.BuffKineticWhip) == null)
-                __result = false;
-
-            else
-                __result = true;
-
-            return false;
-        }
-
-        //[HarmonyPatch(typeof(AbilityRequirementHasItemInHands), nameof(AbilityRequirementHasItemInHands.IsAbilityRestrictionPassed))]
-        //[HarmonyPostfix]
-        public static void Postfix3(AbilityData ability, AbilityRequirementHasItemInHands __instance, ref bool __result)
-        {
-            if (__result)
-                return;
-
-            if (__instance.m_Type == AbilityRequirementHasItemInHands.RequirementType.HasMeleeWeapon)
+            void patch(UnitState __instance, UnitCondition condition, Buff source, UnitConditionExceptions exceptions)
             {
-                var body = ability.Caster.Unit.Body;
-                var weapon = body.PrimaryHand.MaybeWeapon ?? body.SecondaryHand.MaybeWeapon;
-                if (weapon != null && weapon.Blueprint.Type.AssetGuid == blade_p || weapon.Blueprint.Type.AssetGuid == blade_e)
-                {
-                    __result = true;
-                }
             }
         }
 
+        /// <summary>
+        /// Modify call to GetThreadHand to return only weapons that allow attacks of opportunity (not kinetic blades).<br/>
+        /// This should be a transpiler, but it's wrapped in a compiler generated field.
+        /// </summary>
         [HarmonyPatch(typeof(UnitCombatState), nameof(UnitCombatState.CanAttackOfOpportunity), MethodType.Getter)]
         [HarmonyPrefix]
         public static bool Prefix4(UnitCombatState __instance, ref bool __result)
@@ -95,6 +69,9 @@ namespace DarkCodex
             return false;
         }
 
+        /// <summary>
+        /// Modify call to GetThreadHand to return only weapons that allow attacks of opportunity (not kinetic blades).
+        /// </summary>
         [HarmonyPatch(typeof(UnitCombatState), nameof(UnitCombatState.AttackOfOpportunity))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
@@ -118,7 +95,7 @@ namespace DarkCodex
                 var bp = slot.Weapon.Blueprint;
                 if ((bp.IsMelee || unit.State.Features.SnapShot)
                     && (!bp.IsUnarmed || unit.Descriptor.State.Features.ImprovedUnarmedStrike)
-                    && (bp.Type.Category != WeaponCategory.KineticBlast || unit.Buffs.GetBuff(Resource.Cache.BuffKineticWhip) != null))
+                    && (bp.Type.Category != WeaponCategory.KineticBlast || unit.HasFlag(MechanicFeature.KineticBladeAttackOfOpportunity)))
                     return slot;
             }
             return null;

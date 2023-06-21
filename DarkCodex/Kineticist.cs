@@ -95,7 +95,8 @@ namespace DarkCodex
             buff.Flags(hidden: true);
             buff.SetComponents(
                 new AddKineticistBurnModifier() { BurnType = KineticistBurnType.Infusion, Value = 1, m_AppliableTo = applicable },
-                Helper.CreateAddStatBonus(5, StatType.Reach)
+                Helper.CreateAddStatBonus(5, StatType.Reach),
+                Helper.CreateAddMechanicsFeature(MechanicFeature.KineticBladeAttackOfOpportunity)
                 );
 
             var whip = Helper.CreateBlueprintFeature(
@@ -123,8 +124,6 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, whip.ToRef());
             knight.AddFeature(5, whip);
             knight.AddFeature(5, maneuver);
-
-            Resource.Cache.BuffKineticWhip.SetReference(buff);
         }
 
         [PatchInfo(Severity.Create, "Blade Rush Infusion", "infusion: Blade Rush, expands Kinetic Knight", false)]

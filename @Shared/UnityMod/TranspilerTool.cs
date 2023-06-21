@@ -1308,9 +1308,9 @@ namespace Shared
         /// <summary>Collection of member opcodes.</summary>
         public static OpCode[] OpCode_Member = new OpCode[]
         {
-            OpCodes.Call, 
-            OpCodes.Callvirt, 
-            OpCodes.Ldsfld, 
+            OpCodes.Call,
+            OpCodes.Callvirt,
+            OpCodes.Ldsfld,
             OpCodes.Ldfld,
         };
 
@@ -1439,12 +1439,25 @@ namespace Shared
         }
 
         /// <summary>
-        /// Untested. Returns all methods calling a particular method.
+        /// Untested. Checks if a particular method has calls to another method.<br/>
+        /// Does not resolve wrapped method calls (e.g. lambda expressions).
         /// </summary>
-        public static List<MethodInfo> GetCallers(MethodInfo info, string[] includeAssemblies = null, string[] excludeAssemblies = null)
+        public static bool HasMethodCall(MethodInfo parentMethod, MethodInfo lookingforMethod)
+        {
+            foreach (var line in PatchProcessor.ReadMethodBody(parentMethod))
+            {
+                if (lookingforMethod.Equals(line.Value))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Untested. Returns all methods in all assemblies calling a particular method.
+        /// </summary>
+        public static IEnumerable<MethodInfo> GetCallers(MethodInfo lookingforMethod, string[] includeAssemblies = null, string[] excludeAssemblies = null)
         {
             //var patches = Harmony.GetPatchInfo(info);
-            var callers = new List<MethodInfo>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 string name = assembly.FullName;
@@ -1453,22 +1466,42 @@ namespace Shared
                 if (excludeAssemblies != null && excludeAssemblies.Any(name.StartsWith))
                     continue;
 
-                foreach (var @class in assembly.GetTypes())
+                foreach (var @class in AccessTools.GetTypesFromAssembly(assembly))
                 {
-                    foreach (var method in @class.GetMethods(BindingAll))
+                    foreach (var parentMethod in @class.GetMethods(BindingAll))
                     {
-                        foreach (var line in PatchProcessor.ReadMethodBody(method))
-                        {
-                            if (info.Equals(line.Value))
-                            {
-                                callers.Add(method);
-                                break;
-                            }
-                        }
+                        if (HasMethodCall(parentMethod, lookingforMethod))
+                            yield return parentMethod;
                     }
                 }
             }
-            return callers;
+        }
+
+        /// <summary>
+        /// Untested. Returns <i><paramref name="parentMethod"/></i> and embedded methods which call <i><paramref name="lookingforMethod"/></i>.
+        /// Does resolve some wrapped method calls (e.g. lambda expressions).
+        /// </summary>
+        public static IEnumerable<MethodInfo> GetCallersR(MethodInfo parentMethod, MethodInfo lookingforMethod, bool onlyParent = false)
+        {
+            bool didReturn = false;
+            foreach (var line in PatchProcessor.ReadMethodBody(parentMethod))
+            {
+                if (!didReturn && lookingforMethod.Equals(line.Value))
+                {
+                    didReturn = true;
+                    yield return parentMethod;
+                }
+
+                // ldftn - MethodInfo
+                // newobj - System.Action or System.Func
+                // if buffered: dup + stsfld
+                if (line.Key == OpCodes.Ldftn && line.Value is MethodInfo lambda
+                    && (!onlyParent || lambda.DeclaringType == parentMethod.DeclaringType || lambda.DeclaringType?.DeclaringType == parentMethod.DeclaringType)
+                    && HasMethodCall(lambda, lookingforMethod))
+                {
+                    yield return lambda;
+                }
+            }
         }
 
         #endregion

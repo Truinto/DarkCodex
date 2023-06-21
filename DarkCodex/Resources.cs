@@ -71,7 +71,6 @@ namespace DarkCodex
             public static readonly Texture IconBookBlack = Helper.CreateTexture(Path.Combine(Main.ModPath, "icons", "book black.png"), 16, 16);
 
             // Mods
-            public static readonly BlueprintBuffReference BuffKineticWhip = new();
             public static readonly BlueprintUnitPropertyReference PropertySneakAttackDice = new();
             public static readonly BlueprintUnitPropertyReference PropertyMaxMentalAttribute = new();
             public static readonly BlueprintUnitPropertyReference PropertyMythicDispel = new();

@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.36]
+- changed Patch_KineticistAllowOpportunityAttack for compatibility
+
 ## [1.5.35]
 - fixed FixBloodlineArcane removing Metamagic Adept at level 9 #262
 - changed how cackle is applied which perhaps fixes inconsistencies #264

@@ -459,7 +459,7 @@ namespace Shared
         {
             if (!open)
             {
-                try
+                try // TODO: this seems to not work anymore
                 {
                     if (instanceSettings == null)
                     {

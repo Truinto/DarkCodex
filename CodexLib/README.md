@@ -82,7 +82,7 @@ Things to note
 -----------
 * This assembly will only be loaded once. Only the most recent assembly should be loaded. Which is why you must set local copy to false.
 * Failure to comply will potentially crash other mods using this library or cause bugs.
-* Method signatures should not changed during versions. If there is a major change, you will need to recompile your project.
+* Method signatures should not change during versions. If there is a major change, you will need to recompile your project.
 * I will usually keep original method signatures for a while and mark them as obsolete. Check your compiler warnings.
 * Set ``<AllowUnsafeBlocks>true</AllowUnsafeBlocks>`` in your project. This helps a bit with backwards compatibility.
 * PS: I plan to rework or remove the ToRef methods.

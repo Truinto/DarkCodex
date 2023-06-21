@@ -154,6 +154,14 @@ namespace CodexLib
         }
 
         /// <summary>
+        /// Returns true if <i><paramref name="type"/></i> is a subclass of <i><paramref name="parent"/></i>.
+        /// </summary>
+        public static bool HasDeclaringType(this Type type, Type parent)
+        {
+            return type != null && (type == parent || HasDeclaringType(type.DeclaringType, parent));
+        }
+
+        /// <summary>
         /// Returns string sufficient for <b>Type.GetType(string)</b>, without version, culture, or token.
         /// </summary>
         public static string GetFullName(this Type type)

@@ -383,12 +383,9 @@ namespace Shared
                 for (int i = 0; i < matches.Count; i++)
                 {
                     var match = matches[i];
-                    if (index < match.Index)
-                    {
-                        sb.Append(input, index, match.Index - index);
-                        index = match.Index + match.Length;
-                    }
-                    sb.Append(evaluator(match, i, matches.Count));
+                    sb.Append(input, index, match.Index - index); // append non-matches
+                    index = match.Index + match.Length;
+                    sb.Append(evaluator(match, i, matches.Count)); // append match replacement
                 }
 
                 if (index < input.Length)
