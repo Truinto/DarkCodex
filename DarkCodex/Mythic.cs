@@ -133,15 +133,29 @@ namespace DarkCodex
                     continue;
 
                 var check = ability.GetComponent<AbilityTargetHasFact>();
-                if (check == null)
-                    continue;
+                if (check != null)
+                {
 
-                var checknew = new AbilityTargetHasFactExcept();
-                checknew.m_CheckedFacts = check.m_CheckedFacts;
-                checknew.Inverted = check.Inverted;
-                checknew.PassIfFact = limitless;
+                    var checknew = new AbilityTargetHasFactExcept();
+                    checknew.m_CheckedFacts = check.m_CheckedFacts;
+                    checknew.Inverted = check.Inverted;
+                    checknew.PassIfFact = limitless;
 
-                ability.ReplaceComponent(check, checknew);
+                    ability.ReplaceComponent(check, checknew);
+                }
+                else
+                {
+                    ability.ComponentsArray
+                        .Where(comp => comp.GetType().ToString().Contains("AbilityTargetHasNoFactUnlessAccursedHex"))
+                        .ForEach(comp => {
+                            var compnew = new AbilityTargetHasFactExcept();
+                            var checkedFacts = (BlueprintUnitFactReference[])comp.GetType().GetField("m_CheckedFacts").GetValue(comp);
+                            compnew.m_CheckedFacts = checkedFacts;
+                            compnew.Inverted = true;
+                            compnew.PassIfFact = limitless;
+                            ability.ReplaceComponent(comp, compnew);
+                        });
+                }
             }
 
             // resource based
