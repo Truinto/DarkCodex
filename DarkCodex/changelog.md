@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.5.37]
+- fixed stacking of Master Shapeshifter bonus #269
+- added Fix Wolverine Rage, unlock Limitless Rage for Wolverine (Shifter) #268
+- merged fix for limitless hexes and TTT #270, closes #267
+
 ## [1.5.36]
 - changed Patch_KineticistAllowOpportunityAttack for compatibility
 

@@ -4704,6 +4704,17 @@ namespace CodexLib
 
         #endregion
 
+        #region Prerequisite
+
+        public static PrerequisiteFeaturesFromList Add(this PrerequisiteFeaturesFromList comp, params AnyRef[] features)
+        {
+            AppendAndReplace(ref comp.m_Features, features);
+
+            return comp;
+        }
+
+        #endregion
+
         #region Enums
 
         public static void EnumCreateModifierDescriptor(ModifierDescriptor num, string name, string description)

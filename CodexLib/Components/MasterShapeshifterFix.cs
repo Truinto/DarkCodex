@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    /// <summary>
+    /// Ensures Master Shapeshifter gets its bonuses, even when the spell has no <see cref="Polymorph"/> component (non-visual).
+    /// </summary>
     public class MasterShapeshifterFix : UnitFactComponentDelegate<MasterShapeshifterFix.RuntimeData>, IUnitBuffHandler
     {
         public void HandleBuffDidAdded(Buff buff)
@@ -40,9 +43,9 @@ namespace CodexLib
             this.Data.SourceBuff = buff;
             this.Data.AppliedModifiers = new()
             {
-                this.Owner.Stats.GetStat(StatType.Strength).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable),
-                this.Owner.Stats.GetStat(StatType.Dexterity).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable),
-                this.Owner.Stats.GetStat(StatType.Constitution).AddModifier(4, this.Runtime, ModifierDescriptor.UntypedStackable)
+                this.Owner.Stats.GetStat(StatType.Strength).AddModifier(4, this.Runtime, ModifierDescriptor.MasterShapeshifter),
+                this.Owner.Stats.GetStat(StatType.Dexterity).AddModifier(4, this.Runtime, ModifierDescriptor.MasterShapeshifter),
+                this.Owner.Stats.GetStat(StatType.Constitution).AddModifier(4, this.Runtime, ModifierDescriptor.MasterShapeshifter)
             };
         }
 

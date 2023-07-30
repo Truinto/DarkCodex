@@ -592,6 +592,11 @@
             <param name="type">Type of combat maneuver.</param>
             <param name="descriptor">ModifierDescriptor of maneuver bonus.</param>
         </member>
+        <member name="T:CodexLib.MasterShapeshifterFix">
+            <summary>
+            Ensures Master Shapeshifter gets its bonuses, even when the spell has no <see cref="T:Kingmaker.UnitLogic.Buffs.Polymorph" /> component (non-visual).
+            </summary>
+        </member>
         <member name="T:CodexLib.MetamagicReduceCostParametrized">
             <summary>
             Reduces metamagic cost. Can reduce cost by fixed amount or make the most expensive metamagic free. Can be filtered by metamagic.<br />
