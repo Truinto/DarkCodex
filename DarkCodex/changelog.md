@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.38]
+- fixed Elemental Ascetic: Powerful Fist not dealing extra damage
+
 ## [1.5.37]
 - fixed stacking of Master Shapeshifter bonus #269
 - added Fix Wolverine Rage, unlock Limitless Rage for Wolverine (Shifter) #268

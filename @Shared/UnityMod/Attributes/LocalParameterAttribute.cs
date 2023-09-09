@@ -28,7 +28,7 @@ namespace Shared
         /// If <b>indexByType</b> is 0 or greater, the index in a collection of exact matching type will be chosen. <br/>
         /// If both indices are below zero, the current CodeInstruction will determine the local. 
         /// </summary>
-        public LocalParameterAttribute(string name = null, Type type = null, int index = -1, int indexByType = -1)
+        public LocalParameterAttribute(string name = null, Type type = null, int index = -1, int indexByType = 0)
         {
             this.Name = name;
             this.Type = type;

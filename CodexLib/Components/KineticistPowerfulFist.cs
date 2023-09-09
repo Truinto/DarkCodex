@@ -55,19 +55,23 @@ namespace CodexLib
             if (this.Data.Selected is not UINumber num)
                 return;
 
-            var kin = evt.SourceAbility?.GetComponent<AbilityKineticist>();
-            if (kin == null)
-                return;
+            //var kin = evt.SourceAbility?.GetComponent<AbilityKineticist>();
+            //if (kin == null)
+            //    return;
 
             var bundles = evt.m_DamageBundle.m_Chunks;
             for (int i = 0; i < bundles.Count; i++)
             {
-                var dmg = bundles[i].Dice;
+                var bundle = bundles[i];
+                if (bundle.SourceFact?.Blueprint?.name == null || !bundle.SourceFact.Blueprint.name.Contains("Kinetic"))
+                    continue;
+
+                var dmg = bundle.Dice;
                 var baseValue = dmg.ModifiedValue;
 
                 int value = (int)baseValue.m_Dice;
-                if (value < 6)
-                    continue;
+                //if (value < 6)
+                //    continue;
 
                 dmg.Modify(new(baseValue.m_Rolls, (value + num.Value * 2).ToDiceType()), this.Fact);
             }
