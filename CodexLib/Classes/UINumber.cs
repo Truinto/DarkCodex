@@ -15,8 +15,10 @@ namespace CodexLib
 
         public string Name { get; set; }
         public string Description { get; set; }
-        public Sprite Icon { get; set; }
+        public Sprite Icon { get => icon ??= GetSprite(Value); }
         public string NameForAcronym { get; set; }
+
+        private Sprite icon;
 
         private static Sprite GetSprite(int num)
         {
@@ -46,16 +48,16 @@ namespace CodexLib
 
         public static UINumber[] Numbers = new UINumber[]
         {
-            new UINumber() { Value = 0, Name = "0", Description = "", Icon = GetSprite(0) },
-            new UINumber() { Value = 1, Name = "1", Description = "", Icon = GetSprite(1) },
-            new UINumber() { Value = 2, Name = "2", Description = "", Icon = GetSprite(2) },
-            new UINumber() { Value = 3, Name = "3", Description = "", Icon = GetSprite(3) },
-            new UINumber() { Value = 4, Name = "4", Description = "", Icon = GetSprite(4) },
-            new UINumber() { Value = 5, Name = "5", Description = "", Icon = GetSprite(5) },
-            new UINumber() { Value = 6, Name = "6", Description = "", Icon = GetSprite(6) },
-            new UINumber() { Value = 7, Name = "7", Description = "", Icon = GetSprite(7) },
-            new UINumber() { Value = 8, Name = "8", Description = "", Icon = GetSprite(8) },
-            new UINumber() { Value = 9, Name = "9", Description = "", Icon = GetSprite(9) },
+            new UINumber() { Value = 0, Name = "Level 0", Description = "" },
+            new UINumber() { Value = 1, Name = "Level 1", Description = "" },
+            new UINumber() { Value = 2, Name = "Level 2", Description = "" },
+            new UINumber() { Value = 3, Name = "Level 3", Description = "" },
+            new UINumber() { Value = 4, Name = "Level 4", Description = "" },
+            new UINumber() { Value = 5, Name = "Level 5", Description = "" },
+            new UINumber() { Value = 6, Name = "Level 6", Description = "" },
+            new UINumber() { Value = 7, Name = "Level 7", Description = "" },
+            new UINumber() { Value = 8, Name = "Level 8", Description = "" },
+            new UINumber() { Value = 9, Name = "Level 9", Description = "" },
         };
     }
 }

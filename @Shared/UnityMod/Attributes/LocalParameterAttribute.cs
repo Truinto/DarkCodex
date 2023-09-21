@@ -17,7 +17,7 @@ namespace Shared
         /// <summary>Type of local. If missing, will assume by type of parameter.</summary>
         public Type Type;
         /// <summary>Index of local.</summary>
-        public int Index;
+        public int Index = -1;
         /// <summary>Index of local, filtered by exactly matching type.</summary>
         public int IndexByType;
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.5.39]
+- fixed Elemental Ascetic: Powerful Fist crashing the game
+
 ## [1.5.38]
 - fixed Elemental Ascetic: Powerful Fist not dealing extra damage
 
