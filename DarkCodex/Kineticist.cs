@@ -1265,7 +1265,8 @@ namespace DarkCodex
             ascetic.SetAddFeatures(
                 Helper.CreateLevelEntry(1, wisdom_feat, flurry_feat, Tree.KineticFist.Feature, "7812ad3672a4b9a4fb894ea402095167", "fd99770e6bd240a4aab70f7af103e56a"), //ImprovedUnarmedStrike, MonkFlurryOfBlowstUnlock
                 Helper.CreateLevelEntry(2, monk_ac),
-                Helper.CreateLevelEntry(5, power_feat)
+                Helper.CreateLevelEntry(5, power_feat),
+                Helper.CreateLevelEntry(11, "a34b8a9fcc9024b42bacfd5e6b614bfa") //MonkFlurryOfBlowstLevel11Unlock
                 );
 
             ascetic.SetRemoveFeatures(
@@ -1285,6 +1286,7 @@ namespace DarkCodex
 
             // add to monk ac progression
             var ac = Helper.Get<BlueprintBuff>("d7ff7a9f1fe84e679f98b36e4bacd63c").GetComponents<ContextRankConfig>().First(f => f.m_BaseValueType == ContextRankBaseValueType.SummClassLevelWithArchetype);
+            ac.m_Class = Helper.Append(ac.m_Class, Tree.Class);
             ac.m_AdditionalArchetypes = Helper.Append(ac.m_AdditionalArchetypes, Tree.ElementalAscetic);
 
             Main.RunLast("Elemental Flurry", () =>

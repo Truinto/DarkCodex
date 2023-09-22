@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.5.40]
+- fixed Elemental Ascetic AC not counting towards monk levels
+- fixed Elemental Ascetic not getting extra flurry at level 11
+
 ## [1.5.39]
 - fixed Elemental Ascetic: Powerful Fist crashing the game
 
