@@ -59,7 +59,7 @@ namespace CodexLib.Patches
             return false;
         }
 
-        [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.CreateCastCommand))]
+        [HarmonyPatch(typeof(UnitUseAbility), nameof(UnitUseAbility.CreateCastCommand), typeof(AbilityData), typeof(TargetWrapper), typeof(UnitCommand.CommandType))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler4(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {

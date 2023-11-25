@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace CodexLib
 {
+    // TODO: Kingmaker.Designers.Mechanics.Facts.ModifyD20 has been updated
     public class ModifyD20Once : UnitFactComponentDelegate<ModifyD20Once.ComponentData>, IInitiatorRulebookHandler<RuleRollD20>, IUnitNewCombatRoundHandler
     {
         public AlignmentComponent Alignment;
@@ -32,7 +33,7 @@ namespace CodexLib
         public int RollsAmount;
         public ModifierDescriptor BonusDescriptor;
         public ModifierDescriptor ModifierDescriptor;
-        public ModifyD20.InnerSavingThrowType m_SavingThrowType = ModifyD20.InnerSavingThrowType.All;
+        public FlaggedSavingThrowType m_SavingThrowType = FlaggedSavingThrowType.All;
         public ModifyD20.RollConditionType RollCondition;
         public RuleDispelMagic.CheckType DispellMagicCheckType;
         public RuleType Rule;
@@ -218,7 +219,7 @@ namespace CodexLib
             if (this.SpecificDescriptor && !descriptor.Intersects(this.SpellDescriptor))
                 return false;
 
-            var innerSavingThrowType = ModifyD20.ConvertToInnerSavingThrowType(ruleSavingThrow.Type);
+            var innerSavingThrowType = RuleSavingThrow.ConvertToFlaggedSavingThrowType(ruleSavingThrow.Type);
             return (this.m_SavingThrowType & innerSavingThrowType) != 0;
         }
 

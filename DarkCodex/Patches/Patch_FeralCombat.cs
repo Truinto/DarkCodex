@@ -68,22 +68,24 @@ namespace DarkCodex
         {
             var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
-            data.InsertAfter(Patch1);
+            data.InsertAfter(patch1);
             data.First().Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
-            data.InsertAfter(Patch1b);
+            data.InsertAfter(patch2);
             return data.Code;
-        }
-        public static WeaponCategory Patch1(WeaponCategory category, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
-        {
-            if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return WeaponCategory.UnarmedStrike;
-            return category;
-        }
-        public static BlueprintWeaponType Patch1b(BlueprintWeaponType weaponType, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
-        {
-            if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return Resource.Cache.WeaponTypeUnarmed.Get();
-            return weaponType;
+
+            static WeaponCategory patch1(WeaponCategory category, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
+            {
+                if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return WeaponCategory.UnarmedStrike;
+                return category;
+            }
+
+            static BlueprintWeaponType patch2(BlueprintWeaponType weaponType, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
+            {
+                if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return Resource.Cache.WeaponTypeUnarmed.Get();
+                return weaponType;
+            }
         }
 
 
@@ -103,12 +105,13 @@ namespace DarkCodex
         public static IEnumerable<CodeInstruction> Transpiler3(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // flurry of blows
         {
             var data = new TranspilerTool(instructions, generator, original);
-            data.ReplaceAllCalls(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsMonk), Patch3); // TODO: use InsertAfter instead
+            data.ReplaceAllCalls(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.IsMonk), patch);
             return data.Code;
-        }
-        public static bool Patch3(BlueprintItemWeapon weapon, MonkNoArmorAndMonkWeaponFeatureUnlock __instance)
-        {
-            return weapon.IsMonk || (weapon.IsNatural && __instance.Owner.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat));
+
+            static bool patch(BlueprintItemWeapon weapon, MonkNoArmorAndMonkWeaponFeatureUnlock __instance)
+            {
+                return weapon.IsMonk || (weapon.IsNatural && __instance.Owner.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat));
+            }
         }
 
 
@@ -118,14 +121,15 @@ namespace DarkCodex
         {
             var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
-            data.InsertAfter(Patch4);
+            data.InsertAfter(patch);
             return data.Code;
-        }
-        public static WeaponCategory Patch4(WeaponCategory category, AdditionalStatBonusOnAttackDamage __instance, RuleCalculateWeaponStats evt)
-        {
-            if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return WeaponCategory.UnarmedStrike;
-            return category;
+
+            static WeaponCategory patch(WeaponCategory category, AdditionalStatBonusOnAttackDamage __instance, RuleCalculateWeaponStats evt)
+            {
+                if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return WeaponCategory.UnarmedStrike;
+                return category;
+            }
         }
 
 
@@ -135,14 +139,15 @@ namespace DarkCodex
         {
             var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
-            data.InsertAfter(Patch5);
+            data.InsertAfter(patch);
             return data.Code;
-        }
-        public static WeaponCategory Patch5(WeaponCategory category, AdditionalDiceOnAttack __instance, RuleAttackRoll evt)
-        {
-            if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return WeaponCategory.UnarmedStrike;
-            return category;
+
+            static WeaponCategory patch(WeaponCategory category, AdditionalDiceOnAttack __instance, RuleAttackRoll evt)
+            {
+                if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return WeaponCategory.UnarmedStrike;
+                return category;
+            }
         }
 
 
@@ -152,34 +157,36 @@ namespace DarkCodex
         {
             var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Category));
-            data.InsertAfter(Patch6);
+            data.InsertAfter(patch);
             return data.Code;
-        }
-        public static WeaponCategory Patch6(WeaponCategory category, AdditionalDiceOnAttack __instance, RuleAttackWithWeapon evt)
-        {
-            if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return WeaponCategory.UnarmedStrike;
-            return category;
+
+            static WeaponCategory patch(WeaponCategory category, AdditionalDiceOnAttack __instance, RuleAttackWithWeapon evt)
+            {
+                if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return WeaponCategory.UnarmedStrike;
+                return category;
+            }
         }
 
 
-        [HarmonyPatch(typeof(AddOutgoingPhysicalDamageProperty), nameof(AddOutgoingPhysicalDamageProperty.OnEventDidTrigger), typeof(RulePrepareDamage))]
+        [HarmonyPatch(typeof(AddOutgoingPhysicalDamageProperty), nameof(AddOutgoingPhysicalDamageProperty.OnEventAboutToTrigger), typeof(RulePrepareDamage))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler7(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // Ki Strike
         {
             var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(AddOutgoingPhysicalDamageProperty), nameof(AddOutgoingPhysicalDamageProperty.CheckWeaponType));
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
-            data.InsertAfter(Patch7);
+            data.InsertAfter(patch);
             return data.Code;
-        }
-        public static BlueprintWeaponType Patch7(BlueprintWeaponType weaponType, AddOutgoingPhysicalDamageProperty __instance, RulePrepareDamage evt)
-        {
-            if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() 
-                && evt.DamageBundle.Weapon.Blueprint.IsNatural 
-                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return Resource.Cache.WeaponTypeUnarmed.Get();
-            return weaponType;
+
+            static BlueprintWeaponType patch(BlueprintWeaponType weaponType, AddOutgoingPhysicalDamageProperty __instance, RulePrepareDamage evt)
+            {
+                if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get()
+                    && evt.DamageBundle.Weapon.Blueprint.IsNatural
+                    && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return Resource.Cache.WeaponTypeUnarmed.Get();
+                return weaponType;
+            }
         }
 
 
@@ -189,16 +196,17 @@ namespace DarkCodex
         {
             var data = new TranspilerTool(instructions, generator, original);
             data.Seek(typeof(BlueprintItemWeapon), nameof(BlueprintItemWeapon.Type));
-            data.InsertAfter(Patch8);
+            data.InsertAfter(patch);
             return data.Code;
-        }
-        public static BlueprintWeaponType Patch8(BlueprintWeaponType weaponType, IgnoreDamageReductionOnAttack __instance, RuleAttackWithWeapon evt)
-        {
-            if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() 
-                && evt.Weapon.Blueprint.IsNatural 
-                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
-                return Resource.Cache.WeaponTypeUnarmed.Get();
-            return weaponType;
+
+            static BlueprintWeaponType patch(BlueprintWeaponType weaponType, IgnoreDamageReductionOnAttack __instance, RuleAttackWithWeapon evt)
+            {
+                if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get()
+                    && evt.Weapon.Blueprint.IsNatural
+                    && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+                    return Resource.Cache.WeaponTypeUnarmed.Get();
+                return weaponType;
+            }
         }
 
 
@@ -208,7 +216,7 @@ namespace DarkCodex
         {
             if (!evt.Weapon.Blueprint.IsUnarmed
                 && evt.Weapon.Blueprint.IsNatural
-                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))            
+                && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                 evt.AddDamageModifier(evt.Initiator.Progression.MythicLevel / 2, __instance.Fact);
         }
     }

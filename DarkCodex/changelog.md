@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.6.0]
+- fixed multiple patches for update (watch out for more bugs)
+
 ## [1.5.40]
 - fixed Elemental Ascetic AC not counting towards monk levels
 - fixed Elemental Ascetic not getting extra flurry at level 11

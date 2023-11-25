@@ -31,7 +31,7 @@ namespace CodexLib.Patches
             return data;
 
             //call class [mscorlib]System.Array [mscorlib]System.Enum::GetValues(class [mscorlib]System.Type)
-            Metamagic[] patch(Type type)
+            static Metamagic[] patch(Type type)
             {
                 if (_buffer == null)
                 {
@@ -60,7 +60,7 @@ namespace CodexLib.Patches
                 yield return line;
             }
 
-            Metamagic[] patch(Type type)
+            static Metamagic[] patch(Type type)
             {
                 if (_buffer == null)
                 {

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.4.2.19</Version>
+		<Version>1.6.0.1</Version>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -95,7 +95,7 @@
 	</Target>
 
 	<!-- Publicize -->
-	<Target Name="Publicize" BeforeTargets="BeforeBuild" AfterTargets="">
+	<Target Name="Publicize" BeforeTargets="Clean;BeforeBuild" AfterTargets="">
 		<ItemGroup>
 			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
 			<PublicizeInput Include="$(GameManaged)\UnityModManager\0Harmony.dll" />

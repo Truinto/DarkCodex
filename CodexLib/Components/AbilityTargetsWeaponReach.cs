@@ -45,7 +45,7 @@ namespace CodexLib
 
             return data;
 
-            Feet patch(Feet __stack, AbilityExecutionContext context, AbilityTargetsAround __instance)
+            static Feet patch(Feet __stack, AbilityExecutionContext context, AbilityTargetsAround __instance)
             {
                 if (__instance.m_SpreadSpeed != Marker)
                     return __stack;
@@ -76,7 +76,7 @@ namespace CodexLib
 
             return data;
 
-            Feet patch(Feet __stack, AbilityData ability, CharacterUIDecal __instance)
+            static Feet patch(Feet __stack, AbilityData ability, CharacterUIDecal __instance)
             {
                 var targetsAround = ability.Blueprint.GetComponent<AbilityTargetsAround>();
                 if (targetsAround != null || targetsAround.m_SpreadSpeed != Marker)

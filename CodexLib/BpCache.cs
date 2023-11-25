@@ -114,7 +114,7 @@ namespace CodexLib
                 }
 
                 var buffer = new byte[16];
-                using var writer = new FileStream(path, FileMode.CreateNew, FileAccess.Write);
+                using var writer = new FileStream(path, FileMode.Create, FileAccess.Write);
                 foreach (var (type, list) in dic)
                 {
                     // print length of type; print type

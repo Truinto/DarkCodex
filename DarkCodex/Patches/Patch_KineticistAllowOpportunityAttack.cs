@@ -43,7 +43,7 @@ namespace DarkCodex
             data.ReplaceAllCalls(typeof(UnitState), nameof(UnitState.AddCondition), patch);
             return data;
 
-            void patch(UnitState __instance, UnitCondition condition, Buff source, UnitConditionExceptions exceptions)
+            static void patch(UnitState __instance, UnitCondition condition, Buff source, UnitConditionExceptions exceptions)
             {
             }
         }

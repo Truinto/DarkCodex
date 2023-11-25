@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.6.0]
+- fixes for update
+
 ## [1.4.2]
 - renamed FlameBladeLogic to SummonWeaponLogic
 
