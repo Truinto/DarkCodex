@@ -17,8 +17,8 @@ namespace CodexLib
     /// </summary>
     public static class MasterPatch
     {
-        public static List<Type> PatchList = new()
-        {
+        public static List<Type> PatchList =
+        [
             //typeof(Event_AbilityEffectApplied),
             typeof(BpCache),
             typeof(Patch_AbilityAtWill),
@@ -47,7 +47,7 @@ namespace CodexLib
             typeof(Patch_SuppressError),
             typeof(Patch_TouchPersist),
             typeof(Patch_WeaponCategory),
-        };
+        ];
 
         /// <summary>
         /// Call at least once, if you plan to use components.

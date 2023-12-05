@@ -8,6 +8,9 @@
             <summary>
             Local selection for TranspilerTool delegate.
             </summary>
+            <remarks>
+            If you want to define the local dynamically inside the transpiler, then define <see cref="F:Shared.LocalParameterAttribute.Name"/> and set the name via TranspilerTool.NameLocal.
+            </remarks>
         </member>
         <member name="F:Shared.LocalParameterAttribute.Name">
             <summary>Name of local.</summary>
@@ -439,10 +442,20 @@
         <member name="M:Shared.TranspilerTool.IsLoadConstant(System.Double)">
             <summary>Checks if current line loads a constant.</summary>
         </member>
-        <member name="M:Shared.TranspilerTool.InsertCall(System.Boolean,System.Delegate)">
+        <member name="M:Shared.TranspilerTool.InsertCall(System.Delegate,System.Boolean)">
             <summary>
-            Inserts call to a delegate. Either before or after current line. Increments index.
+            Injects call. Increments index. Same as <see cref="M:Shared.TranspilerTool.InsertAfter(System.Delegate)"/> or <see cref="M:Shared.TranspilerTool.InsertBefore(System.Delegate)"/> <br/>
+            Delegate may return void. Otherwise the <b>first parameter is taken from the stack and replaced with the return value</b>.<br/>
+            <b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b>
             </summary>
+            <param name="func"><b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b></param>
+            <param name="before">If true will inject delegate before current line (still pointing to the same code). Otherwise after (pointing to the new code).</param>
+            <remarks>
+            The delegate may define any of the original parameters, locals, and __instance (if non-static).<br/>
+            These optional parameters are matched by name, with <see cref="T:Shared.LocalParameterAttribute"/>, or with <see cref="T:Shared.OriginalParameterAttribute"/>.<br/>
+            If <see cref="T:Shared.LocalParameterAttribute"/> doesn't match any existing locals, then a new one is generated. Non matching parameters will throw.<br/>
+            If the optional parameter's source is ref (or out), then the delegate must also use ref. Otherwise ref is optional.
+            </remarks>
         </member>
         <member name="M:Shared.TranspilerTool.InsertPushLocal(System.Boolean,System.Reflection.ParameterInfo)">
             <summary>
@@ -660,12 +673,22 @@
             Get local by index.
             </summary>
         </member>
+        <member name="M:Shared.TranspilerTool.NameLocal(System.String)">
+            <summary>
+            Set name of local at the current index.
+            </summary>
+        </member>
         <member name="M:Shared.TranspilerTool.NameLocal(System.Int32,System.String)">
             <summary>
             Set name of local by index.
             </summary>
         </member>
         <member name="M:Shared.TranspilerTool.NameLocal(System.Reflection.LocalVariableInfo,System.String)">
+            <summary>
+            Set name of local.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.NameLocal(Shared.LocalInfo,System.String)">
             <summary>
             Set name of local.
             </summary>

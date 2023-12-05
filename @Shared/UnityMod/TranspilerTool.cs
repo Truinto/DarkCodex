@@ -9,6 +9,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
+using JetBrains.Annotations;
 
 #pragma warning disable IDE0009 // ignore missing 'this.'
 
@@ -99,8 +100,8 @@ namespace Shared
             this.Generator = generator ?? throw new ArgumentNullException();
             this.Original = (MethodInfo)original ?? throw new ArgumentNullException();
             Locals = original.GetMethodBody().LocalVariables;
-            LocalsExtended = new();
-            LabelsExtended = new();
+            LocalsExtended = [];
+            LabelsExtended = [];
 
             foreach (var local in Locals)
                 LocalsExtended.Add(new(local, "V_" + local.LocalIndex));
@@ -339,9 +340,19 @@ namespace Shared
         #region Manipulation
 
         /// <summary>
-        /// Inserts call to a delegate. Either before or after current line. Increments index.
+        /// Injects call. Increments index. Same as <see cref="InsertAfter(Delegate)"/> or <see cref="InsertBefore(Delegate)"/> <br/>
+        /// Delegate may return void. Otherwise the <b>first parameter is taken from the stack and replaced with the return value</b>.<br/>
+        /// <b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b>
         /// </summary>
-        protected void InsertCall(bool before, Delegate func)
+        /// <param name="func"><b>[T] Function([T __stack], [object __instance], [object arg0], [object arg1...])</b></param>
+        /// <param name="before">If true will inject delegate before current line (still pointing to the same code). Otherwise after (pointing to the new code).</param>
+        /// <remarks>
+        /// The delegate may define any of the original parameters, locals, and __instance (if non-static).<br/>
+        /// These optional parameters are matched by name, with <see cref="LocalParameterAttribute"/>, or with <see cref="OriginalParameterAttribute"/>.<br/>
+        /// If <see cref="LocalParameterAttribute"/> doesn't match any existing locals, then a new one is generated. Non matching parameters will throw.<br/>
+        /// If the optional parameter's source is ref (or out), then the delegate must also use ref. Otherwise ref is optional.
+        /// </remarks>
+        public void InsertCall(Delegate func, bool before)
         {
             var mi = func.GetMethodInfo();
             var parametersFunc = mi.GetParameters();
@@ -474,7 +485,7 @@ namespace Shared
         /// </remarks>
         public void InsertBefore(Delegate func)
         {
-            InsertCall(true, func);
+            InsertCall(func, true);
         }
 
         /// <summary>
@@ -491,7 +502,7 @@ namespace Shared
         /// </remarks>
         public void InsertAfter(Delegate func)
         {
-            InsertCall(false, func);
+            InsertCall(func, false);
         }
 
         /// <summary>
@@ -1154,6 +1165,17 @@ namespace Shared
         }
 
         /// <summary>
+        /// Set name of local at the current index.
+        /// </summary>
+        public void NameLocal(string name)
+        {
+            var local = GetLocal();
+            if (local.IsEmpty)
+                throw new Exception("CodeInstruction does not point to local");
+            NameLocal(local, name);
+        }
+
+        /// <summary>
         /// Set name of local by index.
         /// </summary>
         public void NameLocal(int localIndex, string name)
@@ -1161,7 +1183,7 @@ namespace Shared
             if (LocalsExtended.Any(a => a.Name == name))
                 throw new Exception($"Label with the same index/name already exists! {name}");
 
-            int index = LocalsExtended.FindIndex(f => f.Index == localIndex);
+            int index = LocalsExtended.FindIndex(f => f.Equals(localIndex));
             if (index < 0)
                 throw new Exception($"Local with index {localIndex} doesn't exists! {name}");
             LocalsExtended[index] = new(LocalsExtended[index].Local, name);
@@ -1175,9 +1197,23 @@ namespace Shared
             if (LocalsExtended.Any(a => a.Name == name))
                 throw new Exception($"Label with the same index/name already exists! {name}");
 
-            int index = LocalsExtended.FindIndex(f => f.Local.LocalIndex == local.LocalIndex);
+            int index = LocalsExtended.FindIndex(f => f.Equals(local));
             if (index < 0)
                 throw new Exception($"Local with index {local.LocalIndex} doesn't exists! {name}");
+            LocalsExtended[index] = new(local, name);
+        }
+
+        /// <summary>
+        /// Set name of local.
+        /// </summary>
+        public void NameLocal(LocalInfo local, string name)
+        {
+            if (LocalsExtended.Any(a => a.Name == name))
+                throw new Exception($"Label with the same index/name already exists! {name}");
+
+            int index = LocalsExtended.FindIndex(f => f.Equals(local));
+            if (index < 0)
+                throw new Exception($"Local with index {local.Local.LocalIndex} doesn't exists! {name}");
             LocalsExtended[index] = new(local, name);
         }
 
@@ -1281,8 +1317,8 @@ namespace Shared
         #region Statics
 
         /// <summary>Collection of Ldc_i opcodes.</summary>
-        public static OpCode[] OpCode_Ldc_i = new OpCode[]
-        {
+        public static OpCode[] OpCode_Ldc_i =
+        [
             OpCodes.Ldc_I4_M1,
             OpCodes.Ldc_I4_0,
             OpCodes.Ldc_I4_1,
@@ -1296,23 +1332,23 @@ namespace Shared
             OpCodes.Ldc_I4,
             OpCodes.Ldc_I4_S,
             OpCodes.Ldc_I8,
-        };
+        ];
 
         /// <summary>Collection of Ldc_r opcodes.</summary>
-        public static OpCode[] OpCode_Ldc_r = new OpCode[]
-        {
+        public static OpCode[] OpCode_Ldc_r =
+        [
             OpCodes.Ldc_R4,
             OpCodes.Ldc_R8,
-        };
+        ];
 
         /// <summary>Collection of member opcodes.</summary>
-        public static OpCode[] OpCode_Member = new OpCode[]
-        {
+        public static OpCode[] OpCode_Member =
+        [
             OpCodes.Call,
             OpCodes.Callvirt,
             OpCodes.Ldsfld,
             OpCodes.Ldfld,
-        };
+        ];
 
         /// <summary>
         /// Increment index by 1.
@@ -1537,7 +1573,7 @@ namespace Shared
         {
             if (label < 0)
                 throw new IndexOutOfRangeException();
-            this.Label = (Label)typeof(Label).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0].Invoke(new object[] { label });
+            this.Label = (Label)typeof(Label).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0].Invoke([label]);
             this.Name = name ?? throw new ArgumentNullException();
         }
 

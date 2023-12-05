@@ -22,17 +22,17 @@ namespace CodexLib
         /// <summary>
         /// Default types to export and cache.
         /// </summary>
-        public static readonly Type[] DefaultTypes = new Type[]
-        {
+        public static readonly Type[] DefaultTypes =
+        [
             typeof(BlueprintAbility),
             typeof(BlueprintActivatableAbility),
             typeof(BlueprintBuff),
             typeof(BlueprintFeature),
             typeof(BlueprintItem),
             typeof(BlueprintItemEnchantment),
-        };
+        ];
 
-        private static readonly Dictionary<Type, IList> _blueprints = new();
+        private static readonly Dictionary<Type, IList> _blueprints = [];
 
         static BpCache()
         {
@@ -86,7 +86,7 @@ namespace CodexLib
             try
             {
                 var watch = Stopwatch.StartNew();
-                Dictionary<Type, IList> dic = new();
+                Dictionary<Type, IList> dic = [];
                 foreach (var type in types ?? DefaultTypes)
                     dic.Add(type, (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type)));
 

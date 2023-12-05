@@ -26,8 +26,8 @@ namespace DarkCodex
 
         public static void Example()
         {
-            var CreateAddMechanicsFeature = AccessTools.Method("CodexLib.Helper, CodexLib:CreateAddMechanicsFeature", new[] { Type.GetType("CodexLib.MechanicFeature, CodexLib") });
-            var comp = CreateAddMechanicsFeature?.Invoke(null, new object[] { 8 });
+            var CreateAddMechanicsFeature = AccessTools.Method("CodexLib.Helper, CodexLib:CreateAddMechanicsFeature", [Type.GetType("CodexLib.MechanicFeature, CodexLib")]);
+            var comp = CreateAddMechanicsFeature?.Invoke(null, [8]);
 
             Main.Print($"Patch_KineticistAllowOpportunityAttack.Example {comp != null}");
         }

@@ -18,7 +18,7 @@ namespace CodexLib.Patches
     [HarmonyPatch]
     public class Patch_WeaponCategory
     {
-        public static List<(WeaponCategory num, LocalizedString name, Sprite icon)> Extention = new();
+        public static List<(WeaponCategory num, LocalizedString name, Sprite icon)> Extention = [];
 
         [HarmonyPatch(typeof(BlueprintParametrizedFeature), nameof(BlueprintParametrizedFeature.ExtractItemsWeaponCategory))]
         [HarmonyPostfix]

@@ -9,6 +9,9 @@ namespace Shared
     /// <summary>
     /// Local selection for TranspilerTool delegate.
     /// </summary>
+    /// <remarks>
+    /// If you want to define the local dynamically inside the transpiler, then define <see cref="Name"/> and set the name via TranspilerTool.NameLocal.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     public class LocalParameterAttribute : Attribute
     {

@@ -47,7 +47,7 @@ namespace CodexLib
         {
             this.Unit = unit;
             this.hash = hash;
-            this.Slots = slots ?? new();
+            this.Slots = slots ?? [];
         }
 
         List<MechanicActionBarSlot> IMechanicGroup.Slots => Slots;

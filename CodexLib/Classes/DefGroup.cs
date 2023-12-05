@@ -41,7 +41,7 @@ namespace CodexLib
         {
             this.Title = title;
             this.Description = description;
-            this.Guids = guids ?? new();
+            this.Guids = guids ?? [];
             this.icon = icon;
             this.hash = title.GetHashCode();
         }
@@ -57,7 +57,7 @@ namespace CodexLib
 
         public DefGroup()
         {
-            this.Guids = new();
+            this.Guids = [];
         }
         public Sprite GetIcon()
         {

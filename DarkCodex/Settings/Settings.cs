@@ -61,7 +61,7 @@ namespace DarkCodex
                     hash.Add(toUpper(str));
                 Whitelist = hash;
 
-                hash = new HashSet<string>();
+                hash = [];
                 foreach (string str in Blacklist)
                     hash.Add(toUpper(str));
                 Blacklist = hash;

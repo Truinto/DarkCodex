@@ -46,8 +46,8 @@ namespace CodexLib
             return Numbers[num.MinMax(0, Numbers.Length - 1)];
         }
 
-        public static UINumber[] Numbers = new UINumber[]
-        {
+        public static UINumber[] Numbers =
+        [
             new UINumber() { Value = 0, Name = "Level 0", Description = "" },
             new UINumber() { Value = 1, Name = "Level 1", Description = "" },
             new UINumber() { Value = 2, Name = "Level 2", Description = "" },
@@ -58,6 +58,6 @@ namespace CodexLib
             new UINumber() { Value = 7, Name = "Level 7", Description = "" },
             new UINumber() { Value = 8, Name = "Level 8", Description = "" },
             new UINumber() { Value = 9, Name = "Level 9", Description = "" },
-        };
+        ];
     }
 }

@@ -14,7 +14,7 @@ namespace CodexLib
     public class ActionBarConvertedVMAny : ActionBarConvertedVM
     {
         /// <inheritdoc cref="ActionBarConvertedVMAny"/>
-        public ActionBarConvertedVMAny(ActionBarSlotVM parent, List<MechanicActionBarSlot> list, Action onClose) : base(new(), onClose)
+        public ActionBarConvertedVMAny(ActionBarSlotVM parent, List<MechanicActionBarSlot> list, Action onClose) : base([], onClose)
         {
             foreach (var item in list)
                 this.Slots.Add(new ActionBarSlotVMChild(parent, item));

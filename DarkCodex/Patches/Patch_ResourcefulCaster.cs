@@ -66,7 +66,7 @@ namespace DarkCodex
             }
         }
 
-        public static List<UnitEntityData> unitsSpellNotResisted = new();
+        public static List<UnitEntityData> unitsSpellNotResisted = [];
         [HarmonyPatch(typeof(AbilityExecutionProcess), nameof(AbilityExecutionProcess.Tick))]
         [HarmonyPostfix]
         public static void Postfix3(AbilityExecutionProcess __instance) // all targets resisted

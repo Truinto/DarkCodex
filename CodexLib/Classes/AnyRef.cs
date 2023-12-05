@@ -85,7 +85,7 @@ namespace CodexLib
             if (this.Cached is BlueprintScriptableObject obj)
                 action(obj);
             else
-                (Actions ??= new()).Add(action);
+                (Actions ??= []).Add(action);
         }
 
         /// <summary>
@@ -160,6 +160,15 @@ namespace CodexLib
 
         /// <inheritdoc cref="Equals(object)"/>
         public bool Is(string bp) => this.deserializedGuid == bp;
+
+        /// <summary>returns as BlueprintAbility</summary>
+        public BlueprintAbility AsAbility => Get<BlueprintAbility>();
+        /// <summary>returns as BlueprintBuff</summary>
+        public BlueprintBuff AsBuff => Get<BlueprintBuff>();
+        /// <summary>returns as BlueprintActivatableAbility</summary>
+        public BlueprintActivatableAbility AsActivatable => Get<BlueprintActivatableAbility>();
+        /// <summary>returns as BlueprintFeature</summary>
+        public BlueprintFeature AsFeature => Get<BlueprintFeature>();
 
         /// <inheritdoc cref="Get{T}()"/>
         public static T Get<T>(AnyRef bp) where T : SimpleBlueprint

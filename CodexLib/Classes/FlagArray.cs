@@ -17,7 +17,7 @@ namespace CodexLib
     internal class FlagArray
     {
         [JsonProperty]
-        public Dictionary<Type, long> Data = new();
+        public Dictionary<Type, long> Data = [];
 
         public T GetFlags<T>() where T : Enum
         {

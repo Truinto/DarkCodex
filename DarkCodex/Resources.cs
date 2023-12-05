@@ -39,7 +39,7 @@ namespace DarkCodex
         // clear before use
         public static StringBuilder sb = new();
 
-        public static readonly int[] WeaponPrice = new int[] {
+        public static readonly int[] WeaponPrice = [
                 100,
                 2000,
                 8000,
@@ -51,7 +51,7 @@ namespace DarkCodex
                 128000,
                 162000,
                 200000,
-            };
+            ];
 
         public static ContextValue ValueRank = Helper.CreateContextValue();
 
@@ -81,7 +81,7 @@ namespace DarkCodex
             public static readonly BlueprintWeaponTypeReference WeaponTypeButchering = new();
 
             // Cross Feature
-            public static List<BlueprintAbility> AccursedStrike = new();
+            public static List<BlueprintAbility> AccursedStrike = [];
 
             public static void Save<T>(List<T> list, string path) where T : SimpleBlueprint
             {
@@ -495,8 +495,8 @@ namespace DarkCodex
                     return _localizedStrings;
 
                 using var scope = new Scope(Main.ModPath, Main.logger, Main.harmony, Main.AllowGuidGeneration);
-                return _localizedStrings = new[]
-                {
+                return _localizedStrings =
+                [
                     //None
                     "", 
                     //MenuDisclaimer
@@ -537,7 +537,7 @@ namespace DarkCodex
                     Helper.CreateString("Enable patches"),
                     //MessagePatchesEnabled
                     Helper.CreateString("Patches enabled, you must restart game now!"),
-                };
+                ];
             }
         }
     }

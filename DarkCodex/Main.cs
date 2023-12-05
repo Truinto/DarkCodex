@@ -69,8 +69,8 @@ namespace Shared
         public static bool Enabled;
         public static string ModPath;
         internal static PatchInfoCollection patchInfos;
-        internal static readonly List<string> appliedPatches = new();
-        internal static readonly List<string> skippedPatches = new();
+        internal static readonly List<string> appliedPatches = [];
+        internal static readonly List<string> skippedPatches = [];
         internal static UnityModManager.ModEntry.ModLogger logger;
         public static bool applyNullFinalizer;
 
@@ -93,7 +93,7 @@ namespace Shared
         internal static bool restart;
         private static GUIStyle StyleBox;
         private static GUIStyle StyleLine;
-        private static List<string> CategoryFolded = new();
+        private static List<string> CategoryFolded = [];
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
@@ -365,7 +365,7 @@ namespace Shared
             GUILayout.EndHorizontal();
         }
 
-        private static Dictionary<string, string> NumberTable = new();
+        private static Dictionary<string, string> NumberTable = [];
         private static void NumberField(string key, string label)
         {
             NumberTable.TryGetValue(key, out string str);
@@ -918,7 +918,7 @@ namespace Shared
 
         #region Helper
 
-        private static List<(string, Action)> _patchLast = new();
+        private static List<(string, Action)> _patchLast = [];
         internal static void RunLast(string message, Action action)
         {
             if (_patchLast == null)

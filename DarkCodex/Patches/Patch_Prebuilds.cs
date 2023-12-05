@@ -66,7 +66,7 @@ namespace DarkCodex
             { "SetStat", "DarkCodex.Patch_Prebuilds+SetStat, DarkCodex" },
         };
 
-        private static Dictionary<UnitEntityData, bool> _hasPlan = new();
+        private static Dictionary<UnitEntityData, bool> _hasPlan = [];
 
         public static void Clear()
         {
@@ -113,7 +113,7 @@ namespace DarkCodex
         {
             var list = new List<LevelPlanData>()
             {
-                new LevelPlanData(2, new ILevelUpAction[] { new Wrapper(new ApplySkillPoints()), new SetStat(StatType.Strength, 20) }),
+                new LevelPlanData(2, [new Wrapper(new ApplySkillPoints()), new SetStat(StatType.Strength, 20)]),
             };
             Helper.Serialize(list, path: Path.Combine(Main.ModPath, "builds", "testdata.json"));
         }

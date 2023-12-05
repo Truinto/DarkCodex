@@ -54,7 +54,7 @@ namespace DarkCodex
 
             const string descAdept = "At 3rd level, you can apply any one metamagic feat you know to a spell you are about to cast without increasing the casting time. You must still expend a higher-level spell slot to cast this spell. You can use this ability once per day at 3rd level and one additional time per day for every four sorcerer levels you possess beyond 3rd, up to five times per day at 19th level. At 20th level, this ability is replaced by arcane apotheosis.";
             var resource = Helper.CreateBlueprintAbilityResource("MetamagicAdeptResource", baseValue: 1, startLevel: 3, levelDiv: 4,
-                classes: new BlueprintCharacterClassReference[] { sorcerer, scion });
+                classes: [sorcerer, scion]);
             var adept = Helper.CreateBlueprintActivatableAbility(
                 "MetamagicAdeptActivatable",
                 out var buff,
@@ -113,12 +113,12 @@ namespace DarkCodex
                 );
 
             var action = Helper.CreateConditional(
-                new Condition[] {
+                [
                     new ContextConditionCasterHasFact() { m_Fact = feat },
                     new ContextConditionIsEnemy(),
                     Helper.CreateContextConditionSharedValueHigher(AbilitySharedValue.DurationSecond, 0, Equality.LowerOrEqual)
-                },
-                ifTrue: new GameAction[] {
+                ],
+                ifTrue: [
                     Helper.CreateContextActionChangeSharedValue(AbilitySharedValue.DurationSecond, add: 1),
                     new ContextActionSavingThrow() {
                         Type = SavingThrowType.Will,
@@ -127,7 +127,7 @@ namespace DarkCodex
                             Helper.CreateContextActionConditionalSaved(failed: Helper.CreateContextActionApplyBuff("df6d1025da07524429afbae248845ecc", Helper.CreateContextDurationValue(bonus: 1))), //DazzledBuff
                             new ContextActionSpawnFx() { PrefabLink = Helper.GetPrefabLink("61602c5b0ac793d489c008e9cb58f631") })
                     },
-                });
+                ]);
 
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("f5fc9a1a2a3c1a946a31b320d1dd31b2").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergy
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("6670f0f21a1d7f04db2b8b115e8e6abf").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyPaladinHeal
@@ -168,14 +168,14 @@ namespace DarkCodex
                 );
 
             var action = Helper.CreateConditional(
-                new Condition[] {
+                [
                     new ContextConditionCasterHasFact() { m_Fact = feat },
                     new ContextConditionIsAlly()
-                },
-                ifTrue: new GameAction[] {
+                ],
+                ifTrue: [
                     Helper.CreateContextActionRemoveBuff(shaken),
                     new ContextActionSubstituteBuff(frightend, shaken, true)
-                });
+                ]);
 
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("f5fc9a1a2a3c1a946a31b320d1dd31b2").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergy
             Helper.AppendAndReplace(ref Helper.Get<BlueprintAbility>("6670f0f21a1d7f04db2b8b115e8e6abf").GetComponent<AbilityEffectRunAction>().Actions.Actions, action); //ChannelEnergyPaladinHeal

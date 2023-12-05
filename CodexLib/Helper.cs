@@ -341,7 +341,7 @@ namespace CodexLib
         public static T[] ObjToArray<T>(this T obj)
         {
             if (obj == null) return null;
-            return new T[] { obj };
+            return [obj];
         }
 
         public static T[] ToArray<T>(params T[] objs)
@@ -553,7 +553,7 @@ namespace CodexLib
                     yield return result;
         }
 
-        private static readonly List<object> _list = new();
+        private static readonly List<object> _list = [];
 
         /// <summary>
         /// Gets a static list object. Do not save reference.
@@ -710,7 +710,7 @@ namespace CodexLib
             ParameterExpression target = Expression.Parameter(typeof(Exception));
             ParameterExpression stack = Expression.Parameter(typeof(StackTrace));
             Type traceFormatType = typeof(StackTrace).GetNestedType("TraceFormat", BindingFlags.NonPublic);
-            MethodInfo toString = typeof(StackTrace).GetMethod("ToString", BindingFlags.NonPublic | BindingFlags.Instance, null, new[] { traceFormatType }, null);
+            MethodInfo toString = typeof(StackTrace).GetMethod("ToString", BindingFlags.NonPublic | BindingFlags.Instance, null, [traceFormatType], null);
             object normalTraceFormat = Enum.GetValues(traceFormatType).GetValue(0); // Enum.ToObject(traceFormatType, 0);
             FieldInfo stackTraceStringField = typeof(Exception).GetField("_stackTraceString", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -881,7 +881,7 @@ namespace CodexLib
 
         private static string _overwriteGuid;
 
-        private static Dictionary<string, Dictionary<string, string>> _mappedGuids = new();
+        private static Dictionary<string, Dictionary<string, string>> _mappedGuids = [];
 
         private static Dictionary<string, string> GetGuidMap()
         {
@@ -1002,7 +1002,7 @@ namespace CodexLib
 
         private static SHA1 _SHA = SHA1.Create();
         private static StringBuilder _sb1 = new();
-        private static Dictionary<string, Dictionary<string, string>> _mappedStrings = new();
+        private static Dictionary<string, Dictionary<string, string>> _mappedStrings = [];
 
         private static Dictionary<string, string> GetStringMap(string suffix)
         {
@@ -1026,7 +1026,7 @@ namespace CodexLib
                     }
                 }
                 catch (Exception e) { Print($"Could not read lanaguage file for {suffix}{LocalizationManager.CurrentPack.Locale}: {e.Message}"); }
-                return new();
+                return [];
             }
         }
 
@@ -1956,7 +1956,7 @@ namespace CodexLib
             // prevent some morphing
             if (result is BlueprintFeature feature)
             {
-                feature.IsPrerequisiteFor = new();
+                feature.IsPrerequisiteFor = [];
             }
             else if (result is BlueprintAbility ability)
             {
@@ -2433,9 +2433,9 @@ namespace CodexLib
         public static ActionList InjectCondition(this ActionList actionList, Condition condition, bool ifTrue = true)
         {
             if (ifTrue)
-                actionList.Actions = new GameAction[] { CreateConditional(condition.ObjToArray(), ifTrue: actionList.Actions) };
+                actionList.Actions = [CreateConditional(condition.ObjToArray(), ifTrue: actionList.Actions)];
             else
-                actionList.Actions = new GameAction[] { CreateConditional(condition.ObjToArray(), ifFalse: actionList.Actions) };
+                actionList.Actions = [CreateConditional(condition.ObjToArray(), ifFalse: actionList.Actions)];
 
             return actionList;
         }
@@ -2766,12 +2766,25 @@ namespace CodexLib
         /// <summary>
         /// Replace references with their sticky variant.
         /// </summary>
-        public static BlueprintAbilityReference[] StickyResolve(this BlueprintAbilityReference[] spells)
+        public static BlueprintAbilityReference[] GetSticky(this BlueprintAbilityReference[] spells)
         {
             var result = new BlueprintAbilityReference[spells.Length];
             for (int i = 0; i < result.Length; i++)
                 result[i] = spells[i].GetSticky() ?? spells[i];
             return result;
+        }
+
+        public static BlueprintAbilityReference[] StickyResolve(this IEnumerable<BlueprintAbilityReference> spells)
+        {
+            var list = new List<BlueprintAbilityReference>();
+            foreach (var spell in spells)
+            {
+                list.Add(spell);
+                var sticky = spell.GetSticky();
+                if (sticky != null)
+                    list.Add(sticky);
+            }
+            return list.ToArray();
         }
 
         #endregion
@@ -3030,7 +3043,7 @@ namespace CodexLib
             var result = new AutoMetamagic();
             result.m_AllowedAbilities = type;
             result.Metamagic = metamagic;
-            result.Abilities = abilities ?? new List<BlueprintAbilityReference>();
+            result.Abilities = abilities ?? [];
             return result;
         }
 
@@ -4749,7 +4762,7 @@ namespace CodexLib
             var stats = LocalizedTexts.Instance.Stats;
             if (stats.m_WeaponCache == null && stats.WeaponEntries != null)
             {
-                stats.m_WeaponCache = new();
+                stats.m_WeaponCache = [];
                 foreach (var entry in stats.WeaponEntries)
                     stats.m_WeaponCache[entry.Proficiency] = entry.Text;
             }

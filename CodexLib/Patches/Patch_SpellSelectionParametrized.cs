@@ -174,7 +174,7 @@ namespace CodexLib.Patches
             if (state == null)
                 return true;
 
-            __result = new List<FeatureSelectionViewState>();
+            __result = [];
 
             foreach (IFeatureSelectionItem item in feature.ExtractSelectionItems(state.Unit, state.Preview))
             {

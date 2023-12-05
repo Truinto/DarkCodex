@@ -41,12 +41,12 @@ namespace CodexLib
 
             this.Data.Clear();
             this.Data.SourceBuff = buff;
-            this.Data.AppliedModifiers = new()
-            {
+            this.Data.AppliedModifiers =
+            [
                 this.Owner.Stats.GetStat(StatType.Strength).AddModifier(4, this.Runtime, ModifierDescriptor.MasterShapeshifter),
                 this.Owner.Stats.GetStat(StatType.Dexterity).AddModifier(4, this.Runtime, ModifierDescriptor.MasterShapeshifter),
                 this.Owner.Stats.GetStat(StatType.Constitution).AddModifier(4, this.Runtime, ModifierDescriptor.MasterShapeshifter)
-            };
+            ];
         }
 
         public void HandleBuffDidRemoved(Buff buff)

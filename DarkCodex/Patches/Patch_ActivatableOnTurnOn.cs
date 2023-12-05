@@ -17,7 +17,7 @@ namespace DarkCodex
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
-            data.ReplaceAllCalls(typeof(EntityFact), nameof(EntityFact.GetComponent), Patch, null, new Type[] { typeof(ActivatableAbilityUnitCommand) });
+            data.ReplaceAllCalls(typeof(EntityFact), nameof(EntityFact.GetComponent), Patch, null, [typeof(ActivatableAbilityUnitCommand)]);
             return data;
         }
 

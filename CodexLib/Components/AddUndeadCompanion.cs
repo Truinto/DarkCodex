@@ -177,10 +177,10 @@ namespace CodexLib
         public class RuntimeData
         {
             [JsonProperty]
-            public List<BlueprintUnit> UnitBlueprint = new();
+            public List<BlueprintUnit> UnitBlueprint = [];
 
             [JsonProperty]
-            public List<UnitReference> UnitRef = new();
+            public List<UnitReference> UnitRef = [];
 
             [JsonProperty]
             public bool Disabled;

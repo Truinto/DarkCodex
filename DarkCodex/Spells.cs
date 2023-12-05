@@ -54,13 +54,13 @@ namespace DarkCodex
                 },
                 Helper.CreateAbilitySpawnFx("503b78b507366cc4da0f462cb40131f6"),
                 Helper.CreateAbilityEffectRunAction(
-                    condition: new Condition[] {
+                    condition: [
                         Helper.CreateContextConditionIsEnemy(),
                         new ContextConditionAttackRoll() { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
-                    },
-                    ifTrue: new GameAction[] {
+                    ],
+                    ifTrue: [
                         new ContextActionDealWeaponDamage()
-                    }),
+                    ]),
                 checkWeapon,
                 school,
                 craft
@@ -87,13 +87,13 @@ namespace DarkCodex
                 },
                 Helper.CreateAbilitySpawnFx("503b78b507366cc4da0f462cb40131f6"),
                 Helper.CreateAbilityEffectRunAction(
-                    condition: new Condition[] {
+                    condition: [
                         Helper.CreateContextConditionIsEnemy(),
                         new ContextConditionAttackRoll() { IgnoreAoO = true, ApplyBladedBonus = true, CanBeRanged = false }
-                    },
-                    ifTrue: new GameAction[] {
+                    ],
+                    ifTrue: [
                         new ContextActionDealWeaponDamage()
-                    }),
+                    ]),
                 school,
                 craft
                 ).TargetEnemy(point: true);
@@ -213,7 +213,7 @@ namespace DarkCodex
                 cloneVisuals: "d9fbec4637d71bd4ebc977628de3daf3", //Scimitar
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
-                enchantments: new AnyRef[] { enchantment }
+                enchantments: [enchantment]
                 );
 
             var buff = Helper.CreateBlueprintBuff(
@@ -297,7 +297,7 @@ namespace DarkCodex
                 cloneVisuals: "6ff66364e0a2c89469c2e52ebb46365e", //Trident
                 damageOverride: new DiceFormula(1, DiceType.D8),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Electricity),
-                enchantments: new AnyRef[] { enchantment }
+                enchantments: [enchantment]
                 );
 
             var buff = Helper.CreateBlueprintBuff(
@@ -379,11 +379,11 @@ namespace DarkCodex
                 weaponType: "1d39a22f206840e40b2255fc0175b8d0", //RayType
                 damageOverride: new DiceFormula(1, DiceType.D6),
                 form: Helper.CreateDamageTypeDescription(DamageEnergyType.Fire),
-                enchantments: new AnyRef[] { enchantment }
+                enchantments: [enchantment]
                 );
             weapon.m_VisualParameters = new()
             {
-                m_Projectiles = new BlueprintProjectileReference[] { (AnyRef)Resource.Projectile.ScorchingRay00 },
+                m_Projectiles = [(AnyRef)Resource.Projectile.ScorchingRay00],
                 m_WeaponAnimationStyle = WeaponAnimationStyle.ThrownStraight,
                 m_WeaponModel = Helper.GetPrefabLink("8dcb2efc5b9c4da44af5e2e7d59b4433") // todo: Produce Flame, look for better fx
             };

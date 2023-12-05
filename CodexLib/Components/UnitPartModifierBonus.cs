@@ -28,7 +28,7 @@ namespace CodexLib
     internal class UnitPartModifierBonus : UnitPart
     {
         [JsonProperty]
-        public List<Data> Bonuses = new();
+        public List<Data> Bonuses = [];
 
         public void AddBonus(int value, ModifierDescriptor descriptor, EntityFactComponent source)
         {

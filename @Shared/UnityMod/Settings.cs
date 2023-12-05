@@ -17,9 +17,9 @@ namespace Shared
         /// <summary>Whenever new features should be considered on by default.</summary>
         [JsonProperty] public bool NewFeatureDefaultOn { get; set; }
         /// <summary>Collection of features explicitly turned off.</summary>
-        [JsonProperty] public HashSet<string> Blacklist { get; protected set; } = new();
+        [JsonProperty] public HashSet<string> Blacklist { get; protected set; } = [];
         /// <summary>Collection of features explicitly turned on.</summary>
-        [JsonProperty] public HashSet<string> Whitelist { get; protected set; } = new();
+        [JsonProperty] public HashSet<string> Whitelist { get; protected set; } = [];
         /// <summary>File path to load from / save to.</summary>
         [JsonIgnore] public string FilePath;
         /// <summary>Serialization settings.</summary>

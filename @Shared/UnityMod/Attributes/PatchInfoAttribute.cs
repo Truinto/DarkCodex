@@ -93,7 +93,7 @@ namespace Shared
 
     public class PatchInfoCollection : IEnumerable<PatchInfoAttribute>
     {
-        private List<PatchInfoAttribute> list = new();
+        private List<PatchInfoAttribute> list = [];
         private ISettings state;
 
         public PatchInfoCollection(ISettings state)

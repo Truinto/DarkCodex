@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.6.1]
+- added ProphetOfPestilence to cursing gaze logic #284
+- added 3 buffs PatchHideBuffs #280
+- fixed Boundless Injury caster level unlock #273
+
 ## [1.6.0]
 - fixed multiple patches for update (watch out for more bugs)
 

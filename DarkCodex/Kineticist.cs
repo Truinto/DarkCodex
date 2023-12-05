@@ -139,7 +139,7 @@ namespace DarkCodex
             string description = "Element: universal\nType: form infusion\nLevel: 2\nBurn: 2\nAssociated Blasts: any\nSaving Throw: none\nYou use your element’s power to instantly move 30 feet, manifest a kinetic blade, and attack once. You gain a +2 bonus on the attack roll and take a –2 penalty to your AC until the start of your next turn. The movement doesn’t provoke attacks of opportunity, though activating blade rush does.";
             Sprite icon = Helper.StealIcon("4c349361d720e844e846ad8c19959b1e");
 
-            var ability = Helper.CreateBlueprintAbility(
+            AnyRef ability = Helper.CreateBlueprintAbility(
                 "KineticBladeRushAbility",
                 name,
                 description,
@@ -155,9 +155,8 @@ namespace DarkCodex
                 Step5_burn(null, 1),
                 new RestrictionCanGatherPowerAbility()
                 ).TargetPoint();
-            ability.SpellResistance = false;
-            ability.AvailableMetamagic = Metamagic.Quicken;
-            var abref = ability.ToRef();
+            ability.AsAbility.SpellResistance = false;
+            ability.AsAbility.AvailableMetamagic = Metamagic.Quicken;
 
             var rush = Helper.CreateBlueprintFeature(
                 "KineticBladeRush",
@@ -168,7 +167,7 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(kineticist_class, 4),
                 Helper.CreatePrerequisiteFeature(blade),
-                Helper.CreateAddFacts(ability.ToRef2())
+                Helper.CreateAddFacts(ability)
                 );
 
             var quickblade = Helper.CreateBlueprintFeature(
@@ -176,7 +175,7 @@ namespace DarkCodex
                 "Blade Rush — Quicken",
                 "At 13th level as a swift action, a Kinetic Knight can accept 2 points of burn to unleash a kinetic blast with the blade rush infusion."
                 ).SetComponents(
-                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { abref }, AutoMetamagic.AllowedType.KineticistBlast)
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, [ability], AutoMetamagic.AllowedType.KineticistBlast)
                 );
 
             Helper.AppendAndReplace(ref infusion_selection.m_AllFeatures, rush.ToRef());
@@ -185,7 +184,7 @@ namespace DarkCodex
             foreach (var meta in Tree.MetakinesisBuffs)
             {
                 var abilities = meta.GetComponent<AutoMetamagic>().Abilities;
-                abilities.Add(abref);
+                abilities.Add(ability);
                 meta.GetComponent<AddKineticistBurnModifier>().m_AppliableTo = abilities.ToArray();
             }
         }
@@ -229,9 +228,9 @@ namespace DarkCodex
             // - applies debuff
             // - get same restriction as usual gathering
             var three2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff3), Helper.CreateContextActionApplyBuff(buff3, 2));
-            var two2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff2).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff2), Helper.CreateContextActionApplyBuff(buff3, 2) });
-            var one2two = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff2, 2) });
-            var zero2one = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff1, 2) });
+            var two2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff2).ObjToArray(), [Helper.CreateContextActionRemoveBuff(buff2), Helper.CreateContextActionApplyBuff(buff3, 2)]);
+            var one2two = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), [Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff2, 2)]);
+            var zero2one = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), [Helper.CreateContextActionApplyBuff(buff1, 2)]);
             var regain_halfmove = new ContextActionUndoAction(command: UnitCommand.CommandType.Move, amount: 1.5f);
             var mobile_gathering_short_ab = Helper.CreateBlueprintAbility(
                 "MobileGatheringShort",
@@ -252,8 +251,8 @@ namespace DarkCodex
             mobile_gathering_short_ab.HasFastAnimation = true;
 
             // same as above but standard action and 2 levels of gatherpower
-            var one2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), new GameAction[] { Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff3, 2) });
-            var zero2two = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), new GameAction[] { Helper.CreateContextActionApplyBuff(buff2, 2) });
+            var one2three = Helper.CreateConditional(Helper.CreateContextConditionHasBuff(buff1).ObjToArray(), [Helper.CreateContextActionRemoveBuff(buff1), Helper.CreateContextActionApplyBuff(buff3, 2)]);
+            var zero2two = Helper.CreateConditional(Helper.MakeConditionHasNoBuff(buff1, buff2, buff3), [Helper.CreateContextActionApplyBuff(buff2, 2)]);
             var hasMoveAction = Helper.CreateAbilityRequirementActionAvailable(false, ActionType.Move, 6f);
             var lose_halfmove = new ContextActionUndoAction(command: UnitCommand.CommandType.Move, amount: -1.5f);
             var mobile_gathering_long_ab = Helper.CreateBlueprintAbility(
@@ -311,12 +310,12 @@ namespace DarkCodex
                 if (element.Parent1 != null && element.Parent2 != null)
                 {
                     list.Add(Helper.CreateConditional(
-                        new Condition[] {
+                        [
                             new ContextConditionCharacterClass() { CheckCaster = true, m_Class = t.Class, MinLevel = 7 },
                             Helper.CreateContextConditionHasFact(element.BlastFeature, true),
                             Helper.CreateContextConditionHasFact(element.Parent1.BlastFeature),
                             Helper.CreateContextConditionHasFact(element.Parent2.BlastFeature)
-                        },
+                        ],
                         ifTrue: Helper.CreateContextActionAddFeature(element.BlastFeature).ObjToArray()));
                 }
             }
@@ -325,13 +324,13 @@ namespace DarkCodex
             foreach (var boost in t.GetAll(boost: true).Cast<KineticistTree.Boost>())
             {
                 list.Add(Helper.CreateConditional(
-                    new Condition[] {
+                    [
                         new ContextConditionCharacterClass() { CheckCaster = true, m_Class = t.Class, MinLevel = boost.IsGreaterVersion ? 15 : 7},
                         Helper.CreateContextConditionHasFact(boost.BlastFeature, true),
                         Helper.CreateContextConditionHasFact(boost.Parent1.BlastFeature),
                         Helper.CreateConditionOr(t.GetAll(basic: boost.ModifiesSimple, composite: boost.ModifiesComposite, onlyPhysical: boost.IsOnlyPhysical, onlyEnergy: boost.IsOnlyEnergy)
                                 .Select(s => Helper.CreateContextConditionHasFact(s.BlastFeature)).ToArray())
-                    },
+                    ],
                     ifTrue: Helper.CreateContextActionAddFeature(boost.BlastFeature).ObjToArray()));
             }
             t.CompositeBuff.Get().GetComponent<AddFactContextActions>().Activated.Actions = list.ToArray();
@@ -1081,12 +1080,7 @@ namespace DarkCodex
                 {
                     BurnType = KineticistBurnType.WildTalent,
                     BurnValue = 1,
-                    m_AppliableTo = new BlueprintAbilityReference[]
-                    {
-                        //Helper.ToRef<BlueprintAbilityReference>("3c030a62a0efa1c419ecf315a9d694ef"), //SlickAbility
-                        //Helper.ToRef<BlueprintAbilityReference>("80e7e30cdf96be0418a615ebb38ea4b9"), //Celerity
-                        //Helper.ToRef<BlueprintAbilityReference>("c3a13237b17de5742a2dbf2da46f23d5"), //FlameShieldAbility
-                    }
+                    m_AppliableTo = []
                 });
             PropertyKineticistBurn.ElementalEmbodiment = f20_elementalEmbodiment; // this fakes 1 burn more than you actually have; for Adaptation talents
             Helper.Get<BlueprintUnitProperty>("02c5943c77717974cb7fa1b7c0dc51f8").SetComponents(new PropertyKineticistBurn()); //BurnNumberProperty

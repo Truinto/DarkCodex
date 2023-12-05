@@ -34,7 +34,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteClassLevel(ranger, 9),
                 Helper.CreatePrerequisiteFeature(huntersbond)
                 );
-            improvedFeat.Groups = new FeatureGroup[] { FeatureGroup.Feat, FeatureGroup.CombatFeat };
+            improvedFeat.Groups = [FeatureGroup.Feat, FeatureGroup.CombatFeat];
 
             var improvedBuff = Helper.CreateBlueprintBuff(
                 "ImprovedHuntersBondBuff", "", "",

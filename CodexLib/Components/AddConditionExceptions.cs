@@ -22,7 +22,7 @@ namespace CodexLib
             int index = (int)Condition;
             var exceptions = this.Owner.State.m_ConditionsExceptions;
             if (exceptions[index] == null)
-                exceptions[index] = new();
+                exceptions[index] = [];
             exceptions[index].Add(Exception);
         }
 

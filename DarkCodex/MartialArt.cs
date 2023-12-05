@@ -318,14 +318,14 @@ namespace DarkCodex
                 ).SetComponents(
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
                     Helper.CreateActionList(Helper.CreateConditional(
-                        condition: new Condition[] {
-                            Helper.CreateContextConditionHasBuff(holy_strike_buff) },
-                        ifFalse: new GameAction[] {
+                        condition: [
+                            Helper.CreateContextConditionHasBuff(holy_strike_buff) ],
+                        ifFalse: [
                             Helper.CreateContextActionApplyBuff(holy_strike_buff, Helper.DurationOneDay, dispellable: false),
                             Helper.MakeContextActionSavingThrow(
                                 SavingThrowType.Fortitude,
                                 succeed: Helper.CreateContextActionApplyBuff("09d39b38bb7c6014394b6daced9bacd3", Helper.DurationOneRound, dispellable: false), //Stunned
-                                failed: new ContextActionKill()) }
+                                failed: new ContextActionKill()) ]
                         )),
                     CriticalHit: true,
                     DuelistWeapon: true)

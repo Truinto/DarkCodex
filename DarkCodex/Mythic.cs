@@ -558,7 +558,7 @@ namespace DarkCodex
                 "Swift Hunters Bond",
                 "Benefit: You can use Hunter's Bond as a swift action."
                 ).SetComponents(
-                Helper.CreateAutoMetamagic(Metamagic.Quicken, new List<BlueprintAbilityReference>() { huntersab, freebooterab }),
+                Helper.CreateAutoMetamagic(Metamagic.Quicken, [huntersab, freebooterab]),
                 Helper.CreatePrerequisiteFeature(hunterfeat, true),
                 Helper.CreatePrerequisiteFeature(freebooterfeat, true)
                 );
@@ -571,19 +571,20 @@ namespace DarkCodex
         {
             var witch_selection = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
             var shaman_selection = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
+            var plague_selection = Helper.Get<BlueprintFeatureSelection>("68db664d2b5046eab2e6fd267f5d017d"); //PlagueHexSelection
             var trickster_selection = Helper.Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452"); //SylvanTricksterTalentSelection
             var hexcrafterMagus_selection = Helper.Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf"); //HexcrafterHexSelection
             var grant_hex = BlueprintGuid.Parse("d24c2467804ce0e4497d9978bafec1f9"); //WitchGrandHex
 
             var abilities = new List<BlueprintAbilityReference>();
 
-            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures))
+            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures).Concat(plague_selection.m_AllFeatures))
             {
                 var hex = sel.Get();
                 if (hex.GetComponent<PrerequisiteFeature>()?.m_Feature?.Guid == grant_hex)
                     continue;
 
-                foreach (var fact in hex.GetComponent<AddFacts>()?.m_Facts ?? Array.Empty<BlueprintUnitFactReference>())
+                foreach (var fact in hex.GetComponent<AddFacts>()?.m_Facts ?? [])
                     if (fact.Get() is BlueprintAbility ab)
                         abilities.Add(ab.ToRef());
             }
@@ -594,10 +595,11 @@ namespace DarkCodex
                 "A mere glimpse is enough to curse your enemies. You may use hexes and major hexes, but not grant hexes, as a swift action."
                 ).SetComponents(
                 Helper.CreateAutoMetamagic(Metamagic.Quicken, abilities),
-                Helper.CreatePrerequisiteFeature(witch_selection.ToRef(), true),
-                Helper.CreatePrerequisiteFeature(shaman_selection.ToRef(), true),
-                Helper.CreatePrerequisiteFeature(trickster_selection.ToRef(), true),
-                Helper.CreatePrerequisiteFeature(hexcrafterMagus_selection.ToRef(), true)
+                Helper.CreatePrerequisiteFeature(witch_selection, true),
+                Helper.CreatePrerequisiteFeature(shaman_selection, true),
+                Helper.CreatePrerequisiteFeature(plague_selection, true),
+                Helper.CreatePrerequisiteFeature(trickster_selection, true),
+                Helper.CreatePrerequisiteFeature(hexcrafterMagus_selection, true)
                 );
 
             Helper.AddMythicTalent(feat);
@@ -620,7 +622,7 @@ namespace DarkCodex
                 .ReplaceComponent(default(AbilityTargetHasFact),
                     new AbilityTargetHasFact()
                     {
-                        m_CheckedFacts = new BlueprintUnitFactReference[] { typedemon } //SubtypeDemon, DemonOfMagicFeature, DemonOfSlaughterFeature, DemonOfStrengthFeature
+                        m_CheckedFacts = [typedemon] //SubtypeDemon, DemonOfMagicFeature, DemonOfSlaughterFeature, DemonOfStrengthFeature
                     })
                 .ReplaceComponent(default(AbilityEffectRunAction),
                     Helper.CreateAbilityEffectRunAction(SavingThrowType.Will,
@@ -751,7 +753,7 @@ namespace DarkCodex
             var feat = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing
             feat.AddComponents(new AddKnownSpellsAnyClass()
             {
-                Spells = new BlueprintAbilityReference[] {
+                Spells = [
                     Helper.ToRef<BlueprintAbilityReference>("5590652e1c2225c4ca30c4a699ab3649"), //1: CureLightWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("6b90c773a6543dc49b2505858ce33db5"), //2: CureModerateWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("3361c5df793b4c8448756146a88026ad"), //3: CureSeriousWoundsCast
@@ -766,8 +768,8 @@ namespace DarkCodex
                     Helper.ToRef<BlueprintAbilityReference>("e84fc922ccf952943b5240293669b171"), //2: RestorationLesser
                     Helper.ToRef<BlueprintAbilityReference>("f2115ac1148256b4ba20788f7e966830"), //4: Restoration
                     Helper.ToRef<BlueprintAbilityReference>("fafd77c6bfa85c04ba31fdc1c962c914"), //7: RestorationGreater
-                },
-                Levels = new int[] {
+                ],
+                Levels = [
                     1, //1: CureLightWoundsCast
                     2,
                     3,
@@ -782,7 +784,7 @@ namespace DarkCodex
                     2, //2: RestorationLesser
                     4,
                     7,
-                }
+                ]
             });
 
             feat.m_Description.CreateString(feat.m_Description + "\nGain cure wound bonus spells to your spellbooks.");
@@ -793,7 +795,7 @@ namespace DarkCodex
         {
             var addKnownSpells = new AddKnownSpellsAnyClass()
             {
-                Spells = new BlueprintAbilityReference[] {
+                Spells = [
                     Helper.ToRef<BlueprintAbilityReference>("e5af3674bb241f14b9a9f6b0c7dc3d27"), //1: InflictLightWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("65f0b63c45ea82a4f8b8325768a3832d"), //2: InflictModerateWoundsCast
                     Helper.ToRef<BlueprintAbilityReference>("bd5da98859cf2b3418f6d68ea66cabbe"), //3: InflictSeriousWoundsCast
@@ -804,8 +806,8 @@ namespace DarkCodex
                     Helper.ToRef<BlueprintAbilityReference>("5ee395a2423808c4baf342a4f8395b19"), //8: InflictCriticalWoundsMass
                     Helper.ToRef<BlueprintAbilityReference>("cc09224ecc9af79449816c45bc5be218"), //6: HarmCast
                     //Helper.ToRef<BlueprintAbilityReference>(""), //9: HarmMass
-                },
-                Levels = new int[] {
+                ],
+                Levels = [
                     1, //1: InflictLightWoundsCast
                     2,
                     3,
@@ -816,7 +818,7 @@ namespace DarkCodex
                     8,
                     6, //6: HarmCast
                     //9, //9: HarmMass
-                }
+                ]
             };
 
             //var feat = Helper.Get<BlueprintFeature>("c8bbb330aaecaf54dbc7570200653f8c"); //BoundlessHealing

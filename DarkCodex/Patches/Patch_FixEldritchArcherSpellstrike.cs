@@ -24,7 +24,7 @@ namespace DarkCodex
         {
             var code = instructions as List<CodeInstruction> ?? instructions.ToList();
 
-            var call = AccessTools.Method(typeof(EntityDataBase), nameof(EntityDataBase.Get), new Type[] { }, new Type[] { typeof(UnitPartMagus) });
+            var call = AccessTools.Method(typeof(EntityDataBase), nameof(EntityDataBase.Get), [], [typeof(UnitPartMagus)]);
             int index = 0;
 
             for (; index < code.Count; index++)

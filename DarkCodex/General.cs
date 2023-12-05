@@ -165,7 +165,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 5),
                 Helper.CreatePrerequisiteFeature(heighten)
                 );
-            feat.Groups = new FeatureGroup[] { FeatureGroup.Feat, FeatureGroup.WizardFeat };
+            feat.Groups = [FeatureGroup.Feat, FeatureGroup.WizardFeat];
             feat.Ranks = 10;
 
             Helper.AddFeats(feat);
@@ -177,11 +177,14 @@ namespace DarkCodex
         [PatchInfo(Severity.Extend | Severity.WIP, "Hide Buffs", "unclogs UI by hiding a few buffs", false)]
         public static void PatchHideBuffs()
         {
-            string[] guids = new string[] {
+            string[] guids = [
                 "359e8fc68f81b5d4e96fae22be5e439f", //Artifact_RingOfSummonsBuff
                 "4677cfde5b184a94e898425d88a4665a", //MetamagicRodLesserKineticBuff
                 "7c4ebf464651bbe4798f25e839cead25", //HatOfHearteningSongEffectBuff
-            };
+                "5898bcf75a0942449a5dc16adc97b279", //PowerAttackBuff
+                "8af258b1dd322874ba6047b0c24660c7", //PiranhaStrikeBuff
+                "6aaf11aa06ae0e7499a71b79725828df", //DeadlyAimBuff
+            ];
 
             foreach (var guid in guids)
             {
@@ -561,7 +564,7 @@ namespace DarkCodex
 
              */
 
-            (string displayName, int dc, StatType statType, DiceFormula damage, int ticks, int successfullSaves)[] poisons = {
+            (string displayName, int dc, StatType statType, DiceFormula damage, int ticks, int successfullSaves)[] poisons = [
                 ("Deathblade", 20, StatType.Constitution, new DiceFormula(1, DiceType.D3), 6, 2),
                 ("Wyvern Poison", 17, StatType.Constitution, new DiceFormula(1, DiceType.D4), 6, 1),
                 ("Bluetip Eurypterid Poison", 16, StatType.Constitution, new DiceFormula(1, DiceType.D4), 6, 2),
@@ -579,7 +582,7 @@ namespace DarkCodex
                 ("Hag Spit", 16, StatType.Wisdom, new DiceFormula(1, DiceType.D4), 6, 2), // blindness
 
                 ("Tongue Twist", 16, StatType.Intelligence, new DiceFormula(1, DiceType.D2), 6, 2),
-            };
+            ];
 
             var sfx = Helper.GetPrefabLink("fbf39991ad3f5ef4cb81868bb9419bff");
             var list = new List<BlueprintAbility>();

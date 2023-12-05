@@ -12,7 +12,7 @@ namespace CodexLib
     /// </summary>
     public class PartCooldown : EntityPart
     {
-        public Dictionary<BlueprintAbility, TimeSpan> Cooldowns = new();
+        public Dictionary<BlueprintAbility, TimeSpan> Cooldowns = [];
 
         public TimeSpan Now => CombatController.IsInTurnBasedCombat() ? Game.Instance.TurnBasedCombatController.TurnStartTime : Game.Instance.TimeController.GameTime;
 

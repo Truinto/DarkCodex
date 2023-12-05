@@ -100,6 +100,9 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 dotnet_style_allow_multiple_blank_lines_experimental = true
 dotnet_style_allow_statement_immediately_after_block_experimental = true
 
+# IDE0305: Initialisierung der Sammlung vereinfachen
+dotnet_style_prefer_collection_expression = true
+
 #### C#-Codierungskonventionen ####
 
 # Var-Einstellungen
@@ -251,3 +254,6 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# IDE0290: Primären Konstruktor verwenden
+csharp_style_prefer_primary_constructors = false

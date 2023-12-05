@@ -16,7 +16,7 @@ namespace CodexLib
     public class CountableFlagArray
     {
         [JsonProperty]
-        private readonly Dictionary<Enum, CountableFlag> Data = new();
+        private readonly Dictionary<Enum, CountableFlag> Data = [];
 
         /// <summary>
         /// Increases count for a specific enum value.

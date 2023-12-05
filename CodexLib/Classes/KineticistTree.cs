@@ -52,15 +52,15 @@ namespace CodexLib
 
             #region Metakinesis
 
-            MetakinesisBuffs = new()
-            {
+            MetakinesisBuffs =
+            [
                 Helper.Get<BlueprintBuff>("f5f3aa17dd579ff49879923fb7bc2adb"), //MetakinesisEmpowerBuff
                 Helper.Get<BlueprintBuff>("f8d0f7099e73c95499830ec0a93e2eeb"), //MetakinesisEmpowerCheaperBuff
                 Helper.Get<BlueprintBuff>("870d7e67e97a68f439155bdf465ea191"), //MetakinesisMaximizedBuff
                 Helper.Get<BlueprintBuff>("b8f43f0040155c74abd1bc794dbec320"), //MetakinesisMaximizedCheaperBuff
                 Helper.Get<BlueprintBuff>("f690edc756b748e43bba232e0eabd004"), //MetakinesisQuickenBuff
                 Helper.Get<BlueprintBuff>("c4b74e4448b81d04f9df89ed14c38a95"), //MetakinesisQuickenCheaperBuff
-            };
+            ];
 
             #endregion
 
@@ -822,8 +822,8 @@ namespace CodexLib
                 Feature = new(),
                 Buff = null,
                 RequiresRangedAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("31f668b12011e344aa542aa07ab6c8d9"),
                     Helper.ToRef<BlueprintAbilityReference>("519e36decde7c964d87c2ffe4d3d8459"),
                     Helper.ToRef<BlueprintAbilityReference>("3236a9e26e23b364e8951ee9e92554e8"),
@@ -854,7 +854,7 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("b2a2f0376759441cba623407b094b14b"),
                     Helper.ToRef<BlueprintAbilityReference>("cab7dca922f94e3d971ce6b076b23750"),
                     Helper.ToRef<BlueprintAbilityReference>("322911b79eabdb64f8b079c7a2d95e68"),
-                },
+                ],
             };
             BladeWhirlwind = new()
             {
@@ -879,68 +879,68 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("3c53ee4965a13d74e81b37ae34f0861b"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("251af7913c0a0f442a38bc85ed5737a8"),
                     Helper.ToRef<BlueprintAbilityReference>("6462a12f53252aa4fbd3b18f99c9d1a8"),
                     Helper.ToRef<BlueprintAbilityReference>("c6b747b7a087ed942b743e3911018464"),
                     Helper.ToRef<BlueprintAbilityReference>("ba303565ad91ae542ac7eba89f59a9c4"),
-                },
+                ],
             };
             Cyclone = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("f2fa7541f18b8af4896fbaf9f2a21dfe"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("9fbc4fe045472984aa4a2d15d88bdaf9"),
                     Helper.ToRef<BlueprintAbilityReference>("2d1f3ad47ce421745b80495b9ed8ddc9"),
                     Helper.ToRef<BlueprintAbilityReference>("3e5996148b4ff634ea7033e112710402"),
                     Helper.ToRef<BlueprintAbilityReference>("cca552f27c6ea4f458858fb857212df7"),
-                },
+                ],
             };
             DeadlyEarth = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("061f5d7e659432b478668b70f6d4caae"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("e29cf5372f89c40489227edc9ffc52be"),
                     Helper.ToRef<BlueprintAbilityReference>("44804ca6ba7d495439cc9d5ad6d6cfcf"),
                     Helper.ToRef<BlueprintAbilityReference>("c0704daaf6e4c5840a94e7db6d7dbe0e"),
                     Helper.ToRef<BlueprintAbilityReference>("0be97d0e752060f468bbf62ce032b9f5"),
                     Helper.ToRef<BlueprintAbilityReference>("0e3b058a1c0042bb86d5c39264f387ce"),
-                },
+                ],
             };
             Detonation = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("77c24cc95ce319c44a0e5fc6ff466d5b"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("d651db4ffb7441548a06b11de5f163a1"),
                     Helper.ToRef<BlueprintAbilityReference>("2ca478c57073c9f469beef873b001503"),
-                },
+                ],
             };
             Eruption = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("00f8e4b846c367141afcd133f4a1c816"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("5b69fce8b7890de4b8b9ab973158fed8"),
                     Helper.ToRef<BlueprintAbilityReference>("7cc353f52000d4742a2710fa38de7357"),
                     Helper.ToRef<BlueprintAbilityReference>("f42bf8d4379d1b641b6163aa317ec80e"),
                     Helper.ToRef<BlueprintAbilityReference>("0f70d9349ef23bf4089387edac18317c"),
-                },
+                ],
             };
             ExtendedRange = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("cb2d9e6355dd33940b2bef49e544b0bf"),
                 Buff = null,
                 RequiresRangedAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("cae4cb39eb87a5d47b8ff35fd948dc4f"),
                     Helper.ToRef<BlueprintAbilityReference>("7d4712812818f094297f7d7920d130b1"),
                     Helper.ToRef<BlueprintAbilityReference>("11eba1184c7108846a665d8ca317963f"),
@@ -972,36 +972,36 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("0bcf1c4c9e0144b6acdd6c82a590d9be"),
                     Helper.ToRef<BlueprintAbilityReference>("2dea7d6d304e49418b446d543ec557c8"),
                     Helper.ToRef<BlueprintAbilityReference>("cb8c6e1c78e29444285e6fd97d9ef6ee"),
-                },
+                ],
             };
             FanOfFlames = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("fde466d2c24705641bcd97d04a323566"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("a240a6d61e1aee040bf7d132bfe1dc07"),
                     Helper.ToRef<BlueprintAbilityReference>("e3b3c7747e14f54458d27163f19761ae"),
-                },
+                ],
             };
             Fragmentation = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("88ae936abf296894695a282f49214718"),
                 Buff = null,
                 RequiresRangedAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("d859e796f6177cf449679c677076c577"),
                     Helper.ToRef<BlueprintAbilityReference>("3cf0a759bc612264fb9b03aa2f90b24b"),
                     Helper.ToRef<BlueprintAbilityReference>("415ce928decc2ac4fa551be49de86ceb"),
-                },
+                ],
             };
             Spindle = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("c4f4a62a325f7c14dbcace3ce34782b5"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("a28e54e4e5fafd1449dd9e926be85160"),
                     Helper.ToRef<BlueprintAbilityReference>("44d37b2230390b24e8060fe821068984"),
                     Helper.ToRef<BlueprintAbilityReference>("7021bbe4dca437440a41da4552dce28e"),
@@ -1031,25 +1031,25 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("e84f5f51a0714665a4474c509617f2bf"),
                     Helper.ToRef<BlueprintAbilityReference>("c6c92fc3541b4d6fbcb6b25a1d4bcc5d"),
                     Helper.ToRef<BlueprintAbilityReference>("3442485bd9cdfeb4fb7faf1984dec5bb"),
-                },
+                ],
             };
             Spray = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("b5852e8287f12d34ca6f84fcc7019f07"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("963da934d652bdc41900ed68f63ca1fa"),
                     Helper.ToRef<BlueprintAbilityReference>("53b701d71c0cde64e887f3b81a094682"),
                     Helper.ToRef<BlueprintAbilityReference>("48ae2d5a6105bdb4abb9c23a3809f1c1"),
-                },
+                ],
             };
             Torrent = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("2aad85320d0751340a0786de073ee3d5"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("51ede1faa3cdb3b47a46f7579ca02b0a"),
                     Helper.ToRef<BlueprintAbilityReference>("93cc42235edc6824fa7d54b83ed4e1fe"),
                     Helper.ToRef<BlueprintAbilityReference>("a87fd82362ff7d247b998e68eecc087b"),
@@ -1064,14 +1064,14 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("4d2e60cfd9902724d999758551020288"),
                     Helper.ToRef<BlueprintAbilityReference>("e5b1f4d8995f3f0489a4fed250a178a0"),
                     Helper.ToRef<BlueprintAbilityReference>("cc514f4604da850409f1af291e848e3a"),
-                },
+                ],
             };
             Wall = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("c684335918896ce4ab13e96cec929796"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("d0390bd9ff12cd242a40c384445546cd"),
                     Helper.ToRef<BlueprintAbilityReference>("f493e7b18b2a22c438df7ced760dd5b0"),
                     Helper.ToRef<BlueprintAbilityReference>("1ab8c76ac4983174dbffa35e2a87e582"),
@@ -1102,7 +1102,7 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("370794259a9a4ca8828dca53140672bd"),
                     Helper.ToRef<BlueprintAbilityReference>("70cefed4b3754a9eb26407bd831d3e0e"),
                     Helper.ToRef<BlueprintAbilityReference>("f185a0cf96cb6034f8fbcd9b349382af"),
-                },
+                ],
             };
             Wrack = new()
             {
@@ -1213,23 +1213,23 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("4b6884729a46432ea9b5e1a873e8efa6"),
                 Buff = null,
                 RequiresRangedAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("2279885fa7be4cd98fff498f99cf4699"),
                     Helper.ToRef<BlueprintAbilityReference>("00c9bd3f9b9e489cae0f27f79047b131"),
-                },
+                ],
             };
             Impale = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("611f666629f7451c98618d62b16ed62e"),
                 Buff = null,
                 RequiresMeleeAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("b699d93443d843aeb00ecf4fa8f52f0e"),
                     Helper.ToRef<BlueprintAbilityReference>("ce9903778fde46bfa63b88a29ce543fa"),
                     Helper.ToRef<BlueprintAbilityReference>("beae9019794349d7a5263c19f1800d74"),
-                },
+                ],
             };
             Venom = new()
             {
@@ -1279,10 +1279,10 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("000706ddb53e468a926a3c36e1889213"),
                 Buff = null,
                 RequiresRangedAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("8e8a85d2adc541e98b35f43555238b27"),
-                },
+                ],
             };
             FoeThrow = new()
             {
@@ -1295,10 +1295,10 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("ae785f510e4c4ed2991b59b421c0a2e5"),
                 Buff = null,
                 RequiresRangedAttackRoll = true,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("b32b471e39b3464d87a00ad2a5483b72"),
-                },
+                ],
             };
             Dampening = new()
             {
@@ -1340,12 +1340,12 @@ namespace CodexLib
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("2a8b8823924245aa9c9494679b311866"),
                 Buff = null,
-                Variants = new()
-                {
+                Variants =
+                [
                     Helper.ToRef<BlueprintAbilityReference>("13ef7dd6d6cf404f86d7c1bedf17df06"),
                     Helper.ToRef<BlueprintAbilityReference>("55649aab43a84b618faebfee15420292"),
                     Helper.ToRef<BlueprintAbilityReference>("489e9e94b39c4bd09aa657884ea0a331"),
-                },
+                ],
             };
             Spore = new()
             {

@@ -96,7 +96,7 @@ namespace DarkCodex
             var weapon = new BlueprintItemWeapon();
             weapon.m_Type = bladetype;
             weapon.m_Size = Size.Medium;
-            weapon.m_Enchantments = new BlueprintWeaponEnchantmentReference[] { enchant_3, enchant_kinetic.ToRef(), enchant_air };
+            weapon.m_Enchantments = [enchant_3, enchant_kinetic.ToRef(), enchant_air];
             weapon.m_OverrideDamageDice = true;
             weapon.m_VisualParameters = staff.m_VisualParameters;
             weapon.m_Icon = staff.Type.Icon;

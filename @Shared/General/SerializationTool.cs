@@ -15,7 +15,7 @@ namespace Shared
     /// </summary>
     public static class SerializationTool
     {
-        public static List<JsonConverter> DefaultConverters = new();
+        public static List<JsonConverter> DefaultConverters = [];
 
         public static JsonSerializerSettings JSettings = new()
         {

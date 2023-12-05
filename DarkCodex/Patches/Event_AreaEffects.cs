@@ -21,7 +21,7 @@ namespace DarkCodex
     [PatchInfo(Severity.Event, "Event: Area Effects", "mute player area effects while in dialog", false)]
     public class Event_AreaEffects : IDialogStartHandler, IDialogFinishHandler, IPartyCombatHandler, ICutsceneHandler, ICutsceneDialogHandler, IGlobalSubscriber, ISubscriber
     {
-        private static readonly List<AreaEffectEntityData> paused = new();
+        private static readonly List<AreaEffectEntityData> paused = [];
 
         public static void Stop()
         {

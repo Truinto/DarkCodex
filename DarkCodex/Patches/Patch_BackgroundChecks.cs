@@ -39,7 +39,7 @@ namespace DarkCodex
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original)
         {
             var data = new TranspilerTool(instructions, generator, original);
-            data.ReplaceAllCalls(typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), Empty, new Type[] { typeof(LogChannel), typeof(string), typeof(object[]) });
+            data.ReplaceAllCalls(typeof(LogChannelEx), nameof(LogChannelEx.ErrorWithReport), Empty, [typeof(LogChannel), typeof(string), typeof(object[])]);
             return data;
         }
 

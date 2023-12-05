@@ -162,7 +162,7 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(AbilityData), MethodType.Constructor, new Type[] { typeof(BlueprintAbility), typeof(UnitDescriptor), typeof(Ability), typeof(BlueprintSpellbook) })]
+        [HarmonyPatch(typeof(AbilityData), MethodType.Constructor, [typeof(BlueprintAbility), typeof(UnitDescriptor), typeof(Ability), typeof(BlueprintSpellbook)])]
         public class SpellReach
         {
             public static void Prefix(AbilityData __instance, BlueprintAbility blueprint, UnitDescriptor caster)
@@ -176,7 +176,7 @@ namespace DarkCodex
         }
 
         [PatchInfo(Severity.Extend | Severity.WIP, "Display All", "makes enchantments visible for items that don't usually display them", false)]
-        [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), new Type[] { typeof(ItemEntity), typeof(ItemTooltipData) })]
+        [HarmonyPatch(typeof(UIUtilityItem), nameof(UIUtilityItem.FillEnchantmentDescription), [typeof(ItemEntity), typeof(ItemTooltipData)])]
         public class Enchantments
         {
             public static void Postfix(ItemEntity item, ItemTooltipData itemTooltipData, ref string __result)
@@ -395,7 +395,7 @@ namespace DarkCodex
             }
         }
 
-        [HarmonyPatch(typeof(SettlementState), nameof(SettlementState.GetActualCost), new Type[] { typeof(BlueprintSettlementBuilding) })]
+        [HarmonyPatch(typeof(SettlementState), nameof(SettlementState.GetActualCost), [typeof(BlueprintSettlementBuilding)])]
         public class Settlement2
         {
             public static float buy_multiplier = 1f;

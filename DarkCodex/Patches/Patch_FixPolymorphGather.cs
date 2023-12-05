@@ -31,7 +31,7 @@ namespace DarkCodex
             return false;
         }
 
-        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), new Type[] { typeof(UnitDescriptor) })]
+        [HarmonyPatch(typeof(RestrictionCanUseKineticBlade), nameof(RestrictionCanUseKineticBlade.IsAvailable), [typeof(UnitDescriptor)])]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler2(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) => Transpiler1(instructions, generator, original);
 
