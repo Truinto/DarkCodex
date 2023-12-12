@@ -12,7 +12,7 @@ namespace Shared
         public static T[] ObjToArray<T>(this T obj)
         {
             if (obj == null) return null;
-            return new T[] { obj };
+            return [obj];
         }
 
         public static T[] ToArray<T>(params T[] objs)

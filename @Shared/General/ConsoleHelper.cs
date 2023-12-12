@@ -23,7 +23,7 @@ namespace Shared
     /// </summary>
     public static class ConsoleHelper
     {
-        public static char[] ArgsIdentifier = new char[] { '-', '/' };
+        public static char[] ArgsIdentifier = ['-', '/'];
 
         public static bool ReadArgs(this string[] args, params string[] identifier)
         {

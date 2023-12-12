@@ -22,13 +22,15 @@
 	<!-- Library Path -->
 	<PropertyGroup>
 		<Lib Condition="'$(Lib)' == ''">..\non-public\lib\</Lib>
+		<UserSecretsId>01005f08-df25-44e7-866c-3cdaead5f756</UserSecretsId>
 	</PropertyGroup>
 
 	<!-- Nuget Packages -->
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
-		<PackageReference Include="System.Management" Version="7.0.0" />
+		<PackageReference Include="System.Management" Version="8.0.0" />
+		<PackageReference Include="System.Text.Json" Version="8.0.0" />
 	</ItemGroup>
 
 	<!-- Project References -->

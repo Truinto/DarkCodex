@@ -571,14 +571,13 @@ namespace DarkCodex
         {
             var witch_selection = Helper.Get<BlueprintFeatureSelection>("9846043cf51251a4897728ed6e24e76f"); //WitchHexSelection
             var shaman_selection = Helper.Get<BlueprintFeatureSelection>("4223fe18c75d4d14787af196a04e14e7"); //ShamanHexSelection
-            var plague_selection = Helper.Get<BlueprintFeatureSelection>("68db664d2b5046eab2e6fd267f5d017d"); //PlagueHexSelection
             var trickster_selection = Helper.Get<BlueprintFeatureSelection>("290bbcc3c3bb92144b853fd8fb8ff452"); //SylvanTricksterTalentSelection
             var hexcrafterMagus_selection = Helper.Get<BlueprintFeatureSelection>("ad6b9cecb5286d841a66e23cea3ef7bf"); //HexcrafterHexSelection
             var grant_hex = BlueprintGuid.Parse("d24c2467804ce0e4497d9978bafec1f9"); //WitchGrandHex
 
             var abilities = new List<BlueprintAbilityReference>();
 
-            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures).Concat(plague_selection.m_AllFeatures))
+            foreach (var sel in witch_selection.m_AllFeatures.Concat(shaman_selection.m_AllFeatures))
             {
                 var hex = sel.Get();
                 if (hex.GetComponent<PrerequisiteFeature>()?.m_Feature?.Guid == grant_hex)
@@ -589,6 +588,8 @@ namespace DarkCodex
                         abilities.Add(ab.ToRef());
             }
 
+            abilities.Add((AnyRef)"1af015a346ef453d8f0151343c27efd9"); //PlagueHexAbility
+
             var feat = Helper.CreateBlueprintFeature(
                 "MythicSwiftHex",
                 "Cursing Gaze",
@@ -597,7 +598,7 @@ namespace DarkCodex
                 Helper.CreateAutoMetamagic(Metamagic.Quicken, abilities),
                 Helper.CreatePrerequisiteFeature(witch_selection, true),
                 Helper.CreatePrerequisiteFeature(shaman_selection, true),
-                Helper.CreatePrerequisiteFeature(plague_selection, true),
+                Helper.CreatePrerequisiteFeature("16b45f3a50454d4cb7b10e76656bd998", true), //PlagueHexFeature
                 Helper.CreatePrerequisiteFeature(trickster_selection, true),
                 Helper.CreatePrerequisiteFeature(hexcrafterMagus_selection, true)
                 );

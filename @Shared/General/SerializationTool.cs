@@ -5,8 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 #pragma warning disable CS1591
+
+// TODO: update to use System.Text.Json JsonSerializer.Serialize
+//private static JsonSerializerOptions jsonOptions = new() { WriteIndented = true, ReferenceHandler = ReferenceHandler.Preserve, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip, IncludeFields = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals }; //[JsonInclude] [JsonIgnore]
+//private static JsonSerializerOptions jsonOptionsRef = new() { WriteIndented = true, ReferenceHandler = ReferenceHandler.IgnoreCycles, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip, IncludeFields = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals };
+
 
 namespace Shared
 {

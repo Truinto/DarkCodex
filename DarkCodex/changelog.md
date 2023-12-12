@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.6.2]
+- fixed cursing gaze X plague hex #284
+
 ## [1.6.1]
 - added ProphetOfPestilence to cursing gaze logic #284
 - added 3 buffs PatchHideBuffs #280
