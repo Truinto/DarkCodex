@@ -5,9 +5,9 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace Shared
+namespace Shared.Generals
 {
-    public static class GeneralHelper
+    public static class General
     {
         public static readonly BindingFlags BindingAll = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
         public static readonly BindingFlags BindingInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;

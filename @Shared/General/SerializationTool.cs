@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using Shared.Loggers;
 
 #pragma warning disable CS1591
 
@@ -14,7 +15,7 @@ using System.Text.Json;
 //private static JsonSerializerOptions jsonOptionsRef = new() { WriteIndented = true, ReferenceHandler = ReferenceHandler.IgnoreCycles, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip, IncludeFields = false, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.AllowNamedFloatingPointLiterals };
 
 
-namespace Shared
+namespace Shared.Serialize
 {
     /// <summary>
     /// Tool to handle (de-)serialization.
@@ -107,7 +108,7 @@ namespace Shared
             {
                 return Serialize<T>(value: value, indent: indent, type: type, path: path, append: append);
             }
-            catch (Exception e) { Logger.PrintException(e); }
+            catch (Exception e) { Shared.Loggers.Logger.PrintException(e); }
             return null;
         }
 
@@ -118,7 +119,7 @@ namespace Shared
                 result = Deserialize<T>(path, value);
                 return true;
             }
-            catch (Exception e) { Logger.PrintException(e); }
+            catch (Exception e) { Shared.Loggers.Logger.PrintException(e); }
             result = default;
             return false;
         }
@@ -132,7 +133,7 @@ namespace Shared
                 using var sw = new StreamWriter(path, append);
                 sw.WriteLine(content);
             }
-            catch (Exception e) { Logger.PrintException(e); }
+            catch (Exception e) { Shared.Loggers.Logger.PrintException(e); }
         }
 
         public static void TryPrintBytes(string path, byte[] data)
@@ -143,7 +144,7 @@ namespace Shared
                 EnsureDir(path);
                 File.WriteAllBytes(path, data);
             }
-            catch (Exception e) { Logger.PrintException(e); }
+            catch (Exception e) { Shared.Loggers.Logger.PrintException(e); }
         }
 
         public static byte[] TryReadBytes(string path)
@@ -153,7 +154,7 @@ namespace Shared
                 //path = Path.Combine(Main.ModPath, path);
                 return File.ReadAllBytes(path);
             }
-            catch (Exception e) { Logger.PrintException(e); }
+            catch (Exception e) { Shared.Loggers.Logger.PrintException(e); }
             return new byte[0];
         }
 
@@ -163,14 +164,14 @@ namespace Shared
             {
                 File.Delete(path);
             }
-            catch (Exception e) { Logger.PrintException(e); }
+            catch (Exception e) { Shared.Loggers.Logger.PrintException(e); }
         }
 
         private static void EnsureDir(string path)
         {
             if (string.IsNullOrEmpty(path))
                 return;
-            path = Path.GetDirectoryName(path);
+            path = System.IO.Path.GetDirectoryName(path);
             if (string.IsNullOrEmpty(path))
                 return;
             Directory.CreateDirectory(path);

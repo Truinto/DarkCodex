@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.6.0.4</Version>
+		<Version>1.6.0.6</Version>
 		<TargetFramework>net472</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -11,7 +11,6 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RootNamespace>CodexLib</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DebugType>embedded</DebugType>
 		<DebugSymbols>true</DebugSymbols>

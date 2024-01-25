@@ -12,8 +12,10 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Shared.Generals;
+using Shared.Strings;
 
-namespace Shared
+namespace Shared.Consoles
 {
     /// <summary>
     /// Functions for use in console applications.<br/>
@@ -21,7 +23,7 @@ namespace Shared
     /// - manage processes<br/>
     /// - manage drives<br/>
     /// </summary>
-    public static class ConsoleHelper
+    public static class Console
     {
         public static char[] ArgsIdentifier = ['-', '/'];
 
@@ -148,7 +150,7 @@ namespace Shared
         /// <returns>Process thread</returns>
         public static Process RunCommandAsync(string command, string args = "", Action<string> onData = null, bool startNow = true, ProcessPriorityClass priority = ProcessPriorityClass.BelowNormal)
         {
-            onData ??= Console.WriteLine;
+            onData ??= System.Console.WriteLine;
 
             var p = new Process();
             p.StartInfo.FileName = command;
@@ -221,60 +223,60 @@ namespace Shared
         {
             if (!char.IsWhiteSpace(GetChar()))
             {
-                Console.CursorLeft += 0;
-                Console.Write(" ");
-                Console.CursorLeft += 0;
+                System.Console.CursorLeft += 0;
+                System.Console.Write(" ");
+                System.Console.CursorLeft += 0;
             }
-            else if (Console.CursorLeft > 0)
+            else if (System.Console.CursorLeft > 0)
             {
-                Console.Write("\b \b");
+                System.Console.Write("\b \b");
             }
-            else if (Console.CursorTop > 0)
+            else if (System.Console.CursorTop > 0)
             {
-                Console.CursorTop--;
-                var line = GetText(Console.CursorTop).TrimEnd();
-                Console.CursorLeft = Math.Min(line.Length, Console.BufferWidth - 1);
-                Console.Write(" ");
-                Console.CursorLeft -= Console.CursorLeft < Console.BufferWidth - 1 ? 1 : 0;
+                System.Console.CursorTop--;
+                var line = GetText(System.Console.CursorTop).TrimEnd();
+                System.Console.CursorLeft = Math.Min(line.Length, System.Console.BufferWidth - 1);
+                System.Console.Write(" ");
+                System.Console.CursorLeft -= System.Console.CursorLeft < System.Console.BufferWidth - 1 ? 1 : 0;
             }
         }
 
         public static int GetDistance(int x, int y)
         {
-            int startL = Console.CursorLeft;
-            int startT = Console.CursorTop;
-            int width = Console.BufferWidth;
+            int startL = System.Console.CursorLeft;
+            int startT = System.Console.CursorTop;
+            int width = System.Console.BufferWidth;
 
             return (y - startT) * width + (x - startL);
         }
 
         public static void PutText(int x, int y, string text)
         {
-            int startL = Console.CursorLeft;
-            int startT = Console.CursorTop;
+            int startL = System.Console.CursorLeft;
+            int startT = System.Console.CursorTop;
 
-            Console.SetCursorPosition(x, y);
-            Console.Write(text);
+            System.Console.SetCursorPosition(x, y);
+            System.Console.Write(text);
             int dist = GetDistance(startL, startT);
             if (dist > 0)
             {
-                startL = Console.CursorLeft;
-                startT = Console.CursorTop;
-                Console.Write(new string(' ', dist));
-                Console.SetCursorPosition(startL, startT);
+                startL = System.Console.CursorLeft;
+                startT = System.Console.CursorTop;
+                System.Console.Write(new string(' ', dist));
+                System.Console.SetCursorPosition(startL, startT);
             }
         }
 
         public static string ReadLineDefault(string @default)
         {
-            int startL = Console.CursorLeft;
-            int startT = Console.CursorTop;
+            int startL = System.Console.CursorLeft;
+            int startT = System.Console.CursorTop;
 
-            Console.Write(@default);
+            System.Console.Write(@default);
 
             while (true)
             {
-                var c = Console.ReadKey(true);
+                var c = System.Console.ReadKey(true);
 
                 if (c.Key == ConsoleKey.Enter)
                 {
@@ -283,7 +285,7 @@ namespace Shared
 
                 if (c.Key == ConsoleKey.LeftArrow || c.Key == ConsoleKey.Backspace)
                 {
-                    if (Console.CursorTop <= startT && Console.CursorLeft <= startL)
+                    if (System.Console.CursorTop <= startT && System.Console.CursorLeft <= startL)
                         continue;
 
                     if ((c.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Control)) != 0)
@@ -298,7 +300,7 @@ namespace Shared
 
                 if (c.KeyChar != '\0')
                 {
-                    Console.Write(c.KeyChar);
+                    System.Console.Write(c.KeyChar);
                     continue;
                 }
             }
@@ -310,17 +312,17 @@ namespace Shared
         private static int _dirsI;
         public static string ReadLineTabComplete()
         {
-            int startL = Console.CursorLeft;
-            int startT = Console.CursorTop;
+            int startL = System.Console.CursorLeft;
+            int startT = System.Console.CursorTop;
             string buffer;
             _dirs ??= new();
 
-            //Console.WriteLine(Directory.GetCurrentDirectory());
-            //Console.CursorSize = 25;
+            //System.Console.WriteLine(Directory.GetCurrentDirectory());
+            //System.Console.CursorSize = 25;
 
             while (true)
             {
-                var c = Console.ReadKey(true);
+                var c = System.Console.ReadKey(true);
 
                 if (c.Key == ConsoleKey.Enter)
                 {
@@ -371,7 +373,7 @@ namespace Shared
 
                 if (c.Key == ConsoleKey.LeftArrow || c.Key == ConsoleKey.Backspace)
                 {
-                    if (Console.CursorTop <= startT && Console.CursorLeft <= startL)
+                    if (System.Console.CursorTop <= startT && System.Console.CursorLeft <= startL)
                         continue;
 
                     if ((c.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Control)) != 0)
@@ -386,7 +388,7 @@ namespace Shared
 
                 if (c.KeyChar != '\0')
                 {
-                    Console.Write(c.KeyChar);
+                    System.Console.Write(c.KeyChar);
                     continue;
                 }
             }
@@ -457,8 +459,8 @@ namespace Shared
             {
                 foreach (var device in new ManagementObjectSearcher(@"SELECT * FROM Win32_DiskDrive WHERE InterfaceType LIKE 'USB%'").Get())
                 {
-                    //Console.WriteLine((string)device.GetPropertyValue("DeviceID"));
-                    //Console.WriteLine((string)device.GetPropertyValue("PNPDeviceID"));
+                    //System.Console.WriteLine((string)device.GetPropertyValue("DeviceID"));
+                    //System.Console.WriteLine((string)device.GetPropertyValue("PNPDeviceID"));
 
                     foreach (var partition in new ManagementObjectSearcher(
                         "ASSOCIATORS OF {Win32_DiskDrive.DeviceID='" + device.Properties["DeviceID"].Value + "'} WHERE AssocClass = Win32_DiskDriveToDiskPartition").Get())
@@ -502,12 +504,12 @@ namespace Shared
 
         /// <summary>
         /// Get current cursor position from console window.
-        /// In .Net 5 > use Console.GetCursorPosition
+        /// In .Net 5 > use System.Console.GetCursorPosition
         /// </summary>
         /// <returns>Cursor position</returns>
         public static COORD GetCursorPosition()
         {
-            // in .net 5 there's Console.GetCursorPosition for this
+            // in .net 5 there's System.Console.GetCursorPosition for this
             return GetConsoleInfo(Stdout).dwCursorPosition;
         }
 
@@ -569,7 +571,7 @@ namespace Shared
             return coords;
         }
 
-        public static char GetChar() => GetChar(new COORD(Console.CursorLeft, Console.CursorTop), Stdout);
+        public static char GetChar() => GetChar(new COORD(System.Console.CursorLeft, System.Console.CursorTop), Stdout);
         public static char GetChar(int x, int y) => GetChar(new COORD(x, y), Stdout);
         /// <summary>
         /// Retrieve character from console window
@@ -590,15 +592,15 @@ namespace Shared
             return ReadConsoleOutputCharacterW(Stdout, out value, sizeof(char), new COORD(x, y), out var len) && len == sizeof(char);
         }
 
-        public static bool WriteChar(char ch) => WriteChar(new COORD(Console.CursorLeft, Console.CursorTop), ch, Stdout);
+        public static bool WriteChar(char ch) => WriteChar(new COORD(System.Console.CursorLeft, System.Console.CursorTop), ch, Stdout);
         public static bool WriteChar(int x, int y, char ch) => WriteChar(new COORD(x, y), ch, Stdout);
         public static bool WriteChar(COORD coord, char ch, IntPtr ptr)
         {
             return WriteConsoleOutputCharacterW(ptr, ch, sizeof(char), coord, out var len) && len == sizeof(char);
         }
 
-        public static string GetText(int y) => GetText(0, y, Console.BufferWidth - y, Stdout);
-        public static string GetText(int x, int y) => GetText(x, y, Console.BufferWidth - y, Stdout);
+        public static string GetText(int y) => GetText(0, y, System.Console.BufferWidth - y, Stdout);
+        public static string GetText(int x, int y) => GetText(x, y, System.Console.BufferWidth - y, Stdout);
         public static string GetText(int x, int y, int length) => GetText(x, y, length, Stdout);
         /// <summary>
         /// Retrieve text from console window.<br/>
@@ -615,12 +617,12 @@ namespace Shared
                 int num;
                 char ch;
 
-                while (x < Console.BufferWidth
-                    && y < Console.BufferHeight
+                while (x < System.Console.BufferWidth
+                    && y < System.Console.BufferHeight
                     && length != 0)
                 {
                     // stop at cursor
-                    if (stopAtCursor && x == Console.CursorLeft && y == Console.CursorTop)
+                    if (stopAtCursor && x == System.Console.CursorLeft && y == System.Console.CursorTop)
                         break;
 
                     // read char
@@ -637,7 +639,7 @@ namespace Shared
                         ++x;
 
                     // move position by one; wrapping
-                    if (++x >= Console.BufferWidth)
+                    if (++x >= System.Console.BufferWidth)
                     {
                         x = 0;
                         y++;

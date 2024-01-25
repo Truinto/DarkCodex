@@ -1,43 +1,131 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace Shared.Paths
 {
-    /// <summary>
-    /// Tool to handle path operations.
-    /// </summary>
-    public class PathTool
+    public enum FileType
     {
+        Undefined,
+        Directory,
+        File,
+    }
+
+    /// <summary>
+    /// WIP. Tool to handle path operations.
+    /// </summary>
+    public class PathInfo
+    {
+        public static char PathSeparator => System.IO.Path.DirectorySeparatorChar;
+
+        public static bool IsValidPath(string path)
+        {
+            try
+            {
+                System.IO.Path.GetFullPath(path);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            //return name.IndexOfAny(Path.GetInvalidPathChars()) == -1;
+        }
+
+        private bool isDirty;
+
+        public PathInfo(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                path = ".";
+            path = path.Replace(PathSeparator == '/' ? '\\' : '/', PathSeparator);
+
+            int indexSlash = path.LastIndexOf(PathSeparator);
+            int indexDot = path.LastIndexOf('.');
+            bool hasNoExtension = indexDot <= indexSlash + 1;
+
+            this.FullName = path;
+            this.Root = System.IO.Path.GetPathRoot(path);
+            this.IsAbsolute = this.Root.Length > 0;
+            this.Directory = path.Substring(0, indexSlash + 1);
+            if (hasNoExtension)
+            {
+                this.FileNameNoExtension = path.Substring(indexSlash + 1);
+                if (this.FileNameNoExtension.EndsWith("."))
+                    this.FileNameNoExtension = this.FileNameNoExtension.Substring(1);
+                this.Extension = "";
+                this.FileName = this.FileNameNoExtension;
+            }
+            else
+            {
+                this.FileNameNoExtension = path.Substring(indexSlash + 1, indexDot - indexSlash - 1);
+                this.Extension = path.Substring(indexDot + 1);
+                this.FileName = $"{this.FileNameNoExtension}.{this.Extension}";
+            }
+        }
+
+        public bool IsValid { get; } //WIP
+
+        public string FullName { get; }
+
+        public string Root { get; }
+
+        public string Directory { get; }
+
+        public string FileNameNoExtension { get; }
+
+        public string Extension { get; }
+
+        public string FileName { get; }
+
+        public FileType Type { get; } //WIP
+
+        public bool IsAbsolute { get; } //WIP
+
+        public string PathAbsolute(string workingDirectory = null)
+        {
+            if (this.IsAbsolute && !string.IsNullOrEmpty(workingDirectory))
+                Trace.WriteLine($"[Warning] {typeof(PathInfo).FullName}.PathAbsolute trying to set working directory on an absolute path '{FullName}'");
+
+            if (this.IsAbsolute)
+                return this.FullName;
+
+            workingDirectory ??= System.IO.Directory.GetCurrentDirectory(); //System.IO.Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName)
+            return workingDirectory + this.FullName;
+
+            throw new NotImplementedException();
+        }
+
         private static void Sandbox()
         {
-            Directory.Delete("");
-            Directory.Exists("");
-            Directory.CreateDirectory("");
+            System.IO.Directory.Delete("");
+            System.IO.Directory.Exists("");
+            System.IO.Directory.CreateDirectory("");
 
-            File.Delete("");
-            File.Exists("");
-            File.CreateText("");
+            System.IO.File.Delete("");
+            System.IO.File.Exists("");
+            System.IO.File.CreateText("");
 
-            Path.ChangeExtension("", "");
-            Path.Combine("", "");
-            Path.GetDirectoryName(""); // warning, this is inconsistent
-            Path.GetExtension("");
-            Path.GetFileName("");
-            Path.GetFileNameWithoutExtension("");
-            Path.GetFullPath("");
-            Path.GetInvalidFileNameChars();
-            Path.GetPathRoot("");
-            Path.GetRandomFileName();
-            Path.GetTempFileName();
-            Path.GetTempPath();
-            Path.HasExtension("");
-            Path.IsPathRooted("");
+            System.IO.Path.ChangeExtension("", "");
+            System.IO.Path.Combine("", "");
+            System.IO.Path.GetDirectoryName(""); // warning, this is inconsistent
+            System.IO.Path.GetExtension("");
+            System.IO.Path.GetFileName("");
+            System.IO.Path.GetFileNameWithoutExtension("");
+            System.IO.Path.GetFullPath("");
+            System.IO.Path.GetInvalidFileNameChars();
+            System.IO.Path.GetPathRoot("");
+            System.IO.Path.GetRandomFileName();
+            System.IO.Path.GetTempFileName();
+            System.IO.Path.GetTempPath();
+            System.IO.Path.HasExtension("");
+            System.IO.Path.IsPathRooted("");
 
-            var di = new DirectoryInfo("");
+            var di = new System.IO.DirectoryInfo("");
             _ = di.Parent;
             _ = di.Exists;
             _ = di.FullName;
@@ -50,16 +138,12 @@ namespace Shared
             di.MoveTo("");
             di.CreateSubdirectory("");
 
-            var fi = new FileInfo("");
+            var fi = new System.IO.FileInfo("");
             _ = fi.Exists;
             fi.CreateText();
             fi.Delete();
 
-
-
-
         }
-
     }
 
     public static class PathHelper

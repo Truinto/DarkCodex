@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.0.0.55</Version>
+		<Version>1.0.0.73</Version>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -37,13 +37,14 @@
 	<ItemGroup>
 		<GlobalAnalyzerConfigFiles Include="..\.globalconfiguration" Link=".globalconfiguration" />
 
-		<Compile Include="..\General\CollectionHelper.cs" Link="CollectionHelper.cs" />
-		<Compile Include="..\General\ConsoleHelper.cs" Link="ConsoleHelper.cs" />
-		<Compile Include="..\General\GeneralHelper.cs" Link="GeneralHelper.cs" />
+		<Compile Include="..\General\Attributes.cs" Link="Attributes.cs" />
+		<Compile Include="..\General\Collection.cs" Link="Collection.cs" />
+		<Compile Include="..\General\Console.cs" Link="Console.cs" />
+		<Compile Include="..\General\General.cs" Link="General.cs" />
 		<Compile Include="..\General\Logger.cs" Link="Logger.cs" />
-		<Compile Include="..\General\PathHelper.cs" Link="PathHelper.cs" />
+		<Compile Include="..\General\Path.cs" Link="Path.cs" />
 		<Compile Include="..\General\SerializationTool.cs" Link="SerializationTool.cs" />
-		<Compile Include="..\General\StringsHelper.cs" Link="StringsHelper.cs" />
+		<Compile Include="..\General\String.cs" Link="String.cs" />
 	</ItemGroup>
 
 	<!-- Update build version -->

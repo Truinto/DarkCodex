@@ -571,6 +571,7 @@ namespace Shared
             LoadSafe(General.CreateDirtyFighting);
             LoadSafe(General.CreateOpportuneParry);
             LoadSafe(General.CreateKitsuneFoxfire);
+            LoadSafe(General.FixCruoromancer);
 
             // Spellcasters
             LoadSafe(Spellcasters.FixBloodlineArcane);

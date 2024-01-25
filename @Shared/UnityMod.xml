@@ -151,42 +151,6 @@
         <member name="M:Shared.ExceptionMissingRef.#ctor(System.String)">
             <summary></summary>
         </member>
-        <member name="T:Shared.Extensions">
-            <summary>
-            Custom extensions.
-            </summary>
-        </member>
-        <member name="M:Shared.Extensions.FindIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
-            <summary>
-            Find index in a collection by a predicate.
-            </summary>
-        </member>
-        <member name="M:Shared.Extensions.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
-            <summary>
-            Get element at index or default.
-            </summary>
-        </member>
-        <member name="M:Shared.Extensions.IsTypeCompatible(System.Type,System.Type)">
-            <summary>
-            Checks if right type can be assigned to left type. <br/>
-            Works similiar to IsAssignableFrom, but will returns false for ValueTypes (which need boxing) and void (which overflows the stack).     
-            </summary>
-        </member>
-        <member name="M:Shared.Extensions.AddUnique``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Adds items to a list, which are not already in the list. Compares with Equal().
-            </summary>
-        </member>
-        <member name="M:Shared.Extensions.AddUnique``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
-            <summary>
-            Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T1"/>.
-            </summary>
-        </member>
-        <member name="M:Shared.Extensions.AddUnique2``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
-            <summary>
-            Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T2"/>.
-            </summary>
-        </member>
         <member name="T:Shared.LocalizedStringCached">
             <summary>
             Flexible LocalizedString whose logic depends on <see cref="F:Shared.LocalizedStringCached.Resolver"/>.
@@ -881,39 +845,116 @@
         <member name="M:Shared.LocalInfo.op_Implicit(Shared.LocalInfo)~System.Int32">
             <summary></summary>
         </member>
-        <member name="T:Shared.SerializationTool">
+        <member name="T:Shared.Attributes.MaybeNull">
+            <summary>
+            Parameter attribute. Given parameter can be null.
+            </summary>
+        </member>
+        <member name="T:Shared.Attributes.NeverNull">
+            <summary>
+            Parameter attribute. Given parameter must not be null.
+            </summary>
+        </member>
+        <member name="T:Shared.Serialize.SerializationTool">
             <summary>
             Tool to handle (de-)serialization.
             </summary>
         </member>
-        <member name="T:Shared.Logger">
+        <member name="T:Shared.Loggers.Logger">
             <summary>
             Methods to print to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintDebug(System.String,System.String)">
+        <member name="M:Shared.Loggers.Logger.PrintDebug(System.String,System.String)">
             <summary>
             Only prints in DEBUG.
             </summary>
         </member>
-        <member name="M:Shared.Logger.Print(System.String)">
+        <member name="M:Shared.Loggers.Logger.Print(System.String)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintWarning(System.String,System.String)">
+        <member name="M:Shared.Loggers.Logger.PrintWarning(System.String,System.String)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintError(System.String,System.String)">
+        <member name="M:Shared.Loggers.Logger.PrintError(System.String,System.String)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Logger.PrintException(System.Exception)">
+        <member name="M:Shared.Loggers.Logger.PrintException(System.Exception)">
             <summary>
             Prints to standard output.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.IsTypeCompatible(System.Type,System.Type)">
+            <summary>
+            Checks if right type can be assigned to left type. <br/>
+            Works similiar to IsAssignableFrom, but will returns false for ValueTypes (which need boxing) and void (which overflows the stack).     
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.FindIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
+            <summary>
+            Find index in a collection by a predicate.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+            <summary>
+            Get element at index or default.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AddUnique``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds items to a list, which are not already in the list. Compares with Equal().
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AddUnique``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
+            <summary>
+            Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T1"/>.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AddUnique2``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
+            <summary>
+            Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T2"/>.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AsArray``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns itself, if value is an array. Otherwise creates a new array.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AsList``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns itself, if value is a list. Otherwise creates a new list.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.Append``1(``0[],``0[])">
+            <summary>Appends objects on array.</summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AppendAndReplace``1(``0[]@,``0[])">
+            <summary>Appends objects on array and overwrites the original.</summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.AppendAndReplace``1(``0[]@,System.Collections.Generic.IEnumerable{``0})">
+            <summary>Appends objects on array and overwrites the original.</summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@)">
+            <summary>
+            Get dictionary by key and create new value with standard constructor, if it did not exist.
+            </summary>
+            <returns>true if new value was created</returns>
+        </member>
+        <member name="M:Shared.Collections.Collection.GetList">
+            <summary>
+            Gets a static list object. Do not save reference.
+            Call <b>Flush&lt;T&gt;()</b> to receive output.
+            </summary>
+        </member>
+        <member name="M:Shared.Collections.Collection.Flush``1">
+            <summary>
+            Use when finished with <b>GetList()</b>
             </summary>
         </member>
     </members>

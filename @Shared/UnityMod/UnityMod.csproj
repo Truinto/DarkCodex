@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.0.1.13</Version>
+		<Version>1.0.2.6</Version>
 		<TargetFrameworks>net472</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -11,7 +11,6 @@
 		<RepositoryUrl>https://github.com/Truinto/</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<RootNamespace>Shared</RootNamespace>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DebugType>embedded</DebugType>
@@ -45,8 +44,10 @@
 		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(Lib)\UnityEngine.InputLegacyModule.dll" />
 		<Reference Include="UnityEngine.UI" HintPath="$(Lib)\UnityEngine.UI.dll" />
 
+		<Compile Include="..\General\Attributes.cs" Link="Attributes.cs" />
 		<Compile Include="..\General\SerializationTool.cs" Link="SerializationTool.cs" />
 		<Compile Include="..\General\Logger.cs" Link="Logger.cs" />
+		<Compile Include="..\General\Collection.cs" Link="Collection.cs" />
 	</ItemGroup>
 
 	<!-- Other Files -->

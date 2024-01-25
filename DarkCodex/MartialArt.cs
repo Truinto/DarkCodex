@@ -419,7 +419,7 @@ namespace DarkCodex
         public static void FixShifterWolverineRage()
         {
             Helper.Get<BlueprintFeature>("5cb58e6e406525342842a073fb70d068") //LimitlessRage
-                .GetComponent<PrerequisiteFeaturesFromList>().Add("6c4079c4c751405abc48a6dea8a78cee"); //ShifterWildShapeWolverineFeature
+                .GetComponent<PrerequisiteFeaturesFromList>().Add("f3e2fc2d692c40e8b24f14c40dac5297"); //ShifterWildShapeWolverineFeatureLevelUp
         }
     }
 }

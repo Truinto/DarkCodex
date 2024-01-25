@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Shared
+namespace Shared.Strings
 {
-    public static class StringsHelper
+    public static class String
     {
         #region Args
 
@@ -152,7 +152,7 @@ namespace Shared
                         continue;
 
                     if (!first)
-                        sb.Append(Path.PathSeparator);
+                        sb.Append(System.IO.Path.PathSeparator);
                     else
                         first = false;
                     sb.Append(full);

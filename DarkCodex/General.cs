@@ -37,6 +37,7 @@ using CodexLib;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.RuleSystem;
 using Kingmaker.UnitLogic.Parts;
+using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 
 namespace DarkCodex
 {
@@ -571,9 +572,9 @@ namespace DarkCodex
                 ("Common Eurypterid Poison", 12, StatType.Constitution, new DiceFormula(1, DiceType.D2), 4, 1),
 
                 ("Giant Wasp Poison", 18, StatType.Dexterity, new DiceFormula(1, DiceType.D2), 6, 1),
-                ("Blood Marsh Spider Venom", 14, StatType.Dexterity, new DiceFormula(1, DiceType.D4), 6 ,2), // confused
+                ("Blood Marsh Spider Venom", 14, StatType.Dexterity, new DiceFormula(1, DiceType.D4), 6, 2), // confused
                 ("Cockatrice Spit", 12, StatType.Dexterity, new DiceFormula(1, DiceType.D2), 6, 1), // petrified at 0 dex
-                
+
                 ("Dragon Bile", 26, StatType.Strength, new DiceFormula(1, DiceType.D3), 6, 6),
                 ("Purple Worm Poison", 24, StatType.Strength, new DiceFormula(1, DiceType.D3), 6, 2),
                 ("Large Scorpion Venom", 17, StatType.Strength, new DiceFormula(1, DiceType.D2), 6, 1),
@@ -665,7 +666,7 @@ namespace DarkCodex
                 Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 15)
                 );
 
-            Main.RunLast("Spell Perfection", () => 
+            Main.RunLast("Spell Perfection", () =>
             {
                 feat.AddComponents(
                     Helper.CreatePrerequisiteFeaturesFromList(BpCache.Get<BlueprintFeature>().Where(w => w.GetComponent<AddMetamagicFeat>() && w.IsClassFeature).ToAny(), 3)
@@ -728,6 +729,20 @@ namespace DarkCodex
 
             magictail.m_Description.CreateString(magictail.m_Description + "\nAdditionally, as a standard action, you can unleash a scorching bolt of foxfire from your outstretched hand, and target any single foe within 30 feet as a ranged touch attack. If you hit the foe, the foxfire bolt deals 1d6 points of fire damage + 1 point for every two character levels you possess. You can use this ability a number of times er day equal to 2 + your Charisma modifier + once for each magical tail feat you possess.");
             Helper.AppendAndReplace(ref magictail.GetComponent<AddFacts>().m_Facts, foxfire_ab);
+        }
+
+        [PatchInfo(Severity.Fix, "Fix Cruoromancer", "changes Commanding Infusion to affect all friendly summoned undead", true)]
+        public static void FixCruoromancer()
+        {
+            var area = Helper.Get<BlueprintAbilityAreaEffect>("aa55fa6be38a469d934ca46d8fab6d6a"); //CommandingInfusionArea
+            area.Size.m_Value = 100f;
+            var area_effect = area.GetComponent<AbilityAreaEffectRunAction>();
+            var conditions_enter = (Conditional)area_effect.UnitEnter.Actions[0];
+            conditions_enter.ConditionsChecker.Conditions = [
+                Helper.CreateContextConditionIsAlly(),
+                Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.SummonedUnitBuff),
+                Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.UndeadType),
+            ];
         }
 
         #region General Resources and Stuff

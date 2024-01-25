@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.6.3]
+- added 'Fix Cruoromancer', changes Commanding Infusion to affect all friendly summoned undead #287
+- changed "Fix Wolverine Rage" prerequisite which should be available at level 4 #288
+
 ## [1.6.2]
 - fixed cursing gaze X plague hex #284
 

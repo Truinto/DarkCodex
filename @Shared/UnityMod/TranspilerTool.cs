@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
+using Shared.Collections;
+using Shared.Loggers;
 
 #pragma warning disable IDE0009 // ignore missing 'this.'
 

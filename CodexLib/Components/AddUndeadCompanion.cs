@@ -83,8 +83,10 @@ namespace CodexLib
             if (this.Data.Disabled)
                 return;
 
-            foreach (var pet in this.Data.UnitRef.SelectNotNull(s => s.Value))
+            foreach (var pet in this.Data.UnitRef.Select(s => s.Value))
             {
+                if (pet is null)
+                    continue;
                 foreach (var itemSlot in pet.Body.EquipmentSlots)
                 {
                     if (itemSlot.HasItem && itemSlot.CanRemoveItem())

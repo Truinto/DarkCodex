@@ -422,6 +422,8 @@
   "22dc43fc2838939733341e6dd1f806cb1243d129": "unclogs UI by hiding a few buffs",
   "b5606c959a9525cfd81abee77db0711e1dbda346": "Various Tweaks",
   "42515d914211ed94e82b2c204f233dcbab3d9ee4": "removed PreciousTreat penalty, extend protection from X to 10 minutes",
+  "dc22c110af153c51c46d89493941ed71435f48f2": "Fix Cruoromancer",
+  "463c6ddb5a1a956818253c826262c9d707f4204b": "changes Commanding Infusion to affect all friendly summoned undead",
   "fa0e3adede244e25516d1cb8dd2342e310039fa8": "Fix Master Shapeshifter",
   "124035296441131d9c6a17018e4e8549919c1d2e": "ensures spells with the Polymorph descriptor get the benefit of Master Shapeshifter",
   "0ddf59cce102eaf6ec199f95637339f29f2ac8e5": "Fix Spell Element Change",
