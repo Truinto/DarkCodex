@@ -856,6 +856,12 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("322911b79eabdb64f8b079c7a2d95e68"),
                 ],
             };
+            ArmorPiercing = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("cf531860c9fb44c09bda9d8904657314"),
+                Buff = Helper.ToRef<BlueprintFeatureReference>("a4018afcb4a84c0aad23f16448cdbbe1"),
+                Activator = Helper.ToRef<BlueprintFeatureReference>("9bd38cf432604da2a8db0bdc2b545da4"),
+            };
             BladeWhirlwind = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("80fdf049d396c33408a805d9e21a42e1"),
@@ -875,6 +881,12 @@ namespace CodexLib
                 Buff = Helper.ToRef<BlueprintBuffReference>("492a8156ecede6345a8e82475eed85ac"),
                 Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("6d35b4f39de9eb446b2d0a65b931246b"),
             };
+            ChainArrows = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("0ff81c5691c64c4aa8b2ecc35c885901"),
+                Buff = Helper.ToRef<BlueprintFeatureReference>("f583e43e4c904c1e854c479a280ab657"),
+                Activator = Helper.ToRef<BlueprintFeatureReference>("c0072c5a58ad46e88c3b0eb6c110855b"),
+            };
             Cloud = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("3c53ee4965a13d74e81b37ae34f0861b"),
@@ -886,6 +898,12 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("c6b747b7a087ed942b743e3911018464"),
                     Helper.ToRef<BlueprintAbilityReference>("ba303565ad91ae542ac7eba89f59a9c4"),
                 ],
+            };
+            ClusterArrows = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("8896ac251d394dceaf650793aa85e177"),
+                Buff = Helper.ToRef<BlueprintFeatureReference>("132f24437854435eb903f11d47062b1a"),
+                Activator = Helper.ToRef<BlueprintFeatureReference>("f0f724d499ba4697b060ab658db55c0f"),
             };
             Cyclone = new()
             {
@@ -932,6 +950,43 @@ namespace CodexLib
                     Helper.ToRef<BlueprintAbilityReference>("7cc353f52000d4742a2710fa38de7357"),
                     Helper.ToRef<BlueprintAbilityReference>("f42bf8d4379d1b641b6163aa317ec80e"),
                     Helper.ToRef<BlueprintAbilityReference>("0f70d9349ef23bf4089387edac18317c"),
+                ],
+            };
+            ExplodingArrows = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("7c8ded7015114e4086b3dbdd16388b29"),
+                Buff = null,
+                Variants = 
+                [
+                    Helper.ToRef<BlueprintAbilityReference>("fea5c544704a4dd29a654316c52982c0"),
+                    Helper.ToRef<BlueprintAbilityReference>("bd8d0e05e3b944138bcaae7366518e07"),
+                    Helper.ToRef<BlueprintAbilityReference>("7c5a34ed8b074396be2af47cc38fb529"),
+                    Helper.ToRef<BlueprintAbilityReference>("04D0A41BC93D42C487BE50430A31C68E"),
+                    Helper.ToRef<BlueprintAbilityReference>("564D18E3C66E432CBD9A646B0A4D6ED1"),
+                    Helper.ToRef<BlueprintAbilityReference>("06E13E5EDF624A858703C21B6FDE6D14"),
+                    Helper.ToRef<BlueprintAbilityReference>("d89f7e8024bd4ba3be8c42923c43fe1f"),
+                    Helper.ToRef<BlueprintAbilityReference>("dd75e4532ee14cc1995481b21006874b"),
+                    Helper.ToRef<BlueprintAbilityReference>("7f5398082d3a45ab838cdc66988dbf80"),
+                    Helper.ToRef<BlueprintAbilityReference>("0AC74B57EBEC4E46870955A61813819D"),
+                    Helper.ToRef<BlueprintAbilityReference>("967755B952B84B9BB21FE18687F15131"),
+                    Helper.ToRef<BlueprintAbilityReference>("7707d4b8ed864757bf019dc86286df7b"),
+                    Helper.ToRef<BlueprintAbilityReference>("f922cbd782f648e5928c6866af0c5809"),
+                    Helper.ToRef<BlueprintAbilityReference>("94ef0e254f814fd4ade9e168b7aeef4f"),
+                    Helper.ToRef<BlueprintAbilityReference>("03d2afbd2c9f442faab75ad8cd2e7578"),
+                    Helper.ToRef<BlueprintAbilityReference>("3d1a23a5a01b40d9a756e38816e294b7"),
+                    Helper.ToRef<BlueprintAbilityReference>("35d2f23a727a4e358ea230525c6afd9d"),
+                    Helper.ToRef<BlueprintAbilityReference>("d9cccdb1f9354014957176447145bc62"),
+                    Helper.ToRef<BlueprintAbilityReference>("bdcf5efe1d714e46886c2a5eb9012167"),
+                    Helper.ToRef<BlueprintAbilityReference>("3219a6f0969747ab870e3828b32e2e0b"),
+                    Helper.ToRef<BlueprintAbilityReference>("24ab8ee216d947af9d79d1f3c08e3041"),
+                    Helper.ToRef<BlueprintAbilityReference>("3F89E2D83045410E8772E59A99E031A2"),
+                    Helper.ToRef<BlueprintAbilityReference>("A852E808920645EE92D3059FE64D77FE"),
+                    Helper.ToRef<BlueprintAbilityReference>("020BF646D03E4D3495D8ADA998BEA1D5"),
+                    Helper.ToRef<BlueprintAbilityReference>("00D95CA929D4467CB4B05C5BBD840C6C"),
+                    Helper.ToRef<BlueprintAbilityReference>("EF31081D67AD468CA13442F2CA5E31AA"),
+                    Helper.ToRef<BlueprintAbilityReference>("F3C136AF8F4A47B197BF077AFEEB78E0"),
+                    Helper.ToRef<BlueprintAbilityReference>("1B16CBDD4E7F47208FAC65E64E76186A"),
+                    Helper.ToRef<BlueprintAbilityReference>("9b3bf9206bf9451d81c00d96ef7db7ee"),
                 ],
             };
             ExtendedRange = new()
@@ -1157,6 +1212,12 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("d6b95ac99e3004b499d750835864e053"),
                 Buff = Helper.ToRef<BlueprintBuffReference>("696a0eafc6a21334580174a461079841"),
                 Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("b2d91bac690b74140b4fa3eec443edee"),
+            };
+            PiercingArrows = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("7852679e07034dca8035fe84c3e49338"),
+                Buff = null,
+                Variants = [],
             };
             PureFlame = new()
             {
@@ -1958,14 +2019,18 @@ namespace CodexLib
         public Element Composite_Winter;
         public Boost Boost_PositiveAdmixture;
 
+        public Infusion ArmorPiercing;
         public Infusion BladeWhirlwind;
         public Infusion KineticBlade;
         public Infusion Bleeding;
+        public Infusion ChainArrows;
         public Infusion Cloud;
+        public Infusion ClusterArrows;
         public Infusion Cyclone;
         public Infusion DeadlyEarth;
         public Infusion Detonation;
         public Infusion Eruption;
+        public Infusion ExplodingArrows;
         public Infusion ExtendedRange;
         public Infusion FanOfFlames;
         public Infusion Fragmentation;
@@ -1982,12 +2047,14 @@ namespace CodexLib
         public Infusion Foxfire;
         public Infusion Grappling;
         public Infusion Magnetic;
+        public Infusion PiercingArrows;
         public Infusion PureFlame;
         public Infusion Pushing;
         public Infusion RareMetal;
         public Infusion Synaptic;
         public Infusion Unraveling;
         public Infusion Vampiric;
+
         /// <summary>Special case: Feature is empty</summary>
         public Infusion DefaultAbility;
 
