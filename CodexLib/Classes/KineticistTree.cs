@@ -49,6 +49,7 @@ namespace CodexLib
             ExpandedElement = Helper.ToRef<BlueprintFeatureSelectionReference>("acdb730a59e64153964505587b809f93");
             ExtraWildTalent = Helper.ToRef<BlueprintFeatureSelectionReference>("bd287f6d1c5247da9b81761cab64021c");
             CompositeBuff = Helper.ToRef<BlueprintBuffReference>("cb30a291c75def84090430fbf2b5c05e");
+            BladeEnableBuff = Helper.ToRef<BlueprintBuffReference>("426a9c079ee7ac34aa8e0054f2218074");
 
             #region Metakinesis
 
@@ -1963,6 +1964,7 @@ namespace CodexLib
         public BlueprintFeatureSelectionReference ExpandedElement;
         public BlueprintFeatureSelectionReference ExtraWildTalent;
         public BlueprintBuffReference CompositeBuff;
+        public BlueprintBuffReference BladeEnableBuff;
         public List<BlueprintBuff> MetakinesisBuffs;
 
         public BlueprintAbilityReference[] BaseBasic;

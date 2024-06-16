@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.6.4]
+- added 'Fix Necromancer's Staff', changes Necromancer's Staff to affect all friendly summed undead #287
+
 ## [1.6.3]
 - added 'Fix Cruoromancer', changes Commanding Infusion to affect all friendly summoned undead #287
 - changed "Fix Wolverine Rage" prerequisite which should be available at level 4 #288

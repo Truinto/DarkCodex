@@ -11,7 +11,118 @@ using System.Threading.Tasks;
 namespace CodexLib
 {
     [HarmonyPatch]
-    public static class Patch_FixAbilityTargetsWeaponReach
+    public static class Patch_AbilityTargetsAround2
+    {
+        [HarmonyPatch(typeof(AbilityTargetsAround), nameof(AbilityTargetsAround.WouldTargetUnit))]
+        [HarmonyPrefix]
+        public static bool Prefix_WouldTargetUnit(AbilityData ability, Vector3 targetPos, UnitEntityData unit, ref bool __result, AbilityTargetsAround __instance)
+        {
+            if (__instance is not AbilityTargetsAround2 __instance2)
+                return true;
+            __result = __instance2.WouldTargetUnit2(ability, targetPos, unit);
+            return false;
+        }
+
+        [HarmonyPatch(typeof(AbilityTargetsAround), nameof(AbilityTargetsAround.AoERadius), MethodType.Getter)]
+        [HarmonyPrefix]
+        public static bool Prefix_AoERadius(ref Feet __result, AbilityTargetsAround __instance)
+        {
+            if (__instance is not AbilityTargetsAround2 __instance2)
+                return true;
+            __result = __instance2.AoERadius2();
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// WIP, suspect to change.
+    /// Changes ability reach to weapon reach.
+    /// </summary>
+    public class AbilityTargetsAround2 : AbilityTargetsAround
+    {
+        public Feet BaseRange;
+        public Feet SpreadSpeed;
+        public bool IncludeDead;
+        public ConditionsChecker Condition;
+
+        public AbilityTargetsAround2(Feet baseRange, TargetType targets = TargetType.Enemy, Feet spreadSpeed = default, bool includeDead = false, ConditionsChecker condition = null)
+        {
+            this.BaseRange = baseRange;
+            this.m_TargetType = targets;
+            this.m_SpreadSpeed = spreadSpeed;
+            this.IncludeDead = includeDead;
+            this.Condition = condition ?? new();
+        }
+
+        public Feet GetRealRadius(UnitEntityData caster = null, UnitEntityData target = null)
+        {
+            var weapon = caster?.GetFirstWeapon();
+            if (weapon == null)
+                return BaseRange;
+
+            float corpulence = caster.View.Corpulence + (target?.View.Corpulence ?? 0.5f);
+            return weapon.AttackRange + corpulence.Feet();
+        }
+
+        public override IEnumerable<TargetWrapper> Select(AbilityExecutionContext context, TargetWrapper anchor)
+        {
+            if (context.MaybeCaster == null)
+            {
+                Helper.PrintDebug("Caster is missing");
+                return Enumerable.Empty<TargetWrapper>();
+            }
+            var source = GameHelper.GetTargetsAround(anchor.IsUnit ? anchor.Unit.EyePosition : anchor.Point, GetRealRadius(context.MaybeCaster, anchor.Unit), true, this.IncludeDead);
+
+            switch (this.Targets)
+            {
+                case TargetType.Enemy:
+                    source = source.Where(new Func<UnitEntityData, bool>(context.MaybeCaster.IsEnemy));
+                    break;
+                case TargetType.Ally:
+                    source = source.Where(new Func<UnitEntityData, bool>(context.MaybeCaster.IsAlly));
+                    break;
+                case TargetType.Any:
+                    if (context.HasMetamagic(Metamagic.Selective) && !this.Condition.HasIsAllyCondition())
+                        source = source.Where(new Func<UnitEntityData, bool>(context.MaybeCaster.IsEnemy));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            if (!context.AbilityBlueprint.CanTargetFriends)
+            {
+                source = from t in source
+                         where t.IsPlayerFaction || context.Caster.CanAttack(t)
+                         select t;
+            }
+            if (this.Condition.HasConditions)
+            {
+                source = source.Where(delegate (UnitEntityData u)
+                {
+                    bool result;
+                    using (context.GetDataScope(u))
+                    {
+                        result = this.Condition.Check();
+                    }
+                    return result;
+                }).ToList<UnitEntityData>();
+            }
+            return from u in source
+                   select new TargetWrapper(u);
+        }
+
+        public bool WouldTargetUnit2(AbilityData ability, Vector3 targetPos, UnitEntityData unit)
+        {
+            return unit.IsUnitInRange(targetPos, GetRealRadius(ability.Caster, unit).Meters, true);
+        }
+
+        public Feet AoERadius2() => GetRealRadius();
+    }
+
+    /// <summary>
+    /// Not used.
+    /// </summary>
+    [HarmonyPatch]
+    static class Patch_FixAbilityTargetsWeaponReach
     {
         public static readonly Feet Marker = (-123).Feet();
 
@@ -102,12 +213,15 @@ namespace CodexLib
         }
     }
 
-    public class AbilityTargetsWeaponReach : AbilitySelectTarget, IAbilityAoERadiusProvider
+    /// <summary>
+    /// A bunch of game code checks for the class AbilityTargetsAround instead of the interface. This means this class does not get called in a these cases. Use AbilityTargetsAround2 instead.
+    /// </summary>
+    class AbilityTargetsWeaponReach : AbilitySelectTarget, IAbilityAoERadiusProvider
     {
         public Feet BaseRange;
         public Feet SpreadSpeed;
-        private bool IncludeDead;
-        private ConditionsChecker Condition;
+        public bool IncludeDead;
+        public ConditionsChecker Condition;
 
         public AbilityTargetsWeaponReach(Feet baseRange, TargetType targets = TargetType.Enemy, Feet spreadSpeed = default, bool includeDead = false, ConditionsChecker condition = null)
         {

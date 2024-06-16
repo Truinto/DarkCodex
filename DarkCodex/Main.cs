@@ -499,7 +499,7 @@ namespace Shared
             PatchSafe(typeof(DEBUG.SpellReach));
             PatchSafe(typeof(Patch_Prebuilds));
             LoadSafe(General.CreatePoison);
-            //LoadSafe(Kineticist.FixBladeWhirlwind);
+            LoadSafe(Kineticist.FixBladeWhirlwind);
             LoadSafe(Spellcasters.CreateDazingMetamagic);
 #endif
             LoadSafe(DEBUG.Enchantments.NameAll);
@@ -572,6 +572,7 @@ namespace Shared
             LoadSafe(General.CreateOpportuneParry);
             LoadSafe(General.CreateKitsuneFoxfire);
             LoadSafe(General.FixCruoromancer);
+            LoadSafe(General.FixNecromancersStaff);
 
             // Spellcasters
             LoadSafe(Spellcasters.FixBloodlineArcane);

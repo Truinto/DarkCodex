@@ -1818,6 +1818,7 @@ namespace CodexLib
         public static readonly ContextDurationValue DurationMinutesPerLevel = CreateContextDurationValue(bonus: CreateContextValue(AbilityParameterType.Level), rate: DurationRate.Minutes);
         public static readonly ContextDurationValue DurationHoursPerLevel = CreateContextDurationValue(bonus: CreateContextValue(AbilityParameterType.Level), rate: DurationRate.Hours);
         public static readonly ContextDurationValue DurationOneRound = CreateContextDurationValue(bonus: 1);
+        public static readonly ContextDurationValue DurationTwoRounds = CreateContextDurationValue(bonus: 2);
         public static readonly ContextDurationValue DurationOneMinute = CreateContextDurationValue(bonus: 1, rate: DurationRate.Minutes);
         public static readonly ContextDurationValue DurationOneHour = CreateContextDurationValue(bonus: 1, rate: DurationRate.Hours);
         public static readonly ContextDurationValue DurationOneDay = CreateContextDurationValue(bonus: 1, rate: DurationRate.Days);
@@ -3223,6 +3224,57 @@ namespace CodexLib
             var result = new AddConditionExceptions();
             result.Condition = condition;
             result.Exception = new UnitConditionExceptionsFromBuff() { Exceptions = buffs };
+            return result;
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="gameActions"></param>
+        /// <param name="afterCast"></param>
+        /// <param name="minSpellLevel"></param>
+        /// <param name="exactSpellLevel"></param>
+        /// <param name="isAoE"></param>
+        /// <param name="abilityRange"></param>
+        /// <param name="spellSchool"></param>
+        /// <param name="abilityType"></param>
+        /// <param name="spellDescriptor"></param>
+        /// <param name="abilities">type: <b>BlueprintAbility</b></param>
+        /// <param name="spellBooks">type: <b>BlueprintSpellbook</b></param>
+        /// <param name="actionsOnTarget"></param>
+        /// <param name="once"></param>
+        public static AddAbilityUseTrigger CreateAddAbilityUseTrigger(GameAction[] gameActions, bool afterCast = true, int minSpellLevel = -1, int exactSpellLevel = -1, bool? isAoE = null, AbilityRange? abilityRange = null, SpellSchool? spellSchool = null, AbilityType? abilityType = null, SpellDescriptor? spellDescriptor = null, AnyRef[] abilities = null, AnyRef[] spellBooks = null, bool actionsOnTarget = false, bool once = false)
+        {
+            var result = new AddAbilityUseTrigger();
+            result.Action = CreateActionList(gameActions);
+            result.AfterCast = afterCast;
+            result.ActionsOnTarget = actionsOnTarget;
+            result.FromSpellbook = spellBooks != null && spellBooks.Length > 0;
+            result.m_Spellbooks = spellBooks.ToRef<BlueprintSpellbookReference>();
+            result.ForOneSpell = false;
+            result.m_Ability = null;
+            result.ForMultipleSpells = abilities != null && abilities.Length > 0;
+            result.Abilities = new(abilities.ToRef<BlueprintAbilityReference>());
+            result.MinSpellLevel = minSpellLevel >= 0;
+            result.MinSpellLevelLimit = minSpellLevel;
+            result.ExactSpellLevel = exactSpellLevel >= 0;
+            result.ExactSpellLevelLimit = exactSpellLevel;
+            result.CheckAbilityType = abilityType != null;
+            result.Type = abilityType.GetValueOrDefault();
+            result.CheckDescriptor = spellDescriptor != null;
+            result.SpellDescriptor = spellDescriptor.GetValueOrDefault();
+            result.CheckAoE = isAoE != null;
+            result.IsAoE = isAoE.GetValueOrDefault();
+            result.CheckSpellSchool = spellSchool != null;
+            result.IsSpellSchool = spellSchool.GetValueOrDefault();
+            result.CheckRange = abilityRange != null;
+            result.Range = abilityRange.GetValueOrDefault();
+            result.CheckSourceItemType = false;
+            result.SourceItemTypeExclude = false; // if CheckSourceItemType
+            result.SourceItemType = SpellSourceTypeFlag.AnyEquipment; // if CheckSourceItemType
+            result.UseCastRule = true;
+            result.OnlyOnce = false;
+            result.OncePerContext = once;
+            result.DisableForStickyTouchCasts = false;
             return result;
         }
 

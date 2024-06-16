@@ -1083,8 +1083,10 @@ namespace DarkCodex
                     m_AppliableTo = []
                 });
             PropertyKineticistBurn.ElementalEmbodiment = f20_elementalEmbodiment; // this fakes 1 burn more than you actually have; for Adaptation talents
+            AbilityAcceptBurnOnCast2.ElementalEmbodiment = f20_elementalEmbodiment;
             Helper.Get<BlueprintUnitProperty>("02c5943c77717974cb7fa1b7c0dc51f8").SetComponents(new PropertyKineticistBurn()); //BurnNumberProperty
 
+            // TODO: add condition "has f20_elementalEmbodiment" to ContextSharedBonus
             Helper.Get<BlueprintFeature>("a942347023fedb2419f8bdbb4450e528").AddComponents(new ContextSharedBonus(1, AbilitySharedValue.Damage)); //FleshOfStoneEffectFeature
             Helper.Get<BlueprintFeature>("642bb6097c37b3b4b8be1f46d2d9296e").AddComponents(new ContextSharedBonus(1, AbilitySharedValue.Damage)); //SearingFleshEffectFeature
             Helper.Get<BlueprintAbility>("41281aa38b6b27f4fa3a05c97cc01783").ReplaceComponent(default(AbilityAcceptBurnOnCast), new AbilityAcceptBurnOnCast2()); //AerialEvasionAbility
@@ -1310,14 +1312,23 @@ namespace DarkCodex
             });
         }
 
-        [PatchInfo(Severity.Fix | Severity.WIP | Severity.Hidden, "Blade Whirlwind", "fix Blade Whirlwind reach", false)]
+        [PatchInfo(Severity.Fix | Severity.WIP | Severity.Hidden, "Blade Whirlwind", "fix Blade Whirlwind reach and cost", false)]
         public static void FixBladeWhirlwind()
         {
-            var whirlwind = Tree.BladeWhirlwind.Activator.GetBlueprint() as BlueprintAbility;
-            whirlwind.GetComponent<AbilityTargetsAround>().m_SpreadSpeed = Patch_FixAbilityTargetsWeaponReach.Marker;
-            //whirlwind.ReplaceComponent(default(AbilityTargetsAround), new AbilityTargetsWeaponReach(10.Feet()));
+            var whirlwind = (BlueprintAbility)Tree.BladeWhirlwind.Activator.GetBlueprint();
 
-            Main.Patch(typeof(Patch_FixAbilityTargetsWeaponReach));
+            // fix reach
+            //whirlwind.GetComponent<AbilityTargetsAround>().m_SpreadSpeed = Patch_FixAbilityTargetsWeaponReach.Marker;
+            //Main.Patch(typeof(Patch_FixAbilityTargetsWeaponReach));
+            whirlwind.ReplaceComponent(default(AbilityTargetsAround), new AbilityTargetsAround2(10.Feet()));
+            Main.Patch(typeof(Patch_AbilityTargetsAround2));
+
+            // fix burn cost
+            whirlwind.GetComponent<AbilityEffectRunAction>().Actions.InsertAt(Helper.CreateContextActionApplyBuff(Tree.BladeEnableBuff, Helper.DurationTwoRounds), 0);
+            var burn = whirlwind.GetComponent<AbilityKineticist>();
+            burn.BlastBurnCost = 0;
+            burn.InfusionBurnCost = 3;
+            whirlwind.AddComponents(new AddKineticBladeBurn());
         }
 
         #region Helper

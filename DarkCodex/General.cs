@@ -731,18 +731,46 @@ namespace DarkCodex
             Helper.AppendAndReplace(ref magictail.GetComponent<AddFacts>().m_Facts, foxfire_ab);
         }
 
-        [PatchInfo(Severity.Fix, "Fix Cruoromancer", "changes Commanding Infusion to affect all friendly summoned undead", true)]
+        [PatchInfo(Severity.Fix, "Fix Cruoromancer", "changes Commanding Infusion to affect all friendly summoned undead", false)]
         public static void FixCruoromancer()
         {
-            var area = Helper.Get<BlueprintAbilityAreaEffect>("aa55fa6be38a469d934ca46d8fab6d6a"); //CommandingInfusionArea
-            area.Size.m_Value = 100f;
-            var area_effect = area.GetComponent<AbilityAreaEffectRunAction>();
-            var conditions_enter = (Conditional)area_effect.UnitEnter.Actions[0];
-            conditions_enter.ConditionsChecker.Conditions = [
-                Helper.CreateContextConditionIsAlly(),
-                Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.SummonedUnitBuff),
-                Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.UndeadType),
-            ];
+            //var area = Helper.Get<BlueprintAbilityAreaEffect>("aa55fa6be38a469d934ca46d8fab6d6a"); //CommandingInfusionArea
+            //area.Size.m_Value = 100f;
+            //var area_effect = area.GetComponent<AbilityAreaEffectRunAction>();
+            //var conditions_enter = (Conditional)area_effect.UnitEnter.Actions[0];
+            //conditions_enter.ConditionsChecker.Conditions = [
+            //    Helper.CreateContextConditionIsAlly(),
+            //    Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.SummonedUnitBuff),
+            //    Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.UndeadType),
+            //];
+
+            //var ability = Helper.Get<BlueprintAbility>("6489492a34994d00926e8802c3f2b4cf"); //CommandingInfusionAbility
+            //var applyBuff = (ContextActionApplyBuff)ability.GetComponent<AbilityEffectRunAction>().Actions.Actions[0];
+
+            var buff = Helper.Get<BlueprintBuff>("406711ebdd8f4f419e95c9b4778b5927"); //CommandingInfusionBuff
+            buff.RemoveComponents<AddAreaEffect>();
+            buff.AddComponents(
+                new ApplyToSummonUnit(Helper.CreateConditional(
+                    condition: Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.UndeadType),
+                    ifTrue: Helper.CreateContextActionApplyBuff("cd72077182894e4e935662a16fe0051b") //CommandingInfusionAllyBuff
+                    )),
+                Helper.CreateAddAbilityUseTrigger(gameActions: [new ContextActionSetBuffDuration("406711ebdd8f4f419e95c9b4778b5927", 0.1)], spellDescriptor: SpellDescriptor.Summoning)
+                );
+#if DEBUG
+            buff.Flags(hidden: false);
+#endif
+        }
+
+        [PatchInfo(Severity.Fix, "Fix Necromancer's Staff", "changes Necromancer's Staff to affect all friendly summed undead", false)]
+        public static void FixNecromancersStaff()
+        {
+            var staffFeat = Helper.Get<BlueprintFeature>("2f571c1c93b7ebc4ab4ba98613c89b09"); //NecromancersStaffFeature
+            staffFeat.AddComponents(
+                new ApplyToSummonUnit(Helper.CreateConditional(
+                    condition: Helper.CreateContextConditionHasFact(BlueprintRoot.Instance.SystemMechanics.UndeadType),
+                    ifTrue: Helper.CreateContextActionApplyBuff("b86373af74985c44a96e813ab06dd419") //NecromancersStaffBuff
+                    ))
+                );
         }
 
         #region General Resources and Stuff
