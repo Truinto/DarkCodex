@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.6.5]
+- recompile
+
 ## [1.6.4]
 - added 'Fix Necromancer's Staff', changes Necromancer's Staff to affect all friendly summed undead #287
 

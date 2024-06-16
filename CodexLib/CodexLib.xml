@@ -420,6 +420,22 @@
             Only the first buff found will check against the condition.
             </summary>
         </member>
+        <member name="T:CodexLib.AbilityTargetsAround2">
+            <summary>
+            WIP, suspect to change.
+            Changes ability reach to weapon reach.
+            </summary>
+        </member>
+        <member name="T:CodexLib.Patch_FixAbilityTargetsWeaponReach">
+            <summary>
+            Not used.
+            </summary>
+        </member>
+        <member name="T:CodexLib.AbilityTargetsWeaponReach">
+            <summary>
+            A bunch of game code checks for the class AbilityTargetsAround instead of the interface. This means this class does not get called in a these cases. Use AbilityTargetsAround2 instead.
+            </summary>
+        </member>
         <member name="T:CodexLib.ActivatableVariants">
             <summary>
             Component to add foldable to any BlueprintAbility or BlueprintActivatableAbility. Takes priority over existing conversions, if any.
@@ -480,6 +496,14 @@
             Adds another feature when gaining a feature. Can be a BlueprintFeatureSelection, in which case a new tab is generated.
             </summary>
         </member>
+        <member name="T:CodexLib.AddKineticBladeBurn">
+            <summary>
+            Adds equipped kinetic blade blast burn to the current burn cost.
+            </summary>
+        </member>
+        <member name="M:CodexLib.AddKineticBladeBurn.#ctor">
+            <inheritdoc cref="T:CodexLib.AddKineticBladeBurn" />
+        </member>
         <member name="T:CodexLib.AddMechanicFeatureCustom">
             <summary>
             Attaches <see cref="T:Kingmaker.EntitySystem.EntityPart`1" /> to unit and sets the <see cref="T:CodexLib.MechanicFeature" />.<br />
@@ -516,6 +540,23 @@
             fix: need to save data in UnitPart instead of RuntimeData? or new interface?
             </summary>
         </member>
+        <member name="T:CodexLib.ApplyToSummonUnit">
+            <summary>
+            Runs action list on units summoned by owner.
+            </summary>
+        </member>
+        <member name="F:CodexLib.ApplyToSummonUnit.Actions">
+            <summary />
+        </member>
+        <member name="M:CodexLib.ApplyToSummonUnit.#ctor(Kingmaker.ElementsSystem.GameAction[])">
+            <inheritdoc cref="T:CodexLib.ApplyToSummonUnit" />
+        </member>
+        <member name="M:CodexLib.ApplyToSummonUnit.OnEventAboutToTrigger(Kingmaker.RuleSystem.Rules.RuleSummonUnit)">
+            <summary />
+        </member>
+        <member name="M:CodexLib.ApplyToSummonUnit.OnEventDidTrigger(Kingmaker.RuleSystem.Rules.RuleSummonUnit)">
+            <summary />
+        </member>
         <member name="F:CodexLib.BleedBuff.BuffBleed">
             <summary>type: <b>BlueprintBuff</b></summary>
         </member>
@@ -545,6 +586,16 @@
         <member name="M:CodexLib.BuffRunEachRound.OnNewRound">
             <summary>
             Interface implementation to execute on each round.
+            </summary>
+        </member>
+        <member name="T:CodexLib.ContextActionSetBuffDuration">
+            <summary>
+            Set the remaining duration of a buff. Does nothing if buff is not on target.
+            </summary>
+        </member>
+        <member name="F:CodexLib.ContextActionSetBuffDuration.TargetBuff">
+            <summary>
+                <b>type: BlueprintBuffReference</b>
             </summary>
         </member>
         <member name="M:CodexLib.ContextActionUndoAction.#ctor(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType,System.Single,System.Boolean)">
@@ -1163,6 +1214,22 @@
         </member>
         <member name="M:CodexLib.Helper.CreateAddFeatureIfHasFact(CodexLib.AnyRef)">
             <summary>Adds a fact, but only fact not already granted through other means.</summary>
+        </member>
+        <member name="M:CodexLib.Helper.CreateAddAbilityUseTrigger(Kingmaker.ElementsSystem.GameAction[],System.Boolean,System.Int32,System.Int32,System.Nullable{System.Boolean},System.Nullable{Kingmaker.UnitLogic.Abilities.Blueprints.AbilityRange},System.Nullable{Kingmaker.Blueprints.Classes.Spells.SpellSchool},System.Nullable{Kingmaker.UnitLogic.Abilities.Blueprints.AbilityType},System.Nullable{Kingmaker.Blueprints.Classes.Spells.SpellDescriptor},CodexLib.AnyRef[],CodexLib.AnyRef[],System.Boolean,System.Boolean)">
+            <summary />
+            <param name="gameActions" />
+            <param name="afterCast" />
+            <param name="minSpellLevel" />
+            <param name="exactSpellLevel" />
+            <param name="isAoE" />
+            <param name="abilityRange" />
+            <param name="spellSchool" />
+            <param name="abilityType" />
+            <param name="spellDescriptor" />
+            <param name="abilities">type: <b>BlueprintAbility</b></param>
+            <param name="spellBooks">type: <b>BlueprintSpellbook</b></param>
+            <param name="actionsOnTarget" />
+            <param name="once" />
         </member>
         <member name="M:CodexLib.Helper.CreateContextActionReduceBuffDuration(CodexLib.AnyRef,System.Int32,Kingmaker.UnitLogic.Mechanics.DurationRate,System.Boolean,System.Boolean)">
             <summary>
