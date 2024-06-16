@@ -859,7 +859,7 @@ namespace CodexLib
             ArmorPiercing = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("cf531860c9fb44c09bda9d8904657314"),
-                Buff = Helper.ToRef<BlueprintFeatureReference>("a4018afcb4a84c0aad23f16448cdbbe1"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("a4018afcb4a84c0aad23f16448cdbbe1"),
                 Activator = Helper.ToRef<BlueprintFeatureReference>("9bd38cf432604da2a8db0bdc2b545da4"),
             };
             BladeWhirlwind = new()
@@ -884,7 +884,7 @@ namespace CodexLib
             ChainArrows = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("0ff81c5691c64c4aa8b2ecc35c885901"),
-                Buff = Helper.ToRef<BlueprintFeatureReference>("f583e43e4c904c1e854c479a280ab657"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("f583e43e4c904c1e854c479a280ab657"),
                 Activator = Helper.ToRef<BlueprintFeatureReference>("c0072c5a58ad46e88c3b0eb6c110855b"),
             };
             Cloud = new()
@@ -902,7 +902,7 @@ namespace CodexLib
             ClusterArrows = new()
             {
                 Feature = Helper.ToRef<BlueprintFeatureReference>("8896ac251d394dceaf650793aa85e177"),
-                Buff = Helper.ToRef<BlueprintFeatureReference>("132f24437854435eb903f11d47062b1a"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("132f24437854435eb903f11d47062b1a"),
                 Activator = Helper.ToRef<BlueprintFeatureReference>("f0f724d499ba4697b060ab658db55c0f"),
             };
             Cyclone = new()
