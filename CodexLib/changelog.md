@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.7.0]
+- fixes for SpellSelectionParametrized
+
 ## [1.6.0]
 - fixes for update
 

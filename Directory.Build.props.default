@@ -5,6 +5,5 @@
 		<ProgramFolder>D:\Programme\GOG Galaxy\Games</ProgramFolder>
 		<GameManaged>$(ProgramFolder)\Pathfinder Wrath of the Righteous\Wrath_Data\Managed</GameManaged>
 		<ModFolder>$(ProgramFolder)\Pathfinder Wrath of the Righteous\Mods</ModFolder>
-		<!-- <Lib>$(GameManaged)</Lib> -->
 	</PropertyGroup>
 </Project>

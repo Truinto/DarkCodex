@@ -50,8 +50,8 @@ namespace DarkCodex
                 "AbilityFocusCustom",
                 "Ability Focus",
                 "Choose one special attack. Add +2 to the DC for all saving throws against the special attack on which you focus.",
-                requireKnown: true,
-                onlyNonSpells: true
+                allowKnown: true,
+                allowAbilities: true
                 ).SetComponents(
                 new AbilityFocusParametrized()
                 );
@@ -159,14 +159,14 @@ namespace DarkCodex
                 "Preferred Spell",
                 "Choose one spell which you have the ability to cast. You can cast that spell spontaneously by sacrificing a prepared spell or spell slot of equal or higher level. You can apply any metamagic feats you possess to this spell when you cast it. This increases the minimum level of the prepared spell or spell slot you must sacrifice in order to cast it but does not affect the casting time.\nSpecial: You can gain this feat multiple times.Its effects do not stack. Each time you take the feat, it applies to a different spell.",
                 icon: null,
-                onlyKnownSpells: true,
-                requireKnown: true
+                allowSpells: true,
+                allowKnown: true,
+                group: FeatureGroup.WizardFeat
                 ).SetComponents(
                 new PreferredSpell(),
                 Helper.CreatePrerequisiteStatValue(StatType.SkillKnowledgeArcana, 5),
                 Helper.CreatePrerequisiteFeature(heighten)
                 );
-            feat.Groups = [FeatureGroup.Feat, FeatureGroup.WizardFeat];
             feat.Ranks = 10;
 
             Helper.AddFeats(feat);
@@ -369,6 +369,9 @@ namespace DarkCodex
                 "One of your parents was a gifted spellcaster who not only used metamagic often, but also developed many magical items and perhaps even a new spell or two — and you have inherited a fragment of this greatness.\nBenefit: Pick one spell when you choose this trait. When you apply metamagic feats to this spell that add at least 1 level to the spell, treat its actual level as 1 lower for determining the spell's final adjusted level. Additionally your caster level gains a +2 trait bonus as long as this bonus doesn’t raise your caster level above your current Hit Dice.",
                 icon: null,
                 group: FeatureGroup.Trait,
+                allowSpells: true,
+                allowKnown: true,
+                allowUnknown: true,
                 maxlevel: 10
                 ).SetComponents(
                 new MetamagicReduceCostParametrized(),
@@ -381,6 +384,9 @@ namespace DarkCodex
                 "You have mastered a particular spell. Whenever you apply metamagic feats to it, you can reduce its final adjusted level by up to 2, but not below the spell's original cost.",
                 icon: null,
                 group: FeatureGroup.Trait,
+                allowSpells: true,
+                allowKnown: true,
+                allowUnknown: true,
                 maxlevel: 10
                 ).SetComponents(
                 new MetamagicReduceCostParametrized(2)
@@ -659,7 +665,8 @@ namespace DarkCodex
                 "SpellPerfection",
                 "Spell Perfection",
                 "You are unequaled at the casting of one particular spell.\nBenefit: Pick one spell which you have the ability to cast. Whenever you cast that spell you may apply any one metamagic feat you have to that spell without affecting its level or casting time, as long as the total modified level of the spell does not use a spell slot above 9th level. In addition, if you have other feats which allow you to apply a set numerical bonus to any aspect of this spell (such as Spell Focus, Spell Penetration, Weapon Focus [ray], and so on), double the bonus granted by that feat when applied to this spell.",
-                onlyKnownSpells: true
+                allowSpells: true,
+                allowKnown: true
                 ).SetComponents(
                 new MetamagicReduceCostParametrized(reduceByMostExpensive: true),
                 new SpellPerfection(),

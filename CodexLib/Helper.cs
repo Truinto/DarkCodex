@@ -4244,13 +4244,15 @@ namespace CodexLib
             result.m_Icon = icon;
 
             if (group == 0)
-                result.Groups = Array.Empty<FeatureGroup>();
+                result.Groups = [];
             else if (group == FeatureGroup.WizardFeat)
-                result.Groups = ToArray(FeatureGroup.WizardFeat, FeatureGroup.Feat);
+                result.Groups = [FeatureGroup.WizardFeat, FeatureGroup.Feat];
             else if (group == FeatureGroup.CombatFeat)
-                result.Groups = ToArray(FeatureGroup.CombatFeat, FeatureGroup.Feat);
+                result.Groups = [FeatureGroup.CombatFeat, FeatureGroup.Feat];
+            else if (group == FeatureGroup.RogueTalent)
+                result.Groups = [FeatureGroup.RogueTalent, FeatureGroup.SlayerTalent, FeatureGroup.VivisectionistDiscovery];
             else
-                result.Groups = ToArray(group);
+                result.Groups = [group];
 
             AddAsset(result, guid);
             return result;
@@ -4296,7 +4298,7 @@ namespace CodexLib
             return result;
         }
 
-        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool requireKnown = false, bool requireUnknown = false, AnyRef spellList = null, int minLevel = 0, int maxlevel = 10, bool onlyKnownSpells = false, bool onlyNonSpells = false, AnyRef[] blueprints = null)
+        public static BlueprintParametrizedFeature CreateBlueprintParametrizedFeature(string name, string displayName = null, string description = null, Sprite icon = null, FeatureGroup group = 0, FeatureParameterType parameterType = FeatureParameterType.Custom, bool allowKnown = false, bool allowUnknown = false, AnyRef spellList = null, int minLevel = 0, int maxlevel = 10, bool allowSpells = false, bool allowAbilities = false, AnyRef[] blueprints = null)
         {
             // TODO: AbilityFocus allow BlueprintFeature
             string guid = GetGuid(name);
@@ -4304,12 +4306,23 @@ namespace CodexLib
             var groups = new List<FeatureGroup>();
             if (parameterType == FeatureParameterType.Custom)
                 groups.Add(Const.ParameterizedAbilitySelection);
-            if (onlyKnownSpells)
-                groups.Add(Const.KnownSpell);
-            if (onlyNonSpells)
-                groups.Add(Const.KnownAbility);
+            if (allowSpells)
+                groups.Add(Const.AllowSpells);
+            if (allowAbilities)
+                groups.Add(Const.AllowAbilities);
+            if (allowKnown)
+                groups.Add(Const.AllowKnown);
+            if (allowUnknown)
+                groups.Add(Const.AllowUnknown);
             if (group != 0)
                 groups.Add(group);
+            if (group is FeatureGroup.WizardFeat or FeatureGroup.CombatFeat)
+                groups.Add(FeatureGroup.Feat);
+            if (group is FeatureGroup.RogueTalent)
+            {
+                groups.Add(FeatureGroup.SlayerTalent);
+                groups.Add(FeatureGroup.VivisectionistDiscovery);
+            }
 
             var result = new BlueprintParametrizedFeature();
             result.IsClassFeature = true;
@@ -4317,18 +4330,18 @@ namespace CodexLib
             result.m_DisplayName = displayName.CreateString();
             result.m_Description = description.CreateString();
             result.m_Icon = icon;
-            result.Groups = groups.ToArray();
+            result.Groups = [.. groups];
             result.ParameterType = parameterType; //FeatureParameterType.FeatureSelection
             result.CustomParameterVariants = blueprints.ToRef<AnyBlueprintReference>();
             result.m_SpellList = spellList;
             result.SpellLevelPenalty = minLevel;
             result.SpellLevel = maxlevel;
 
-            result.RequireProficiency = requireKnown; // use this to require the spell to be known?
-            result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unknown?
-            // if both true, check unknown and prerequisites are met
+            //result.RequireProficiency = requireKnown; // use this to require the spell to be known?
+            //result.HasNoSuchFeature = requireUnknown; // use this to require the spell to be unknown?
+            //// if both true, check unknown and prerequisites are met?
 
-            result.BlueprintParameterVariants = Array.Empty<AnyBlueprintReference>();
+            result.BlueprintParameterVariants = [];
 
             AddAsset(result, guid);
             return result;
@@ -4688,7 +4701,7 @@ namespace CodexLib
             result.m_DisplayName = displayname.CreateString();
             result.m_Description = description.CreateString();
             result.m_Icon = icon;
-            result.Groups = group == 0 ? Array.Empty<FeatureGroup>() : ToArray(group);
+            result.Groups = group == 0 ? [] : [group];
 
             result.IsClassFeature = true;
 

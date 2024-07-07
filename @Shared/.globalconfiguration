@@ -26,6 +26,9 @@ dotnet_diagnostic.CA1069.severity = none
 # CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 dotnet_diagnostic.CS1591.severity = suggestion
 
+# CA1806: Methodenergebnisse nicht ignorieren
+dotnet_diagnostic.CA1806.severity = none
+
 # CA2211: Nicht konstante Felder dürfen nicht sichtbar sein
 dotnet_diagnostic.CA2211.severity = none
 

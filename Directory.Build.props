@@ -3,9 +3,10 @@
 	<PropertyGroup>
 		<Company>Truinto</Company>
 		<Authors>Truinto</Authors>
-		<Copyright>Copyright © Truinto 2023</Copyright>
+		<Copyright>Copyright © Truinto 2024</Copyright>
 		<DoILRepack>false</DoILRepack>
 		<ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
+		<AccelerateBuildsInVisualStudio>false</AccelerateBuildsInVisualStudio>
 	</PropertyGroup>
 	
 	<ItemDefinitionGroup>

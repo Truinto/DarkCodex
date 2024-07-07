@@ -44,6 +44,8 @@ namespace DarkCodex
             var bardic_prereq = Helper.ToRef<BlueprintFeatureReference>("019ada4530c41274a885dfaa0fbf6218");
             var martyr_resource = BlueprintGuid.Parse("875aac46f5e879f4c9ec3ba46847d86e");
             var martyr_prereq = Helper.ToRef<BlueprintFeatureReference>("8504fad23ce93d44caf69550b8059e7b");
+            var fakeInspire_resource = BlueprintGuid.Parse("63c6df02067d42dd94fe65a0fc4ec696");
+            var fakeInspire_prereq = Helper.ToRef<BlueprintFeatureReference>("d754e431ef504adaaccdfbb90174657a");
 
             var limitless = Helper.CreateBlueprintFeature(
                 "LimitlessBardicPerformance",
@@ -52,11 +54,13 @@ namespace DarkCodex
                 group: FeatureGroup.MythicAbility
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(bardic_prereq, true),
-                Helper.CreatePrerequisiteFeature(martyr_prereq, true)
+                Helper.CreatePrerequisiteFeature(martyr_prereq, true),
+                Helper.CreatePrerequisiteFeature(fakeInspire_prereq, true)
                 );
 
             SetResourceDecreasing(bardic_resource, limitless);
             SetResourceDecreasing(martyr_resource, limitless);
+            SetResourceDecreasing(fakeInspire_resource, limitless);
             Helper.AddMythicTalent(limitless);
 
             // mod Homebrew Archetypes: Evangelist

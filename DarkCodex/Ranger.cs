@@ -29,12 +29,12 @@ namespace DarkCodex
             var improvedFeat = Helper.CreateBlueprintFeature(
                 "ImprovedHuntersBond",
                 "Improved Hunter’s Bond",
-                "When you activate hunter’s bond, you can grant your allies your full favored enemy bonus against a single target."
+                "When you activate hunter’s bond, you can grant your allies your full favored enemy bonus against a single target.",
+                group: FeatureGroup.CombatFeat
                 ).SetComponents(
                 Helper.CreatePrerequisiteClassLevel(ranger, 9),
                 Helper.CreatePrerequisiteFeature(huntersbond)
                 );
-            improvedFeat.Groups = [FeatureGroup.Feat, FeatureGroup.CombatFeat];
 
             var improvedBuff = Helper.CreateBlueprintBuff(
                 "ImprovedHuntersBondBuff", "", "",

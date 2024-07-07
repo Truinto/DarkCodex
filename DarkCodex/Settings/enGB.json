@@ -426,6 +426,8 @@
   "463c6ddb5a1a956818253c826262c9d707f4204b": "changes Commanding Infusion to affect all friendly summoned undead",
   "fa0e3adede244e25516d1cb8dd2342e310039fa8": "Fix Master Shapeshifter",
   "124035296441131d9c6a17018e4e8549919c1d2e": "ensures spells with the Polymorph descriptor get the benefit of Master Shapeshifter",
+  "42afc84ed6c333d34997612656d8b9f3f88e2e95": "Fix Necromancer's Staff",
+  "e03a52cdef5d8d459a75144394f5b9e82f9fac98": "changes Necromancer's Staff to affect all friendly summed undead",
   "0ddf59cce102eaf6ec199f95637339f29f2ac8e5": "Fix Spell Element Change",
   "9374716e52cdeab1aed3629673f36b6d3bc0fa59": "fixes Elemental Bloodline and Spell Focus interaction",
   "44d25b5d1b6d98c7d090ca3609aca11ae2815fa0": "Items",

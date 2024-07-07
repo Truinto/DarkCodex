@@ -58,8 +58,10 @@ namespace CodexLib
 
         // use in BlueprintParametrizedFeature
         public const FeatureGroup ParameterizedAbilitySelection = (FeatureGroup)5580;
-        public const FeatureGroup KnownSpell = (FeatureGroup)5581;
-        public const FeatureGroup KnownAbility = (FeatureGroup)5582;
+        public const FeatureGroup AllowSpells = (FeatureGroup)5581;
+        public const FeatureGroup AllowAbilities = (FeatureGroup)5582;
+        public const FeatureGroup AllowKnown = (FeatureGroup)5583;
+        public const FeatureGroup AllowUnknown = (FeatureGroup)5584;
 
         // use in BlueprintActivatableAblity.WeightInGroup to restrict use of Activatable
         public const int NoManualOn = 788704819;

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Craft;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
@@ -40,7 +41,7 @@ namespace CodexLib.Patches
         public static bool GetAllItems(BlueprintParametrizedFeature __instance, ref IEnumerable<IFeatureSelectionItem> __result)
         {
             if (!IsCustom(__instance)) return true;
-            __result = new FeatureUIData[] { new FeatureUIData(__instance, __instance) };
+            __result = [new FeatureUIData(__instance, __instance)];
             return false;
         }
 
@@ -54,32 +55,88 @@ namespace CodexLib.Patches
         {
             if (!IsCustom(__instance)) return true;
 
-            bool knownSpell = __instance.HasGroup(Const.KnownSpell);
-            bool knownAbility = __instance.HasGroup(Const.KnownAbility);
+            //// if cached, return that
+            //if (__instance.m_CachedItems != null)
+            //{
+            //    __result = __instance.m_CachedItems;
+            //    return false;
+            //}
+
+            bool allowSpells = __instance.HasGroup(Const.AllowSpells);
+            bool allowAbilities = __instance.HasGroup(Const.AllowAbilities);
+            bool allowKnown = __instance.HasGroup(Const.AllowKnown);
+            bool allowUnknown = __instance.HasGroup(Const.AllowUnknown);
             int minLevel = Math.Max(1, __instance.SpellLevelPenalty);
             int maxLevel = __instance.SpellLevel < 1 ? 10 : Math.Min(__instance.SpellLevel, 10);
             var spellList = __instance.SpellList;
 
-            if (knownAbility)
-            {
-                __result = __instance.ExtractItemsFromBlueprints(previewUnit.Abilities.Enumerable.Select(s => s.Blueprint));
-                return false;
-            }
+            //Helper.PrintDebug($"GetItemsForUnit allowSpells={allowSpells} allowAbilities={allowAbilities} allowKnown={allowKnown} allowUnknown={allowUnknown} minLevel={minLevel} maxLevel={maxLevel}");
 
             var list = new List<FeatureUIData>();
 
-            // if known spell flag
-            if (knownSpell)
+            if (allowAbilities)
             {
-                foreach (var book in previewUnit.Spellbooks)
-                    for (int i = minLevel; i < maxLevel; i++)
-                        foreach (var abilityData in book.GetKnownSpells(i))
-                            if (!list.Any(a => a.Param == abilityData.Blueprint))
-                                list.Add(new FeatureUIData(__instance, abilityData.Blueprint, abilityData.Blueprint.Name,
-                                    abilityData.Blueprint.Description, abilityData.Blueprint.Icon, abilityData.Blueprint.name));
-                __result = list;
-                return false;
+                foreach (var ability in previewUnit.Abilities)
+                {
+                    string displayName = ability.Blueprint.Name;
+                    if (ability.SourceFact?.Blueprint != null)
+                        displayName = $"{displayName} ({ability.SourceFact})";
 
+                    if (list.Any(a => a.Name == displayName))
+                        continue;
+
+                    list.Add(new(__instance, ability.Blueprint, displayName, ability.Blueprint.Description, ability.Blueprint.Icon, ability.Blueprint.name));
+                }
+            }
+
+            // if known spell flag
+            if (allowSpells)
+            {
+                if (allowUnknown)
+                {
+                    // filter for all spells
+                    foreach (var spell in BpCache.Get<BlueprintAbility>())
+                    {
+                        //Helper.PrintDebug($"parametrized name={spell.name} hidden={spell.Hidden} parent={spell.m_Parent?.Get()?.name} comp={spell.GetComponent<SpellListComponent>() == null} key={spell.m_DisplayName.IsEmptyKey()} dn={spell.m_DisplayName}");
+
+                        if (spell.Hidden
+                            || spell.m_Parent.NotEmpty()
+                            || spell.GetComponent<SpellListComponent>() == null
+                            || spell.GetComponent<CraftInfoComponent>() == null
+                            || spell.m_DisplayName.IsEmptyKey())
+                        {
+                            continue;
+                        }
+
+                        int min = 10;
+                        int max = 0;
+
+                        foreach (var spellComp in spell.GetComponents<SpellListComponent>())
+                        {
+                            if (spellComp.SpellLevel < min) min = spellComp.SpellLevel;
+                            if (spellComp.SpellLevel > max) max = spellComp.SpellLevel;
+                        }
+
+                        if (minLevel <= max && maxLevel >= min)
+                            list.Add(new FeatureUIData(__instance, spell, $"{spell.Name} ({spell.name})", spell.Description, spell.Icon, spell.name));
+                    }
+                }
+                else if (allowKnown)
+                {
+                    foreach (var book in previewUnit.Spellbooks)
+                    {
+                        for (int i = minLevel; i < maxLevel; i++)
+                        {
+                            foreach (var abilityData in book.GetKnownSpells(i))
+                            {
+                                if (!list.Any(a => a.Param.Blueprint == abilityData.Blueprint))
+                                {
+                                    list.Add(new(__instance, abilityData.Blueprint, abilityData.Blueprint.Name, abilityData.Blueprint.Description, abilityData.Blueprint.Icon, abilityData.Blueprint.name));
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             // if spell list
@@ -87,54 +144,17 @@ namespace CodexLib.Patches
             {
                 for (int i = minLevel; i < maxLevel; i++)
                     list.AddRange(spellList.GetSpells(i).Select(s => new FeatureUIData(__instance, s, s.Name, s.Description, s.Icon, s.name)));
-                __result = list;
-                return false;
             }
 
-            // if cached, return that
-            if (__instance.m_CachedItems != null)
-            {
-                __result = __instance.m_CachedItems;
-                return false;
-            }
+            //// use custom blueprints, if any
+            //if (__instance.CustomParameterVariants != null && __instance.CustomParameterVariants.Length > 0)
+            //{
+            //    foreach (var bp in __instance.CustomParameterVariants)
+            //        if (bp.Get() is BlueprintUnitFact fact && !list.Any(a => a.Param.Blueprint == fact))
+            //            list.Add(new FeatureUIData(__instance, fact, fact.Name, fact.Description, fact.Icon, fact.name));
+            //}
 
-            // use custom blueprints, if any
-            if (__instance.CustomParameterVariants != null && __instance.CustomParameterVariants.Length > 0)
-            {
-                foreach (var bp in __instance.CustomParameterVariants)
-                    if (bp.Get() is BlueprintUnitFact fact && !list.Any(a => a.Param == fact))
-                        list.Add(new FeatureUIData(__instance, fact, fact.Name, fact.Description, fact.Icon, fact.name));
-
-                __result = __instance.m_CachedItems = list.ToArray();
-                return false;
-            }
-
-            // if none of the above matches, filter for all spells; these are stored in cache
-            foreach (var spell in BpCache.Get<BlueprintAbility>())
-            {
-                //Helper.PrintDebug($"parametrized name={spell.name} hidden={spell.Hidden} parent={spell.m_Parent?.Get()?.name} comp={spell.GetComponent<SpellListComponent>() == null} key={spell.m_DisplayName.IsEmptyKey()} dn={spell.m_DisplayName}");
-
-                if (spell.Hidden
-                    || spell.m_Parent.NotEmpty()
-                    || spell.GetComponent<SpellListComponent>() == null
-                    || spell.m_DisplayName.IsEmptyKey())
-                {
-                    continue;
-                }
-
-                int min = 10;
-                int max = 0;
-
-                foreach (var spellComp in spell.GetComponents<SpellListComponent>())
-                {
-                    if (spellComp.SpellLevel < min) min = spellComp.SpellLevel;
-                    if (spellComp.SpellLevel > max) max = spellComp.SpellLevel;
-                }
-
-                if (minLevel <= max && maxLevel >= min)
-                    list.Add(new FeatureUIData(__instance, spell, spell.Name, spell.Description, spell.Icon, spell.name));
-            }
-            __result = __instance.m_CachedItems = list.ToArray();
+            __result = list;
             return false;
         }
 

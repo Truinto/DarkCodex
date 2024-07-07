@@ -34,7 +34,8 @@ namespace DarkCodex
                 "RogueBleedingAttack",
                 "Bleeding Attack",
                 "A rogue with this ability can cause living opponents to bleed by hitting them with a sneak attack. This attack causes the target to take 1 additional point of damage each round for each die of the rogue’s sneak attack (e.g., 4d6 equals 4 points of bleed). Bleeding creatures take that amount of damage every round at the start of each of their turns. The bleeding can be stopped by a DC 15 Heal check or the application of any effect that heals hit point damage.\nSpecial: Bleeding damage from this ability does not stack with itself. Bleeding damage bypasses any damage reduction the creature might possess.",
-                icon: Helper.StealIcon("75039846c3d85d940aa96c249b97e562")
+                icon: Helper.StealIcon("75039846c3d85d940aa96c249b97e562"),
+                group: FeatureGroup.RogueTalent
                 ).SetComponents(
                 Helper.CreatePrerequisiteFeature(SneakAttack),
                 Helper.CreateAddInitiatorAttackWithWeaponTrigger(
@@ -46,7 +47,6 @@ namespace DarkCodex
                 Helper.CreateSpellDescriptorComponent(SpellDescriptor.Bleed),
                 Helper.CreateContextRankConfig(ContextRankBaseValueType.CustomProperty, customProperty: Resource.Cache.PropertySneakAttackDice)
                 );
-            bleeding.Groups = [FeatureGroup.RogueTalent, FeatureGroup.SlayerTalent, FeatureGroup.VivisectionistDiscovery];
 
             flensing.SetComponents(
                 Helper.CreatePrerequisiteFullStatValue(StatType.SneakAttack, 3),

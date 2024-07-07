@@ -747,7 +747,8 @@ namespace Shared
 
             try
             {
-                EnsureCodexLib(modEntry.Path);
+                //EnsureCodexLib(modEntry.Path);
+                ForceUpdateCodexLib(modEntry.Path);
                 harmony = new Harmony(modEntry.Info.Id);
                 Patch(typeof(Patches));
                 OnLoad(modEntry);
@@ -769,6 +770,7 @@ namespace Shared
         }
 
         /// <summary>
+        /// This method broke (July 2024). UnityModManager tries to get all types and force loads CodexLib too early.<br/>
         /// <b>You must set your project's reference of CodexLib as 'local copy false' (private="false").</b><br/>
         /// Doing so causes the app domain to not load CodexLib with your mod. Instead call <see cref="EnsureCodexLib(string)"/> in your load entry (before calls to CodexLib show up in your code).<br/>
         /// This makes sure only the newest assembly version is loaded. This is shared between all mods.<br/>
@@ -814,6 +816,68 @@ namespace Shared
             }
         }
 
+        /// <summary>
+        /// Update all CodexLib.dlls.<br/>
+        /// Search and replace all CodexLib with the most recent version. If this overwrites a file loaded in AppDomain, then the game will crash. But a restart will then load the updated file.
+        /// </summary>
+        /// <param name="modPath">Path of your mod. This is <b>modEntry.Path</b>.</param>
+        /// <returns>True if no updates where necessary.</returns>
+        private static void ForceUpdateCodexLib(string modPath)
+        {
+            // skip if "disable_update" file exists in mod folder
+            if (File.Exists(Path.Combine(modPath, "disable_update")))
+            {
+                PrintDebug("CodexLib update is disabled");
+                return;
+            }
+
+            // goto mod root directory
+            modPath = new DirectoryInfo(modPath).Parent.FullName;
+            PrintDebug("Looking for CodexLib in " + modPath);
+
+            // search for all CodexLibs
+            var list = new List<(string path, Version version)>();
+            foreach (string path in Directory.GetFiles(modPath, "CodexLib.dll", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    var version = new Version(FileVersionInfo.GetVersionInfo(path).FileVersion);
+                    PrintDebug($"  Found: version={version} @ {path}");
+                    list.Add((path, version));
+                }
+                catch (Exception) { }
+            }
+
+            // overwrite all old CodexLibs
+            bool didUpdate = false;
+            var latest = list.Aggregate((i1, i2) => i1.version > i2.version ? i1 : i2);
+            foreach (var (path, version) in list)
+            {
+                if (version < latest.version)
+                {
+                    didUpdate = true;
+                    try
+                    {
+                        using var reader = new FileStream(latest.path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                        using var writer = new FileStream(path, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);
+                        reader.CopyTo(writer);
+                        while (writer.Position < writer.Length)
+                            writer.Write(0);
+                    }
+                    catch (Exception) { }
+                }
+            }
+
+            // force a restart; although the game will likely crash anyways
+            if (didUpdate)
+                throw new Exception("CodexLib was changed during runtime. Please restart.");
+
+            return;
+        }
+
+        /// <summary>
+        /// Deprecated event method to resolve assemblies.
+        /// </summary>
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             try

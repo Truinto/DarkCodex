@@ -49,8 +49,9 @@ Content
 |General.PatchBasicFreebieFeats|reduced feat tax, inspired from https://michaeliantorno.com/feat-taxes-in-pathfinder/|:house:|:heavy_check_mark:|
 |General.PatchHideBuffs|unclogs UI by hiding a few buffs|:book:|:construction:|
 |General.PatchVarious|removed PreciousTreat penalty, extend protection from X to 10 minutes|:house:|:heavy_check_mark:|
-|General.FixCruoromancer|changes Commanding Infusion to affect all friendly summoned undead|:house:|:heavy_check_mark:|
+|General.FixCruoromancer|changes Commanding Infusion to affect all friendly summoned undead|:book:|:heavy_check_mark:|
 |General.FixMasterShapeshifter|ensures spells with the Polymorph descriptor get the benefit of Master Shapeshifter|:book:|:heavy_check_mark:|
+|General.FixNecromancersStaff|changes Necromancer's Staff to affect all friendly summed undead|:book:|:heavy_check_mark:|
 |General.FixSpellElementChange|fixes Elemental Bloodline and Spell Focus interaction|:book:|:heavy_check_mark:|
 |Items.CreateButcheringAxe|new weapon type Butchering Axe|:book:|:construction:|
 |Items.CreateImpactEnchantment|new enchantment Impact|:book:|:heavy_check_mark:|

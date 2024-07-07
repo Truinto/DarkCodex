@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.0]
+- added Fake Celebrity to Limitless Bardic Performance
+- fixed preferred spell and ability focus showing all abilities instead of known
+- added extra info on spell source (if possible) #296
+
 ## [1.6.5]
 - recompile
 
