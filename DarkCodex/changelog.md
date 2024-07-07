@@ -1,6 +1,7 @@
 # Changelog
 
 ## [1.7.0]
+- updated UnityModManager version
 - added Fake Celebrity to Limitless Bardic Performance
 - fixed preferred spell and ability focus showing all abilities instead of known
 - added extra info on spell source (if possible) #296
