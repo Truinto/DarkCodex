@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.7.1]
+- disabled CodexLib auto update #315; if you have issues ensure CodexLib.dll is up to date in ALL mods
+
 ## [1.7.0]
 - updated UnityModManager version
 - added Fake Celebrity to Limitless Bardic Performance

@@ -747,8 +747,8 @@ namespace Shared
 
             try
             {
-                //EnsureCodexLib(modEntry.Path);
-                ForceUpdateCodexLib(modEntry.Path);
+                EnsureCodexLib(modEntry.Path);
+                //ForceUpdateCodexLib(modEntry.Path);
                 harmony = new Harmony(modEntry.Info.Id);
                 Patch(typeof(Patches));
                 OnLoad(modEntry);
