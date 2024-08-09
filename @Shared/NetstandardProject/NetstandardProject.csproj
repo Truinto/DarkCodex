@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.0.0.73</Version>
+		<Version>1.0.0.80</Version>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
@@ -29,8 +29,8 @@
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
-		<PackageReference Include="System.Management" Version="8.0.0" />
-		<PackageReference Include="System.Text.Json" Version="8.0.0" />
+		<PackageReference Include="System.Management" Version="*" />
+		<PackageReference Include="System.Text.Json" Version="*" />
 	</ItemGroup>
 
 	<!-- Project References -->
@@ -42,9 +42,9 @@
 		<Compile Include="..\General\Console.cs" Link="Console.cs" />
 		<Compile Include="..\General\General.cs" Link="General.cs" />
 		<Compile Include="..\General\Logger.cs" Link="Logger.cs" />
-		<Compile Include="..\General\Path.cs" Link="Path.cs" />
+		<Compile Include="..\General\Paths.cs" Link="Paths.cs" />
 		<Compile Include="..\General\SerializationTool.cs" Link="SerializationTool.cs" />
-		<Compile Include="..\General\String.cs" Link="String.cs" />
+		<Compile Include="..\General\Strings.cs" Link="Strings.cs" />
 	</ItemGroup>
 
 	<!-- Update build version -->

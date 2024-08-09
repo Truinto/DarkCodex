@@ -10,8 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
-using Shared.Collections;
-using Shared.Loggers;
+using Shared.CollectionNS;
+using Shared.LoggerNS;
 
 #pragma warning disable IDE0009 // ignore missing 'this.'
 
@@ -293,7 +293,7 @@ namespace Shared
         public bool Is(OpCode op, object operand) => Current.opcode == op && object.Equals(Current.operand, operand);
 
         /// <summary>
-        /// Checks if current line calls or accesses given member.
+        /// Checks if current line calls or gets given member.
         /// </summary>
         /// <seealso cref="GetMemberInfo(Type, string, Type[], Type[])"/>
         public bool Calls(Type type, string name, Type[] parameters = null, Type[] generics = null)
@@ -302,7 +302,7 @@ namespace Shared
         }
 
         /// <summary>
-        /// Checks if current line calls or accesses given member.
+        /// Checks if current line calls or gets given member.
         /// </summary>
         /// <seealso cref="GetMemberInfo(Type, string, Type[], Type[])"/>
         public bool Calls(MemberInfo memberinfo)

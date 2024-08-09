@@ -1986,13 +1986,13 @@
         </member>
         <member name="M:Shared.TranspilerTool.Calls(System.Type,System.String,System.Type[],System.Type[])">
             <summary>
-            Checks if current line calls or accesses given member.
+            Checks if current line calls or gets given member.
             </summary>
             <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
         </member>
         <member name="M:Shared.TranspilerTool.Calls(System.Reflection.MemberInfo)">
             <summary>
-            Checks if current line calls or accesses given member.
+            Checks if current line calls or gets given member.
             </summary>
             <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
         </member>
@@ -2459,114 +2459,147 @@
         <member name="M:Shared.LocalInfo.op_Implicit(Shared.LocalInfo)~System.Int32">
             <summary />
         </member>
-        <member name="T:Shared.Attributes.MaybeNull">
+        <member name="T:Shared.AttributesNS.MaybeNull">
             <summary>
             Parameter attribute. Given parameter can be null.
             </summary>
         </member>
-        <member name="T:Shared.Attributes.NeverNull">
+        <member name="T:Shared.AttributesNS.NeverNull">
             <summary>
             Parameter attribute. Given parameter must not be null.
             </summary>
         </member>
-        <member name="T:Shared.Serialize.SerializationTool">
+        <member name="T:Shared.SerializeNS.SerializationTool">
             <summary>
             Tool to handle (de-)serialization.
             </summary>
         </member>
-        <member name="T:Shared.Loggers.Logger">
+        <member name="T:Shared.LoggerNS.Logger">
             <summary>
             Methods to print to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Loggers.Logger.PrintDebug(System.String,System.String)">
+        <member name="M:Shared.LoggerNS.Logger.PrintDebug(System.String,System.String)">
             <summary>
             Only prints in DEBUG.
             </summary>
         </member>
-        <member name="M:Shared.Loggers.Logger.Print(System.String)">
+        <member name="M:Shared.LoggerNS.Logger.Print(System.String)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Loggers.Logger.PrintWarning(System.String,System.String)">
+        <member name="M:Shared.LoggerNS.Logger.PrintWarning(System.String,System.String)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Loggers.Logger.PrintError(System.String,System.String)">
+        <member name="M:Shared.LoggerNS.Logger.PrintError(System.String,System.String)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Loggers.Logger.PrintException(System.Exception)">
+        <member name="M:Shared.LoggerNS.Logger.PrintException(System.Exception)">
             <summary>
             Prints to standard output.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.IsTypeCompatible(System.Type,System.Type)">
+        <member name="M:Shared.CollectionNS.CollectionTool.IsTypeCompatible(System.Type,System.Type)">
             <summary>
             Checks if right type can be assigned to left type. <br />
             Works similiar to IsAssignableFrom, but will returns false for ValueTypes (which need boxing) and void (which overflows the stack).     
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.FindIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Shared.CollectionNS.CollectionTool.FindIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
             <summary>
             Find index in a collection by a predicate.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+        <member name="M:Shared.CollectionNS.CollectionTool.IndexOf``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Find index in a collection by object.Equals.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.IndexOf``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)">
+            <summary>
+            Find index in a collection by object.Equals. Returns notFound, if no element matches.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
             <summary>
             Get element at index or default.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AddUnique``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Shared.CollectionNS.CollectionTool.AddUnique``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Adds items to a list, which are not already in the list. Compares with Equal().
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AddUnique``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
+        <member name="M:Shared.CollectionNS.CollectionTool.AddUnique``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
             <summary>
             Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T1" />.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AddUnique2``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
+        <member name="M:Shared.CollectionNS.CollectionTool.AddUnique2``2(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``1},System.Func{``1,``0})">
             <summary>
             Adds items to a list, which are not already in the list. Types can be different. Compares with Equal() of <typeparamref name="T2" />.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AsArray``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Shared.CollectionNS.CollectionTool.AsArray``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Returns itself, if value is an array. Otherwise creates a new array.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AsList``1(System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Shared.CollectionNS.CollectionTool.AsList``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Returns itself, if value is a list. Otherwise creates a new list.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.Append``1(``0[],``0[])">
-            <summary>Appends objects on array.</summary>
+        <member name="M:Shared.CollectionNS.CollectionTool.AddBefore``1(``0,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns numerable with element at the first position.
+            </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AppendAndReplace``1(``0[]@,``0[])">
+        <member name="M:Shared.CollectionNS.CollectionTool.AddAfter``1(``0,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Returns numerable with element at the last position.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.AddBefore``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Returns numerable with element at the first position.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.AddAfter``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Returns numerable with element at the last position.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Append``1(``0[],``0[])">
+            <summary>Appends objects on array, returning a new array.</summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Append``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IList{``0})">
+            <summary>Appends objects on list, returning a new list.</summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.AppendAndReplace``1(``0[]@,``0[])">
             <summary>Appends objects on array and overwrites the original.</summary>
         </member>
-        <member name="M:Shared.Collections.Collection.AppendAndReplace``1(``0[]@,System.Collections.Generic.IEnumerable{``0})">
+        <member name="M:Shared.CollectionNS.CollectionTool.AppendAndReplace``1(``0[]@,System.Collections.Generic.IEnumerable{``0})">
             <summary>Appends objects on array and overwrites the original.</summary>
         </member>
-        <member name="M:Shared.Collections.Collection.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@)">
+        <member name="M:Shared.CollectionNS.CollectionTool.Ensure``2(System.Collections.Generic.Dictionary{``0,``1},``0,``1@)">
             <summary>
             Get dictionary by key and create new value with standard constructor, if it did not exist.
             </summary>
             <returns>true if new value was created</returns>
         </member>
-        <member name="M:Shared.Collections.Collection.GetList">
+        <member name="M:Shared.CollectionNS.CollectionTool.GetList">
             <summary>
             Gets a static list object. Do not save reference.
             Call <b>Flush&lt;T&gt;()</b> to receive output.
             </summary>
         </member>
-        <member name="M:Shared.Collections.Collection.Flush``1">
+        <member name="M:Shared.CollectionNS.CollectionTool.Flush``1">
             <summary>
             Use when finished with <b>GetList()</b></summary>
         </member>

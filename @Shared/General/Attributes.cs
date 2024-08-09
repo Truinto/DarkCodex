@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Shared.Attributes
+namespace Shared.AttributesNS
 {
     /// <summary>
     /// Parameter attribute. Given parameter can be null.

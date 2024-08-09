@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.0.2.27</Version>
-		<TargetFrameworks>net48</TargetFrameworks>
+		<Version>1.0.2.37</Version>
+		<TargetFrameworks>net472;net48</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -79,9 +79,15 @@
 		<ItemGroup>
 			<_CopyItems Include="$(TargetDir)$(TargetName).dll" />
 			<_CopyItems Include="$(TargetDir)$(TargetName).xml" />
+			
+			<_CopyItemsDest Include="$(ProjectDir)..\$(TargetName)-$(TargetFramework).dll" Condition="'$(TargetFramework)'!='net48'" />
+			<_CopyItemsDest Include="$(ProjectDir)..\$(TargetName)-$(TargetFramework).xml" Condition="'$(TargetFramework)'!='net48'" />
+
+			<_CopyItemsDest Include="$(ProjectDir)..\$(TargetName).dll" Condition="'$(TargetFramework)'=='net48'" />
+			<_CopyItemsDest Include="$(ProjectDir)..\$(TargetName).xml" Condition="'$(TargetFramework)'=='net48'" />
 		</ItemGroup>
 		
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="..\" UseHardlinksIfPossible="true" />
+		<Copy SourceFiles="@(_CopyItems)" DestinationFiles="@(_CopyItemsDest)" UseHardlinksIfPossible="true" />
 	</Target>
 
 </Project>

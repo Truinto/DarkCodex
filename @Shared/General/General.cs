@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
-namespace Shared.Generals
+namespace Shared.GeneralNS
 {
     public static class General
     {

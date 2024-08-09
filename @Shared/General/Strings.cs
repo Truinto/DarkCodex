@@ -7,78 +7,106 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Shared.Strings
+#pragma warning disable SYSLIB1045 // ignore GeneratedRegexAttribute
+
+namespace Shared.StringsNS
 {
-    public static class String
+    public static class Strings
     {
         #region Args
 
+        /// <summary>Search for characters that need to be escaped in shell commands. (Unix/Windows)</summary>
+        public static Regex Rx_ShellEscape => _Rx_ShellEscape ??= new(@"[`~!#$&*()\t{}[\]|;'""\n<>? +]", RegexOptions.Compiled);
+        private static Regex _Rx_ShellEscape;
+
         /// <summary>
-        /// Joins an array of arguments into a single string, which can be used for commands.
+        /// Joins an array of arguments into a single string, which can be used for commands. Puts arguments in quotes, if necessary. Escapes quotes with triple-quotes.
         /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public static string JoinArgs(string[] args)
+        public static string JoinArgs(this IEnumerable<string> args)
         {
-            if (args == null || args.Length == 0)
+            if (args is null)
                 return "";
 
             var sb = new StringBuilder();
 
             foreach (string arg in args)
             {
-                if (arg == null)
+                if (arg is null)
                     continue;
 
-                if (arg.Contains(' '))
+                if (sb.Length > 0)
+                    sb.Append(' ');
+
+                if (Rx_ShellEscape.IsMatch(arg))
                 {
                     sb.Append('\"');
-                    sb.Append(arg);
+                    sb.Append(arg.Replace("\"", "\"\"\""));
                     sb.Append('\"');
                 }
                 else
                 {
                     sb.Append(arg);
                 }
-
-                sb.Append(' ');
             }
 
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Splits arguments into an array. Handles quotes and triple-quotes.
+        /// </summary>
+        public static List<string> SplitArgs(this string args)
+        {
+            var result = new List<string>();
+            var sb = new StringBuilder();
+
+            bool isEnd = true;
+            bool inQuote = false;
+            int quoteCount = 0;
+            foreach (char c in args)
+            {
+                if (c is not ' ')
+                    isEnd = false;
+                if (c is '\"')
+                {
+                    inQuote = !inQuote;
+                    if (inQuote && quoteCount > 0)
+                    {
+                        sb.Append('\"');
+                        quoteCount = 0;
+                    }
+                    quoteCount = 1;
+                }
+                else
+                {
+                    quoteCount = 0;
+                    if (!inQuote && c is ' ')
+                    {
+                        if (sb.Length > 0 || !isEnd)
+                        {
+                            result.Add(sb.ToString());
+                            sb.Clear();
+                            isEnd = true;
+                        }
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                }
+            }
+
+            if (!isEnd)
+                result.Add(sb.ToString());
+
+            //-metadata""":s:s:1 "artist=John Wick"
+
+            return result;
+        }
+
         #endregion
 
         #region Conversions
-
-        public static ulong TryToUInt64(this object obj)
-        {
-            try
-            {
-                return Convert.ToUInt64(obj);
-            }
-            catch (Exception)
-            {
-                return 0UL;
-            }
-        }
-
-        public static string GetDiskSize(this object obj)
-        {
-            ulong size = obj.TryToUInt64();
-
-            switch (size)
-            {
-                case < 1024UL:
-                    return $"{size} bytes";
-                case < 10485760UL:
-                    return $"{size / 1024UL:0,0} KiB";
-                case < 10737418240UL:
-                    return $"{size / 1048576UL:0,0} MiB";
-                default:
-                    return $"{size / 1073741824UL:0,0} GiB";
-            }
-        }
 
         #endregion
 
@@ -168,7 +196,7 @@ namespace Shared.Strings
 
         #endregion
 
-        public static readonly char[] InvalidFileNameChars =
+        private static readonly char[] InvalidFileNameChars =
         [
             '"', '<', '>', '|', '\0', '\u0001', '\u0002', '\u0003', '\u0004', '\u0005',
             '\u0006', '\a', '\b', '\t', '\n', '\v', '\f', '\r', '\u000e', '\u000f',
@@ -279,7 +307,7 @@ namespace Shared.Strings
         public static string Join<T>(this IEnumerable<T> enumeration, Func<T, string> converter = null, string delimiter = ", ")
         {
             converter ??= t => t.ToString();
-            return enumeration.Aggregate("", (prev, curr) => prev + (prev.Length > 0 ? delimiter : "") + converter(curr));
+            return enumeration.Aggregate("", (prev, curr) => prev + (prev.Length > 0 ? delimiter : "") + converter(curr)); // TODO: could use Stringbuilder
         }
 
         /// <summary>Returns substring. Always excludes char 'c'. Returns null, if index is out of range or char not found.</summary>

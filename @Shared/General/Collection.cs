@@ -1,5 +1,4 @@
-﻿using Shared.Attributes;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Shared.Collections
+namespace Shared.CollectionNS
 {
-    public static class Collection
+    public static class CollectionTool
     {
         public static T Get<T>(this IEnumerable enumerable)
         {
@@ -60,6 +59,36 @@ namespace Shared.Collections
                 num++;
             }
             return -1;
+        }
+
+        /// <summary>
+        /// Find index in a collection by object.Equals.
+        /// </summary>
+        public static int IndexOf<T>(this IEnumerable<T> enumerable, T element)
+        {
+            int i = 0;
+            foreach (T item in enumerable)
+            {
+                if (Equals(item, element))
+                    return i;
+                i++;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Find index in a collection by object.Equals. Returns notFound, if no element matches.
+        /// </summary>
+        public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, int notFound)
+        {
+            int i = 0;
+            foreach (T item in enumerable)
+            {
+                if (Equals(item, element))
+                    return i;
+                i++;
+            }
+            return notFound;
         }
 
         /// <summary>
@@ -163,7 +192,47 @@ namespace Shared.Collections
 
         #region Append
 
-        /// <summary>Appends objects on array.</summary>
+        /// <summary>
+        /// Returns numerable with element at the first position.
+        /// </summary>
+        public static IEnumerable<T> AddBefore<T>(this T element, IEnumerable<T> collection)
+        {
+            yield return element;
+            foreach (var item in collection)
+                yield return item;
+        }
+
+        /// <summary>
+        /// Returns numerable with element at the last position.
+        /// </summary>
+        public static IEnumerable<T> AddAfter<T>(this T element, IEnumerable<T> collection)
+        {
+            foreach (var item in collection)
+                yield return item;
+            yield return element;
+        }
+
+        /// <summary>
+        /// Returns numerable with element at the first position.
+        /// </summary>
+        public static IEnumerable<T> AddBefore<T>(this IEnumerable<T> collection, T element)
+        {
+            yield return element;
+            foreach (var item in collection)
+                yield return item;
+        }
+
+        /// <summary>
+        /// Returns numerable with element at the last position.
+        /// </summary>
+        public static IEnumerable<T> AddAfter<T>(this IEnumerable<T> collection, T element)
+        {
+            foreach (var item in collection)
+                yield return item;
+            yield return element;
+        }
+
+        /// <summary>Appends objects on array, returning a new array.</summary>
         public static T[] Append<T>(this T[] orig, params T[] objs)
         {
             orig ??= [];
@@ -178,6 +247,7 @@ namespace Shared.Collections
             return result;
         }
 
+        /// <summary>Appends objects on list, returning a new list.</summary>
         public static List<T> Append<T>(this IList<T> orig, IList<T> objs)
         {
             var result = new List<T>(orig);

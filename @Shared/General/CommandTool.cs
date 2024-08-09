@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace Shared
+namespace AutoCompress // TODO: update
 {
     public class CommandTool
     {
+        public delegate void OnKeyPressDelegate(object sender, ConsoleKeyInfo key, out bool consumed);
+
         public string FilePath;
         public string Args;
+        public IEnumerable<string> ArgsList;
         public Action<string> OnStandard;
         public Action<string> OnError;
-        public Action<object, ConsoleKeyInfo> OnKeyPress;
+        public OnKeyPressDelegate OnKeyPress;
         public readonly StringBuilder Sb_Output = new();
         public readonly StringBuilder Sb_Error = new();
         public int ExitCode;
@@ -28,10 +29,19 @@ namespace Shared
             _handler = new EventHandler(Handler);
         }
 
-        public CommandTool(string filePath, string args, Action<string> onStandard = null, Action<string> onError = null, Action<object, ConsoleKeyInfo> onKeyPress = null) : this()
+        public CommandTool(string filePath, string args, Action<string> onStandard = null, Action<string> onError = null, OnKeyPressDelegate onKeyPress = null) : this()
         {
             this.FilePath = filePath;
             this.Args = Regex.Replace(args, @"[\\^]\n", "");
+            this.OnStandard = onStandard;
+            this.OnError = onError;
+            this.OnKeyPress = onKeyPress;
+        }
+
+        public CommandTool(string filePath, IEnumerable<string> argsList, Action<string> onStandard = null, Action<string> onError = null, OnKeyPressDelegate onKeyPress = null) : this()
+        {
+            this.FilePath = filePath;
+            this.ArgsList = argsList;
             this.OnStandard = onStandard;
             this.OnError = onError;
             this.OnKeyPress = onKeyPress;
@@ -83,6 +93,9 @@ namespace Shared
                     RedirectStandardError = true,
                 };
 
+                foreach (var arg in this.ArgsList ?? [])
+                    Process.StartInfo.ArgumentList.Add(arg);
+
                 Process.EnableRaisingEvents = true;
                 Process.OutputDataReceived += (sender, args) =>
                 {
@@ -114,8 +127,9 @@ namespace Shared
                     {
                         var key = Console.ReadKey(true);
                         Debug.WriteLine($"key-press {key.Modifiers} {key.Key}");
-                        OnKeyPress.Invoke(this, key);
-                        Process?.StandardInput.Write(key.KeyChar);
+                        OnKeyPress(this, key, out bool consumed);
+                        if (!consumed)
+                            Process?.StandardInput.Write(key.KeyChar);
                         continue;
                     }
 
@@ -234,7 +248,7 @@ namespace Shared
         /// <summary>
         /// Synchronous process execution.
         /// </summary>
-        public static int RunNow(string filePath, string args, Action<string> onStandard = null, Action<string> onError = null, Action<object, ConsoleKeyInfo> onKeyPress = null)
+        public static int RunNow(string filePath, string args, Action<string> onStandard = null, Action<string> onError = null, OnKeyPressDelegate onKeyPress = null)
         {
             return new CommandTool(filePath, args, onStandard, onError, onKeyPress).Execute();
         }
@@ -242,7 +256,7 @@ namespace Shared
         /// <summary>
         /// Synchronous process execution.
         /// </summary>
-        public static int RunNow(string filePath, string args, Action<string> onStandard, Action<string> onError, Action<object, ConsoleKeyInfo> onKeyPress, out string output, out string error)
+        public static int RunNow(string filePath, string args, out string output, out string error, Action<string> onStandard = null, Action<string> onError = null, OnKeyPressDelegate onKeyPress = null)
         {
             return new CommandTool(filePath, args, onStandard, onError, onKeyPress).Execute(out output, out error);
         }

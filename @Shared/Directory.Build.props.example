@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+	<PropertyGroup>
+		<Company>Truinto</Company>
+		<Authors>Truinto</Authors>
+		<Copyright>Copyright © Truinto 2024</Copyright>
+		<DoILRepack>false</DoILRepack>
+		<ILRepackTargetsFile>$(SolutionDir)ILRepack.targets</ILRepackTargetsFile>
+		<AccelerateBuildsInVisualStudio>false</AccelerateBuildsInVisualStudio>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<ItemDefinitionGroup>
+		<!--<Reference Private="false" />-->
+		<!--<ProjectReference Private="false" />-->
+	</ItemDefinitionGroup>
+
+	<ItemGroup>
+		<GlobalAnalyzerConfigFiles Condition="Exists('$(SolutionDir)\..\Shared\.globalconfiguration')" Include="$(SolutionDir)\..\Shared\.globalconfiguration" Link=".globalconfiguration" />
+		<GlobalAnalyzerConfigFiles Condition="!Exists('$(SolutionDir)\..\Shared\.globalconfiguration') And Exists('$(SolutionDir)\@Shared\.globalconfiguration')" Include="$(SolutionDir)\@Shared\.globalconfiguration" Link=".globalconfiguration" />
+	</ItemGroup>
+
+	<Import Condition="Exists('Directory.Build.props.user')" Project="Directory.Build.props.user" />
+</Project>

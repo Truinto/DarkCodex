@@ -12,10 +12,10 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Shared.Generals;
-using Shared.Strings;
+using Shared.GeneralNS;
+using Shared.StringsNS;
 
-namespace Shared.Consoles
+namespace Shared.ConsoleNS
 {
     /// <summary>
     /// Functions for use in console applications.<br/>
@@ -23,7 +23,7 @@ namespace Shared.Consoles
     /// - manage processes<br/>
     /// - manage drives<br/>
     /// </summary>
-    public static class Console
+    public static class ConsoleTool
     {
         public static char[] ArgsIdentifier = ['-', '/'];
 

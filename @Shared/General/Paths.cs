@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Paths
+namespace Shared.PathsNS
 {
     public enum FileType
     {
@@ -146,6 +146,9 @@ namespace Shared.Paths
         }
     }
 
+    /// <summary>
+    /// Collection of special folders.
+    /// </summary>
     public static class PathHelper
     {
         /// <summary>%username%</summary>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Shared.Loggers
+namespace Shared.LoggerNS
 {
     /// <summary>
     /// Methods to print to standard output.
