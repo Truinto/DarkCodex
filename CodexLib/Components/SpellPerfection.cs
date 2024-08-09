@@ -57,8 +57,8 @@ namespace CodexLib
                 return null;
             if (bp == spell)
                 return spell;
-            if (bp == spell.Parent)
-                return spell.Parent;
+            if (bp == spell?.Parent)
+                return spell?.Parent;
             return null;
         }
 
