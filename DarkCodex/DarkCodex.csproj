@@ -4,25 +4,15 @@
 		<Version>1.7.2</Version>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<Nullable>disable</Nullable>
 		<Authors>Truinto</Authors>
 		<Title>$(MSBuildProjectName)</Title>
 		<RepositoryUrl>https://github.com/Truinto/DarkCodex</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RootNamespace>$(MSBuildProjectName)</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
 	<!-- Shared Libs -->
-
-	<!-- Nuget Packages -->
-	<ItemGroup>
-		<PackageReference Include="AssemblyPublicizer" Version="1.0.4" ExcludeAssets="runtime" />
-		<PackageReference Include="BuildTaskVersionControl" Version="1.2.1" ExcludeAssets="runtime" />
-	</ItemGroup>
 
 	<!-- Common References -->
 	<ItemGroup>
@@ -38,30 +28,30 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Include="0Harmony_public" HintPath="$(GameManaged)\UnityModManager\0Harmony_public.dll" />
-		<Reference Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
-		<Reference Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
+		<Reference Private="false" Include="0Harmony_public" HintPath="$(GameManaged)\UnityModManager\0Harmony_public.dll" />
+		<Reference Private="false" Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
+		<Reference Private="false" Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
 
-		<Reference Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
-		<Reference Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
-		<Reference Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
-		<Reference Include="UniRx" HintPath="$(GameManaged)\UniRx.dll" />
-		<Reference Include="DotNetZip" HintPath="$(GameManaged)\DotNetZip.dll" />
-		<Reference Include="Owlcat.SharedTypes" HintPath="$(GameManaged)\Owlcat.SharedTypes.dll" />
-		<Reference Include="Owlcat.Runtime.Core" HintPath="$(GameManaged)\Owlcat.Runtime.Core.dll" />
-		<Reference Include="Owlcat.Runtime.Validation" HintPath="$(GameManaged)\Owlcat.Runtime.Validation.dll" />
-		<Reference Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
-		<Reference Include="UnityTextMeshPro" HintPath="$(GameManaged)\Unity.TextMeshPro.dll" />
-		<Reference Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
-		<Reference Include="UnityEngine.AnimationModule" HintPath="$(GameManaged)\UnityEngine.AnimationModule.dll" />
-		<Reference Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
-		<Reference Include="UnityEngine.ImageConversionModule" HintPath="$(GameManaged)\UnityEngine.ImageConversionModule.dll" />
-		<Reference Include="UnityEngine.IMGUIModule" HintPath="$(GameManaged)\UnityEngine.IMGUIModule.dll" />
-		<Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(GameManaged)\UnityEngine.JSONSerializeModule.dll" />
-		<Reference Include="UnityEngine.ParticleSystemModule" HintPath="$(GameManaged)\UnityEngine.ParticleSystemModule.dll" />
-		<Reference Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
-		<Reference Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
-		<Reference Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
+		<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
+		<Reference Private="false" Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
+		<Reference Private="false" Include="Newtonsoft.Json" HintPath="$(GameManaged)\Newtonsoft.Json.dll" />
+		<Reference Private="false" Include="UniRx" HintPath="$(GameManaged)\UniRx.dll" />
+		<Reference Private="false" Include="DotNetZip" HintPath="$(GameManaged)\DotNetZip.dll" />
+		<Reference Private="false" Include="Owlcat.SharedTypes" HintPath="$(GameManaged)\Owlcat.SharedTypes.dll" />
+		<Reference Private="false" Include="Owlcat.Runtime.Core" HintPath="$(GameManaged)\Owlcat.Runtime.Core.dll" />
+		<Reference Private="false" Include="Owlcat.Runtime.Validation" HintPath="$(GameManaged)\Owlcat.Runtime.Validation.dll" />
+		<Reference Private="false" Include="UnityEngine" HintPath="$(GameManaged)\UnityEngine.dll" />
+		<Reference Private="false" Include="UnityTextMeshPro" HintPath="$(GameManaged)\Unity.TextMeshPro.dll" />
+		<Reference Private="false" Include="UnityEngine.UI" HintPath="$(GameManaged)\UnityEngine.UI.dll" />
+		<Reference Private="false" Include="UnityEngine.AnimationModule" HintPath="$(GameManaged)\UnityEngine.AnimationModule.dll" />
+		<Reference Private="false" Include="UnityEngine.CoreModule" HintPath="$(GameManaged)\UnityEngine.CoreModule.dll" />
+		<Reference Private="false" Include="UnityEngine.ImageConversionModule" HintPath="$(GameManaged)\UnityEngine.ImageConversionModule.dll" />
+		<Reference Private="false" Include="UnityEngine.IMGUIModule" HintPath="$(GameManaged)\UnityEngine.IMGUIModule.dll" />
+		<Reference Private="false" Include="UnityEngine.JSONSerializeModule" HintPath="$(GameManaged)\UnityEngine.JSONSerializeModule.dll" />
+		<Reference Private="false" Include="UnityEngine.ParticleSystemModule" HintPath="$(GameManaged)\UnityEngine.ParticleSystemModule.dll" />
+		<Reference Private="false" Include="UnityEngine.TextRenderingModule" HintPath="$(GameManaged)\UnityEngine.TextRenderingModule.dll" />
+		<Reference Private="false" Include="UnityEngine.InputLegacyModule" HintPath="$(GameManaged)\UnityEngine.InputLegacyModule.dll" />
+		<Reference Private="false" Include="UnityEngine.UIModule" HintPath="$(GameManaged)\UnityEngine.UIModule.dll" />
 
 		<ProjectReference Include="..\CodexLib\CodexLib.csproj" />
 		<ProjectReference Include="..\@Shared\UnityMod\UnityMod.csproj" />
@@ -79,7 +69,7 @@
 		<ItemGroup>
 			<ProjectReference Remove="..\CodexLib\CodexLib.csproj" />
 			<ProjectReference Remove="..\@Shared\UnityMod\UnityMod.csproj" />
-			<Reference Include="CodexLib" HintPath="$(SolutionDir)\CodexLib\CodexLib.dll" Private="false" />
+			<Reference Private="false" Include="CodexLib" HintPath="$(SolutionDir)\CodexLib\CodexLib.dll" />
 		</ItemGroup>
 	</Target>
 
