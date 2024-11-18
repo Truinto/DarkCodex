@@ -3,8 +3,8 @@
 <!-- Create Directory.Build.props.default for project specific settings. -->
 <!-- Create Directory.Build.props.user for user specific settings. -->
 <Project>
-	<Import Condition="Exists('../Shared/Directory.Build.props.shared')" Project="../Shared/Directory.Build.props.shared" />
-	<Import Condition="!Exists('../Shared/Directory.Build.props.shared') And Exists('./@Shared/Directory.Build.props.shared')" Project="./@Shared/Directory.Build.props.shared" />
+	<Import Condition="Exists('./@Shared/Directory.Build.props.shared')" Project="./@Shared/Directory.Build.props.shared" />
+	<Import Condition="!Exists('./@Shared/Directory.Build.props.shared') And Exists('../Shared/Directory.Build.props.shared')" Project="../Shared/Directory.Build.props.shared" />
 	
 	<Import Condition="Exists('Directory.Build.props.default')" Project="Directory.Build.props.default" />
 	<Import Condition="Exists('Directory.Build.props.user')" Project="Directory.Build.props.user" />

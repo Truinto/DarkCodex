@@ -59,7 +59,6 @@
 
 	<!-- Other Files -->
 	<ItemGroup>
-		<GlobalAnalyzerConfigFiles Include="$(SolutionDir)\@Shared\.globalconfiguration" Link=".globalconfiguration" />
 		<None Update="changelog.md" CopyToOutputDirectory="PreserveNewest" />
 		<None Update="info.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>

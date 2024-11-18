@@ -57,8 +57,7 @@
 
 	<!-- Other Files -->
 	<ItemGroup>
-		<GlobalAnalyzerConfigFiles Include="$(SolutionDir)\@Shared\.globalconfiguration" Link=".globalconfiguration" />
-		<EmbeddedResource Include="Resources\Blueprints.bin" />
+		<EmbeddedResource Include="Resources\Blueprints.bin" LogicalName="CodexLib.Resources.Blueprints.bin" />
 		<EmbeddedResource Include="Resources\Num0.png" />
 		<EmbeddedResource Include="Resources\Num1.png" />
 		<EmbeddedResource Include="Resources\Num2.png" />
