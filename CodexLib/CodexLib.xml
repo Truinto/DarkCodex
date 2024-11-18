@@ -1962,6 +1962,34 @@
             </summary>
             <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
         </member>
+        <member name="M:Shared.TranspilerTool.SeekSetter(System.Type,System.String)">
+            <summary>
+            Moves index forward until calling a matching method or accessing a matching field. <br />
+            Also resolves property getter, but their setter is ignored.
+            </summary>
+            <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
+        </member>
+        <member name="M:Shared.TranspilerTool.RewindSetter(System.Type,System.String)">
+            <summary>
+            Moves index backward until calling a matching method or accessing a matching field. <br />
+            Also resolves property getter, but their setting is ignored.
+            </summary>
+            <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
+        </member>
+        <member name="M:Shared.TranspilerTool.Seek(System.Reflection.MemberInfo)">
+            <summary>
+            Moves index forward until calling a matching method or accessing a matching field. <br />
+            Also resolves property getter, but their setter is ignored.
+            </summary>
+            <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
+        </member>
+        <member name="M:Shared.TranspilerTool.Rewind(System.Reflection.MemberInfo)">
+            <summary>
+            Moves index backward until calling a matching method or accessing a matching field. <br />
+            Also resolves property getter, but their setting is ignored.
+            </summary>
+            <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
+        </member>
         <member name="M:Shared.TranspilerTool.Seek(System.Reflection.Emit.OpCode,System.Object)">
             <summary>
             Moves index forward until a specified OpCode is used. Can optionally compare the operand as well.
@@ -2022,6 +2050,11 @@
         </member>
         <member name="M:Shared.TranspilerTool.IsLoadConstant(System.Double)">
             <summary>Checks if current line loads a constant.</summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.Set(System.Reflection.Emit.OpCode,System.Object)">
+            <summary>
+            Overwrites Current.
+            </summary>
         </member>
         <member name="M:Shared.TranspilerTool.InsertCall(System.Delegate,System.Boolean)">
             <summary>
@@ -2469,11 +2502,6 @@
             Parameter attribute. Given parameter must not be null.
             </summary>
         </member>
-        <member name="T:Shared.SerializeNS.SerializationTool">
-            <summary>
-            Tool to handle (de-)serialization.
-            </summary>
-        </member>
         <member name="T:Shared.LoggerNS.Logger">
             <summary>
             Methods to print to standard output.
@@ -2504,23 +2532,38 @@
             Prints to standard output.
             </summary>
         </member>
+        <member name="T:Shared.CollectionNS.CollectionTool">
+            <summary>
+            Extension class for collection operations.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Get``1(System.Collections.IEnumerable)">
+            <summary>
+            Gets the first element that is of type <typeparamref name="T" />.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.GetAll``1(System.Collections.IEnumerable)">
+            <summary>
+            Gets all elements that are of type <typeparamref name="T" />.
+            </summary>
+        </member>
         <member name="M:Shared.CollectionNS.CollectionTool.IsTypeCompatible(System.Type,System.Type)">
             <summary>
             Checks if right type can be assigned to left type. <br />
             Works similiar to IsAssignableFrom, but will returns false for ValueTypes (which need boxing) and void (which overflows the stack).     
             </summary>
         </member>
-        <member name="M:Shared.CollectionNS.CollectionTool.FindIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
+        <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
             <summary>
             Find index in a collection by a predicate.
             </summary>
         </member>
-        <member name="M:Shared.CollectionNS.CollectionTool.IndexOf``1(System.Collections.Generic.IEnumerable{``0},``0)">
+        <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.Generic.IEnumerable{``0},``0)">
             <summary>
             Find index in a collection by object.Equals.
             </summary>
         </member>
-        <member name="M:Shared.CollectionNS.CollectionTool.IndexOf``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)">
+        <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)">
             <summary>
             Find index in a collection by object.Equals. Returns notFound, if no element matches.
             </summary>
@@ -2528,6 +2571,29 @@
         <member name="M:Shared.CollectionNS.CollectionTool.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
             <summary>
             Get element at index or default.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Contains``1(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}},``0)">
+            <summary>
+                <inheritdoc cref="M:System.Linq.Enumerable.Contains``1(System.Collections.Generic.IEnumerable{``0},``0)" />
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.ContainsSequence(System.Collections.IList,System.Collections.IList,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Search a sequence of elements in <paramref name="array" />.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.ContainsSequence(System.Byte[],System.Byte[],System.Int32,System.Int32,System.Int32,System.Int32)">
+            <inheritdoc cref="M:Shared.CollectionNS.CollectionTool.ContainsSequence(System.Collections.IList,System.Collections.IList,System.Int32,System.Int32,System.Int32,System.Int32)" />
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.StartsWith(System.IO.FileInfo,System.String,System.Boolean)">
+            <summary>
+            Check a text file starts with a specific ASCII string. File can have ASCII or Unicode (UTF-16) encoding.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.SelectWhere``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},System.Func{``0,``1})">
+            <summary>
+            Filters a sequence and projects each element into a new form.
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.AddUnique``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
@@ -2555,15 +2621,11 @@
             Returns itself, if value is a list. Otherwise creates a new list.
             </summary>
         </member>
-        <member name="M:Shared.CollectionNS.CollectionTool.AddBefore``1(``0,System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Returns numerable with element at the first position.
-            </summary>
+        <member name="M:Shared.CollectionNS.CollectionTool.InjectBefore``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},System.Func{``0,``0})">
+            <summary>Injects a new element into an enumerable, if a condition is met.</summary>
         </member>
-        <member name="M:Shared.CollectionNS.CollectionTool.AddAfter``1(``0,System.Collections.Generic.IEnumerable{``0})">
-            <summary>
-            Returns numerable with element at the last position.
-            </summary>
+        <member name="M:Shared.CollectionNS.CollectionTool.InjectAfter``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},System.Func{``0,``0})">
+            <summary>Injects a new element into an enumerable, if a condition is met.</summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.AddBefore``1(System.Collections.Generic.IEnumerable{``0},``0)">
             <summary>
@@ -2592,6 +2654,41 @@
             Get dictionary by key and create new value with standard constructor, if it did not exist.
             </summary>
             <returns>true if new value was created</returns>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.QuickSort``1(System.Collections.Generic.IList{``0},System.Int32,System.Int32)">
+            <summary>
+            Sorts the elements in a list using the IComparable&lt;<typeparamref name="T" />&gt; implementation.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.QuickSort``2(System.Collections.Generic.IList{``0},System.Func{``0,``1},System.Int32,System.Int32)">
+            <summary>
+            Sorts the elements in a list using the IComparable&lt;<typeparamref name="T2" />&gt; implementation of a specified member.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Sort``1(System.Collections.Generic.IList{``0})">
+            <summary>
+            Sorts the elements in a list using the IComparable&lt;<typeparamref name="T" />&gt; implementation.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Sort``2(System.Collections.Generic.IList{``0},System.Func{``0,``1})">
+            <summary>
+            Sorts the elements in a list using the IComparable&lt;<typeparamref name="T2" />&gt; implementation of a specified member.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Sort``2(``0[],System.Func{``0,``1})">
+            <summary>
+            Sorts the elements in an <see cref="T:System.Array" /> using the IComparable&lt;<typeparamref name="T2" />&gt; implementation of a specified member.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.MoveTo``1(System.Collections.Generic.IList{``0},System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Move item to index, shifting all elements inbetween by one.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Swap``1(System.Collections.Generic.IList{``0},System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Swap position of two elements by index.
+            </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.GetList">
             <summary>

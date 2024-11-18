@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.0]
+- updated for new patch
+
 ## [1.7.2]
 - pulled #322
 
@@ -215,7 +218,7 @@
 - fixed Bladed Brush for Spell Combat, Duelist Parry, and Duelist's Deflect Arrows #144
 - split boundless healing and boundless injury into separate feats #143
 - added fix for fortune hex
-- added background: Fate’s Favored #146
+- added background: Fateï¿½s Favored #146
 - fixed ice tomb DC stacking, added to winter witch selection #149
 - fixed Patch_ChangeSpellElement overwriting channel energy #148
 

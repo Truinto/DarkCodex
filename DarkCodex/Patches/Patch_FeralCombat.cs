@@ -62,7 +62,7 @@ namespace DarkCodex
         //OK: MonkNoArmorAndMonkWeaponFeatureUnlock	MonkNoArmorAndMonkWeaponOrFeralCombatFeatureUnlock
         //OK: AdditionalStatBonusOnAttackDamage		AdditionalStatBonusOnAttackDamageOrFeralCombat
 
-        [HarmonyPatch(typeof(AddInitiatorAttackWithWeaponTrigger), nameof(AddInitiatorAttackWithWeaponTrigger.IsSuitable), typeof(RuleAttackWithWeapon))]
+        [HarmonyPatch(typeof(AbstractWeaponTrigger), nameof(AbstractWeaponTrigger.IsSuitable), typeof(RuleAttackWithWeapon))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler1(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // general & styles strikes
         {
@@ -73,14 +73,14 @@ namespace DarkCodex
             data.InsertAfter(patch2);
             return data.Code;
 
-            static WeaponCategory patch1(WeaponCategory category, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
+            static WeaponCategory patch1(WeaponCategory category, AbstractWeaponTrigger __instance, RuleAttackWithWeapon evt)
             {
                 if (__instance.Category == WeaponCategory.UnarmedStrike && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                     return WeaponCategory.UnarmedStrike;
                 return category;
             }
 
-            static BlueprintWeaponType patch2(BlueprintWeaponType weaponType, AddInitiatorAttackWithWeaponTrigger __instance, RuleAttackWithWeapon evt)
+            static BlueprintWeaponType patch2(BlueprintWeaponType weaponType, AbstractWeaponTrigger __instance, RuleAttackWithWeapon evt)
             {
                 if (__instance.WeaponType == Resource.Cache.WeaponTypeUnarmed.Get() && evt.Weapon.Blueprint.IsNatural && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                     return Resource.Cache.WeaponTypeUnarmed.Get();
@@ -133,7 +133,7 @@ namespace DarkCodex
         }
 
 
-        [HarmonyPatch(typeof(AdditionalDiceOnAttack), nameof(AdditionalDiceOnAttack.CheckCondition), typeof(RuleAttackRoll))]
+        [HarmonyPatch(typeof(AdditionalDiceOnAttack), nameof(AdditionalDiceOnAttack.CheckCondition), typeof(RuleAttackRoll), typeof(UnitEntityData))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler5(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // elemental fist
         {
@@ -151,7 +151,7 @@ namespace DarkCodex
         }
 
 
-        [HarmonyPatch(typeof(AdditionalDiceOnAttack), nameof(AdditionalDiceOnAttack.CheckCondition), typeof(RuleAttackWithWeapon))]
+        [HarmonyPatch(typeof(AdditionalDiceOnAttack), nameof(AdditionalDiceOnAttack.CheckCondition), typeof(RuleAttackWithWeapon), typeof(UnitEntityData))]
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler6(IEnumerable<CodeInstruction> instructions, ILGenerator generator, MethodBase original) // elemental fist
         {
