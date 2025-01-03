@@ -2000,6 +2000,16 @@
             Moves index backward until a specified OpCode is used. Can optionally compare the operand as well.
             </summary>
         </member>
+        <member name="M:Shared.TranspilerTool.Seek(Shared.LocalInfo,System.Boolean)">
+            <summary>
+            Moves index forward until a specified OpCode is used. Can optionally compare the operand as well.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.Rewind(Shared.LocalInfo,System.Boolean)">
+            <summary>
+            Moves index backward until a specified OpCode is used. Can optionally compare the operand as well.
+            </summary>
+        </member>
         <member name="M:Shared.TranspilerTool.Seek(System.Boolean,System.Func{Shared.TranspilerTool,System.Boolean}[])">
             <summary>
             Moves index forward until predicates match in order. <br />
@@ -2023,6 +2033,9 @@
             Checks if current line calls or gets given member.
             </summary>
             <seealso cref="M:Shared.TranspilerTool.GetMemberInfo(System.Type,System.String,System.Type[],System.Type[])" />
+        </member>
+        <member name="M:Shared.TranspilerTool.IsBranch">
+            <summary>Checks if current line branches to a label.</summary>
         </member>
         <member name="M:Shared.TranspilerTool.IsStloc(System.Int32)">
             <summary>Checks if current line stores local and has matching index.</summary>
@@ -2153,7 +2166,7 @@
         </member>
         <member name="M:Shared.TranspilerTool.InsertJump(System.Delegate,Shared.LabelInfo,System.Boolean)">
             <summary>
-            Injects jump to given label.<br />
+            Injects jump to given label, if delegate return true.<br />
             This function will inject necessary load OpCodes.<br />
             Use <see cref="M:Shared.TranspilerTool.GetLabel(HarmonyLib.CodeInstruction,System.String,System.Boolean)" /> to jump to a specific CodeInstruction.<br /><b>bool Function([object __instance], [object arg0], [object arg1...])</b></summary>
             <param name="func">
@@ -2274,6 +2287,25 @@
             Set name of label.
             </summary>
         </member>
+        <member name="M:Shared.TranspilerTool.GetCurrentLabel(System.Boolean)">
+            <summary>
+            Get label to the current line. Throws if canMake is false and no label exists.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetTargetLabel">
+            <summary>
+            Get label of the current operand. May return empty LabelInfo.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetLocal(System.Type,System.String,System.Int32)">
+            <summary>
+            Get local of an exact specific type. Set local name if name is non-null (throws if name is used by other local).<br />
+            Throws if no match.
+            </summary>
+            <param name="type">Type of local to search.</param>
+            <param name="name">Optional name to set or compare. (Throws when mismatch)</param>
+            <param name="occurrence">Zero-based index of occurrence.</param>
+        </member>
         <member name="M:Shared.TranspilerTool.GetLocal(System.String,System.Type,System.Boolean)">
             <summary>
             Get local with a specific name or create a new local, if name is null or non-existent and type is given.
@@ -2281,7 +2313,7 @@
         </member>
         <member name="M:Shared.TranspilerTool.GetLocal(System.Int32,System.Type)">
             <summary>
-            Get local by index.
+            Get local by index. Throws if type is non-null and field type mismatch.
             </summary>
         </member>
         <member name="M:Shared.TranspilerTool.NameLocal(System.String)">
@@ -2409,6 +2441,26 @@
             <summary>
             Untested. Returns <i><paramref name="parentMethod" /></i> and embedded methods which call <i><paramref name="lookingforMethod" /></i>.
             Does resolve some wrapped method calls (e.g. lambda expressions).
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetLambda(System.Reflection.MethodInfo,System.Type,System.Type[],System.Int32)">
+            <summary>
+            Searches method body for a particular lambda expression and returns their MethodInfo.
+            </summary>
+            <param name="parentMethod">Method to search through.</param>
+            <param name="returnType">Return value of the wanted method.</param>
+            <param name="parameters">Parameters of the wanted method.</param>
+            <param name="occurrence">Zero-based index of occurrence.</param>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetLambdas(System.Reflection.MethodInfo)">
+            <summary>
+            Searches method body all lambda expressions and returns their MethodInfo.
+            </summary>
+            <param name="parentMethod">Method to search through.</param>
+        </member>
+        <member name="M:Shared.TranspilerTool.Load(System.Reflection.MethodInfo)">
+            <summary>
+            Create TranspilerTool for analyzing purposes.
             </summary>
         </member>
         <member name="T:Shared.LabelInfo">
@@ -2619,6 +2671,16 @@
         <member name="M:Shared.CollectionNS.CollectionTool.AsList``1(System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Returns itself, if value is a list. Otherwise creates a new list.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Concat``1(System.Collections.Generic.IEnumerable{``0},``0)">
+            <summary>
+            Adds an item to a enumerable.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Concat``1(``0,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds an item to a enumerable.
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.InjectBefore``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},System.Func{``0,``0})">

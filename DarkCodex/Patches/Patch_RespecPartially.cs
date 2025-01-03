@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DarkCodex
 {
-    [PatchInfo(Severity.Harmony | Severity.DefaultOff, "Patch: Partial Respec", "allows respec to be finished at any point", false)]
+    [PatchInfo(Severity.Harmony | Severity.DefaultOff | Severity.Hidden, "Patch: Partial Respec", "allows respec to be finished at any point", false)]
     [HarmonyPatch]
     public class Patch_RespecPartially
     {

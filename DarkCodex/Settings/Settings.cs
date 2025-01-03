@@ -11,7 +11,7 @@ namespace DarkCodex
 {
     public class Settings : BaseSettings<Settings>
     {
-        public Settings() => Version = 4;
+        public Settings() => Version = 5;
 
         [JsonProperty]
         public bool showBootupWarning = true;
@@ -77,6 +77,11 @@ namespace DarkCodex
                     }
                     return text;
                 }
+            }
+
+            if (Version < 5)
+            {
+                Whitelist.Remove("Patch.Patch_RespecPartially");
             }
 
             return true;

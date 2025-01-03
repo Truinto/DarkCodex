@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.1]
+- removed broken Patch_RespecPartially; use Barley's Respec!
+
 ## [1.8.0]
 - updated for new patch
 
