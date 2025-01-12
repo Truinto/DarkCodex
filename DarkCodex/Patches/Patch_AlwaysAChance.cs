@@ -40,7 +40,7 @@ namespace DarkCodex
         [HarmonyPostfix]
         public static void Postfix4(int d20, RuleSkillCheck __instance, ref bool __result)
         {
-            __result = __result || d20 == 20 || (d20 == 1 && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
+            __result = __result || ((d20 == 20 || d20 == 1) && __instance.Initiator != null && __instance.Initiator.State.Features.AlwaysChance);
         }
 
         [HarmonyPatch(typeof(RuleSavingThrow), nameof(RuleSavingThrow.IsSuccessRoll))]

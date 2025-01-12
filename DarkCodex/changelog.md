@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.3]
+- fixed skill checks on Aalways A Chance #331
+
 ## [1.8.2]
 - fixed Feral Combat Training with Pummpeling Charge
 
