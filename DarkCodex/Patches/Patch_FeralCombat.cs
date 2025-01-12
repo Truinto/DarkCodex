@@ -56,8 +56,9 @@ namespace DarkCodex
          */
 
         //search for: ImprovedUnarmedStrike
-        //skip: PummelingCharge, Patch_DeflectArrows_CheckRestriction_Patch
-        //OK: AddInitiatorAttackWithWeaponTrigger		AddInitiatorAttackWithWeaponTriggerOrFeralTraining
+        //skip: Patch_DeflectArrows_CheckRestriction_Patch
+        //OK: PummelingCharge
+        //OK: AbstractWeaponTrigger		AddInitiatorAttackWithWeaponTriggerOrFeralTraining
         //OK: AbilityCasterMainWeaponCheck			AbilityCasterMainWeaponCheckOrFeralCombat
         //OK: MonkNoArmorAndMonkWeaponFeatureUnlock	MonkNoArmorAndMonkWeaponOrFeralCombatFeatureUnlock
         //OK: AdditionalStatBonusOnAttackDamage		AdditionalStatBonusOnAttackDamageOrFeralCombat
@@ -209,7 +210,6 @@ namespace DarkCodex
             }
         }
 
-
         [HarmonyPatch(typeof(MythicUnarmedStrike), nameof(MythicUnarmedStrike.OnEventAboutToTrigger), typeof(RuleCalculateWeaponStats))]
         [HarmonyPostfix]
         public static void Postfix9(RuleCalculateWeaponStats evt, MythicUnarmedStrike __instance) // Mythic Improved Unarmed Strike
@@ -219,6 +219,18 @@ namespace DarkCodex
                 && evt.Initiator.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
                 evt.AddDamageModifier(evt.Initiator.Progression.MythicLevel / 2, __instance.Fact);
         }
-    }
 
+        [HarmonyPatch(typeof(PummelingCharge), nameof(PummelingCharge.CheckWeapon))]
+        [HarmonyPrefix]
+        public static bool Prefix10(PummelingCharge __instance) // Pummpeling Charge
+        {
+            if (__instance.Owner.Body.PrimaryHand.Weapon.Blueprint.IsNatural
+                && __instance.Owner.Descriptor.HasFact(Resource.Cache.FeatureFeralCombat))
+            {
+                __instance.ActivatePounce();
+                return false;
+            }
+            return true;
+        }
+    }
 }

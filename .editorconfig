@@ -155,7 +155,7 @@ csharp_style_conditional_delegate_call = true
 
 # Einstellungen für Modifizierer
 csharp_prefer_static_local_function = true
-csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,readonly,override,unsafe,required,volatile,async:warning
+csharp_preferred_modifier_order = public,private,protected,internal,extern,file,static,new,virtual,abstract,sealed,readonly,override,unsafe,required,volatile,async:warning
 csharp_style_prefer_readonly_struct = true
 csharp_style_prefer_readonly_struct_member = true
 

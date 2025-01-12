@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.2]
+- fixed Feral Combat Training with Pummpeling Charge
+
 ## [1.8.1]
 - removed broken Patch_RespecPartially; use Barley's Respec!
 
