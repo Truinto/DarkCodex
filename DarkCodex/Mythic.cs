@@ -301,6 +301,7 @@ namespace DarkCodex
         {
             var ki_resource = BlueprintGuid.Parse("9d9c90a9a1f52d04799294bf91c80a82");
             var scaled_resource = BlueprintGuid.Parse("7d002c1025fbfe2458f1509bf7a89ce1");
+            var dunken_resource = BlueprintGuid.Parse("fd01f3f969a04febab7877a17aebb812"); //DrunkenKiPowerResource
             var abundant_ki = Helper.ToRef<BlueprintFeatureReference>("e8752f9126d986748b10d0bdac693264"); //AbundantKiPool
 
             var limitless = Helper.CreateBlueprintFeature(
@@ -315,6 +316,7 @@ namespace DarkCodex
 
             SetResourceDecreasing(ki_resource, limitless);
             SetResourceDecreasing(scaled_resource, limitless);
+            SetResourceDecreasing(dunken_resource, limitless);
 
             Helper.AddMythicTalent(limitless);
         }
