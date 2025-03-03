@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.8.6]
+- changed debug texts to default off
+
 ## [1.8.5]
 - made Flame Blade buff visible
 - maybe fixed issue with json settings

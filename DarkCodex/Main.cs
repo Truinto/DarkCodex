@@ -998,13 +998,13 @@ namespace Shared
                 return;
 
             if (_patchLast.Count > 0)
-                PrintDebug("Running _patchLast");
+                Print("Running _patchLast");
 
             foreach (var (message, action) in _patchLast)
             {
                 try
                 {
-                    PrintDebug(message);
+                    Print(message);
                     action();
                 }
                 catch (Exception e) { PrintException(e); }
