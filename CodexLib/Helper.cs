@@ -734,7 +734,7 @@ namespace CodexLib
 
         public static JsonSerializerSettings _jsetting = new()
         {
-            Converters = DefaultJsonSettings.DefaultSettings.Converters,
+            Converters = [.. DefaultJsonSettings.CommonConverters],
             Formatting = Formatting.Indented,
             NullValueHandling = NullValueHandling.Ignore,
             ObjectCreationHandling = ObjectCreationHandling.Replace,

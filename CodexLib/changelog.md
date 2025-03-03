@@ -2,6 +2,7 @@
 
 ## [1.7.0]
 - fixes for SpellSelectionParametrized
+- maybe fixed issue with json settings
 
 ## [1.6.0]
 - fixes for update

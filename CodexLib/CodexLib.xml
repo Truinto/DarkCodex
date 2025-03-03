@@ -2605,6 +2605,11 @@
             Works similiar to IsAssignableFrom, but will returns false for ValueTypes (which need boxing) and void (which overflows the stack).     
             </summary>
         </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.IEnumerable,System.Func{``0,System.Boolean})">
+            <summary>
+            Find index in a collection by a predicate.
+            </summary>
+        </member>
         <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean})">
             <summary>
             Find index in a collection by a predicate.
@@ -2618,6 +2623,11 @@
         <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.Generic.IEnumerable{``0},``0,System.Int32)">
             <summary>
             Find index in a collection by object.Equals. Returns notFound, if no element matches.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.AtIndex``1(System.Collections.IEnumerable,System.Int32)">
+            <summary>
+            Get element at index or default.
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">

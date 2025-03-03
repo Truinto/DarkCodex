@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.8.5]
+- made Flame Blade buff visible
+- maybe fixed issue with json settings
+- added ninja ki pool to Limitless Ki pool
+
 ## [1.8.4]
 - added 'Dunken Master Monk Ki' to Limitless Ki pool
 

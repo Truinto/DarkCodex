@@ -217,9 +217,11 @@ namespace DarkCodex
                 );
 
             var buff = Helper.CreateBlueprintBuff(
-                "FlameBladeBuff"
+                "FlameBladeBuff",
+                "Flame Blade",
+                icon: icon
                 ).Flags(
-                hidden: true
+                //hidden: true
                 ).SetComponents(
                 new AddTemporaryWeapon(weapon),
                 Helper.CreateAddStatBonusIfHasFact(StatType.Speed, ModifierDescriptor.Enhancement, 10, facts: feat),
