@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.9.0]
+- fixed foldables, fix #336, fix #337, fix #339
+
 ## [1.8.6]
 - changed debug texts to default off
 

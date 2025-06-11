@@ -92,8 +92,7 @@ namespace DarkCodex
                         Texture.allowThreadedTextureCreation = true;
                         File.WriteAllBytes(Path.Combine(Main.ModPath, "IconsExport", fact.m_Icon.name), ImageConversion.EncodeToPNG(fact.m_Icon.texture));
                         Main.PrintDebug($"Export sprite {fact.m_Icon.name} from {fact.name} ");
-                    }
-                    catch (Exception)
+                    } catch (Exception)
                     {
                         Main.PrintDebug($"Didn't like sprite {fact.m_Icon.name} from {fact.name} ");
                     }
@@ -149,8 +148,7 @@ namespace DarkCodex
                     //window.HandleLootInterraction(Game.Instance.Player.Party.First(), Game.Instance.Player.SharedStash, "Remote Stash");
 
 
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     Main.Print(e.ToString());
                 }
@@ -234,7 +232,7 @@ namespace DarkCodex
             {
                 StringBuilder sb = new();
 #if DEBUG
-                using StreamWriter sw = new(Path.Combine(Main.ModPath, "enchantment-export.txt"), false); // todo: remove debug log
+                using StreamWriter sw = new(Path.Combine(Main.ModPath, "enchantment-export.txt"), false);
                 sw.WriteLine("names");
 #endif
                 foreach (var enchantment in BpCache.Get<BlueprintItemEnchantment>())
@@ -259,8 +257,8 @@ namespace DarkCodex
                         // space uppercase char,
                         // unless the previous char was already spaced, unless the next char is lowercase (if any)
                         // also no double spaces
-                        if (current.IsUppercase() 
-                            && (!previous.IsUppercase() || next.IsLowercase()) 
+                        if (current.IsUppercase()
+                            && (!previous.IsUppercase() || next.IsLowercase())
                             && sb.IsNotSpaced())
                             sb.Append(' ');
 
@@ -291,17 +289,19 @@ namespace DarkCodex
                             continue;
 
                         int i = 0;
-                        foreach (var enchantent in item.CollectEnchantments().Where(w => w.m_Description == null || w.m_Description.IsEmpty() || w.m_Description == ""))
+                        foreach (var enchantent in item.CollectEnchantments().Where(w =>
+                            w.m_Description == null
+                            || w.m_Description.IsEmpty()
+                            || w.m_Description.LoadString(LocalizationManager.CurrentPack, LocalizationManager.CurrentLocale) == ""))
                         {
-                            enchantent.m_Description = ((string)item.m_DescriptionText).CreateString($"{i++}#{item.m_DescriptionText.m_Key}", "enchant");
+                            enchantent.m_Description = item.m_DescriptionText.LoadString(LocalizationManager.CurrentPack, LocalizationManager.CurrentLocale).CreateString($"{i++}#{item.m_DescriptionText.m_Key}", "enchant");
 #if DEBUG
                             sw.Write(enchantent.AssetGuid);
                             sw.Write("\t");
-                            sw.WriteLine(enchantent.m_Description.ToString());
+                            sw.WriteLine(enchantent.m_Description.LoadString(LocalizationManager.CurrentPack, LocalizationManager.CurrentLocale));
 #endif
                         }
-                    }
-                    catch (Exception)
+                    } catch (Exception)
                     {
 #if DEBUG
                         sw.WriteLine(item.AssetGuid + "\tcaused crash");
@@ -309,8 +309,6 @@ namespace DarkCodex
                     }
                     // regex to fix linebreaks "\n(?![a-f0-9]{32}\t)", "\\n"
                 }
-#if DEBUG
-#endif
             }
 
             public static string ConvertName(string name)

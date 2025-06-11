@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.8.6</Version>
+		<Version>1.9.0</Version>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Authors>Truinto</Authors>
@@ -28,9 +28,9 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Private="false" Include="0Harmony_public" HintPath="$(GameManaged)\UnityModManager\0Harmony_public.dll" />
-		<Reference Private="false" Include="Assembly-CSharp_public" HintPath="$(GameManaged)\Assembly-CSharp_public.dll" />
-		<Reference Private="false" Include="Owlcat.Runtime.UI_public" HintPath="$(GameManaged)\Owlcat.Runtime.UI_public.dll" />
+		<Reference Private="false" Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" Publicize="true" />
+		<Reference Private="false" Include="Assembly-CSharp" HintPath="$(GameManaged)\Assembly-CSharp.dll" Publicize="true" />
+		<Reference Private="false" Include="Owlcat.Runtime.UI" HintPath="$(GameManaged)\Owlcat.Runtime.UI.dll" Publicize="true" />
 
 		<Reference Private="false" Include="UnityModManager" HintPath="$(GameManaged)\UnityModManager\UnityModManager.dll" />
 		<Reference Private="false" Include="Assembly-CSharp-firstpass" HintPath="$(GameManaged)\Assembly-CSharp-firstpass.dll" />
@@ -70,16 +70,6 @@
 			<ProjectReference Remove="..\@Shared\UnityMod\UnityMod.csproj" />
 			<Reference Private="false" Include="CodexLib" HintPath="$(SolutionDir)\CodexLib\CodexLib.dll" />
 		</ItemGroup>
-	</Target>
-
-	<!-- Publicize -->
-	<Target Name="Publicize" BeforeTargets="Clean;BeforeBuild" AfterTargets="">
-		<ItemGroup>
-			<PublicizeInput Include="$(GameManaged)\Assembly-CSharp.dll" />
-			<!--<PublicizeInput Include="$(GameManaged)\UnityModManager\0Harmony.dll" />-->
-			<PublicizeInput Include="$(GameManaged)\Owlcat.Runtime.UI.dll" />
-		</ItemGroup>
-		<PublicizeTask InputAssemblies="@(PublicizeInput)" OutputDir="$(GameManaged)\" />
 	</Target>
 
 	<!-- Update build version -->

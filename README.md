@@ -182,7 +182,6 @@ Content
 |Patch.Patch_Polymorph|allows debug flags to keep inventory or model during polymorph|:book:|:heavy_check_mark:|
 |Patch.Patch_PreferredSpellMetamagic|necessary patches for Preferred Spell|:book:|:heavy_check_mark:|
 |Patch.Patch_ResourcefulCaster|patches for Resourceful Caster|:house:|:heavy_check_mark:|
-|Patch.Patch_RespecPartially|allows respec to be finished at any point|:book:|:heavy_check_mark:|
 |Patch.Patch_TrueGatherPowerLevel|Normal: The level of gathering power is determined by the mode (none, low, medium, high) selected. If the mode is lower than the already accumulated gather level, then levels are lost. Patched: The level of gathering is true to the accumulated level or the selected mode, whatever is higher.|:book:|:heavy_check_mark:|
 |Patch.Patch_UnlockClassLevels|let's you pick class levels after level 20 with any class; this won't add new features except basic feats and won't allow character levels beyond 20 (which can be done with champion mythic path or Toybox)|:house:|:heavy_check_mark:|
 |Patch.Patch_ZippySpellLike|allows zippy to work on spell-like abilities|:house:|:heavy_check_mark:|

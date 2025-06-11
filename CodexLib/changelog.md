@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.8.0]
+- fixes for IActionBarConvert
+
 ## [1.7.0]
 - fixes for SpellSelectionParametrized
 - maybe fixed issue with json settings

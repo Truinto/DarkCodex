@@ -2589,6 +2589,11 @@
             Extension class for collection operations.
             </summary>
         </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Count(System.Collections.IEnumerable)">
+            <summary>
+            Returns collection count or iterates and counts through all elements.
+            </summary>
+        </member>
         <member name="M:Shared.CollectionNS.CollectionTool.Get``1(System.Collections.IEnumerable)">
             <summary>
             Gets the first element that is of type <typeparamref name="T" />.
@@ -2633,6 +2638,21 @@
         <member name="M:Shared.CollectionNS.CollectionTool.AtIndex``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
             <summary>
             Get element at index or default.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.ContainsReference(System.Collections.IEnumerable,System.Object)">
+            <summary>
+            Check every element with <see cref="M:System.Object.ReferenceEquals(System.Object,System.Object)" />. Returns false if <paramref name="element" /> is null.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Contains(System.Collections.IEnumerable,System.Object)">
+            <summary>
+            Check every element with <see cref="M:System.Object.Equals(System.Object)" />. Returns false if <paramref name="element" /> is null.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.ContainsMany(System.Collections.IEnumerable,System.Object,System.Int32)">
+            <summary>
+            Check every element with <see cref="M:System.Object.Equals(System.Object)" />. Recursively up to <paramref name="depth" />. Returns false if <paramref name="element" /> is null.
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.Contains``1(System.Collections.Generic.IEnumerable{System.Collections.Generic.IEnumerable{``0}},``0)">

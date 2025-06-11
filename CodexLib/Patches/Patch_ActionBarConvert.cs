@@ -1,30 +1,44 @@
 ﻿using Kingmaker.UI.MVVM._PCView.ActionBar;
 using Kingmaker.UI.MVVM._VM.ActionBar;
+using Kingmaker.UI.UnitSettings;
 
 namespace CodexLib.Patches
 {
     [HarmonyPatch]
     public class Patch_ActionBarConvert
     {
-        [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.SetMechanicSlot))]
+        [HarmonyPatch(typeof(ActionBarSlotVM), nameof(ActionBarSlotVM.UpdateResource))]
         [HarmonyPostfix]
-        public static void SetMechanicSlot(ActionBarSlotVM __instance)
+        public static void ShowUnfoldButton(ActionBarSlotVM __instance)
         {
-            object obj = __instance.MechanicActionBarSlot.GetContentData();
-            if (obj is AbilityData ability)
-                obj = ability.m_Fact;
-
-            if (obj is UnitFact fact)
+            try
             {
-                fact.CallComponents<IActionBarConvert>(a =>
+                if (__instance.MechanicActionBarSlot == null || __instance.MechanicActionBarSlot.IsBad())
+                    return;
+
+                if (__instance.MechanicActionBarSlot is IMechanicGroup)
                 {
                     __instance.HasConvert.Value = true;
+                    __instance.Icon.Value = __instance.MechanicActionBarSlot.GetIcon();
+                    return;
+                }
 
-                    var icon = a.GetIcon();
-                    if (icon)
-                        __instance.ForeIcon.Value = icon;
-                });
-            }
+                object obj = __instance.MechanicActionBarSlot.GetContentData();
+                if (obj is AbilityData ability)
+                    obj = ability.m_Fact;
+
+                if (obj is UnitFact fact)
+                {
+                    fact.CallComponents<IActionBarConvert>(a =>
+                    {
+                        __instance.HasConvert.Value = true;
+
+                        var icon = a.GetIcon();
+                        if (icon)
+                            __instance.ForeIcon.Value = icon;
+                    });
+                }
+            } catch (Exception e) { Helper.PrintDebug(e.ToString()); }
         }
 
         //[HarmonyPatch(typeof(ActionBarBaseSlotView), nameof(ActionBarBaseSlotView.BindViewImplementation))]
@@ -43,6 +57,18 @@ namespace CodexLib.Patches
             if (__instance.ConvertedVm.Value != null && !__instance.ConvertedVm.Value.IsDisposed)
                 return true;
 
+            if (__instance.MechanicActionBarSlot is IMechanicGroup group)
+            {
+                for (int i = group.Slots.Count - 1; i >= 0; i--)
+                {
+                    if (group.Slots[i].IsBad())
+                        group.Slots.RemoveAt(i);
+                }
+
+                __instance.ConvertedVm.Value = new ActionBarConvertedVMAny(__instance, group.Slots, __instance.CloseConvert); // if null is used, it won't close; possible useful for nesting
+                return false;
+            }
+
             object obj = __instance.MechanicActionBarSlot.GetContentData();
             if (obj is AbilityData ability)
                 obj = ability.m_Fact;
@@ -59,6 +85,19 @@ namespace CodexLib.Patches
             });
 
             return !hasConvert;
+        }
+
+        [HarmonyPatch(typeof(UnitUISettings), nameof(UnitUISettings.GetBadSlotReplacement))]
+        [HarmonyPrefix]
+        private static bool BadReplacement(MechanicActionBarSlot slot, ref MechanicActionBarSlot __result)
+        {
+            if (slot is MechanicActionBarSlotGroup or MechanicActionBarSlotSpellGroup or MechanicActionBarSlotPlaceholder)
+            {
+                __result = null;
+                Helper.PrintDebug($"BadReplacement {slot} to null");
+                return false;
+            }
+            return true;
         }
 
         [HarmonyPatch(typeof(ActionBarSlotPCView), "UnityEngine.EventSystems.IEndDragHandler.OnEndDrag")]

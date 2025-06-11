@@ -18,6 +18,9 @@ end_of_line = crlf
 # IDE0017: Initialisierung von Objekten vereinfachen
 dotnet_diagnostic.IDE0017.severity = none
 
+# IDE0028: Initialisierung der Sammlung vereinfachen
+dotnet_diagnostic.IDE0028.severity = none
+
 # IDE0044: Modifizierer "readonly" hinzufügen
 dotnet_diagnostic.IDE0044.severity = none
 
@@ -29,6 +32,9 @@ dotnet_diagnostic.IDE0060.severity = suggestion
 
 # IDE0062: Lokale Funktion als "static" festlegen
 dotnet_diagnostic.IDE0062.severity = none
+
+# IDE0305: Initialisierung der Sammlung vereinfachen
+dotnet_diagnostic.IDE0305.severity = none
 
 # CA1041: ObsoleteAttribute-Meldung bereitstellen
 dotnet_diagnostic.CA1041.severity = none
@@ -50,9 +56,6 @@ dotnet_diagnostic.CA1806.severity = none
 
 # CA2211: Nicht konstante Felder dürfen nicht sichtbar sein
 dotnet_diagnostic.CA2211.severity = none
-
-# IDE0028: Initialisierung der Sammlung vereinfachen
-dotnet_diagnostic.IDE0028.severity = none
 
 
 #### Wichtige EditorConfig-Optionen ####
