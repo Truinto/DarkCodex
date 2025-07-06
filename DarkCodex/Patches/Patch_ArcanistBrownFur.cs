@@ -13,10 +13,20 @@ namespace DarkCodex
     public class Patch_ArcanistBrownFur
     {
         [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.IsArcanistSpell), MethodType.Getter)]
-        public static bool Prefix(AbilityData __instance, ref bool __result)
+        [HarmonyPrefix]
+        [HarmonyPriority(Priority.HigherThanNormal)]
+        public static bool Prefix1(AbilityData __instance, ref bool __result)
         {
-            if (__instance.Blueprint.Type == AbilityType.Spell)
-                __result = true;
+            __result = __instance.Blueprint.Type is AbilityType.SpellLike or AbilityType.Spell;
+            return false;
+        }
+
+        [HarmonyPatch(typeof(AbilityData), nameof(AbilityData.ArcanistShareTransmutation), MethodType.Getter)]
+        [HarmonyPrefix]
+        [HarmonyPriority(Priority.HigherThanNormal)]
+        public static bool Prefix2(AbilityData __instance, ref bool __result)
+        {
+            __result = __instance.Blueprint.Type is AbilityType.SpellLike or AbilityType.Spell && __instance.Caster != null && __instance.Caster.State.Features.ShareTransmutation;
             return false;
         }
     }

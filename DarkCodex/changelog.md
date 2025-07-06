@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.9.1]
+- fixed arcanist share transmutation patch, fix #345
+
 ## [1.9.0]
 - fixed foldables, fix #336, fix #337, fix #339
 

@@ -2678,6 +2678,11 @@
             Filters a sequence and projects each element into a new form.
             </summary>
         </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.SelectNotNull``2(System.Collections.Generic.IEnumerable{``0},System.Func{``0,``1})">
+            <summary>
+            Projects each element into a new form, but filters null elements and null results.
+            </summary>
+        </member>
         <member name="M:Shared.CollectionNS.CollectionTool.AddUnique``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Adds items to a list, which are not already in the list. Compares with Equal().
@@ -2718,6 +2723,11 @@
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.InjectAfter``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},System.Func{``0,``0})">
             <summary>Injects a new element into an enumerable, if a condition is met.</summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Add``2(``1,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds elements to a collection. Mutates and returns <paramref name="destination" />.
+            </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.AddBefore``1(System.Collections.Generic.IEnumerable{``0},``0)">
             <summary>
@@ -2780,6 +2790,11 @@
         <member name="M:Shared.CollectionNS.CollectionTool.Swap``1(System.Collections.Generic.IList{``0},System.Int32,System.Int32,System.Boolean)">
             <summary>
             Swap position of two elements by index.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Fill``1(``0[],``0)">
+            <summary>
+            Fills collection with a value.
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.GetList">

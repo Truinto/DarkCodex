@@ -65,13 +65,13 @@ namespace Shared
         public const bool AllowGuidGeneration = false;
 #endif
 
-        public static Harmony harmony;
+        public static Harmony? harmony;
         public static bool Enabled;
-        public static string ModPath;
-        internal static PatchInfoCollection patchInfos;
+        public static string? ModPath;
+        internal static PatchInfoCollection? patchInfos;
         internal static readonly List<string> appliedPatches = [];
         internal static readonly List<string> skippedPatches = [];
-        internal static UnityModManager.ModEntry.ModLogger logger;
+        internal static UnityModManager.ModEntry.ModLogger? logger;
         public static bool applyNullFinalizer;
 
         public static bool IsInGame => Game.Instance.Player?.Party?.Any() ?? false; // RootUIContext.Instance?.IsInGame ?? false; //
@@ -91,8 +91,8 @@ namespace Shared
         }
 
         internal static bool restart;
-        private static GUIStyle StyleBox;
-        private static GUIStyle StyleLine;
+        private static GUIStyle? StyleBox;
+        private static GUIStyle? StyleLine;
         private static List<string> CategoryFolded = [];
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
@@ -303,7 +303,7 @@ namespace Shared
             Settings.State.TrySave();
         }
 
-        private static string lastEnum;
+        private static string? lastEnum;
         private static void Checkbox<T>(ref T value, string label, Action<T> action = null) where T : Enum
         {
             if (GUILayout.Button(label, GUILayout.ExpandWidth(false)))
@@ -416,6 +416,11 @@ namespace Shared
 
         #region Load
 
+        static Main()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+        }
+
         private static void OnLoad(UnityModManager.ModEntry modEntry)
         {
             modEntry.OnToggle = OnToggle;
@@ -453,8 +458,8 @@ namespace Shared
             }
         }
 
-        private static object instanceSettings;
-        private static FieldInfo toggleKineticistGatherPower;
+        private static object? instanceSettings;
+        private static FieldInfo? toggleKineticistGatherPower;
         private static void OnToggleModMenu(bool open)
         {
             if (!open)
@@ -785,8 +790,8 @@ namespace Shared
                 return;
             }
 
-            string path = null;
-            Version version = null;
+            string? path = null;
+            Version? version = null;
             modPath = new DirectoryInfo(modPath).Parent.FullName;
             PrintDebug("Looking for CodexLib in " + modPath);
 
@@ -878,7 +883,7 @@ namespace Shared
         /// <summary>
         /// Deprecated event method to resolve assemblies.
         /// </summary>
-        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        private static Assembly? CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
             {
@@ -886,8 +891,8 @@ namespace Shared
 
                 if (ModPath != null && args.Name.StartsWith("CodexLib, "))
                 {
-                    string path = null;
-                    Version version = null;
+                    string? path = null;
+                    Version? version = null;
 
                     foreach (string cPath in Directory.GetFiles(Directory.GetParent(ModPath).FullName, "CodexLib.dll"))
                     {

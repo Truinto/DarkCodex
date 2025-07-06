@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.9.0</Version>
+		<Version>1.9.1</Version>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Authors>Truinto</Authors>
@@ -102,14 +102,14 @@
 			<_Zip Include="$(ModFolder)\$(TargetName)\enchantenGB.json" />
 			<_Zip Include="$(ModFolder)\$(TargetName)\zhCN.json" />
 			<_Zip Include="$(ModFolder)\$(TargetName)\enchantzhCN.json" />
-			
+
 			<_Download Include="Settings\zhCN.json" Url="DarkCodex汉化/zhCN.json" />
 			<_Download Include="Settings\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
 		</ItemGroup>
-		
+
 		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" Interval="0.12:00" />
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
-		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(ModFolder)\$(TargetName)\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
+		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(SolutionDir)\publish\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>
 

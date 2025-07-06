@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
 	<PropertyGroup>
-		<Zip7>C:\Program Files\7-Zip\7z.exe</Zip7>
 		<ProgramFolder>D:\Programme\GOG Galaxy\Games</ProgramFolder>
 		<GameManaged>$(ProgramFolder)\Pathfinder Wrath of the Righteous\Wrath_Data\Managed</GameManaged>
 		<ModFolder>$(ProgramFolder)\Pathfinder Wrath of the Righteous\Mods</ModFolder>
