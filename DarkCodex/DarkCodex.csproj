@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.9.1</Version>
+		<Version>1.9.2</Version>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Authors>Truinto</Authors>
@@ -90,6 +90,13 @@
 			<_CopyItems Include="$(TargetDir)\*" />
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
 
+			<_CopySettings Include="$(ModFolder)\$(TargetName)\blueprints.txt" />
+			<_CopySettings Include="$(ModFolder)\$(TargetName)\blueprints_dynamic.txt" />
+			<_CopySettings Include="$(ModFolder)\$(TargetName)\enGB.json" />
+			<_CopySettings Include="$(ModFolder)\$(TargetName)\enchantenGB.json" />
+			<_CopySettings Include="$(ModFolder)\$(TargetName)\zhCN.json" />
+			<_CopySettings Include="$(ModFolder)\$(TargetName)\enchantzhCN.json" />
+
 			<_Zip Include="$(ModFolder)\$(TargetName)\builds\testdata.json" />
 			<_Zip Include="$(ModFolder)\$(TargetName)\icons\*.png" />
 			<_Zip Include="$(ModFolder)\$(TargetName)\info.json" />
@@ -106,7 +113,8 @@
 			<_Download Include="Settings\zhCN.json" Url="DarkCodex汉化/zhCN.json" />
 			<_Download Include="Settings\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
 		</ItemGroup>
-
+		
+		<Copy SourceFiles="@(_CopySettings)" DestinationFolder="$(SolutionDir)\$(TargetName)\Settings" />
 		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" Interval="0.12:00" />
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
 		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(SolutionDir)\publish\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />

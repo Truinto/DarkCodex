@@ -2767,6 +2767,11 @@
             Sorts the elements in a list using the IComparable&lt;<typeparamref name="T2" />&gt; implementation of a specified member.
             </summary>
         </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.QuickSort``1(System.Collections.Generic.IList{``0},System.Func{``0,``0,System.Int32},System.Int32,System.Int32)">
+            <summary>
+            Sorts the elements in a list using a delegate.
+            </summary>
+        </member>
         <member name="M:Shared.CollectionNS.CollectionTool.Sort``1(System.Collections.Generic.IList{``0})">
             <summary>
             Sorts the elements in a list using the IComparable&lt;<typeparamref name="T" />&gt; implementation.
@@ -2775,6 +2780,11 @@
         <member name="M:Shared.CollectionNS.CollectionTool.Sort``2(System.Collections.Generic.IList{``0},System.Func{``0,``1})">
             <summary>
             Sorts the elements in a list using the IComparable&lt;<typeparamref name="T2" />&gt; implementation of a specified member.
+            </summary>
+        </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.Sort``1(System.Collections.Generic.IList{``0},System.Func{``0,``0,System.Int32})">
+            <summary>
+            Sorts the elements in a list using a delegate.
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.Sort``2(``0[],System.Func{``0,``1})">

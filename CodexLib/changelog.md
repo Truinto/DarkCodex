@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.8.1]
+- updated references (Harmony v2.3.6)
+
 ## [1.8.0]
 - fixes for IActionBarConvert
 

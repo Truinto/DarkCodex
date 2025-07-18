@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.9.2]
+- updated references (Harmony v2.3.6)
+
 ## [1.9.1]
 - fixed arcanist share transmutation patch, fix #345
 
