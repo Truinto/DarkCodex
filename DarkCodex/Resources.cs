@@ -486,7 +486,7 @@ namespace DarkCodex
             public const string Weapon_Shock = "1d1465ffa2699644ba8dfac48cb33195";
         }
 
-        internal static string[] _localizedStrings;
+        internal static string[]? _localizedStrings;
         public static string[] LocalizedStrings
         {
             get
@@ -494,7 +494,7 @@ namespace DarkCodex
                 if (_localizedStrings != null)
                     return _localizedStrings;
 
-                using var scope = new Scope(Main.ModPath, Main.logger, Main.harmony, Main.AllowGuidGeneration);
+                using var scope = new Scope(Main.ModPath!, Main.logger!, Main.harmony!, Main.AllowGuidGeneration);
                 return _localizedStrings =
                 [
                     //None

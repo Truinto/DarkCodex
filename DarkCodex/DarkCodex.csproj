@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.9.2</Version>
+		<Version>1.9.3</Version>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Authors>Truinto</Authors>
@@ -28,7 +28,7 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<Reference Private="false" Include="0Harmony" HintPath="$(GameManaged)\UnityModManager\0Harmony.dll" Publicize="true" />
+		<PackageReference Include="Lib.Harmony.Thin" Version="2.3.6" />
 		<Reference Private="false" Include="Assembly-CSharp" HintPath="$(GameManaged)\Assembly-CSharp.dll" Publicize="true" />
 		<Reference Private="false" Include="Owlcat.Runtime.UI" HintPath="$(GameManaged)\Owlcat.Runtime.UI.dll" Publicize="true" />
 
@@ -91,7 +91,7 @@
 			<_CopyItems Include="$(SolutionDir)\CodexLib\CodexLib.dll" />
 
 			<_CopySettings Include="$(ModFolder)\$(TargetName)\blueprints.txt" />
-			<_CopySettings Include="$(ModFolder)\$(TargetName)\blueprints_dynamic.txt" />
+			<_CopySettings Include="$(ModFolder)\blueprints_dynamic.txt" />
 			<_CopySettings Include="$(ModFolder)\$(TargetName)\enGB.json" />
 			<_CopySettings Include="$(ModFolder)\$(TargetName)\enchantenGB.json" />
 			<_CopySettings Include="$(ModFolder)\$(TargetName)\zhCN.json" />
@@ -114,9 +114,9 @@
 			<_Download Include="Settings\enchantzhCN.json" Url="DarkCodex汉化/enchantzhCN.json" />
 		</ItemGroup>
 		
-		<Copy SourceFiles="@(_CopySettings)" DestinationFolder="$(SolutionDir)\$(TargetName)\Settings" />
+		<Copy SourceFiles="@(_CopySettings)" DestinationFolder="$(SolutionDir)\$(TargetName)\Settings" UseHardlinksIfPossible="true" SkipUnchangedFiles="true" />
 		<GitRemoteTask Url="https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN" RepoPath="main" DownloadOnChange="@(_Download)" Interval="0.12:00" />
-		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" />
+		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModFolder)\$(TargetName)\%(RecursiveDir)" UseHardlinksIfPossible="true" />
 		<ZipTask Condition="'$(Configuration)'=='Release'" ZipFileName="$(SolutionDir)\publish\$(TargetName).zip" WorkingDirectory="$(ModFolder)" Files="@(_Zip)" />
 		<Message Condition="'$(Configuration)'=='Release'" Text="Updated $(TargetName).zip" Importance="High" />
 	</Target>

@@ -62,7 +62,7 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="0Harmony" HintPath="$(WrathManaged)\0Harmony.dll" Publicize="true" />
+    <Reference Include="0Harmony" HintPath="$(WrathManaged)\0Harmony.dll" />
     <Reference Include="Assembly-CSharp" HintPath="$(WrathManaged)\Assembly-CSharp.dll" Publicize="true" />
     <Reference Include="Owlcat.Runtime.UI" HintPath="$(WrathManaged)\Owlcat.Runtime.UI.dll" Publicize="true" />
 	

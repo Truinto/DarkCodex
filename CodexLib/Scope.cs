@@ -24,6 +24,7 @@ namespace CodexLib
         {
             this.modPath = modPath;
             this.logger = logger;
+            this.harmony = new("Obsolete");
             Stack.Push(this);
         }
 
@@ -38,9 +39,9 @@ namespace CodexLib
 
         public Scope(string modPath, UnityModManager.ModEntry.ModLogger logger, Harmony harmony, bool allowGuidGeneration)
         {
-            this.modPath = modPath;
-            this.logger = logger;
-            this.harmony = harmony;
+            this.modPath = modPath ?? throw new ArgumentNullException(nameof(modPath));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.harmony = harmony ?? throw new ArgumentNullException(nameof(harmony));
             this.allowGuidGeneration = allowGuidGeneration;
             Stack.Push(this);
         }

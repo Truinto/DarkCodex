@@ -65,13 +65,13 @@ namespace Shared
         public const bool AllowGuidGeneration = false;
 #endif
 
-        public static Harmony? harmony;
+        public static Harmony harmony = new("NoInit");
         public static bool Enabled;
-        public static string? ModPath;
+        public static string ModPath = "";
         internal static PatchInfoCollection? patchInfos;
         internal static readonly List<string> appliedPatches = [];
         internal static readonly List<string> skippedPatches = [];
-        internal static UnityModManager.ModEntry.ModLogger? logger;
+        internal static UnityModManager.ModEntry.ModLogger logger = new("NoInit");
         public static bool applyNullFinalizer;
 
         public static bool IsInGame => Game.Instance.Player?.Party?.Any() ?? false; // RootUIContext.Instance?.IsInGame ?? false; //
@@ -97,6 +97,9 @@ namespace Shared
         /// <summary>Draws the GUI</summary>
         private static void OnGUI(UnityModManager.ModEntry modEntry)
         {
+            if (patchInfos == null)
+                throw new NullReferenceException(nameof(patchInfos));
+
             using var scope = new Scope(Main.ModPath, Main.logger, Main.harmony, Main.AllowGuidGeneration);
             Settings state = Settings.State;
 
@@ -157,7 +160,7 @@ namespace Shared
                 patchInfos.Update();
             });
 
-            string category = null;
+            string? category = null;
             bool folded = false;
             foreach (var info in patchInfos)
             {
@@ -304,7 +307,7 @@ namespace Shared
         }
 
         private static string? lastEnum;
-        private static void Checkbox<T>(ref T value, string label, Action<T> action = null) where T : Enum
+        private static void Checkbox<T>(ref T value, string label, Action<T>? action = null) where T : Enum
         {
             if (GUILayout.Button(label, GUILayout.ExpandWidth(false)))
             {
@@ -329,7 +332,7 @@ namespace Shared
             action?.Invoke(value);
         }
 
-        private static void Checkbox(ref bool value, string label, Action<bool> action = null)
+        private static void Checkbox(ref bool value, string label, Action<bool>? action = null)
         {
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(value ? "<color=green><b>✔</b></color>" : "<color=red><b>✖</b></color>", StyleBox, GUILayout.Width(20)))
@@ -423,6 +426,9 @@ namespace Shared
 
         private static void OnLoad(UnityModManager.ModEntry modEntry)
         {
+            if (patchInfos == null)
+                throw new NullReferenceException(nameof(patchInfos));
+
             modEntry.OnToggle = OnToggle;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
@@ -703,6 +709,9 @@ namespace Shared
 
         private static void OnBlueprintsLoadedLast()
         {
+            if (patchInfos == null)
+                throw new NullReferenceException(nameof(patchInfos));
+
             using var scope = new Scope(Main.ModPath, Main.logger, harmony, AllowGuidGeneration);
 
             LoadSafe(Kineticist.CreateExpandedElement);
@@ -989,7 +998,7 @@ namespace Shared
 
         #region Helper
 
-        private static List<(string, Action)> _patchLast = [];
+        private static List<(string, Action)>? _patchLast = [];
         internal static void RunLast(string message, Action action)
         {
             if (_patchLast == null)
@@ -1074,22 +1083,23 @@ namespace Shared
 
             try
             {
-                foreach (var patch in processor.patchMethods)
-                {
-                    var orignal = patch.info.GetOriginalMethod() ?? throw new Exception($"GetOriginalMethod returned null {patch.info}");
-
-                    // if unpatched, no conflict
-                    var info = Harmony.GetPatchInfo(orignal);
-                    if (info == null)
-                        continue;
-
-                    // if foreign transpilers, warn conflict
-                    list.AddRange(info.Transpilers.Where(a => a.owner != harmony.Id));
-
-                    // if foreign prefixes with return type and identical priority as own prefix, warn conflict
-                    var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
-                    list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
-                }
+                // TODO: find workaround for private harmony field
+                //foreach (var patch in processor.patchMethods)
+                //{
+                //    var orignal = patch.info.GetOriginalMethod() ?? throw new Exception($"GetOriginalMethod returned null {patch.info}");
+                //
+                //    // if unpatched, no conflict
+                //    var info = Harmony.GetPatchInfo(orignal);
+                //    if (info == null)
+                //        continue;
+                //
+                //    // if foreign transpilers, warn conflict
+                //    list.AddRange(info.Transpilers.Where(a => a.owner != harmony.Id));
+                //
+                //    // if foreign prefixes with return type and identical priority as own prefix, warn conflict
+                //    var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
+                //    list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
+                //}
             }
             catch (Exception e) { PrintException(e); }
 
@@ -1219,7 +1229,7 @@ namespace Shared
             }
         }
 
-        internal static MethodBase GetOriginalMethod(this HarmonyMethod attr)
+        internal static MethodBase? GetOriginalMethod(this HarmonyMethod attr)
         {
             try
             {
@@ -1283,7 +1293,7 @@ namespace Shared
             patchInfos?.Add(attr, info);
         }
 
-        internal static Exception NullFinalizer(Exception __exception)
+        internal static Exception? NullFinalizer(Exception __exception)
         {
 #if !DEBUG
             return null;
@@ -1303,6 +1313,9 @@ namespace Shared
 
         private static void ExportContent()
         {
+            if (patchInfos == null)
+                throw new NullReferenceException(nameof(patchInfos));
+
             try
             {
                 string path = Path.Combine(Main.ModPath, "readme.link");

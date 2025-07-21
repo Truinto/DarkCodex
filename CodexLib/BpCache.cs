@@ -81,7 +81,7 @@ namespace CodexLib
         /// </summary>
         /// <param name="path">File path to save to</param>
         /// <param name="types">Types of blueprints to filter for</param>
-        public static void ExportResources(string path = "Blueprints.bin", Type[] types = null)
+        public static void ExportResources(string path = "Blueprints.bin", Type[]? types = null)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace CodexLib
         /// Load blueprints from stream. Format must be as ExportResources().<br/>
         /// Tries to load embedded CodexLib.Resources.Blueprints.bin, if null.
         /// </summary>
-        public static void LoadResources(Stream reader = null, bool checkDupe = true)
+        public static void LoadResources(Stream? reader = null, bool checkDupe = true)
         {
             try
             {

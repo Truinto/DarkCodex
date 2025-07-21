@@ -270,30 +270,30 @@ namespace CodexLib
 
         public static List<Patch> GetConflictPatches(PatchClassProcessor processor)
         {
+            var list = new List<Patch>();
             try
             {
-                var harmony = Scope.Harmony;
-                var list = new List<Patch>();
-                foreach (var patch in processor.patchMethods)
-                {
-                    var orignal = patch.info.GetOriginalMethod() ?? throw new Exception($"GetOriginalMethod returned null {patch.info}");
-
-                    // if unpatched, no conflict
-                    var info = Harmony.GetPatchInfo(orignal);
-                    if (info == null)
-                        continue;
-
-                    // if foreign transpilers, warn conflict
-                    list.AddRange(info.Transpilers.Where(a => a.owner != harmony.Id));
-
-                    // if foreign prefixes with return type and identical priority as own prefix, warn conflict
-                    var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
-                    list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
-                }
-                return list;
+                // TODO: find workaround for private harmony field
+                //var harmony = Scope.Harmony;
+                //foreach (var patch in processor.patchMethods)
+                //{
+                //    var orignal = patch.info.GetOriginalMethod() ?? throw new Exception($"GetOriginalMethod returned null {patch.info}");
+                //
+                //    // if unpatched, no conflict
+                //    var info = Harmony.GetPatchInfo(orignal);
+                //    if (info == null)
+                //        continue;
+                //
+                //    // if foreign transpilers, warn conflict
+                //    list.AddRange(info.Transpilers.Where(a => a.owner != harmony.Id));
+                //
+                //    // if foreign prefixes with return type and identical priority as own prefix, warn conflict
+                //    var prio = info.Prefixes.Where(w => w.owner == harmony.Id).Select(s => s.priority);
+                //    list.AddRange(info.Prefixes.Where(w => w.owner != harmony.Id && w.PatchMethod.ReturnType != typeof(void) && prio.Contains(w.priority)));
+                //}
             }
             catch (Exception e) { PrintException(e); }
-            return null;
+            return list;
         }
 
         public static MethodBase GetOriginalMethod(this HarmonyMethod attr)

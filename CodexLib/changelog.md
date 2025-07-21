@@ -1,5 +1,8 @@
 ﻿# Changelog
 
+## [1.8.2]
+- downgraded Harmony reference to Harmony.Thin
+
 ## [1.8.1]
 - updated references (Harmony v2.3.6)
 
