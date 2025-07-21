@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.9.4</Version>
+		<Version>1.9.5</Version>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Authors>Truinto</Authors>
@@ -28,7 +28,7 @@
 
 	<!-- Project References -->
 	<ItemGroup>
-		<PackageReference Include="Lib.Harmony.Thin" Version="2.3.6" />
+		<PackageReference PrivateAssets="all" Include="Lib.Harmony" Version="2.0.4" />
 		<Reference Private="false" Include="Assembly-CSharp" HintPath="$(GameManaged)\Assembly-CSharp.dll" Publicize="true" />
 		<Reference Private="false" Include="Owlcat.Runtime.UI" HintPath="$(GameManaged)\Owlcat.Runtime.UI.dll" Publicize="true" />
 

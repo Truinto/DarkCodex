@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.9.5]
+- downgraded Harmony reference to 2.0.4 to fix issues with InterpolatedStringHandler
+
 ## [1.9.4]
 - fixed mod not loading at all
 
