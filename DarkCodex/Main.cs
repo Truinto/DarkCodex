@@ -426,9 +426,6 @@ namespace Shared
 
         private static void OnLoad(UnityModManager.ModEntry modEntry)
         {
-            if (patchInfos == null)
-                throw new NullReferenceException(nameof(patchInfos));
-
             modEntry.OnToggle = OnToggle;
             modEntry.OnGUI = OnGUI;
             modEntry.OnSaveGUI = OnSaveGUI;
@@ -438,6 +435,8 @@ namespace Shared
             LocalizedStringCached.Resolver = f => Helper.CreateString(f.Default);
             Helper.OnLocaleChange += () =>
             {
+                if (patchInfos == null)
+                    throw new NullReferenceException(nameof(patchInfos));
                 Resource._localizedStrings = null;
                 foreach (var patch in patchInfos)
                 {

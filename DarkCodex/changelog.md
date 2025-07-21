@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.9.4]
+- fixed mod not loading at all
+
 ## [1.9.3]
 - downgraded Harmony reference to Harmony.Thin
 

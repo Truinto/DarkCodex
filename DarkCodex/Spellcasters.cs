@@ -277,6 +277,8 @@ namespace DarkCodex
                 | SpellDescriptor.ChannelPositiveHarm
                 | SpellDescriptor.ChannelPositiveHeal)).ToAny();
 
+            Main.Print($"DEBUG: ab={BpCache.Get<BlueprintAbility>().Count} channels={channels.Length}");
+
             var ray = Helper.CreateBlueprintAbility(
                 "ChannelFormRay",
                 "Channel Ray",
