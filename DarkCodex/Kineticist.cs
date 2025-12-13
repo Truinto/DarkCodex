@@ -1101,7 +1101,6 @@ namespace DarkCodex
                 Helper.CreateLevelEntry(20, Tree.SelectionWildTalent)
                 );
             scion.SetRemoveFeatures(
-                Helper.CreateLevelEntry(1, "58d6f8e9eea63f6418b107ce64f315ea"), //InfusionSelection
                 Helper.CreateLevelEntry(7, "4204bc10b3d5db440b1f52f0c375848b"),  //SecondatyElementalFocusSelection
                 Helper.CreateLevelEntry(15, "e2c1718828fc843479f18ab4d75ded86")  //ThirdElementalFocusSelection
                 );
