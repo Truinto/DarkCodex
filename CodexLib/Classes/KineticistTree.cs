@@ -725,6 +725,156 @@ namespace CodexLib
                 ModifiesPhysical = false,
             };
 
+            Light = new()
+            {
+                Selection = null,
+                Progession = Helper.ToRef<BlueprintProgressionReference>("C83F4371-B2F2-4A88-9D05-85781723A754"),
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("EB5AD780-4AD4-43A4-BD77-5F8B83C53F30"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("9A8E6020-DF82-43C5-83B5-45A02E26470C"),
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("00DB5B41-56CE-4D66-802E-94D3B205C65D"),
+                    Activatable = Helper.ToRef<BlueprintActivatableAbilityReference>("0B735BB3-8D2C-4B1C-BD46-8BFC17F3CD3A"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("F1ED7C1C-B0BA-4D9E-B4B0-1C49FC9DD7E5"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("32BEC956-1014-4BDB-9BEE-F201438E1A5E"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("32BEC956-1014-4BDB-9BEE-F201438E1A5E")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Piercing | PhysicalDamageForm.Slashing)
+            };
+
+            Composite_Aurora = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("96DB4404-63D2-4BEF-9B5E-D10F36A90DEC"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("9FDCE3C8-087B-4440-8F96-6B7432DED9B7"),
+                Parent1 = Light,
+                Parent2 = Cold,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("7F6ACE56-5CF6-4627-86F1-71443EAD82D4"),
+                    Activatable = Helper.ToRef<>("C2CC58BD-B4D7-4939-8C6A-A2028F3EF45C"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("D28D200F-E9FF-41E6-83D4-BDCDBF3D755E"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("A8186198-B162-4486-AF31-F879833023D9"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("08A7F135-2535-489C-9AFD-8E98BFBD0627")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Cold)
+            };
+
+            Composite_Bioluminescent = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("76D7AB9D-2DF3-475E-90E6-129632CF4825"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("1C68852A-41D6-4AA6-A00F-9BC74EB692BF"),
+                Parent1 = Light,
+                Parent2 = Wood,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("93D71F80-CF5F-49AB-BC2C-3BB9FE5D8DA4"),
+                    Activatable = Helper.ToRef<>("1AB3E204-9098-40F9-9B30-FCD31F39639A"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("7BBC0648-190A-4662-B3D3-6477C5EF2E13"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("02A07ADB-7F13-466E-91AF-D180F27B82E1"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("CABB0B23-6475-41B8-B261-75332A913401")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Slashing)
+            };
+
+            Composite_Crystal = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("D14E7CE4-FE3B-41CF-99CA-052C438AED13"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("4D0EF0D8-2758-45C8-B2BE-C65837EF0FB1"),
+                Parent1 = Light,
+                Parent2 = Earth,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("E05D9FB3-A415-4E25-98FE-C12EE5EFD886"),
+                    Activatable = Helper.ToRef<>("CCA6C90A-4CA2-439E-A2EF-08380FA01F39"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("D329D4F8-92D1-4CDE-BEF8-784F053D1F36"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("D1632D0A-B7C1-4DE2-B26A-092AD9DF9B8C"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("A3939791-2B28-43A1-ADF5-7FBE4451BFD6")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning | PhysicalDamageForm.Slashing)
+            };
+
+            Composite_Glorious = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("C65AC12D-4A28-4693-8532-55014C382AFF"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("588518E8-F4B8-43E2-AEB8-4C876597099B"),
+                Parent1 = Light,
+                Parent2 = null,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("5F6F1102-7C86-4C30-8465-C8F2EA7E6BD7"),
+                    Activatable = Helper.ToRef<>("7E41DBD2-4D02-4A2C-8EF4-67C87CDB08B7"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("1F0BB7A9-E31E-4D43-8738-931360D559D2"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("ED7DCCA6-DF47-4DEC-914D-7FDDD7EC6B1A"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("201EBD66-E855-4077-993D-357D86FB5798")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
+            };
+
+            Composite_Lightning = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("1F1AE31B-5448-442D-854B-2789AA418AE8"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("1889179A-E761-4391-909B-A274C2E6F550"),
+                Parent1 = Light,
+                Parent2 = Electric,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("44EEBAE5-6DEA-4CBC-A4A7-D30B6B36FCE3"),
+                    Activatable = Helper.ToRef<>("50522D99-BFCD-49FA-870D-050864FFA2A9"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("6740F0FC-B55A-4C85-B13B-D17D7D6D1B11"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("D13542E8-96CD-44B2-BDA5-FCA590C5914D"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("4651277B-FFB6-4770-8579-CE2D21E0A89A")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageEnergyType.Electricity)
+            };
+
+            Composite_Rainbow = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("3D05A13A-236C-42FE-A521-C82C7A6C3F9F"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("11AF3D43-56ED-4B4F-86D0-CEF03584E0A3"),
+                Parent1 = Light,
+                Parent2 = Water,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("E0AFBCE0-3B4F-47E0-80FB-EFE231E055A4"),
+                    Activatable = Helper.ToRef<>("5DBF88FC-4B03-4287-BE7B-8E8FF5B555B2"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("1BC01BD6-E12B-4B32-BAA5-F275AE8DFCD7"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("02863344-2642-41C8-9477-07A38D053F7A"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("14DB7E87-1B73-407C-81B9-922558C958F8")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning)
+            };
+
+            Composite_Solar = new()
+            {
+                Selection = null,
+                Progession = null,
+                BlastFeature = Helper.ToRef<BlueprintFeatureReference>("1C3CACAF-AC9E-4AC2-A302-88712494E379"),
+                BaseAbility = Helper.ToRef<BlueprintAbilityReference>("05A64356-7C36-4285-9C03-BD46D5B8B0CF"),
+                Parent1 = Light,
+                Parent2 = Fire,
+                Blade = new()
+                {
+                    Feature = Helper.ToRef<BlueprintFeatureReference>("E032F115-CADA-45BD-926A-D5E5FE4842AD"),
+                    Activatable = Helper.ToRef<>("47601AAF-0E44-4419-B982-E8001AD211F8"),
+                    Weapon = Helper.ToRef<BlueprintItemWeaponReference>("D030FC1E-9EA7-4767-9F56-6203ED93FF8B"),
+                    Damage = Helper.ToRef<BlueprintAbilityReference>("77160B0E-9D75-4A47-9BBF-A32CF278A6FB"),
+                    Burn = Helper.ToRef<BlueprintAbilityReference>("{44284728-D975-41C6-887D-12B18CDF2ECA}")
+                },
+                DamageType = GetDamageType(PhysicalDamageForm.Bludgeoning, DamageTypeEnergy.Fire)
+            };
+
             #endregion
 
             #region Focus
@@ -812,6 +962,19 @@ namespace CodexLib
                 Element1 = Wood,
                 Element2 = Positive,
                 Composite = Composite_Verdant
+            };
+
+            FocusLight = new()
+            {
+                First = Helper.ToRef<BlueprintProgressionReference>("C9E2A78E05A9401B9DEEF8A0BB02238E"),
+                Second = Helper.ToRef<BlueprintProgressionReference>("B36683B6-AB79-4029-9E04-E73E89070579"),
+                Third = Helper.ToRef<BlueprintProgressionReference>("0EF27AAC-B72F-484F-9C83-51FE3B448E30"),
+                Knight = Helper.ToRef<BlueprintProgressionReference>("BE3EDD1C-8657-4F00-8A1A-3FE5E808F676"),
+                Defense = Helper.ToRef<BlueprintFeatureReference>("E11D1E1A-936C-4C66-8DB2-2589A40C43E3"),
+                Element1 = Light,
+                Element2 = null,
+                Composite = Composite_Glorious
+                
             };
 
             #endregion
@@ -1434,6 +1597,45 @@ namespace CodexLib
                 Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("d9e3b600a10e4edc97fb3a1702831b4a"),
             };
 
+            Illuminating = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("BC65E452-DBF8-4F48-A5E9-D67809337828"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("68419CB2-1D88-4742-9D74-3045951492F7"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("AA5EEE7A-39C7-4F71-BEDD-7D9344696CA8"),
+            };
+
+            Photokinetic = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("976B6013-C969-4B9E-BB60-23FCC681CDAA"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("AA20DB3C-26D2-4C7A-BA94-2636F74EBAE8"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("6D6A8ECE-EA03-4577-8DAA-FBD605B4DAAC"),
+            };
+            Beacon = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("4DA9EE1B-1663-4AA3-8B62-9FF036B3263F"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("A5F3D78F-6C33-475D-9EC0-81480E487D3A"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("9A3B5E7A-3F48-48F3-A683-B6AA01728DC4"),
+            };
+            Obfuscating = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("FE229AA2-DC78-4F54-BDB2-CAC4B06039C8"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("819BD024-DF5A-4D1F-9A56-A252573A0834"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("3C4404AA-737D-4B8A-958C-FD5EF7C51CF4"),
+            };
+            Overload = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("1A819223-0032-478A-9FAF-C8BD48C6E74B"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("8C314966-B2BC-412B-9177-D436A1F85DE7"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("F5D51C6A-73A2-4A8E-9667-BA971F6BFE47"),
+            };
+            Colorburst = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("78757676-63B5-4C18-8564-A853BCB19A2E"),
+                Buff = Helper.ToRef<BlueprintBuffReference>("ED7F2EDD-97AA-4546-8AF7-2BC3AA103FB3"),
+                Activator = Helper.ToRef<BlueprintActivatableAbilityReference>("27CDEA28-E970-41E9-B601-239DD415297F"),
+            };
+
+
             #endregion
 
             #region Utility
@@ -1610,6 +1812,87 @@ namespace CodexLib
                 Feature = Helper.ToRef<BlueprintFeatureReference>("c9629ef9eebb88b479b2fbc5e836656a"),
             };
 
+            //PhoenixExpandedElements
+            StrobeLights = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("6B68A91D-A3EA-48A9-8C7E-7D796AB8C6CC"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("7695812A-A391-4A02-A084-9C27A117F25C"),
+            };
+
+            CrystalSkin = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("789BEFD4-B293-4BBA-B49B-DAEDDBD98773"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("03A2388E-3D71-466E-BABC-D69B591DED88"),
+            };
+
+            EyesOfLight = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("8D69EA03-CFAE-4AD7-B71A-001C7D8C2AD2"),
+            };
+
+            ExplosiveIllusion = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("71F3F30D-CE3F-4565-9AAC-D34E9F910EDF"),
+            };
+
+            HypnoticPattern = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("61D406D2-8DFA-4988-9764-D2394F6510AF"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("F76BC7B5-0241-44DD-AF35-E4D471B72B3C"),
+            };
+
+            OpticalCamoflage = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("E16125C3-D85A-406C-850F-4FE52BFF42B4"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("02577D9F-567B-4FC5-BC62-6ACC5807D3C7"),
+            };
+
+            Shadowbend = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("BD09800F-75FD-4D4F-876D-2D1B1EF3ECEA"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("49FF0B57-5589-448E-ADC0-4A4325065DE0"),
+            };
+
+            HardLightIllusions = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("ABD74F64-1F2E-4AA4-9CA4-5C238100032C"),
+            };
+
+            LightSpeedTravel = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("715106FF-B662-4756-AF5D-C34D763F7FB1"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("54755B5C-3CC3-480F-B4CA-F297BCD52237"),
+            };
+
+            ExplosiveIllusionGreater = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("BB29F4A3-D5FE-4420-A875-7D09F1395AEE"),
+            };
+
+            ShadowbendImproved = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("D65E0B33-5553-42F5-9101-B18DB86B692A"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("64810762-5FF9-4524-8E4F-4C2B38BDDF64"),
+            };
+
+            OpticalCamoflageGreater = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("C0BD38D7-0D86-42F1-9EDE-05BD1EBABFF2"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("B45DF470-E196-408E-AE84-FA0E3912D973"),
+            };
+
+            GloriousBastion = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("4259A0AB-BC6A-4545-9109-B76D7544C0DF"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("9DE78DFB-714A-4B52-B0B6-E5A5FC256D48"),
+            };
+
+            ShadowbendGreater = new()
+            {
+                Feature = Helper.ToRef<BlueprintFeatureReference>("A7BA1E9B-7C8C-40E8-A744-FC853C03EC1B"),
+                Activator = Helper.ToRef<BlueprintBuffReference>("B50C4B86-9B21-4B0D-B262-42AC02438B35"),
+            };
+
             #endregion
 
             BaseBasic = GetAll(true, false).Select(s => s.BaseAbility).ToArray();
@@ -1636,6 +1919,7 @@ namespace CodexLib
         public IEnumerable<Element> GetAll(bool basic = false, bool composite = false, bool boost = false, bool onlyPhysical = false, bool onlyEnergy = false, bool archetype = false, bool modded = true)
         {
             bool mod1 = modded && EnabledElementsExpanded;
+            bool mod2 = modded && EnabledPhoenixExpandedElements;
 
             if (basic)
             {
@@ -1649,6 +1933,10 @@ namespace CodexLib
                         yield return Telekinetic;
                         yield return Gravity;
                         yield return Wood;
+                    }
+                    if (mod2)
+                    {
+                        yield return Light;
                     }
                 }
                 if (!onlyPhysical)
@@ -1688,6 +1976,19 @@ namespace CodexLib
                         yield return Composite_Summer;
                         yield return Composite_Autumn;
                         yield return Composite_Winter;
+                    }
+                    if (mod2)
+                    {
+                        yield return Composite_Aurora;                       
+                        yield return Composite_Crystal;
+                        yield return Composite_Glorious;
+                        yield return Composite_Lightning;
+                        yield return Composite_Rainbow;
+                        yield return Composite_Solar;
+                    }
+                    if (mod1 && mod2)
+                    {
+                        yield return Composite_Bioluminescent;
                     }
                 }
                 if (!onlyPhysical)
@@ -1732,6 +2033,10 @@ namespace CodexLib
                 yield return FocusAether;
                 yield return FocusVoid;
                 yield return FocusWood;
+            }
+            if (modded && EnabledPhoenixExpandedElements)
+            {
+                yield return FocusLight;
             }
         }
 
@@ -1919,6 +2224,40 @@ namespace CodexLib
 
                 }
             }
+
+            if (modded && EnabledPhoenixExpandedElements)
+            {
+                if (substance)
+                {
+                    yield return Illuminating;
+                    yield return Photokinetic;
+                    yield return Beacon;
+                    yield return Obfuscating;
+                    yield return Overload;
+                    yield return Colorburst;
+                }
+                if (utility)
+                {
+                    yield return StrobeLights;
+                    yield return CrystalSkin;
+                    yield return EyesOfLight;
+                    yield return ExplosiveIllusion;
+                    yield return HypnoticPattern;
+                    yield return OpticalCamoflage;                   
+                    yield return HardLightIllusions;
+                    yield return LightSpeedTravel;
+                    yield return ExplosiveIllusionGreater;                  
+                    yield return OpticalCamoflageGreater;
+                    yield return GloriousBastion;
+
+                    if (EnabledElementsExpanded)
+                    {
+                        yield return Shadowbend;
+                        yield return ShadowbendImproved;
+                        yield return ShadowbendGreater;
+                    }
+                }
+            }
         }
 
         /// <summary>Only returns non null values.</summary>
@@ -1947,6 +2286,7 @@ namespace CodexLib
 
         public bool EnabledDarkCodex;
         public bool EnabledElementsExpanded;
+        public bool EnabledPhoenixExpandedElements;
 
         public BlueprintCharacterClassReference @Class;
         public BlueprintArchetypeReference KineticKnight;
@@ -2020,6 +2360,17 @@ namespace CodexLib
         public Element Composite_Summer;
         public Element Composite_Winter;
         public Boost Boost_PositiveAdmixture;
+
+        public Focus FocusLight;
+        public Element Light;
+        public Element Composite_Aurora;
+        public Element Composite_Bioluminescent;
+        public Element Composite_Crystal;
+        public Element Composite_Glorious;
+        public Element Composite_Lightning;
+        public Element Composite_Rainbow;
+        public Element Composite_Solar;
+
 
         public Infusion ArmorPiercing;
         public Infusion BladeWhirlwind;
@@ -2128,6 +2479,30 @@ namespace CodexLib
         public Infusion Spore;
         public Infusion Toxic;
         public Infusion ToxicGreater;
+
+        //Modded: Phoenix Expanded Elements
+
+        public Infusion Illuminating;
+        public Infusion Photokinetic;
+        public Infusion Beacon;
+        public Infusion Obfuscating;
+        public Infusion Overload;
+        public Infusion Colorburst;
+
+        public Infusion StrobeLights;
+        public Infusion CrystalSkin;
+        public Infusion EyesOfLight;
+        public Infusion ExplosiveIllusion;
+        public Infusion HypnoticPattern;
+        public Infusion OpticalCamoflage;
+        public Infusion Shadowbend;
+        public Infusion HardLightIllusions;
+        public Infusion LightSpeedTravel;
+        public Infusion ExplosiveIllusionGreater;
+        public Infusion ShadowbendImproved;
+        public Infusion OpticalCamoflageGreater;
+        public Infusion GloriousBastion;
+        public Infusion ShadowbendGreater;
 
         public class Element : IUIDataProvider
         {
