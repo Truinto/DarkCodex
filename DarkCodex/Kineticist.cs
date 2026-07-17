@@ -736,7 +736,7 @@ namespace DarkCodex
                 {
                     if (blast.CanTargetPoint
                         || blast.GetArea()?.Get()?.m_TargetType == BlueprintAbilityAreaEffect.TargetType.Any
-                        || blast.GetComponent<AbilityTargetsAround>() && blast.CanTargetFriends
+                        || blast.GetComponent<AbilityTargetsAround>()?.m_TargetType == TargetType.Any
                         || blast.GetComponent<AbilityDeliverChain>()?.m_TargetType == TargetType.Any)
                     {
                         list.Add(blast.ToReference<BlueprintAbilityReference>());
