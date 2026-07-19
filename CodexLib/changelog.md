@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 ## [1.8.3]
 - downgraded Harmony reference to 2.0.4 to fix issues with InterpolatedStringHandler

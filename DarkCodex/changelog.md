@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.6]
+- fixed BlueprintParametrizedFeature to return spells that do not have CraftInfoComponent, fix #357
+- updated limitless logic to make use of the new free-blueprints list (which will fix a couple of limitless activatables)
+- supposedly fixed selective Detonation blast
+
 ## [1.9.5]
 - downgraded Harmony reference to 2.0.4 to fix issues with InterpolatedStringHandler
 
@@ -341,8 +346,8 @@
 ## [1.3.15]
 - added references to KineticistExpandedElements; will fix interactions with substance infusions
 - fixed Venom Infusion's poison from "2 saves" to "2 consecutive saves"; simplified damage calculation which might fix bugs;
-	it deals dex damage, if target is immune to con damage; target is sickended while poisoned; reduced burn by 1;
-	fixed DC being dex based, instead of main stat
+    it deals dex damage, if target is immune to con damage; target is sickended while poisoned; reduced burn by 1;
+    fixed DC being dex based, instead of main stat
 - added more checks to Spell Perfection
 - fixed Dirty Fighting granting all maneuver feats instead of just the action; this might need a respec, if you already took that feat
 - added Razortusk to Orc Atavism

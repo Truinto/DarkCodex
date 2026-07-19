@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -82,7 +82,7 @@ namespace DarkCodex
             }
 
             // mod Homebrew Archetypes: Dervish of the Dawn
-            if ( Helper.Get("a077d4fe75dd0b846a1507f64bff71f8") is BlueprintFeature dervish_prereq)
+            if (Helper.Get("a077d4fe75dd0b846a1507f64bff71f8") is BlueprintFeature dervish_prereq)
             {
                 limitless.AddComponents(Helper.CreatePrerequisiteFeature(dervish_prereq, true));
             }
@@ -151,7 +151,8 @@ namespace DarkCodex
                 {
                     ability.ComponentsArray
                         .Where(comp => comp.GetType().ToString().Contains("AbilityTargetHasNoFactUnlessAccursedHex"))
-                        .ForEach(comp => {
+                        .ForEach(comp =>
+                        {
                             var compnew = new AbilityTargetHasFactExcept();
                             var checkedFacts = (BlueprintUnitFactReference[])comp.GetType().GetField("m_CheckedFacts").GetValue(comp);
                             compnew.m_CheckedFacts = checkedFacts;
@@ -335,7 +336,7 @@ namespace DarkCodex
 
             Main.RunLast("Limitless Domain", () =>
             {
-                var rx = new Regex("[Dd]omain", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+                var rx = new Regex("[Dd]omain", RegexOptions.CultureInvariant);
 
                 foreach (var ability in BpCache.Get<BlueprintAbility>())
                 {
@@ -1051,9 +1052,20 @@ namespace DarkCodex
 
                 Main.PrintDebug($"-free activatable {ability.name}");
 
-                if (logic.m_FreeBlueprint.NotEmpty())
-                    Main.Print($"ERROR: {ability.name} has already a FreeBlueprint");
-                logic.m_FreeBlueprint = limitless;
+                if (logic.m_UseListForFreeBlueprints)
+                {
+                    Helper.AppendAndReplace(ref logic.m_FreeBlueprints, limitless);
+                }
+                else if (logic.m_FreeBlueprint == null || logic.m_FreeBlueprint.deserializedGuid == BlueprintGuid.Empty)
+                {
+                    logic.m_FreeBlueprint = limitless;
+                }
+                else
+                {
+                    logic.m_UseListForFreeBlueprints = true;
+                    logic.m_FreeBlueprints = [logic.m_FreeBlueprint, limitless];
+                    logic.m_FreeBlueprints = null;
+                }
             }
         }
 

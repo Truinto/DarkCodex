@@ -1,4 +1,4 @@
-﻿using CodexLib;
+using CodexLib;
 using Kingmaker.EntitySystem.Stats;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -7,11 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+#pragma warning disable IDE1006 // ignore lower case fields
+
 namespace DarkCodex
 {
     public class Settings : BaseSettings<Settings>
     {
-        public Settings() => Version = 6;
+        public override string DefaultPath => Path.Combine(Main.ModPath, "settings.json");
+        [JsonInclude] public override int Version { get; set; } = 6;
 
         [JsonProperty]
         public bool showBootupWarning = true;
@@ -49,11 +52,17 @@ namespace DarkCodex
         [JsonProperty]
         public bool debug_4 = false;
 
-        public static Settings State = TryLoad(Main.ModPath, "settings.json");
+        [JsonProperty] public bool NewFeatureDefaultOn { get; set; }
+        /// <summary>Collection of features explicitly turned off.</summary>
+        [JsonProperty] public HashSet<string> Blacklist { get; protected set; } = [];
+        /// <summary>Collection of features explicitly turned on.</summary>
+        [JsonProperty] public HashSet<string> Whitelist { get; protected set; } = [];
+
+        public static Settings State = TryLoad();
 
         protected override bool OnUpdate()
         {
-            if (Version < 4 && Whitelist != null && Blacklist != null)
+            if (Version < 4)
             {
                 showBootupWarning = true;
                 var hash = new HashSet<string>();

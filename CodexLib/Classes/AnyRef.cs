@@ -1,4 +1,4 @@
-﻿using Kingmaker.AI.Blueprints;
+using Kingmaker.AI.Blueprints;
 using Kingmaker.AI.Blueprints.Considerations;
 using Kingmaker.AreaLogic.Cutscenes;
 using Kingmaker.AreaLogic.Etudes;
@@ -45,7 +45,9 @@ using Kingmaker.Visual.LightSelector;
 using Kingmaker.Visual.Sound;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,9 +59,9 @@ namespace CodexLib
     public class AnyRef : BlueprintReferenceBase
     {
         /// <summary>List of delayed actions to execute after blueprint is generated.</summary>
-        public List<Action<BlueprintScriptableObject>> Actions;
+        public List<Action<BlueprintScriptableObject>>? Actions;
 
-        private BlueprintReferenceBase cache;
+        private BlueprintReferenceBase? _Cache;
 
         /// <inheritdoc cref="AnyRef"/>
         public AnyRef()
@@ -75,7 +77,15 @@ namespace CodexLib
         /// <summary>
         /// Property to access <see cref="Get()"/> and <see cref="Set(SimpleBlueprint)"/>
         /// </summary>
-        public BlueprintScriptableObject Value { get => this; set => Set(value); }
+        public BlueprintScriptableObject? Value
+        {
+            get => this;
+            set
+            {
+                if (value != null)
+                    Set(value);
+            }
+        }
 
         /// <summary>
         /// Add a delayed action. Will execute immedately if blueprint is already loaded. Otherwise will wait.
@@ -132,7 +142,7 @@ namespace CodexLib
             else
                 Helper.PrintError($"AnyRef {this.deserializedGuid} is not {typeof(T)}, it is {bp.GetType()}");
 
-            return default;
+            return default!;
         }
 
         /// <summary>
@@ -140,8 +150,8 @@ namespace CodexLib
         /// </summary>
         public T ToRef<T>() where T : BlueprintReferenceBase, new()
         {
-            if (cache is not T t)
-                cache = t = new T() { deserializedGuid = this.deserializedGuid };
+            if (_Cache is not T t)
+                _Cache = t = new T() { deserializedGuid = this.deserializedGuid };
 
             if (t.deserializedGuid == BlueprintGuid.Empty)
                 Helper.PrintError("AnyRef.ToRef was used without any GUID");
@@ -171,13 +181,15 @@ namespace CodexLib
         public BlueprintFeature AsFeature => Get<BlueprintFeature>();
 
         /// <inheritdoc cref="Get{T}()"/>
-        public static T Get<T>(AnyRef bp) where T : SimpleBlueprint
+        [return: NotNullIfNotNull(nameof(bp))]
+        public static T? Get<T>(AnyRef bp) where T : SimpleBlueprint
         {
             return bp?.Get<T>();
         }
 
         /// <inheritdoc cref="ToRef{T}()"/>
-        public static T ToRef<T>(AnyRef bp) where T : BlueprintReferenceBase, new()
+        [return: NotNullIfNotNull(nameof(bp))]
+        public static T? ToRef<T>(AnyRef bp) where T : BlueprintReferenceBase, new()
         {
             return bp?.ToRef<T>();
         }
@@ -185,7 +197,8 @@ namespace CodexLib
         /// <summary>
         /// Converts to AnyRef. <paramref name="obj"/> can be any blueprint, blueprint reference type, or guid string.
         /// </summary>
-        public static AnyRef ToAny(object obj)
+        [return: NotNullIfNotNull(nameof(obj))]
+        public static AnyRef? ToAny(object obj)
         {
             if (obj is AnyRef any)
                 return any;
@@ -195,8 +208,10 @@ namespace CodexLib
                 return new AnyRef() { deserializedGuid = bp.deserializedGuid, Cached = bp.Cached };
             if (obj is SimpleBlueprint sb)
                 return new AnyRef() { deserializedGuid = sb.AssetGuid, Cached = sb };
+            if (obj is null)
+                return null;
             Helper.PrintError($"AnyRef could not resolve type '{obj?.GetType()}'");
-            return null;
+            return new();
         }
 
         /// <inheritdoc/>
@@ -221,8 +236,10 @@ namespace CodexLib
 
 #pragma warning disable CS1591 // Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 
-        public static implicit operator AnyRef(string guid) => guid == null ? null : new() { deserializedGuid = BlueprintGuid.Parse(guid) };
-        public static implicit operator AnyRef(SimpleBlueprint bp) => bp == null ? null : new() { deserializedGuid = bp.AssetGuid };
+        [return: NotNullIfNotNull(nameof(guid))]
+        public static implicit operator AnyRef?(string? guid) => guid == null ? null : new() { deserializedGuid = BlueprintGuid.Parse(guid) };
+        [return: NotNullIfNotNull(nameof(bp))]
+        public static implicit operator AnyRef?(SimpleBlueprint? bp) => bp == null ? null : new() { deserializedGuid = bp.AssetGuid };
 
         public static implicit operator AnyRef(AnyBlueprintReference bp) => ToAny(bp);
         public static implicit operator AnyBlueprintReference(AnyRef bp) => ToRef<AnyBlueprintReference>(bp);

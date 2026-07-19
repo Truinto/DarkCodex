@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using JetBrains.Annotations;
 using Kingmaker;
 using Kingmaker.Blueprints;
@@ -201,7 +201,7 @@ namespace CodexLib
         public const BindingFlags BindingInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         public const BindingFlags BindingStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
-        public static List<MethodInfo> Patch(Type patch)
+        public static List<MethodInfo>? Patch(Type patch)
         {
             try
             {
@@ -553,7 +553,7 @@ namespace CodexLib
                     yield return result;
         }
 
-        private static readonly List<object> _list = [];
+        private static readonly List<object> _List = [];
 
         /// <summary>
         /// Gets a static list object. Do not save reference.
@@ -561,12 +561,12 @@ namespace CodexLib
         /// </summary>
         public static List<object> GetList()
         {
-            if (_list.Count != 0)
+            if (_List.Count != 0)
             {
                 PrintDebug("Warning: List wasn't flushed!");
-                _list.Clear();
+                _List.Clear();
             }
-            return _list;
+            return _List;
         }
 
         /// <summary>
@@ -574,9 +574,9 @@ namespace CodexLib
         /// </summary>
         public static T[] Flush<T>() where T : class
         {
-            var result = new T[_list.Count];
-            _list.CopyTo(result);
-            _list.Clear();
+            var result = new T[_List.Count];
+            _List.CopyTo(result);
+            _List.Clear();
             return result;
         }
 
@@ -984,17 +984,20 @@ namespace CodexLib
             return new LocalizedString() { Key = key };
         }
 
+        /// <summary>
+        /// Returns true, if LocalizedString is null, its key is empty or invalid, or the resolved localized string is empty.
+        /// </summary>
         public static bool IsEmptyKey(this LocalizedString locString)
         {
             if (locString == null)
                 return true;
 
             string key = locString.GetActualKey();
-            if (key == null || key == "")
+            if (key is null or "")
                 return true;
 
             string text = LocalizationManager.CurrentPack.GetText(key, false);
-            if (text == null || text == "")
+            if (text is null or "")
                 return true;
 
             return false;
@@ -1273,14 +1276,13 @@ namespace CodexLib
         public static void SetComponents(this AnyRef any, params BlueprintComponent[] components)
             => any.Get<BlueprintScriptableObject>()?.SetComponents(components);
 
-        public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig original, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
+        public static T ReplaceComponent<T, TOrig, TRep>(this T obj, TOrig? original, TRep replacement) where T : BlueprintScriptableObject where TOrig : BlueprintComponent where TRep : BlueprintComponent
         {
             for (int i = 0; i < obj.ComponentsArray.Length; i++)
             {
                 if ((original == null && obj.Components[i] is TOrig) || ReferenceEquals(original, obj.Components[i]))
                 {
-                    if (original != null)
-                        original.OwnerBlueprint = null;
+                    original?.OwnerBlueprint = null;
                     obj.Components[i] = replacement;
                     replacement.name = $"${replacement.GetType().Name}${obj.AssetGuid}${i}";
                     if (replacement.OwnerBlueprint == null)
@@ -4918,7 +4920,7 @@ namespace CodexLib
         /// <summary>
         /// Set a specific BlueprintReference to a specific Blueprint. The main purpose is to ensure guids match.
         /// </summary>
-        public static void SetReference(this BlueprintReferenceBase reference, SimpleBlueprint bp)
+        public static void SetReference(this BlueprintReferenceBase? reference, SimpleBlueprint? bp)
         {
             if (reference is null || bp is null)
             {
@@ -4991,9 +4993,11 @@ namespace CodexLib
             }
         }
 
+        /// <inheritdoc cref="AnyRef.ToAny(object)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AnyRef ToAny(this object obj) => AnyRef.ToAny(obj);
 
+        /// <inheritdoc cref="ToAny(IEnumerable{object})"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AnyRef[] ToAny(params object[] source) => ToAny((IEnumerable<object>)source);
 
@@ -5004,12 +5008,10 @@ namespace CodexLib
         public static AnyRef[] ToAny(this IEnumerable<object> source)
         {
             if (source is null)
-                return new AnyRef[0];
+                return [];
 
             var list = GetList();
-
             recursiveToAny(source);
-
             return Flush<AnyRef>();
 
             void recursiveToAny(IEnumerable<object> range)
@@ -5025,10 +5027,17 @@ namespace CodexLib
             }
         }
 
+        /// <summary>
+        /// Converts a collection of AnyRef into a collection of blueprints. Filters any null values.
+        /// </summary>
         public static IEnumerable<T> Get<T>(this IEnumerable<AnyRef> bpRef) where T : SimpleBlueprint
         {
             foreach (var reference in bpRef)
-                yield return reference.Get<T>();
+            {
+                var bp = reference.Get<T>();
+                if (bp != null)
+                    yield return bp;
+            }
         }
 
         // note: methods below should be phased out in favor of AnyRef

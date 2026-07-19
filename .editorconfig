@@ -1,12 +1,26 @@
 root = true
 
 [*]
-end_of_line = lf
+charset = utf-8
+indent_style = space
+indent_size = 4
+tab_width = 4
 
 [*.bat]
 end_of_line = crlf
 
+[*.{slnx,csproj}]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
 [*.cs]
+charset = utf-8
+indent_style = space
+indent_size = 4
+tab_width = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+end_of_line = lf
 
 #### Benutzerdefiniert ####
 # none: komplett ignoriert
@@ -30,11 +44,9 @@ dotnet_diagnostic.IDE0057.severity = none
 # IDE0060: Nicht verwendete Parameter entfernen
 dotnet_diagnostic.IDE0060.severity = suggestion
 
-# IDE0062: Lokale Funktion als "static" festlegen
-dotnet_diagnostic.IDE0062.severity = none
-
 # IDE0305: Initialisierung der Sammlung vereinfachen
 dotnet_diagnostic.IDE0305.severity = none
+dotnet_diagnostic.IDE0306.severity = none
 
 # CA1041: ObsoleteAttribute-Meldung bereitstellen
 dotnet_diagnostic.CA1041.severity = none
@@ -42,13 +54,16 @@ dotnet_diagnostic.CA1041.severity = none
 # CA1069: Enumerationswerte dürfen nicht dupliziert werden
 dotnet_diagnostic.CA1069.severity = none
 
+# CA1822: Member ohne Instanzdaten als "static" festlegen
+dotnet_diagnostic.CA1822.severity = none
+
 # CA1866: Char-Überladung verwenden
 dotnet_diagnostic.CA1866.severity = none
 
 # CS0164: Auf diese Bezeichnung wurde nicht verwiesen.
 dotnet_diagnostic.CS0164.severity = none
 
-# CS1591: Fehledes XML-Kommentar für öffentlich sichtbaren Typ oder Element
+# CS1591: Fehlendes XML-Kommentar für öffentlich sichtbaren Typ oder Element
 dotnet_diagnostic.CS1591.severity = suggestion
 
 # CA1806: Methodenergebnisse nicht ignorieren
@@ -56,18 +71,6 @@ dotnet_diagnostic.CA1806.severity = none
 
 # CA2211: Nicht konstante Felder dürfen nicht sichtbar sein
 dotnet_diagnostic.CA2211.severity = none
-
-
-#### Wichtige EditorConfig-Optionen ####
-
-# Einzüge und Abstände
-indent_size = 4
-indent_style = space
-tab_width = 4
-
-# Einstellungen für neue Zeilen
-end_of_line = lf
-insert_final_newline = true
 
 #### .NET-Codierungskonventionen ####
 
@@ -122,7 +125,7 @@ dotnet_style_readonly_field = true
 dotnet_code_quality_unused_parameters = non_public
 
 # Unterdrückungseinstellungen
-dotnet_remove_unnecessary_suppression_exclusions = none
+dotnet_remove_unnecessary_suppression_exclusions = SYSLIB1045
 
 # Einstellungen für neue Zeilen
 dotnet_style_allow_multiple_blank_lines_experimental = true
@@ -157,7 +160,7 @@ csharp_style_prefer_switch_expression = true
 csharp_style_conditional_delegate_call = true
 
 # Einstellungen für Modifizierer
-csharp_prefer_static_local_function = true
+csharp_prefer_static_local_function = false
 csharp_preferred_modifier_order = public,private,protected,internal,extern,file,static,new,virtual,abstract,sealed,readonly,override,unsafe,required,volatile,async:warning
 csharp_style_prefer_readonly_struct = true
 csharp_style_prefer_readonly_struct_member = true
@@ -198,7 +201,7 @@ csharp_style_allow_embedded_statements_on_same_line_experimental = true
 #### C#-Formatierungsregeln ####
 
 # Einstellungen für neue Zeilen
-csharp_new_line_before_catch = false
+csharp_new_line_before_catch = true
 csharp_new_line_before_else = true
 csharp_new_line_before_finally = false
 csharp_new_line_before_members_in_anonymous_types = true
@@ -250,36 +253,71 @@ dotnet_naming_rule.interface_should_be_begins_with_i.severity = warning
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
 dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
 
-dotnet_naming_rule.types_should_be_pascal_case.severity = suggestion
-dotnet_naming_rule.types_should_be_pascal_case.symbols = types
-dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.generic_should_be_begins_with_t.severity = warning
+dotnet_naming_rule.generic_should_be_begins_with_t.symbols = type_parameter
+dotnet_naming_rule.generic_should_be_begins_with_t.style = begins_with_t
 
-dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = suggestion
-dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
-dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
+dotnet_naming_rule.types_and_members_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.types_and_members_should_be_pascal_case.symbols = types_and_members
+dotnet_naming_rule.types_and_members_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.local_functions_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.local_functions_should_be_camel_case.symbols = local_functions
+dotnet_naming_rule.local_functions_should_be_camel_case.style = camel_case
+
+dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel_case.symbols = locals
+dotnet_naming_rule.locals_should_be_camel_case.style = camel_case
+
+dotnet_naming_rule.protected_fields_should_be_begins_with_underscore.severity = suggestion
+dotnet_naming_rule.protected_fields_should_be_begins_with_underscore.symbols = protected_fields
+dotnet_naming_rule.protected_fields_should_be_begins_with_underscore.style = begins_with_underscore
 
 # Symbolspezifikationen
 
 dotnet_naming_symbols.interface.applicable_kinds = interface
-dotnet_naming_symbols.interface.applicable_accessibilities = public,internal,private,protected,protected_internal,private_protected
+dotnet_naming_symbols.interface.applicable_accessibilities = *
 dotnet_naming_symbols.interface.required_modifiers = 
 
-dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum
-dotnet_naming_symbols.types.applicable_accessibilities = public,internal,private,protected,protected_internal,private_protected
-dotnet_naming_symbols.types.required_modifiers = 
+dotnet_naming_symbols.type_parameter.applicable_kinds = type_parameter
+dotnet_naming_symbols.type_parameter.applicable_accessibilities = *
+dotnet_naming_symbols.type_parameter.required_modifiers = 
 
-dotnet_naming_symbols.non_field_members.applicable_kinds = property, event, method
-dotnet_naming_symbols.non_field_members.applicable_accessibilities = public,internal,private,protected,protected_internal,private_protected
-dotnet_naming_symbols.non_field_members.required_modifiers = 
+dotnet_naming_symbols.types_and_members.applicable_kinds = namespace,class,struct,enum,property,method,field,event,delegate
+dotnet_naming_symbols.types_and_members.applicable_accessibilities = *
+dotnet_naming_symbols.types_and_members.required_modifiers = 
+
+dotnet_naming_symbols.local_functions.applicable_kinds = local_function
+dotnet_naming_symbols.local_functions.applicable_accessibilities = *
+dotnet_naming_symbols.local_functions.required_modifiers = 
+
+dotnet_naming_symbols.locals.applicable_kinds = local
+dotnet_naming_symbols.locals.applicable_accessibilities = *
+dotnet_naming_symbols.locals.required_modifiers = 
+
+dotnet_naming_symbols.protected_fields.applicable_kinds = field
+dotnet_naming_symbols.protected_fields.applicable_accessibilities = internal,private,protected,protected_internal,private_protected
+dotnet_naming_symbols.protected_fields.required_modifiers = 
 
 # Benennungsstile
 
-dotnet_naming_style.pascal_case.required_prefix = 
-dotnet_naming_style.pascal_case.required_suffix = 
-dotnet_naming_style.pascal_case.word_separator = 
-dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style.camel_case.word_separator = 
 
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.pascal_case.word_separator = _
+
+dotnet_naming_style.begins_with_underscore.capitalization = pascal_case
+dotnet_naming_style.begins_with_underscore.word_separator = _
+dotnet_naming_style.begins_with_underscore.required_prefix = _
+dotnet_naming_style.begins_with_underscore.required_suffix = 
+
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+dotnet_naming_style.begins_with_i.word_separator = _
 dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
-dotnet_naming_style.begins_with_i.word_separator = 
-dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+dotnet_naming_style.begins_with_t.capitalization = pascal_case
+dotnet_naming_style.begins_with_t.word_separator = _
+dotnet_naming_style.begins_with_t.required_prefix = T
+dotnet_naming_style.begins_with_t.required_suffix = 

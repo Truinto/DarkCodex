@@ -950,6 +950,11 @@
         <member name="F:CodexLib.Helper._SetStackTrace">
             <summary>Source: https://stackoverflow.com/a/63685720</summary>
         </member>
+        <member name="M:CodexLib.Helper.IsEmptyKey(Kingmaker.Localization.LocalizedString)">
+            <summary>
+            Returns true, if LocalizedString is null, its key is empty or invalid, or the resolved localized string is empty.
+            </summary>
+        </member>
         <member name="M:CodexLib.Helper.CreateString(System.String,System.String,System.String)">
             <summary>
             Create a new LocalizedString. If key is empty, then a new key is generate based on the string's SHA1 value.<br />
@@ -1358,10 +1363,21 @@
             Can handle multiple different types and will recursively resolve collections.
             </summary>
         </member>
+        <member name="M:CodexLib.Helper.ToAny(System.Object)">
+            <inheritdoc cref="M:CodexLib.AnyRef.ToAny(System.Object)" />
+        </member>
+        <member name="M:CodexLib.Helper.ToAny(System.Object[])">
+            <inheritdoc cref="M:CodexLib.Helper.ToAny(System.Collections.Generic.IEnumerable{System.Object})" />
+        </member>
         <member name="M:CodexLib.Helper.ToAny(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Converts a collection of strings, references, and blueprints into a AnyRef reference type.<br />
             Can handle multiple different types and will recursively resolve collections.
+            </summary>
+        </member>
+        <member name="M:CodexLib.Helper.Get``1(System.Collections.Generic.IEnumerable{CodexLib.AnyRef})">
+            <summary>
+            Converts a collection of AnyRef into a collection of blueprints. Filters any null values.
             </summary>
         </member>
         <member name="M:CodexLib.Helper.AddBuffStacking(Kingmaker.EntitySystem.Entities.UnitEntityData,Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff,Kingmaker.UnitLogic.Mechanics.MechanicsContext,System.Nullable{System.TimeSpan})">
@@ -1798,64 +1814,6 @@
         <member name="M:Shared.LocalizedStringCached.op_Implicit(System.String)~Shared.LocalizedStringCached">
             <inheritdoc cref="T:Shared.LocalizedStringCached" />
         </member>
-        <member name="T:Shared.BaseSettings`1">
-            <summary>
-            Inherit this class in your settings class. Implements basic load/save functions.
-            </summary>
-            <typeparam name="T">Class that contains settings.</typeparam>
-        </member>
-        <member name="P:Shared.BaseSettings`1.Version">
-            <summary>File version. Overwrite this in the constructor.</summary>
-        </member>
-        <member name="P:Shared.BaseSettings`1.NewFeatureDefaultOn">
-            <summary>Whenever new features should be considered on by default.</summary>
-        </member>
-        <member name="P:Shared.BaseSettings`1.Blacklist">
-            <summary>Collection of features explicitly turned off.</summary>
-        </member>
-        <member name="P:Shared.BaseSettings`1.Whitelist">
-            <summary>Collection of features explicitly turned on.</summary>
-        </member>
-        <member name="F:Shared.BaseSettings`1.FilePath">
-            <summary>File path to load from / save to.</summary>
-        </member>
-        <member name="F:Shared.BaseSettings`1.JSettings">
-            <summary>Serialization settings.</summary>
-        </member>
-        <member name="M:Shared.BaseSettings`1.OnUpdate">
-            <summary>
-            Called, if file version is different from current version. Return true, if file should be saved.
-            </summary>
-        </member>
-        <member name="M:Shared.BaseSettings`1.TrySave">
-            <summary>
-            Try save file.
-            </summary>
-        </member>
-        <member name="M:Shared.BaseSettings`1.TryLoad(System.String,System.String)">
-            <summary>
-            Try load file. Creates new file, if loading failed for any reason.
-            </summary>
-            <param name="path">Path settings should be saved.</param>
-            <param name="file">Name of settings file. Should include file extension.</param>
-        </member>
-        <member name="T:Shared.ISettings">
-            <summary>
-            Abstract settings interface.
-            </summary>
-        </member>
-        <member name="P:Shared.ISettings.Version">
-            <summary>File version.</summary>
-        </member>
-        <member name="P:Shared.ISettings.NewFeatureDefaultOn">
-            <summary>Whenever new features should be considered on by default.</summary>
-        </member>
-        <member name="P:Shared.ISettings.Blacklist">
-            <summary>Collection of features explicitly turned off.</summary>
-        </member>
-        <member name="P:Shared.ISettings.Whitelist">
-            <summary>Collection of features explicitly turned on.</summary>
-        </member>
         <member name="T:Shared.TranspilerTool">
             <summary>
             Tool to automate transpiler modifications.
@@ -2190,7 +2148,7 @@
                 <b>object Function(object object_instance, object parameter0, object parameter1..., [object __instance], [object arg0], [object arg1...])</b>
             </param>
             <remarks>
-            The current line may contain a method call or field access.<br />
+            The current line may contain a method call, field access, or load constant.<br />
             The delegate may define any of the original parameters, locals, and __instance (if non-static), but only after the replacement parameters.<br />
             These optional parameters are matched by name, with <see cref="T:Shared.LocalParameterAttribute" />, or with <see cref="T:Shared.OriginalParameterAttribute" />.<br />
             If <see cref="T:Shared.LocalParameterAttribute" /> doesn't match any existing locals, then a new one is generated. Non matching parameters will throw.<br />
@@ -2231,18 +2189,34 @@
         </member>
         <member name="M:Shared.TranspilerTool.ReplaceAllConstant(System.Enum,System.Enum,System.Int32,System.Int32)">
             <summary>
-            Change load to a new value. Can be any integer type. Throws if current isn't OpCode.Ldc_i.<br />
+            Change load to a new value. Can be any integer type.<br />
             Optionally define start and end index.<br /><b>0 and 1 may change boolean values too.</b></summary>
         </member>
         <member name="M:Shared.TranspilerTool.ReplaceAllConstant(System.Int64,System.Int64,System.Int32,System.Int32)">
             <summary>
-            Change load to a new value. Can be any integer type. Throws if current isn't OpCode.Ldc_i.<br />
+            Change load to a new value. Can be any integer type.<br />
             Optionally define start and end index.<br /><b>0 and 1 may change boolean values too.</b></summary>
         </member>
         <member name="M:Shared.TranspilerTool.ReplaceAllConstant(System.Double,System.Double,System.Int32,System.Int32)">
             <summary>
-            Change load to a new value. Can be any float-point type. Throws if current isn't OpCode.Ldc_r.<br />
+            Change load to a new value. Can be any float-point type.<br />
             Optionally define start and end index.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.ReplaceAllConstant(System.Enum,System.Delegate)">
+            <summary>
+            Change load to a new value. Can be any integer type.<br />
+            Replaced by call.<br /><b>0 and 1 may change boolean values too.</b></summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.ReplaceAllConstant(System.Int64,System.Delegate)">
+            <summary>
+            Change load to a new value. Can be any integer type.<br />
+            Replaced by call.<br /><b>0 and 1 may change boolean values too.</b></summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.ReplaceAllConstant(System.Double,System.Delegate)">
+            <summary>
+            Change load to a new value. Can be any float-point type.<br />
+            Replaced by call.
             </summary>
         </member>
         <member name="M:Shared.TranspilerTool.ReplaceNOP">
@@ -2383,7 +2357,7 @@
             <summary>Collection of Ldc_r opcodes.</summary>
         </member>
         <member name="F:Shared.TranspilerTool.OpCode_Member">
-            <summary>Collection of member opcodes.</summary>
+            <summary>Collection of member opcodes, which are allowed on <see cref="M:Shared.TranspilerTool.ReplaceCall(System.Delegate)" />.</summary>
         </member>
         <member name="M:Shared.TranspilerTool.op_Increment(Shared.TranspilerTool)">
             <summary>
@@ -2410,6 +2384,11 @@
             <param name="generics">Only for methods.</param>
         </member>
         <member name="M:Shared.TranspilerTool.GetStackChange(System.Reflection.Emit.StackBehaviour)">
+            <summary>
+            Returns value of stack change. Zero has no change. Negative values pop from stack. Positive values push to stack.
+            </summary>
+        </member>
+        <member name="M:Shared.TranspilerTool.GetStackChange(System.Reflection.Emit.StackBehaviour,System.Object)">
             <summary>
             Returns value of stack change. Zero has no change. Negative values pop from stack. Positive values push to stack.
             </summary>
@@ -2544,16 +2523,6 @@
         <member name="M:Shared.LocalInfo.op_Implicit(Shared.LocalInfo)~System.Int32">
             <summary />
         </member>
-        <member name="T:Shared.AttributesNS.MaybeNull">
-            <summary>
-            Parameter attribute. Given parameter can be null.
-            </summary>
-        </member>
-        <member name="T:Shared.AttributesNS.NeverNull">
-            <summary>
-            Parameter attribute. Given parameter must not be null.
-            </summary>
-        </member>
         <member name="T:Shared.LoggerNS.Logger">
             <summary>
             Methods to print to standard output.
@@ -2594,6 +2563,11 @@
             Returns collection count or iterates and counts through all elements.
             </summary>
         </member>
+        <member name="M:Shared.CollectionNS.CollectionTool.TryGet``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0,System.Boolean},``0@)">
+            <summary>
+            Search collection for an element by predicate.
+            </summary>
+        </member>
         <member name="M:Shared.CollectionNS.CollectionTool.Get``1(System.Collections.IEnumerable)">
             <summary>
             Gets the first element that is of type <typeparamref name="T" />.
@@ -2607,7 +2581,7 @@
         <member name="M:Shared.CollectionNS.CollectionTool.IsTypeCompatible(System.Type,System.Type)">
             <summary>
             Checks if right type can be assigned to left type. <br />
-            Works similiar to IsAssignableFrom, but will returns false for ValueTypes (which need boxing) and void (which overflows the stack).     
+            Works similiar to IsAssignableFrom, but will returns false for non-identical ValueTypes (which need boxing) and void (which overflows the stack).     
             </summary>
         </member>
         <member name="M:Shared.CollectionNS.CollectionTool.GetIndex``1(System.Collections.IEnumerable,System.Func{``0,System.Boolean})">

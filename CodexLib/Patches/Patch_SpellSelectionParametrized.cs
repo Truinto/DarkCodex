@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Craft;
@@ -102,7 +102,6 @@ namespace CodexLib.Patches
                         if (spell.Hidden
                             || spell.m_Parent.NotEmpty()
                             || spell.GetComponent<SpellListComponent>() == null
-                            || spell.GetComponent<CraftInfoComponent>() == null
                             || spell.m_DisplayName.IsEmptyKey())
                         {
                             continue;
